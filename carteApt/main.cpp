@@ -143,6 +143,8 @@ int main(int argc, char *argv[])
                         lay->SetFeature(poFeature);
                     }
                     GDALClose(mDS);
+                } else {
+                    std::cout << " impossible d'ouvrir le dataset, vérifier le fichier " << file << std::endl;
                 }
             } else {
                 std::cout << " renseignez une valeur pour gpkg et layerCode" << std::endl;

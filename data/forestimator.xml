@@ -839,5 +839,8 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
   <message id="dendro.mean.dendro_cdom"> Circonférence dominante Moyenne [cm]</message> 
   <message id="dendro.mean.dendro_hdom"> Hauteur dominante moyenne [m]</message>
   <message id="dendro.mean.dendro_prop_fe"> Moyenne [%]</message>
+  
+  <message id="readme.download.layer">Vous avez téléchargé une couche découpée sur une zone bien précise pour votre usage sous Système d'Information Géographique. Vous pouvez également télécharger la couche cartographique pour l'ensemble de la région wallonne depuis l'adresse  {1} </message>
+  
 
 </messages>

@@ -458,11 +458,30 @@ void layerBase::createRasterColorInterpPalette(GDALRasterBand * aBand){
     e.c3=col->mB;
     colors.SetColorEntry(kv.first,&e);
     }
-    if (globTest){
-        std::cout << " colorTable have " << colors.GetColorEntryCount() << " entries" << std::endl;
-    }
+
+    //std::cout << "get number of entry " << colors.GetColorEntryCount() << " of colortable" << std::endl; -> dicoCol.size, ok
+    //aBand->GetColorTable()->GetColorEntryCount() -> always 255 for 8 bits
 
     aBand->SetColorTable(&colors);
+
+    // ne fonctionne pas du tout pour l'instant
+    if (false & mTypeVar==TypeVar::Classe){
+        GDALRasterAttributeTableH poRAT =GDALCreateRasterAttributeTable();
+        //GDALRasterAttributeTableH poRAT =reinterpret_cast<GDALRasterAttributeTableH>(aBand->GetDefaultRAT( ));
+        GDALRATInitializeFromColorTable(poRAT, reinterpret_cast<GDALColorTableH>(&colors));
+        //GDALRATSetTableType(poRAT,GRTT_THEMATIC);
+        GDALRATCreateColumn(poRAT,"label",GFT_String,GFU_Name);
+        //GDALRATSetRowCount(poRAT,mDicoVal.size());
+        int c(0);
+        for (auto kv : mDicoVal){
+            GDALRATSetValueAsString(poRAT,c,0,kv.second.c_str());
+            c++;
+        }
+        //CPLErr er = aBand->SetDefaultRAT( reinterpret_cast<GDALRasterAttributeTable*>(poRAT));
+        //GDALRasterAttributeTableH poRAT2 =reinterpret_cast<GDALRasterAttributeTableH>(aBand->GetDefaultRAT( ));
+        //std::cout << " row count of RAT " <<  GDALRATGetRowCount(poRAT2) << std::endl;
+        std::cout << "changes written " << GDALRATChangesAreWrittenToFile(poRAT)<< std::endl;
+    }
 }
 
 void layerBase::edit_ColorInterpPalette(){
@@ -753,6 +772,7 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
 
         OGREnvelope ext;
         poGeom->getEnvelope(&ext);
+
         double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
 
         GDALDataset * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
@@ -766,6 +786,19 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             OGRSpatialReference oSRS;
             oSRS.importFromWkt(&pszWkt);
 
+            /*if (globTest){
+
+                char *ppszProj4A = nullptr;
+                char *ppszProj4B = nullptr;
+
+                oSRS.exportToPrettyWkt(& ppszProj4A);
+
+                OGRSpatialReference * oSRS2 = poGeom->getSpatialReference();
+                oSRS2->exportToProj4(& ppszProj4B);
+                std::cout << "SRS raster : " <<  ppszProj4A << std::endl;
+                std::cout << "SRS vector : " << ppszProj4B  << std::endl;
+                CPLFree(ppszProj4A);
+            }*/
             // driver et dataset shp -- creation depuis la géométrie
             GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("Memory");
             char name[L_tmpnam];
@@ -776,14 +809,12 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             //pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
             pShp = pShpDriver->Create(name1.c_str(), 0, 0, 0, GDT_Unknown, NULL );// avoir des noms unique si je veux fontionner en parrallel computing
             // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
-            //mais c'est parceque avant j'utilisais  OGRErr err=src.SetWellKnownGeogCS( "EPSG:31370" );
 
             OGRLayer * lay = pShp->CreateLayer(name2.c_str(),&oSRS,wkbPolygon,NULL);
 
             OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
             feat->SetGeometry(poGeom);
             lay->CreateFeature(feat);
-            //delete feat;
 
             double transform[6];
             mGDALDat->GetGeoTransform(transform);
@@ -864,6 +895,7 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
             int ySize = round(height/pixelHeight);
             int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
             int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
+            //if (yOffset<0){  std::cout << "y offset pour computeStatOn Poly " << yOffset << ", pix Heigth is  " << pixelHeight << ", "<< yOrigin << ", ext.maxy" << ext.MaxY << std::endl;}
 
             float *scanline, *scanlineMask;
             scanline = (float *) CPLMalloc( sizeof( float ) * xSize );

@@ -78,14 +78,18 @@ int launchForestimator(int argc, char **argv)
             std::string aCode = kv.first;
             if (l->rasterExist())
             {
-                layerResource *fileResource = new layerResource(l);
+                layerResource *fileResource = new layerResource(l,dico);
                 fileResource->suggestFileName(l->NomFileWithExt());
                 // if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
                 server.addResource(fileResource, "/telechargement/" + aCode);
                 // fichier de symbologie
-                layerResource *fileResource2 = new layerResource(l, 1);
+                layerResource *fileResource2 = new layerResource(l, dico,1);
                 fileResource2->suggestFileName(l->NomFile() + ".qml");
                 server.addResource(fileResource2, "/telechargement/" + aCode + "qml");
+                // table dictionnaire
+                layerResource *fileResource3 = new layerResource(l,dico, 2);
+                fileResource3->suggestFileName(l->NomFile() + "_dico.csv");
+                server.addResource(fileResource3, "/telechargement/" + aCode + "dico");
             }
         }
 
@@ -105,9 +109,9 @@ int launchForestimator(int argc, char **argv)
         fileResource->suggestFileName("ACR.db");
         server.addResource(fileResource, "/telechargement/ACR");
 
-        Wt::WFileResource *fileResource4 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/invitationCarrefourForestier2025.pdf");
+        /*Wt::WFileResource *fileResource4 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/invitationCarrefourForestier2025.pdf");
         fileResource4->suggestFileName("invitationCarrefourForestier2025.pdf");
-        server.addResource(fileResource4, "/CF");
+        server.addResource(fileResource4, "/CF");*/
 
         Wt::WFileResource *fileResource5 = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "OGF.db");
         fileResource5->suggestFileName("OGF.db");
@@ -197,33 +201,24 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
 
 void layerResource::handleRequest(const Http::Request &request, Http::Response &response)
 {
-    // std::cout << "fichier " << ml->getPathTif() << std::endl;
-    //  création des archives zip avec la carte + la symbologie
 
-    // std::string archiveName=ml->Dico()->File("OUTDIR")+ml->NomFile()+".zip";
     std::string archiveName = ml->getPathTif();
-    if (mQml)
+    if (mQmlDico==1)
     {
         archiveName = ml->symbology();
-    }
 
-    if (!boost::filesystem::exists(archiveName))
-    {
-        /*if (globTest){std::cout << "create archive pour raster complet " << std::endl;}
-        ZipArchive* zf = new ZipArchive(archiveName);
-        zf->open(ZipArchive::WRITE);
-        zf->addFile(ml->NomFileWithExt(),ml->getPathTif());
-        if (ml->hasSymbology()){zf->addFile(ml->NomFile()+".qml",ml->symbology());}
-        zf->close();
-        delete zf;
-        }*/
+    } else if (mQmlDico==2){
+        // création du dictionnaire (fichier temporaire)
+        boost::filesystem::path tmpPath = boost::filesystem::path(mDico->File("TMPDIR")) / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.csv");
+        std::ofstream out(tmpPath, std::ios::app);
+        out << "Valeur Numérique Raster;Signification\n";
+        out << ml->getDicoValStr();
+        out.close();
+        archiveName = tmpPath.c_str();
     }
 
     std::ifstream r(archiveName.c_str(), std::ios::in | std::ios::binary);
-
     handleRequestPiecewise(request, response, r);
-
-    // openfileBug
     r.close();
 }
 

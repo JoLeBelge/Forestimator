@@ -7,6 +7,7 @@
 // pour les vecteurs
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
+#include "gdal_priv.h"
 #include <numeric>
 #include "color.h"
 
