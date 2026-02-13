@@ -394,10 +394,11 @@ class PoiMarker {
 GeometricLayer get selLay => geoLayers[selectedGeoLayer];
 pol.Geometry get selGeo => selLay.geometries[selLay.selectedGeometry];
 
-bool get layerReady => selectedGeoLayer > -1 && geoLayers.isNotEmpty;
+bool get layerReady => selectedGeoLayer > -1 && selectedGeoLayer < geoLayers.length && geoLayers.isNotEmpty;
 bool get geoReady =>
     layerReady &&
     geoLayers[selectedGeoLayer].selectedGeometry > -1 &&
+    geoLayers[selectedGeoLayer].selectedGeometry < geoLayers[selectedGeoLayer].geometries.length &&
     geoLayers[selectedGeoLayer].geometries.isNotEmpty;
 
 double get eqPx => dsp.equipixel;

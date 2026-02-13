@@ -208,7 +208,7 @@ class _MapPageState extends State<MapPage> {
 
   void refreshView(void Function() f) async {
     _mapFrameCounter++;
-    setState(f);
+    mounted ? setState(f) : f();
   }
 
   LatLng latlonBL = LatLng(0.0, 0.0);
@@ -271,13 +271,20 @@ class _MapPageState extends State<MapPage> {
                                 epsg4326.transform(epsg31370, proj4.Point(x: point.longitude, y: point.latitude)),
                               );
                               _pt = point;
+                              gl.refreshStack(() {
+                                gl.stack.add(
+                                  "anaPres",
+                                  AnaResultsMenu(() {
+                                    refreshView(() {});
+                                  }, gl.requestedLayers),
+                                  Duration(milliseconds: 400),
+                                  gl.Anim.searchAnimOnScreenPos,
+                                  Offset(0, -2000),
+                                );
+                              });
                               refreshView(() {
                                 _doingAnaPt = false;
                               });
-                              PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
-                                refreshView(() {});
-                              });
-                              gl.refreshStack(() {});
                             }
                           },
                           onTap:
@@ -599,9 +606,8 @@ class _MapPageState extends State<MapPage> {
                       forestimatorAnalysisToolbar,
                       _mainMenuBar(),
                     ] +
-                    gl.mainStack +
                     [if (gl.modeDevelopper && gl.Mode.debugScanlines) lt.gridlines()] +
-                    gl.stack.widgets,
+                    List<Widget>.from(gl.stack.widgets.reversed),
               );
             },
           ),
@@ -2549,8 +2555,16 @@ class _MapPageState extends State<MapPage> {
                   _doingAnaPt = true;
                 });
                 await _runAnaPt(epsg4326.transform(epsg31370, proj4.Point(x: _pt!.longitude, y: _pt!.latitude)));
-                PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
-                  refreshView(() {});
+                gl.refreshStack(() {
+                  gl.stack.add(
+                    "anaPres",
+                    AnaResultsMenu(() {
+                      refreshView(() {});
+                    }, gl.requestedLayers),
+                    Duration(milliseconds: 400),
+                    gl.Anim.searchAnimOnScreenPos,
+                    Offset(0, -2000),
+                  );
                 });
                 refreshView(() {
                   _doingAnaPt = false;
@@ -2808,7 +2822,6 @@ class _MapPageState extends State<MapPage> {
   void _closeSwitchesMenu() {
     gl.stack.pop("LayerSwitcher");
     _modeLayerSwitches = false;
-    gl.mainStackPopLast();
   }
 
   Widget _mainMenuBar({bool dummy = false, VoidCallback? close}) {
@@ -3016,8 +3029,16 @@ class _MapPageState extends State<MapPage> {
                                       ),
                                     );
                                     _updatePtMarker(LatLng(gl.position.latitude, gl.position.longitude));
-                                    PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
-                                      refreshView(() {});
+                                    gl.refreshStack(() {
+                                      gl.stack.add(
+                                        "anaPres",
+                                        AnaResultsMenu(() {
+                                          refreshView(() {});
+                                        }, gl.requestedLayers),
+                                        Duration(milliseconds: 400),
+                                        gl.Anim.searchAnimOnScreenPos,
+                                        Offset(0, -2000),
+                                      );
                                     });
                                     refreshView(() {
                                       _doingAnaPt = false;
@@ -3084,25 +3105,7 @@ class _MapPageState extends State<MapPage> {
                           setState(() {
                             gl.Mode.recordPath = !gl.Mode.recordPath;
                             _modeAnaPtPreview = !gl.Mode.recordPath;
-                            if (gl.Mode.recordPath) {
-                              /*gl.mainStack.add(
-                                popupPathListMenu(
-                                  gl.notificationContext!,
-                                  gl.selGeo.name,
-                                  (LatLng pos) {
-                                    if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                                      _mapController.move(pos, _mapController.camera.zoom);
-                                    }
-                                  },
-                                  () {
-                                    refreshView(() {
-                                      gl.Mode.recordPath = !gl.Mode.recordPath;
-                                    });
-                                  },
-                                ),
-                              );
-                              refreshView(() {});*/
-                            }
+                            if (gl.Mode.recordPath) {}
                           });
                         },
                         icon: Icon(Icons.nordic_walking),

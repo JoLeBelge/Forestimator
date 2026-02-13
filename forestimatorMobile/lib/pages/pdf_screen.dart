@@ -21,10 +21,13 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          PDFView(
+    return Stack(
+      alignment: AlignmentGeometry.bottomRight,
+      children: <Widget>[
+        SizedBox(
+          width: gl.eqPx * gl.eqPxW * .99,
+          height: gl.eqPx * gl.eqPxH * .9,
+          child: PDFView(
             filePath: widget.path,
             enableSwipe: true,
             swipeHorizontal: true,
@@ -61,45 +64,30 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
               });
             },
           ),
-          Row(
-            children: [
-              TextButton(
-                child: Stack(
-                  children: [
-                    Icon(Icons.arrow_back, color: Colors.black, size: gl.iconSizeM * gl.eqPx),
-                    Icon(Icons.arrow_back, color: Colors.white, size: gl.iconSizeM * (gl.eqPx - .2)),
-                  ],
-                ),
-                onPressed: () {
-                  gl.mainStackPopLast();
-                  gl.refreshStack(() {});
-                },
-              ),
-              //IconButton(icon: Icon(Icons.share), onPressed: () {}),
-            ],
+        ),
+        errorMessage.isEmpty
+            ? !isReady
+                ? Center(child: CircularProgressIndicator())
+                : Container()
+            : Center(child: Text(errorMessage)),
+        Container(
+          alignment: AlignmentGeometry.bottomLeft,
+          child: FutureBuilder<PDFViewController>(
+            future: _controller.future,
+            builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
+              if (snapshot.hasData) {
+                return FloatingActionButton.extended(
+                  label: Text("Aller à la page ${pages! ~/ 2}"),
+                  onPressed: () async {
+                    await snapshot.data!.setPage(pages! ~/ 2);
+                  },
+                );
+              }
+              return Container();
+            },
           ),
-          errorMessage.isEmpty
-              ? !isReady
-                  ? Center(child: CircularProgressIndicator())
-                  : Container()
-              : Center(child: Text(errorMessage)),
-        ],
-      ),
-      floatingActionButton: FutureBuilder<PDFViewController>(
-        future: _controller.future,
-        builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
-          if (snapshot.hasData) {
-            return FloatingActionButton.extended(
-              label: Text("Aller à la page ${pages! ~/ 2}"),
-              onPressed: () async {
-                await snapshot.data!.setPage(pages! ~/ 2);
-              },
-            );
-          }
-
-          return Container();
-        },
-      ),
+        ),
+      ],
     );
   }
 }

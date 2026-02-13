@@ -18,17 +18,17 @@ class ForestimatorStack {
   int indexPriority(int priority) =>
       stack.isEmpty
           ? 0
-          : priorities.firstWhere((int p) {
-            return p <= priority;
+          : priorities.indexWhere((int p) {
+            return (p <= priority);
           });
 
   void add(String id, Widget it, Duration duration, Offset onScreen, Offset offScreen, {int? priority}) {
     if (ids.contains(id)) return;
     stack.insert(
-      indexPriority(priority ?? 0),
+      indexPriority(priority ?? stack.length * 10),
       StackAnimated(
         positions: <Offset>[Offset(offScreen.dx, offScreen.dy), onScreen, offScreen],
-        priority: priority ?? 0,
+        priority: priority ?? stack.length * 10,
         id: id,
         duration: duration,
         child: it,
@@ -46,10 +46,12 @@ class ForestimatorStack {
       it.positions[0] = it.positions[2];
     });
     Timer(it.duration, () {
-      stack.removeWhere((StackAnimated a) {
-        return a.id == id;
+      gl.refreshStack(() {
+        stack.removeWhere((StackAnimated a) {
+          return a.id == id;
+        });
+        animStates.remove(id);
       });
-      animStates.remove(id);
     });
   }
 

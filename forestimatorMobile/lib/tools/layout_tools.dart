@@ -185,6 +185,7 @@ class ForestimatorScrollView extends StatefulWidget {
     this.horizontal = false,
     this.arrowColor,
     this.sizeArrows,
+    this.scrollbar = false,
   });
   final double? height;
   final double? width;
@@ -193,6 +194,7 @@ class ForestimatorScrollView extends StatefulWidget {
   final bool horizontal;
   final Color? arrowColor;
   final double? sizeArrows;
+  final bool scrollbar;
 
   @override
   State<StatefulWidget> createState() => _ForestimatorScrollView();
@@ -244,36 +246,73 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
       height: height,
       child: Stack(
         children: [
-          SingleChildScrollView(
+          Scrollbar(
+            scrollbarOrientation: widget.horizontal ? ScrollbarOrientation.bottom : ScrollbarOrientation.right,
+            thickness: widget.horizontal ? height * .03 : width * .03,
             controller: _controller,
-            padding: EdgeInsets.zero,
-            reverse: widget.reverse,
-            scrollDirection: widget.horizontal ? Axis.horizontal : Axis.vertical,
-            child: widget.child,
+            child: SingleChildScrollView(
+              controller: _controller,
+              padding: EdgeInsets.zero,
+              reverse: widget.reverse,
+              scrollDirection: widget.horizontal ? Axis.horizontal : Axis.vertical,
+              child: widget.child,
+            ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                height: height,
-                width: sizeArrows,
-                child:
-                    !_atTop
-                        ? Icon(Icons.arrow_left_outlined, color: widget.arrowColor ?? Colors.red, size: sizeArrows)
-                        : Container(),
+          widget.horizontal
+              ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    height: height,
+                    width: sizeArrows,
+                    child:
+                        !_atTop
+                            ? Icon(Icons.arrow_left_outlined, color: widget.arrowColor ?? Colors.red, size: sizeArrows)
+                            : Container(),
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    height: height,
+                    width: sizeArrows,
+                    child:
+                        !_atBottom
+                            ? Icon(Icons.arrow_right_outlined, color: widget.arrowColor ?? Colors.red, size: sizeArrows)
+                            : Container(),
+                  ),
+                ],
+              )
+              : Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    alignment: Alignment.topCenter,
+                    height: sizeArrows,
+                    width: width,
+                    child:
+                        !_atTop
+                            ? Icon(
+                              Icons.arrow_drop_up_outlined,
+                              color: widget.arrowColor ?? Colors.red,
+                              size: sizeArrows,
+                            )
+                            : Container(),
+                  ),
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    height: sizeArrows,
+                    width: width,
+                    child:
+                        !_atBottom
+                            ? Icon(
+                              Icons.arrow_drop_down_outlined,
+                              color: widget.arrowColor ?? Colors.red,
+                              size: sizeArrows,
+                            )
+                            : Container(),
+                  ),
+                ],
               ),
-              Container(
-                alignment: Alignment.centerRight,
-                height: height,
-                width: sizeArrows,
-                child:
-                    !_atBottom
-                        ? Icon(Icons.arrow_right_outlined, color: widget.arrowColor ?? Colors.red, size: sizeArrows)
-                        : Container(),
-              ),
-            ],
-          ),
         ],
       ),
     );
