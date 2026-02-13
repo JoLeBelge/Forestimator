@@ -8,7 +8,7 @@ ROBUSTESSE - Forestimator Web
 -système de vérification de la disponibilité des couches WMSs
 -système de vérification de la dispo de nominatim
 -système de vérification de la dispo du serveur collect
--cookies manager/ cookiesconsent in forestimator
+-cookies manager/ cookiesconsent in forestimator web
 
 CONSOLIDATION 
 
@@ -18,16 +18,12 @@ CONSOLIDATION
 
 COMMUNICATION/ DOCUMENTATION
 
--tutoriel pdf -> Jo termine une fois que les dev actuel sont finio
+-tutoriel pdf -> Jo termine une fois que les dev actuel sont fini
 
 -vidéo d'utilisation : après la rédaction du manuel et des développements "observation composition"
 
 NOUVELLES OPTIONS - LONG TERME
 
--gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
+-gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend (calculé depuis un polygone de préférence). puis des couches offlines sur cet extend.
 
--Acquisitions terrains synchronisées dans une BD sur le serveur
---> point avec annotation, photo
---> polygone
-Requiert un module d'authentification et un outils de versionning
 
