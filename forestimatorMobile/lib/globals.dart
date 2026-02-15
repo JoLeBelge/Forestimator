@@ -100,10 +100,9 @@ class UserData {
 }
 
 class Anim {
-  static Offset searchBoxPos = Offset(dsp.alignX(-eqPxW), dsp.alignY(eqPxH * .5));
-  static Offset get searchAnimOnScreenPos =>
-      Offset(dsp.alignX(-eqPxW * .5 + 0), dsp.alignY(eqPxH * .5 - menuBarThickness));
-  static Offset get searchAnimOffScreenPos => Offset(dsp.alignX(-eqPxW), dsp.alignY(eqPxH * .5 - menuBarThickness));
+  static Offset get onScreenPosCenter => Offset(0, 0);
+  static Offset get offScreenPosMessages => Offset(0, -400);
+  static Offset get offScreenPosWindows => Offset(0, -6666);
 }
 
 class Mode {
@@ -168,6 +167,7 @@ class Mode {
 
 class Display {
   double paddingTop = -1;
+  double paddingBot = -1;
   double width = -1;
   double height = -1;
   double dpi = -1;
@@ -180,16 +180,21 @@ class Display {
   Display.empty();
 
   double alignX(double px) => (2.0 / width) * (equipixel * px);
-  double alignY(double px) => (2.0 / (height + paddingTop * 2)) * (equipixel * px);
+  double alignY(double px) => (2.0 / height) * (equipixel * px);
+
+  double get eqAlignTop => paddingTop / equipixel * 2 - equiheight / 2;
+  double get eqlignBottom => -paddingBot / equipixel * 2 + equiheight / 2;
+
+  double get eqMaxWindowHeight => (height - paddingTop - paddingBot) / equipixel;
 
   Display(BuildContext context) {
     paddingTop = MediaQuery.of(context).padding.top;
+    paddingTop = MediaQuery.of(context).padding.bottom;
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     aspect = MediaQuery.of(context).size.aspectRatio;
     dpi = MediaQuery.of(context).devicePixelRatio;
     orientation = MediaQuery.of(context).orientation;
-    print(paddingTop);
     //_tabletMode();
     //_squareMode();
     _enforceEquiWidthHeight();
@@ -780,16 +785,6 @@ Map<int, int> lutVulnerabiliteCS = {
   12: 4,
   13: 7,
 };
-
-List<Widget> mainStack = [];
-
-void mainStackPopLast() {
-  if (mainStack.isNotEmpty) {
-    mainStack.removeLast();
-  } else {
-    print("Error: Stack is empty, cannot pop last element!");
-  }
-}
 
 ForestimatorStack stack = ForestimatorStack();
 

@@ -7,8 +7,17 @@ class PDFScreen extends StatefulWidget {
   final String path;
   final String titre;
   final int currentPage;
+  final double width;
+  final double height;
 
-  const PDFScreen({super.key, required this.path, required this.titre, this.currentPage = 0});
+  const PDFScreen({
+    super.key,
+    required this.path,
+    required this.titre,
+    this.currentPage = 0,
+    required this.width,
+    required this.height,
+  });
   @override
   State<StatefulWidget> createState() => _PDFScreenState();
 }
@@ -25,9 +34,10 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
       alignment: AlignmentGeometry.bottomRight,
       children: <Widget>[
         SizedBox(
-          width: gl.eqPx * gl.eqPxW * .99,
-          height: gl.eqPx * gl.eqPxH * .9,
+          width: widget.width,
+          height: widget.height,
           child: PDFView(
+            backgroundColor: Colors.transparent,
             filePath: widget.path,
             enableSwipe: true,
             swipeHorizontal: true,

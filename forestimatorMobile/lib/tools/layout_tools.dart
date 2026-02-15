@@ -319,7 +319,7 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
   }
 }
 
-Widget forestimatorBackButton(VoidCallback after, IconData icon) {
+Widget forestimatorButton(VoidCallback after, IconData icon, {double? iconSize}) {
   return Stack(
     alignment: AlignmentGeometry.center,
     children: [
@@ -334,7 +334,7 @@ Widget forestimatorBackButton(VoidCallback after, IconData icon) {
         onPressed: () {
           after();
         },
-        icon: Icon(icon, color: Colors.black, size: gl.eqPx * gl.iconSizeS),
+        icon: Icon(icon, color: Colors.black, size: iconSize ?? gl.eqPx * gl.iconSizeS),
       ),
     ],
   );

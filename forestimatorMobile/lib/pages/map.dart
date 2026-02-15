@@ -61,37 +61,38 @@ class _MapPageState extends State<MapPage> {
   ScrollController propertiesTableScrollController = ScrollController();
 
   Offset _layToolBoxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0));
-  Offset get _layToolBoxAnimOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0));
+  Offset get _layToolBoxAnimOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _layToolBoxAnimOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-250));
   Offset get _layToolBoxAnimUnderListPos =>
       Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.eqPxH / 2.0 + computePolygonTitleHeight() * 3));
 
-  Offset _mainMenuSettingsBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset _mainMenuSettingsBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuSettingsAnimOnScreenPos =>
-      Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(-gl.eqPxH * .5));
-  Offset get _mainMenuSettingsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
+      Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(gl.dsp.eqAlignTop));
+  Offset get _mainMenuSettingsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _mainMenuEssenceBoxPos = Offset(gl.dsp.alignX(-33), gl.dsp.alignY(-gl.eqPxH * .5));
-  Offset get _mainMenuEssenceAnimOnScreenPos => Offset(gl.dsp.alignX(-33), gl.dsp.alignY(-gl.eqPxH * .5));
-  Offset get _mainMenuEssenceAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset _mainMenuEssenceBoxPos = Offset(gl.dsp.alignX(-33), gl.dsp.alignY(gl.dsp.eqAlignTop));
+  Offset get _mainMenuEssenceAnimOnScreenPos => Offset(gl.dsp.alignX(-33), gl.dsp.alignY(gl.dsp.eqAlignTop));
+  Offset get _mainMenuEssenceAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _mainMenuWarningsBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(-gl.eqPxH * .5));
-  Offset get _mainMenuWarningsAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(-gl.eqPxH * .5));
-  Offset get _mainMenuWarningsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset _mainMenuWarningsBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(gl.dsp.eqAlignTop));
+  Offset get _mainMenuWarningsAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(gl.dsp.eqAlignTop));
+  Offset get _mainMenuWarningsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _mainMenuOnOfflineBoxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH * .5));
-  Offset get _mainMenuOnOfflineAnimOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH * .5));
-  Offset get _mainMenuOnOfflineAnimOffScreenPos => Offset(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset _mainMenuOnOfflineBoxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.dsp.eqAlignTop));
+  Offset get _mainMenuOnOfflineAnimOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.dsp.eqAlignTop));
+  Offset get _mainMenuOnOfflineAnimOffScreenPos =>
+      Offset(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _boxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-6000));
-  Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0 + gl.dsp.paddingTop * 2));
-  Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-6000));
+  Offset _boxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-2000));
+  Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), 0);
+  Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-2000));
 
-  Offset _anaToolbarBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.eqPxH * .5));
+  Offset _anaToolbarBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqlignBottom));
   Offset get _anaToolbarAnimOnScreenPos =>
-      Offset(gl.dsp.alignX(-gl.eqPxW * .5 + 0), gl.dsp.alignY(gl.eqPxH * .5 - gl.menuBarThickness));
+      Offset(gl.dsp.alignX(-gl.eqPxW * .5 + 0), gl.dsp.alignY(gl.dsp.eqlignBottom - gl.menuBarThickness));
   Offset get _anaToolbarAnimOffScreenPos =>
-      Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.eqPxH * .5 - gl.menuBarThickness));
+      Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqlignBottom - gl.menuBarThickness));
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -272,14 +273,12 @@ class _MapPageState extends State<MapPage> {
                               );
                               _pt = point;
                               gl.refreshStack(() {
-                                gl.stack.add(
-                                  "anaPres",
-                                  AnaResultsMenu(() {
-                                    refreshView(() {});
+                                popupForestimatorWindow(
+                                  id: "anaPres",
+                                  title: "Resultats de l'analyse",
+                                  child: AnaResultsMenu(() {
+                                    gl.refreshStack(() {});
                                   }, gl.requestedLayers),
-                                  Duration(milliseconds: 400),
-                                  gl.Anim.searchAnimOnScreenPos,
-                                  Offset(0, -2000),
                                 );
                               });
                               refreshView(() {
@@ -868,7 +867,7 @@ class _MapPageState extends State<MapPage> {
                               color: Colors.transparent,
                               height: gl.eqPx * gl.iconSizeL,
                               width: gl.eqPx * gl.iconSizeL,
-                              child: lt.forestimatorBackButton(() {
+                              child: lt.forestimatorButton(() {
                                 setState(() {
                                   gl.Mode.polygonList = true;
                                   _polygonMode = true;
@@ -2191,7 +2190,7 @@ class _MapPageState extends State<MapPage> {
             },
           ),
           Duration(milliseconds: 500),
-          gl.Anim.searchAnimOnScreenPos,
+          gl.Anim.onScreenPosCenter,
           Offset(0, -2000),
         );
       } else {
@@ -2556,14 +2555,12 @@ class _MapPageState extends State<MapPage> {
                 });
                 await _runAnaPt(epsg4326.transform(epsg31370, proj4.Point(x: _pt!.longitude, y: _pt!.latitude)));
                 gl.refreshStack(() {
-                  gl.stack.add(
-                    "anaPres",
-                    AnaResultsMenu(() {
-                      refreshView(() {});
+                  popupForestimatorWindow(
+                    id: "anaPres",
+                    title: "Resultats de l'analyse",
+                    child: AnaResultsMenu(() {
+                      gl.refreshStack(() {});
                     }, gl.requestedLayers),
-                    Duration(milliseconds: 400),
-                    gl.Anim.searchAnimOnScreenPos,
-                    Offset(0, -2000),
                   );
                 });
                 refreshView(() {
@@ -2928,7 +2925,7 @@ class _MapPageState extends State<MapPage> {
                         },
                       ),
                       Duration(milliseconds: 400),
-                      gl.Anim.searchAnimOnScreenPos,
+                      gl.Anim.onScreenPosCenter,
                       Offset(0, -500),
                     );
                   } else {
@@ -3030,14 +3027,12 @@ class _MapPageState extends State<MapPage> {
                                     );
                                     _updatePtMarker(LatLng(gl.position.latitude, gl.position.longitude));
                                     gl.refreshStack(() {
-                                      gl.stack.add(
-                                        "anaPres",
-                                        AnaResultsMenu(() {
-                                          refreshView(() {});
+                                      popupForestimatorWindow(
+                                        id: "anaPres",
+                                        title: "Resultats de l'analyse",
+                                        child: AnaResultsMenu(() {
+                                          gl.refreshStack(() {});
                                         }, gl.requestedLayers),
-                                        Duration(milliseconds: 400),
-                                        gl.Anim.searchAnimOnScreenPos,
-                                        Offset(0, -2000),
                                       );
                                     });
                                     refreshView(() {
@@ -3138,7 +3133,7 @@ class _MapPageState extends State<MapPage> {
                             },
                           ),
                           Duration(milliseconds: 500),
-                          gl.Anim.searchAnimOnScreenPos,
+                          gl.Anim.onScreenPosCenter,
                           Offset(0, -2000),
                         );
                       },
