@@ -7,17 +7,8 @@ class PDFScreen extends StatefulWidget {
   final String path;
   final String titre;
   final int currentPage;
-  final double width;
-  final double height;
 
-  const PDFScreen({
-    super.key,
-    required this.path,
-    required this.titre,
-    this.currentPage = 0,
-    required this.width,
-    required this.height,
-  });
+  const PDFScreen({super.key, required this.path, required this.titre, this.currentPage = 0});
   @override
   State<StatefulWidget> createState() => _PDFScreenState();
 }
@@ -33,47 +24,51 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
     return Stack(
       alignment: AlignmentGeometry.bottomRight,
       children: <Widget>[
-        SizedBox(
-          width: widget.width,
-          height: widget.height,
-          child: PDFView(
-            backgroundColor: Colors.transparent,
-            filePath: widget.path,
-            enableSwipe: true,
-            swipeHorizontal: true,
-            autoSpacing: false,
-            pageFling: true,
-            pageSnap: true,
-            defaultPage: widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
-            fitPolicy: FitPolicy.BOTH,
-            preventLinkNavigation: false, // if set to true the link is handled in flutter
-            onRender: (xpages) {
-              setState(() {
-                pages = xpages;
-                isReady = true;
-              });
-            },
-            onError: (error) {
-              setState(() {
-                errorMessage = error.toString();
-              });
-              gl.print(error.toString());
-            },
-            onPageError: (page, error) {
-              setState(() {
-                errorMessage = '$page: ${error.toString()}';
-              });
-              gl.print('$page: ${error.toString()}');
-            },
-            onViewCreated: (PDFViewController pdfViewController) {
-              _controller.complete(pdfViewController);
-            },
-            onPageChanged: (int? page, int? total) {
-              setState(() {
-                gl.currentPage = page!;
-              });
-            },
-          ),
+        OrientationBuilder(
+          builder: (c, o) {
+            return SizedBox(
+              width: gl.eqPx * (gl.eqPxW - 10),
+              height: gl.eqPx * (gl.eqPxH - 30),
+              child: PDFView(
+                backgroundColor: Colors.transparent,
+                filePath: widget.path,
+                enableSwipe: true,
+                swipeHorizontal: true,
+                autoSpacing: false,
+                pageFling: true,
+                pageSnap: true,
+                defaultPage: widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
+                fitPolicy: FitPolicy.BOTH,
+                preventLinkNavigation: false, // if set to true the link is handled in flutter
+                onRender: (xpages) {
+                  setState(() {
+                    pages = xpages;
+                    isReady = true;
+                  });
+                },
+                onError: (error) {
+                  setState(() {
+                    errorMessage = error.toString();
+                  });
+                  gl.print(error.toString());
+                },
+                onPageError: (page, error) {
+                  setState(() {
+                    errorMessage = '$page: ${error.toString()}';
+                  });
+                  gl.print('$page: ${error.toString()}');
+                },
+                onViewCreated: (PDFViewController pdfViewController) {
+                  _controller.complete(pdfViewController);
+                },
+                onPageChanged: (int? page, int? total) {
+                  setState(() {
+                    gl.currentPage = page!;
+                  });
+                },
+              ),
+            );
+          },
         ),
         errorMessage.isEmpty
             ? !isReady

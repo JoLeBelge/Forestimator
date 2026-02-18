@@ -107,16 +107,24 @@ class _StackAnimated extends State<StackAnimated> {
         });
       }
     };
+
     return Container(
       alignment: AlignmentGeometry.center,
       width: double.infinity,
       height: double.infinity,
-      child: AnimatedContainer(
-        width: gl.eqPx * gl.eqPxW,
-        height: gl.eqPx * gl.eqPxH,
-        duration: widget.duration,
-        alignment: AlignmentGeometry.xy(gl.dsp.alignX(widget.positions[0].dx), gl.dsp.alignY(widget.positions[0].dy)),
-        child: widget.child,
+      child: OrientationBuilder(
+        builder: (c, o) {
+          return AnimatedContainer(
+            width: gl.eqPx * gl.eqPxW,
+            height: gl.eqPx * gl.eqPxH,
+            duration: widget.duration,
+            alignment: AlignmentGeometry.xy(
+              gl.dsp.alignX(widget.positions[0].dx),
+              gl.dsp.alignY(widget.positions[0].dy),
+            ),
+            child: widget.child,
+          );
+        },
       ),
     );
   }

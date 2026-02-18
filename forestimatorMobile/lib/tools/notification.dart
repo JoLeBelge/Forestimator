@@ -545,90 +545,94 @@ class PopupForestimatorWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double cWidth = width ?? (gl.eqPxW - 2) * gl.eqPx;
-    double cHeight = height ?? (gl.eqPxH - 10) * gl.eqPx;
-    return Card(
-      margin: EdgeInsetsGeometry.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(gl.eqPx * 5),
-        side: BorderSide(color: gl.colorAgroBioTech, width: gl.eqPx * .5),
-      ),
-      color: gl.backgroundTransparentBlackBox,
-      child: Container(
-        alignment: AlignmentGeometry.center,
-        height: cHeight,
-        width: cWidth,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
+    return OrientationBuilder(
+      builder: (c, o) {
+        double cWidth = width ?? (gl.eqPxW - 2) * gl.eqPx;
+        double cHeight = height ?? (gl.eqPxH - 10) * gl.eqPx;
+        return Card(
+          margin: EdgeInsetsGeometry.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(gl.eqPx * 5),
+            side: BorderSide(color: gl.colorAgroBioTech, width: gl.eqPx * .5),
+          ),
+          color: gl.backgroundTransparentBlackBox,
+          child: Container(
+            alignment: AlignmentGeometry.center,
+            height: cHeight,
+            width: cWidth,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
                   children: [
-                    Container(
-                      alignment: AlignmentGeometry.center,
-                      height: gl.eqPx * 15,
-                      width: gl.eqPx * 15,
-                      child: leadingSymbol ?? forestimatorIcon(width: gl.eqPx * 12, height: gl.eqPx * 12),
-                    ),
-                    Container(
-                      alignment: AlignmentGeometry.center,
-                      height: gl.eqPx * 15,
-                      width: gl.eqPx * 65,
-                      child: Text(
-                        title ?? "Message $count",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: gl.eqPx * gl.fontSizeM,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          alignment: AlignmentGeometry.center,
+                          height: gl.eqPx * 15,
+                          width: gl.eqPx * 15,
+                          child: leadingSymbol ?? forestimatorIcon(width: gl.eqPx * 12, height: gl.eqPx * 12),
                         ),
-                      ),
+                        Container(
+                          alignment: AlignmentGeometry.center,
+                          height: gl.eqPx * 15,
+                          width: gl.eqPx * 65,
+                          child: Text(
+                            title ?? "Message $count",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: gl.eqPx * gl.fontSizeM,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: gl.eqPx * 15,
+                          width: gl.eqPx * 15,
+                          child: lt.forestimatorButton(
+                            onDiscard ??
+                                () {
+                                  gl.stack.pop(id ?? "popWin$count");
+                                },
+                            Icons.arrow_drop_up_outlined,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: gl.eqPx * 15,
-                      width: gl.eqPx * 15,
-                      child: lt.forestimatorButton(
-                        onDiscard ??
-                            () {
-                              gl.stack.pop(id ?? "popWin$count");
-                            },
-                        Icons.arrow_drop_up_outlined,
-                      ),
-                    ),
+                    lt.stroke(0, gl.eqPx * .5, gl.colorAgroBioTech),
                   ],
                 ),
-                lt.stroke(0, gl.eqPx * .5, gl.colorAgroBioTech),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    pdfChild ??
-                        lt.ForestimatorScrollView(
-                          height: cHeight - gl.eqPx * 17,
-                          width: cWidth - gl.eqPx * 5,
-                          child:
-                              child ??
-                              Text(
-                                message ?? "",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: gl.eqPx * gl.fontSizeM,
-                                ),
-                              ),
-                        ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        pdfChild ??
+                            lt.ForestimatorScrollView(
+                              height: cHeight - gl.eqPx * 17,
+                              width: cWidth - gl.eqPx * 5,
+                              child:
+                                  child ??
+                                  Text(
+                                    message ?? "",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: gl.eqPx * gl.fontSizeM,
+                                    ),
+                                  ),
+                            ),
+                      ],
+                    ),
                   ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -966,8 +970,9 @@ class PopupUserData {
             SizedBox(
               width: gl.menuBarLength * gl.eqPx,
               child: TextFormField(
-                maxLength: 22,
+                maxLength: 255,
                 maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                initialValue: oldName,
                 onChanged: (String str) {
                   gl.UserData.name = str;
                 },
@@ -980,7 +985,8 @@ class PopupUserData {
             SizedBox(
               width: gl.menuBarLength * gl.eqPx,
               child: TextFormField(
-                maxLength: 22,
+                maxLength: 255,
+                initialValue: oldForename,
                 maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 onChanged: (String str) {
                   gl.UserData.forename = str;
@@ -994,6 +1000,7 @@ class PopupUserData {
             lt.ValidTextField(
               width: gl.menuBarLength * gl.eqPx,
               height: gl.menuBarThickness * gl.eqPx,
+              initialValue: oldMail,
               validate: gl.UserData.validMail,
               onValid: (String str) {
                 gl.UserData.mail = str;
@@ -4176,6 +4183,28 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                 ],
               ),
               lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+              variableBooleanSlider("Mode Essence", gl.Mode.essence, (bool it) {
+                if (gl.Mode.userDataFilled) {
+                  setState(() {
+                    gl.Mode.essence = it;
+                  });
+                } else {
+                  PopupUserData(
+                    context,
+                    () {},
+                    () {
+                      setState(() {
+                        gl.Mode.essence = it;
+                      });
+                    },
+                    oldForename: gl.UserData.forename,
+                    oldName: gl.UserData.name,
+                    oldMail: gl.UserData.mail,
+                  );
+                }
+                gl.refreshStack(() {});
+                gl.Mode.serialize();
+              }, false),
             ],
           ),
         );
@@ -4275,6 +4304,7 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
             gl.Mode.expert = it;
           });
           gl.refreshStack(() {});
+          gl.Mode.serialize();
         }, false),
         variableBooleanSlider("Gridlines", gl.Mode.debugScanlines, (bool it) {
           setState(() {
@@ -4293,6 +4323,7 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
             gl.Mode.overrideWellDefinedCheck = it;
           });
           gl.refreshStack(() {});
+          gl.Mode.serialize();
         }, true),
         variableBooleanSlider("Tablet Mode", gl.Mode.overrideModeTablet, (bool it) {
           setState(() {
@@ -4306,30 +4337,6 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           });
           gl.refreshStack(() {});
         }, true),
-      ],
-    );
-  }
-}
-
-class ForestimatorAdvancedSettings extends StatefulWidget {
-  const ForestimatorAdvancedSettings({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _ForestimatorAdvancedSettings();
-}
-
-class _ForestimatorAdvancedSettings extends State<ForestimatorAdvancedSettings> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        variableBooleanSlider("Mode Essence", gl.Mode.essence, (bool it) {
-          setState(() {
-            gl.Mode.essence = it;
-          });
-          gl.refreshStack(() {});
-          gl.Mode.serialize();
-        }, false),
         variableBooleanSlider("Petit Label", gl.Mode.smallLabel, (bool it) {
           setState(() {
             gl.Mode.smallLabel = it;
@@ -4827,7 +4834,6 @@ class _SettingsMenu extends State<SettingsMenu> {
           },
         ),
       ),
-      if (gl.Mode.userDataFilled) ItemSettings(name: "Paramètres avancés", entry: ForestimatorAdvancedSettings()),
       ItemSettings(
         name: "À propos de Forestimator",
         entry: forestimatorSettingsVersion((void Function() f) {
@@ -5440,265 +5446,269 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
         f();
       }
     };
-    return SizedBox(
-      width:
-          gl.dsp.orientation == Orientation.portrait
-              ? gl.eqPx * gl.popupWindowsPortraitWidth
-              : gl.eqPx * gl.popupWindowsLandscapeWidth,
-      height:
-          gl.dsp.orientation == Orientation.portrait
-              ? gl.eqPx * gl.popupWindowsPortraitHeight
-              : gl.eqPx * gl.popupWindowsLandscapeHeight,
-      child: switchRowColWithOrientation([
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return OrientationBuilder(
+      builder: (c, o) {
+        return SizedBox(
+          width:
+              gl.dsp.orientation == Orientation.portrait
+                  ? gl.eqPx * gl.popupWindowsPortraitWidth
+                  : gl.eqPx * gl.popupWindowsLandscapeWidth,
+          height:
+              gl.dsp.orientation == Orientation.portrait
+                  ? gl.eqPx * gl.popupWindowsPortraitHeight
+                  : gl.eqPx * gl.popupWindowsLandscapeHeight,
+          child: switchRowColWithOrientation([
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                SizedBox(
-                  height: gl.eqPx * gl.searchBarHeight,
-                  width: gl.eqPx * gl.searchBarWidth,
-                  child: Card(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Entrez le nom d'une couche",
-                        contentPadding: EdgeInsets.zero,
-                        prefixIcon: Icon(Icons.search, color: Colors.black),
-                      ),
-                      onTap: () {
-                        setState(() {});
-                      },
-                      textAlign: TextAlign.start,
-                      autocorrect: false,
-                      enableSuggestions: true,
-                      onChanged: (String value) {
-                        selectedMap = -1;
-                        selectedLayerTile = null;
-                        selectedCategory = -1;
-                        _resultOfMapSearch.clear();
-                        if (value.isNotEmpty) {
-                          for (String term in value.split(' ')) {
-                            if (term != '') {
-                              for (var layer in gl.dico.mLayerBases.values) {
-                                if ((!layer.mExpert || gl.Mode.expert) &&
-                                    (widget.offlineMode ? layer.mOffline : true) &&
-                                    (layer.mNom
-                                        .toLowerCase()
-                                        .replaceAll('è', 'e')
-                                        .replaceAll('é', 'e')
-                                        .replaceAll('ê', 'e')
-                                        .replaceAll('â', 'a')
-                                        .replaceAll('à', 'a')
-                                        .replaceAll('ç', 'c')
-                                        .contains(
-                                          term
-                                              .toLowerCase()
-                                              .replaceAll('è', 'e')
-                                              .replaceAll('é', 'e')
-                                              .replaceAll('ê', 'e')
-                                              .replaceAll('â', 'a')
-                                              .replaceAll('à', 'a')
-                                              .replaceAll('ç', 'c'),
-                                        ))) {
-                                  _resultOfMapSearch.add(layer.mCode);
-                                }
-                              }
-                            }
-                          }
-                        }
-                        if (_resultOfMapSearch.isEmpty || value.isEmpty) {
-                          setState(() {
-                            _showCatalogue = true;
-                          });
-                        } else {
-                          setState(() {
-                            _showCatalogue = false;
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: gl.eqPx * gl.searchBarHeight,
+                      width: gl.eqPx * gl.searchBarWidth,
+                      child: Card(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Entrez le nom d'une couche",
+                            contentPadding: EdgeInsets.zero,
+                            prefixIcon: Icon(Icons.search, color: Colors.black),
+                          ),
+                          onTap: () {
+                            setState(() {});
+                          },
+                          textAlign: TextAlign.start,
+                          autocorrect: false,
+                          enableSuggestions: true,
+                          onChanged: (String value) {
                             selectedMap = -1;
                             selectedLayerTile = null;
                             selectedCategory = -1;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(
-              height:
-                  gl.dsp.orientation == Orientation.portrait
-                      ? (gl.popupWindowsPortraitHeight - gl.searchBarHeight - gl.popupReturnButtonHeight) * gl.eqPx
-                      : (gl.popupWindowsLandscapeHeight - gl.searchBarHeight) * gl.eqPx,
-              width: gl.popupWindowsPortraitWidth * gl.eqPx,
-              child:
-                  _showCatalogue
-                      ? ListView(
-                        controller: _controller,
-                        padding: const EdgeInsets.symmetric(horizontal: 0),
-                        children: _injectGroupData(
-                          (int i, GroupeCouche groupe) => TextButton(
-                            style: ButtonStyle(
-                              minimumSize:
-                                  i == selectedCategory
-                                      ? WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                        WidgetState.any: Size(
-                                          gl.eqPx * gl.onCatalogueWidth * .7,
-                                          gl.eqPx * gl.onCatalogueMapHeight,
-                                        ),
-                                      })
-                                      : WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                        WidgetState.any: Size(
-                                          gl.eqPx * gl.onCatalogueWidth * .7,
-                                          gl.eqPx * gl.onCatalogueCategoryHeight,
-                                        ),
-                                      }),
-                            ),
-                            key: Key('$i'),
-                            onPressed:
-                                i == selectedCategory
-                                    ? () {}
-                                    : () {
-                                      setState(() {
-                                        selectedCategory = i;
-                                        selectedMap = -1;
-                                        selectedLayerTile = null;
-                                      });
-                                    },
-                            child: Card(
-                              surfaceTintColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              color:
-                                  i == selectedCategory
-                                      ? gl.colorAgroBioTech.withAlpha(75)
-                                      : gl.colorAgroBioTech.withAlpha(200),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  i != selectedCategory
-                                      ? Container(
-                                        alignment: Alignment.center,
-                                        padding: EdgeInsets.all(3),
-                                        constraints: BoxConstraints(
-                                          maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                                          minHeight: gl.eqPx * gl.onCatalogueCategoryHeight,
-                                        ),
-                                        child: Text(
-                                          groupe.mLabel,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: gl.eqPx * gl.fontSizeM,
-                                          ),
-                                        ),
-                                      )
-                                      : Container(
-                                        alignment: Alignment.center,
-                                        padding: EdgeInsets.zero,
-                                        constraints: BoxConstraints(maxWidth: gl.eqPx * gl.onCatalogueWidth * .97),
-                                        child: ListBody(
-                                          children:
-                                              <Widget>[
-                                                TextButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      selectedCategory = -1;
-                                                      selectedMap = -1;
-                                                      selectedLayerTile = null;
-                                                    });
-                                                  },
-                                                  child: Card(
-                                                    color: gl.colorAgroBioTech.withAlpha(200),
-                                                    child: Container(
-                                                      alignment: Alignment.center,
-                                                      padding: EdgeInsets.all(3),
-                                                      constraints: BoxConstraints(
-                                                        maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                                                        minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                                                        minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
-                                                      ),
-                                                      child: Text(
-                                                        groupe.mLabel,
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight: FontWeight.w400,
-                                                          fontSize: gl.eqPx * gl.fontSizeM,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ] +
-                                              _injectLayerData(groupe.mCode, (int i, LayerTile layerTile) {
-                                                return layerTileCard(
-                                                  i,
-                                                  layerTile,
-                                                  widget.offlineMode,
-                                                  widget.selectionMode,
-                                                  stateOfLayerSwitcher,
-                                                  setState,
-                                                  noLegend: gl.dsp.orientation.index == 1,
-                                                );
-                                              }),
-                                        ),
-                                      ),
-                                ],
-                              ),
-                            ),
-                          ),
+                            _resultOfMapSearch.clear();
+                            if (value.isNotEmpty) {
+                              for (String term in value.split(' ')) {
+                                if (term != '') {
+                                  for (var layer in gl.dico.mLayerBases.values) {
+                                    if ((!layer.mExpert || gl.Mode.expert) &&
+                                        (widget.offlineMode ? layer.mOffline : true) &&
+                                        (layer.mNom
+                                            .toLowerCase()
+                                            .replaceAll('è', 'e')
+                                            .replaceAll('é', 'e')
+                                            .replaceAll('ê', 'e')
+                                            .replaceAll('â', 'a')
+                                            .replaceAll('à', 'a')
+                                            .replaceAll('ç', 'c')
+                                            .contains(
+                                              term
+                                                  .toLowerCase()
+                                                  .replaceAll('è', 'e')
+                                                  .replaceAll('é', 'e')
+                                                  .replaceAll('ê', 'e')
+                                                  .replaceAll('â', 'a')
+                                                  .replaceAll('à', 'a')
+                                                  .replaceAll('ç', 'c'),
+                                            ))) {
+                                      _resultOfMapSearch.add(layer.mCode);
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                            if (_resultOfMapSearch.isEmpty || value.isEmpty) {
+                              setState(() {
+                                _showCatalogue = true;
+                              });
+                            } else {
+                              setState(() {
+                                _showCatalogue = false;
+                                selectedMap = -1;
+                                selectedLayerTile = null;
+                                selectedCategory = -1;
+                              });
+                            }
+                          },
                         ),
-                      )
-                      : ListView(
-                        children: List<Widget>.generate(_resultOfMapSearch.length, (int i) {
-                          LayerTile layerTile = LayerTile(
-                            key: _resultOfMapSearch[i],
-                            name: gl.dico.getLayerBase(_resultOfMapSearch[i]).mNom,
-                            filter: gl.dico.getLayerBase(_resultOfMapSearch[i]).mGroupe,
-                            downloadable: gl.dico.getLayerBase(_resultOfMapSearch[i]).mIsDownloadableRW,
-                          );
-                          return layerTileCard(
-                            i,
-                            layerTile,
-                            widget.offlineMode,
-                            widget.selectionMode,
-                            stateOfLayerSwitcher,
-                            setState,
-                            noLegend: gl.dsp.orientation == Orientation.landscape,
-                          );
-                        }),
                       ),
-            ),
-          ],
-        ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            if (gl.dsp.orientation == Orientation.landscape)
-              Container(
-                constraints: BoxConstraints(
-                  maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth,
-                  maxHeight: gl.eqPx * (gl.popupWindowsLandscapeHeight - gl.popupReturnButtonHeight),
-                ),
-                child: ListView(
-                  children: [
-                    layerTileCard(
-                      selectedMap,
-                      selectedLayerTile,
-                      widget.offlineMode,
-                      widget.selectionMode,
-                      stateOfLayerSwitcher,
-                      setState,
                     ),
                   ],
                 ),
-              ),
-          ],
-        ),
-      ]),
+
+                SizedBox(
+                  height:
+                      gl.dsp.orientation == Orientation.portrait
+                          ? (gl.popupWindowsPortraitHeight - gl.searchBarHeight - gl.popupReturnButtonHeight) * gl.eqPx
+                          : (gl.popupWindowsLandscapeHeight - gl.searchBarHeight) * gl.eqPx,
+                  width: gl.popupWindowsPortraitWidth * gl.eqPx,
+                  child:
+                      _showCatalogue
+                          ? ListView(
+                            controller: _controller,
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
+                            children: _injectGroupData(
+                              (int i, GroupeCouche groupe) => TextButton(
+                                style: ButtonStyle(
+                                  minimumSize:
+                                      i == selectedCategory
+                                          ? WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                            WidgetState.any: Size(
+                                              gl.eqPx * gl.onCatalogueWidth * .7,
+                                              gl.eqPx * gl.onCatalogueMapHeight,
+                                            ),
+                                          })
+                                          : WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                            WidgetState.any: Size(
+                                              gl.eqPx * gl.onCatalogueWidth * .7,
+                                              gl.eqPx * gl.onCatalogueCategoryHeight,
+                                            ),
+                                          }),
+                                ),
+                                key: Key('$i'),
+                                onPressed:
+                                    i == selectedCategory
+                                        ? () {}
+                                        : () {
+                                          setState(() {
+                                            selectedCategory = i;
+                                            selectedMap = -1;
+                                            selectedLayerTile = null;
+                                          });
+                                        },
+                                child: Card(
+                                  surfaceTintColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  color:
+                                      i == selectedCategory
+                                          ? gl.colorAgroBioTech.withAlpha(75)
+                                          : gl.colorAgroBioTech.withAlpha(200),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      i != selectedCategory
+                                          ? Container(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.all(3),
+                                            constraints: BoxConstraints(
+                                              maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                              minHeight: gl.eqPx * gl.onCatalogueCategoryHeight,
+                                            ),
+                                            child: Text(
+                                              groupe.mLabel,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: gl.eqPx * gl.fontSizeM,
+                                              ),
+                                            ),
+                                          )
+                                          : Container(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.zero,
+                                            constraints: BoxConstraints(maxWidth: gl.eqPx * gl.onCatalogueWidth * .97),
+                                            child: ListBody(
+                                              children:
+                                                  <Widget>[
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          selectedCategory = -1;
+                                                          selectedMap = -1;
+                                                          selectedLayerTile = null;
+                                                        });
+                                                      },
+                                                      child: Card(
+                                                        color: gl.colorAgroBioTech.withAlpha(200),
+                                                        child: Container(
+                                                          alignment: Alignment.center,
+                                                          padding: EdgeInsets.all(3),
+                                                          constraints: BoxConstraints(
+                                                            maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                                            minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                                            minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
+                                                          ),
+                                                          child: Text(
+                                                            groupe.mLabel,
+                                                            textAlign: TextAlign.center,
+                                                            style: TextStyle(
+                                                              color: Colors.black,
+                                                              fontWeight: FontWeight.w400,
+                                                              fontSize: gl.eqPx * gl.fontSizeM,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ] +
+                                                  _injectLayerData(groupe.mCode, (int i, LayerTile layerTile) {
+                                                    return layerTileCard(
+                                                      i,
+                                                      layerTile,
+                                                      widget.offlineMode,
+                                                      widget.selectionMode,
+                                                      stateOfLayerSwitcher,
+                                                      setState,
+                                                      noLegend: gl.dsp.orientation.index == 1,
+                                                    );
+                                                  }),
+                                            ),
+                                          ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                          : ListView(
+                            children: List<Widget>.generate(_resultOfMapSearch.length, (int i) {
+                              LayerTile layerTile = LayerTile(
+                                key: _resultOfMapSearch[i],
+                                name: gl.dico.getLayerBase(_resultOfMapSearch[i]).mNom,
+                                filter: gl.dico.getLayerBase(_resultOfMapSearch[i]).mGroupe,
+                                downloadable: gl.dico.getLayerBase(_resultOfMapSearch[i]).mIsDownloadableRW,
+                              );
+                              return layerTileCard(
+                                i,
+                                layerTile,
+                                widget.offlineMode,
+                                widget.selectionMode,
+                                stateOfLayerSwitcher,
+                                setState,
+                                noLegend: gl.dsp.orientation == Orientation.landscape,
+                              );
+                            }),
+                          ),
+                ),
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (gl.dsp.orientation == Orientation.landscape)
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth,
+                      maxHeight: gl.eqPx * (gl.popupWindowsLandscapeHeight - gl.popupReturnButtonHeight),
+                    ),
+                    child: ListView(
+                      children: [
+                        layerTileCard(
+                          selectedMap,
+                          selectedLayerTile,
+                          widget.offlineMode,
+                          widget.selectionMode,
+                          stateOfLayerSwitcher,
+                          setState,
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ]),
+        );
+      },
     );
   }
 
@@ -6025,15 +6035,8 @@ class PopupPdfMenu {
       popupForestimatorWindow(
         id: "aPDF",
         title: "Documentation",
-        width: (gl.eqPxW - 10) * gl.eqPx,
-        height: (gl.eqPxH - 10) * gl.eqPx,
-        pdfChild: PDFScreen(
-          path: path,
-          titre: titre,
-          currentPage: currentPage,
-          width: (gl.eqPxW - 11) * gl.eqPx,
-          height: (gl.eqPxH - 10 - 40) * gl.eqPx,
-        ),
+
+        pdfChild: PDFScreen(path: path, titre: titre, currentPage: currentPage),
       );
     });
   }
