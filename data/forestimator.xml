@@ -444,12 +444,12 @@ https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE</font
 <br></br><br></br>
 Ci-dessous un exemple avec la couche de la carte de l'essence majoritaire du peuplement :
 <br></br><br></br>
-<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/COMPOALL/point/POINT (217256.9 50427.0)">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/point/<font color="blue">POINT (217256.9 50427.0)</font></a>
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/COMPOALL/point/POINT (217246.9 50427.0)">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/point/<font color="blue">POINT (217246.9 50427.0)</font></a>
 <br></br>
 <br></br>
-Le dictionnaire de cette couche (sous ce lien : <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/COMPOALL/">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/</a>) nous renseigne que la valeur 5 signifie que l'essence majoritaire est l'épicéa commun.
+Le dictionnaire de cette couche (sous ce lien : <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/COMPOALL/">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/</a>) nous renseigne que la valeur 4 signifie que l'essence majoritaire est le Douglas.
 <br></br>
-<span class="hljs-comment">5;EP - Spruces</span>
+<span class="hljs-comment">4;DO - Douglas_fir</span>
 <br></br><br></br>
 
 <h3>Analyse surfacique</h3>
@@ -481,8 +481,8 @@ https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">aptitude</font>/a
 https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">hdom</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
 </p>
 <p style="margin-bottom:0.2cm;margin-top:0.2cm;">
-<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/dendro2018/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))">
-https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">dendro2018</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/aptitude/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))">
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">aptitude</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
 </p>
 
 <p style="margin-bottom:0.2cm;margin-top:0.2cm;">
@@ -516,7 +516,7 @@ parcellaire.shp &lt;- st_read(shp.path)<br></br>
   wkt.pol &lt;- st_as_text(parcellaire.shp$geometry[polNum])<br></br>
 
   <span class="hljs-comment">#cat(paste0("wkt polygone : \n ", wkt.pol,"\n"))</span><br></br>
-  my.request &lt;- paste0(server.api,<span class="hljs-string">"dendro2018/polygon/"</span>,wkt.pol)<br></br>
+  my.request &lt;- paste0(server.api,<span class="hljs-string">"aptitude/polygon/"</span>,wkt.pol)<br></br>
   <span class="hljs-comment"># remplacement des espaces par le symbole consacré</span><br></br>
   my.request &lt;- gsub(<span class="hljs-string">" "</span>, <span class="hljs-string">"%20"</span>, my.request, fixed = <span class="hljs-literal">TRUE</span>)<br></br>
   <span class="hljs-comment"># on effectue la requete auprès du serveur - résultat sauvé en mémoire sous forme hexadécimale (=raw)</span><br></br>
