@@ -406,14 +406,14 @@ void groupLayers::computeStatAllPol(OGRLayer *lay, std::string path)
             if (l->Code() == "MNH2019")
             {
                 aFile << "<processingName>hdom2019</processingName>\n";
-                aFile << mDico->geoservice("hdom", "MNH2019", polWkt, typeAna::surfacique, 1);
+                aFile << mDico->geoservice("hdom", "MNH2019", polWkt, typeAna::surfacique,NULL, 1);
             }
             else
             {
                 if (l->l4Stat())
                 {
                     aFile << "<processingName>" + l->Code() + "</processingName>\n";
-                    aFile << mDico->geoservice(l->Code(), "", polWkt, typeAna::surfacique, 1);
+                    aFile << mDico->geoservice(l->Code(), "", polWkt, typeAna::surfacique,NULL, 1);
                 }
             }
             aFile << "</processing>\n";

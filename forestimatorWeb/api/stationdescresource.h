@@ -8,6 +8,7 @@
 #include "cdicoapt.h"
 #include "layerbase.h"
 #include <Wt/WFileUpload.h>
+#include "istream"
 
 using namespace Wt;
 

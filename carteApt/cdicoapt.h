@@ -4,8 +4,7 @@
 #include  "cnsw.h"
 #include "layerbase.h"
 #include "cadastre.h"
-#include <Wt/Json/Parser.h>
-#include <Wt/Json/Array.h>
+
 
 std::string removeAccents(std::string aStr);
 std::string putInBalise(std::string aCont,std::string aBalise);
@@ -38,7 +37,7 @@ public:
     std::shared_ptr<cadastre> mCadastre;
 
     /*************************/
-    std::string geoservice(std::string aTool,std::string aArgs,std::string aPolyg,typeAna aType,bool xml=0);
+    std::string geoservice(std::string aTool, std::string aArgs, std::string aPolyg, typeAna aType, OGRLayer *lay, bool xml=0);
     bool checkTool(std::string aTool);
     OGRLayer * uploadLayer(std::string aShpToUpload);
     OGRGeometry * checkPolyg(std::string aPolyg, int maxSurf=globMaxSurf);
