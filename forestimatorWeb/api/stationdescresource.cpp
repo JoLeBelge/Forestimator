@@ -38,6 +38,7 @@ void stationDescResource::handleRequest(const Http::Request &request,Http::Respo
             if (name=="toolarg") {aArgs=value;}
             if (name=="pol") {aPolyg=value;}
             if (name=="pt") {aPolyg=value;aMode=typeAna::ponctuel;}
+            if (name=="pts") {aPolyg=value;aMode=typeAna::MassPonctuel;}
         }
         // si pas de polygone mais bien le nom d'une couche, on délivre le dictionnaire de la couche à l'utilisateur
         if (aPolyg==""){aMode=typeAna::dicoTable;

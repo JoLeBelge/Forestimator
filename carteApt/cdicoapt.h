@@ -4,6 +4,8 @@
 #include  "cnsw.h"
 #include "layerbase.h"
 #include "cadastre.h"
+#include <Wt/Json/Parser.h>
+#include <Wt/Json/Array.h>
 
 std::string removeAccents(std::string aStr);
 std::string putInBalise(std::string aCont,std::string aBalise);
@@ -16,7 +18,7 @@ class ST;
 class cnsw;
 class cadastre;
 
-enum typeAna {ponctuel,surfacique,dicoTable};
+enum typeAna {ponctuel,surfacique,dicoTable,MassPonctuel};
 
 extern int globMaxSurf;
 

@@ -451,6 +451,15 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             }
             break;
         }
+        case typeAna::MassPonctuel:{
+            if (globTest){std::cout << "api traitement de mass anaPonctuelle" << std::endl;}
+            Wt::Json::Array o;
+            Wt::Json::ParseError e;
+            if(Wt::Json::parse(aPolyg,o,e)){
+                std::cout << "json parsé" << std::endl;
+            }
+            break;
+        }
         }
 
     } else {aResponse="arguments pour geotraitement ; vous avez rentré une valeur mais qui semble fausse. peut-être le nom de la couche ou du traitement. Consultez la page d'aide.\n";}
