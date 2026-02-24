@@ -214,13 +214,13 @@ class _MyApp extends State<MyApp> {
     }
     return MaterialApp(
       navigatorKey: _navigatorKey,
-      title: 'Forestimator',
+      title: 'Forestimator Mobile',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: gl.colorAgroBioTech),
         fontFamily: "Calibri",
         useMaterial3: true,
       ),
-      home: MapPage(),
+      home: ForestimatorMap(),
     );
   }
 }

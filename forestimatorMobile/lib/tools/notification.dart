@@ -492,6 +492,7 @@ void popupForestimatorWindow({
   double? height,
   double? width,
   Duration? duration,
+  bool? bigVersion,
 }) {
   int count = ++messageCount;
   gl.stack.add(
@@ -508,6 +509,7 @@ void popupForestimatorWindow({
       height,
       width,
       duration,
+      bigVersion ?? false,
     ),
     duration ?? Duration(milliseconds: 400),
     gl.Anim.onScreenPosCenter,
@@ -527,6 +529,7 @@ class PopupForestimatorWindow extends StatelessWidget {
   final double? width;
   final Duration? duration;
   final int count;
+  final bool big;
 
   const PopupForestimatorWindow(
     this.count,
@@ -539,7 +542,8 @@ class PopupForestimatorWindow extends StatelessWidget {
     this.onDiscard,
     this.height,
     this.width,
-    this.duration, {
+    this.duration,
+    this.big, {
     super.key,
   });
 
@@ -563,31 +567,71 @@ class PopupForestimatorWindow extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          alignment: AlignmentGeometry.center,
-                          height: gl.eqPx * 15,
-                          width: gl.eqPx * 15,
-                          child: leadingSymbol ?? forestimatorIcon(width: gl.eqPx * 12, height: gl.eqPx * 12),
-                        ),
-                        Container(
-                          alignment: AlignmentGeometry.center,
-                          height: gl.eqPx * 15,
-                          width: gl.eqPx * 65,
-                          child: Text(
-                            title ?? "Message $count",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: gl.eqPx * gl.fontSizeM,
+                if (!big)
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            alignment: AlignmentGeometry.center,
+                            height: gl.eqPx * 15,
+                            width: gl.eqPx * 15,
+                            child: leadingSymbol ?? forestimatorIcon(width: gl.eqPx * 12, height: gl.eqPx * 12),
+                          ),
+                          Container(
+                            alignment: AlignmentGeometry.center,
+                            height: gl.eqPx * 15,
+                            width: gl.eqPx * 65,
+                            child: Text(
+                              title ?? "Message $count",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: gl.eqPx * gl.fontSizeM,
+                              ),
                             ),
                           ),
+                          SizedBox(
+                            height: gl.eqPx * 15,
+                            width: gl.eqPx * 15,
+                            child: lt.forestimatorButton(
+                              onDiscard ??
+                                  () {
+                                    gl.stack.pop(id ?? "popWin$count");
+                                  },
+                              Icons.arrow_drop_up_outlined,
+                            ),
+                          ),
+                        ],
+                      ),
+                      lt.stroke(0, gl.eqPx * .5, gl.colorAgroBioTech),
+                    ],
+                  ),
+                Stack(
+                  alignment: AlignmentGeometry.xy(0, 0),
+                  children: [
+                    pdfChild ??
+                        lt.ForestimatorScrollView(
+                          height: cHeight - gl.eqPx * 17,
+                          width: cWidth - gl.eqPx * 5,
+                          child:
+                              child ??
+                              Text(
+                                message ?? "",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: gl.eqPx * gl.fontSizeM,
+                                ),
+                              ),
                         ),
-                        SizedBox(
+                    if (big)
+                      SizedBox(
+                        height: cHeight,
+                        width: cWidth,
+                        child: Container(
+                          alignment: Alignment.topRight,
                           height: gl.eqPx * 15,
                           width: gl.eqPx * 15,
                           child: lt.forestimatorButton(
@@ -598,34 +642,7 @@ class PopupForestimatorWindow extends StatelessWidget {
                             Icons.arrow_drop_up_outlined,
                           ),
                         ),
-                      ],
-                    ),
-                    lt.stroke(0, gl.eqPx * .5, gl.colorAgroBioTech),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        pdfChild ??
-                            lt.ForestimatorScrollView(
-                              height: cHeight - gl.eqPx * 17,
-                              width: cWidth - gl.eqPx * 5,
-                              child:
-                                  child ??
-                                  Text(
-                                    message ?? "",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: gl.eqPx * gl.fontSizeM,
-                                    ),
-                                  ),
-                            ),
-                      ],
-                    ),
+                      ),
                   ],
                 ),
               ],
@@ -1153,26 +1170,31 @@ class PopupNewEssenceObservationPoint {
     this.onTapOutside,
     this.callbackOnStartTyping,
   }) {
-    GeometricLayer.getEssenceLayer().addGeometry(
-      name: "Observation - ${GeometricLayer.getEssenceLayer().geometries.length + 1}",
-    );
-    GeometricLayer.getEssenceLayer().geometries.last.addPoint(coordinates);
     gl.refreshStack(() {
+      _AddEssence.reset();
+      double height = 170 * gl.eqPx;
       popupForestimatorMessage(
-        height: gl.eqPx * 80,
+        height: height,
         id: "addESS",
         title: "Observation essence",
         onDiscard: () {
           gl.refreshStack(() {
             gl.stack.pop("addESS");
-            GeometricLayer.getEssenceLayer().geometries.removeLast();
           });
         },
-        child: SelectEssence(
+        child: AddEssence(
+          height: height,
           messageAccept: "Placer",
           messageDecline: "Annuler",
-          onAccept: () {
+          onAccept: (String ess, Color col) {
             gl.refreshStack(() {
+              GeometricLayer.getEssenceLayer().addGeometry(
+                name: "Observation - ${GeometricLayer.getEssenceLayer().geometries.length + 1}",
+              );
+              GeometricLayer.getEssenceLayer().geometries.last.addPoint(coordinates);
+              GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value = ess;
+              GeometricLayer.getEssenceLayer().geometries.last.colorLine = col;
+              GeometricLayer.getEssenceLayer().geometries.last.colorInside = col.withAlpha(150);
               GeometricLayer.getEssenceLayer().geometries.last.serialize();
               Geometry.sendEssencePointsInBackground();
               gl.Mode.serialize();
@@ -1182,7 +1204,6 @@ class PopupNewEssenceObservationPoint {
           onDecline: () {
             gl.refreshStack(() {
               gl.stack.pop("addESS");
-              GeometricLayer.getEssenceLayer().geometries.removeLast();
             });
           },
         ),
@@ -1191,119 +1212,146 @@ class PopupNewEssenceObservationPoint {
   }
 }
 
-class SelectEssence extends StatefulWidget {
+class AddEssence extends StatefulWidget {
   final VoidCallback? callbackOnStartTyping;
-  final VoidCallback onAccept;
+  final Function(String, Color) onAccept;
   final VoidCallback onDecline;
   final String messageAccept;
   final String messageDecline;
+  final double height;
 
-  const SelectEssence({
+  const AddEssence({
     super.key,
     this.callbackOnStartTyping,
     required this.onAccept,
     required this.onDecline,
     required this.messageAccept,
     required this.messageDecline,
+    required this.height,
   });
 
   @override
-  State<StatefulWidget> createState() => _SelectEssence();
+  State<StatefulWidget> createState() => _AddEssence();
 }
 
-class _SelectEssence extends State<SelectEssence> {
+class _AddEssence extends State<AddEssence> {
+  static int _selected = -1;
+  static String _custom = "";
+  static Color _color = Colors.transparent;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          width: gl.menuBarLength * gl.eqPx,
-          child: DropdownMenuFormField<String>(
-            textStyle: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
-            trailingIcon: Icon(Icons.arrow_drop_down),
-            menuStyle: MenuStyle(
-              backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                WidgetState.any: gl.backgroundTransparentBlackBox,
+        AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          height:
+              _selected == gl.essenceChoice.length - 1 ? widget.height - 65 * gl.eqPx : widget.height - 50 * gl.eqPx,
+          child: lt.ForestimatorScrollView(
+            height:
+                _selected == gl.essenceChoice.length - 1 ? widget.height - 65 * gl.eqPx : widget.height - 50 * gl.eqPx,
+            child: Column(
+              children: List<Widget>.generate(gl.essenceChoice.length, (index) {
+                return AnimatedContainer(
+                  color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                  duration: Duration(milliseconds: 500),
+                  child: TextButton(
+                    style: lt.borderlessStyle,
+                    onPressed: () {
+                      _selected = index;
+                      setState(() {
+                        _custom = gl.essenceChoice.keys.toList()[index];
+                        _color = _getColorPointForEssence(gl.essenceChoice.keys.toList()[index]);
+                      });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          gl.essenceChoice.keys.toList()[index],
+                          style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                        ),
+                        CircleAvatar(
+                          backgroundColor: _getColorPointForEssence(gl.essenceChoice.keys.toList()[index]),
+                          radius: gl.iconSizeXS * gl.eqPx * .75,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }),
             ),
-            initialSelection: "Choisissez",
-            dropdownMenuEntries: List<DropdownMenuEntry<String>>.generate(gl.essenceChoice.length, (index) {
-              return DropdownMenuEntry<String>(
-                value: gl.essenceChoice[index],
-                label: gl.essenceChoice[index],
-                labelWidget: Text(
-                  gl.essenceChoice[index],
-                  style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
-                ),
-                trailingIcon: CircleAvatar(
-                  backgroundColor: gl.dico.mLayerBases['COMPOALL']!.mDicoCol[index] ?? Colors.black,
-                  radius: gl.iconSizeXS * gl.eqPx * .75,
-                ),
-              );
-            }),
-            onSelected: (value) {
-              setState(() {
-                GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value = value;
-                GeometricLayer.getEssenceLayer().geometries.last.colorInside =
-                    gl.dico.mLayerBases["COMPOALL"]!.mDicoCol[gl.essenceChoice.indexOf(value!)] ?? Colors.black;
-                GeometricLayer.getEssenceLayer().geometries.last.colorLine = GeometricLayer.getEssenceLayer()
-                    .geometries
-                    .last
-                    .colorInside
-                    .withAlpha(255);
-              });
-            },
           ),
         ),
-        if (!gl.essenceChoice.contains(GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value) ||
-            GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value == "Entrer du texte")
-          lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-        if (!gl.essenceChoice.contains(GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value) ||
-            GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value == "Entrer du texte")
-          SizedBox(
-            width: gl.menuBarLength * gl.eqPx,
-            child: TextFormField(
-              cursorColor: Colors.white,
-              maxLength: 255,
-              maxLengthEnforcement: MaxLengthEnforcement.enforced,
-              onChanged: (value) {
-                setState(() {
-                  GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value = value;
-                });
-              },
-              onTap: () => widget.callbackOnStartTyping ?? () {},
-              onTapOutside: (pointer) {},
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            if (GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value != "Entrer du texte" &&
-                GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value != "Choisissez" &&
-                GeometricLayer.getEssenceLayer().geometries.last.attributes[0].value != "")
-              SizedBox(
-                width: gl.menuBarLength * .5 * gl.eqPx,
-                child: TextButton(
-                  style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
-                  onPressed: widget.onAccept,
-                  child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
+
+        AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          height: _selected == gl.essenceChoice.length - 1 ? 65 * gl.eqPx : 50 * gl.eqPx,
+          width: gl.menuBarLength * gl.eqPx,
+          child: Column(
+            children: [
+              if (_selected == gl.essenceChoice.length - 1) lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+              if (_selected == gl.essenceChoice.length - 1)
+                AnimatedOpacity(
+                  opacity: _selected == gl.essenceChoice.length - 1 ? 1 : 0,
+                  duration: Duration(milliseconds: 200),
+                  child: TextFormField(
+                    cursorColor: Colors.white,
+                    maxLength: 256,
+                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                    onChanged: (value) {
+                      setState(() {
+                        _custom = value;
+                      });
+                    },
+                    onTap: () => widget.callbackOnStartTyping ?? () {},
+                    onTapOutside: (pointer) {},
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
+              lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  if (_selected > -1 && _selected < gl.essenceChoice.length - 1 && _custom.isNotEmpty ||
+                      _selected == gl.essenceChoice.length - 1 && _custom.isNotEmpty)
+                    SizedBox(
+                      width: gl.menuBarLength * .5 * gl.eqPx,
+                      child: TextButton(
+                        style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
+                        onPressed: () {
+                          widget.onAccept(_custom, _color);
+                        },
+                        child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
+                      ),
+                    ),
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.eqPx,
+                    child: TextButton(
+                      style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Retour".length),
+                      onPressed: widget.onDecline,
+                      child: Text(widget.messageDecline, style: dialogTextButtonStyle()),
+                    ),
+                  ),
+                ],
               ),
-            SizedBox(
-              width: gl.menuBarLength * .5 * gl.eqPx,
-              child: TextButton(
-                style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Retour".length),
-                onPressed: widget.onDecline,
-                child: Text(widget.messageDecline, style: dialogTextButtonStyle()),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
+
+  Color _getColorPointForEssence(String ess) {
+    for (int index in gl.dico.mLayerBases['COMPOALL']!.mDicoVal.keys) {
+      if (gl.dico.mLayerBases['COMPOALL']!.mDicoVal[index] == gl.essenceChoice[ess]) {
+        return gl.dico.mLayerBases['COMPOALL']!.mDicoCol[index] ?? Colors.tealAccent;
+      }
+    }
+    return Colors.tealAccent;
+  }
+
+  static void reset() => {_custom = "", _selected = -1};
 }
 
 class PopupValueChange {
@@ -3355,6 +3403,42 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                         width: gl.eqPx * gl.onCatalogueWidth * .9,
                         height: gl.eqPx * gl.onCatalogueMapHeight * .2,
                         child: Text(
+                          gl.selLay.labelsVisibleOnMap ? "Labels visible" : "Labels non visible",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                        ),
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
+                          if (gl.layerReady)
+                            IconButton(
+                              style: lt.trNoPadButtonstyle,
+                              onPressed: () {
+                                setState(() {
+                                  gl.selLay.labelsVisibleOnMap = !gl.selLay.labelsVisibleOnMap;
+                                  for (Geometry g in gl.selLay.geometries) {
+                                    g.labelsVisibleOnMap = gl.selLay.labelsVisibleOnMap;
+                                  }
+                                });
+                              },
+                              icon: Icon(
+                                gl.selLay.labelsVisibleOnMap ? Icons.label_off_outlined : Icons.label_outline,
+                                color: Colors.black,
+                                size: gl.eqPx * gl.iconSizeM,
+                              ),
+                            ),
+                          SizedBox(width: gl.eqPx * gl.iconSizeXS),
+                        ],
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Container(
+                        padding: EdgeInsets.zero,
+                        width: gl.eqPx * gl.onCatalogueWidth * .9,
+                        height: gl.eqPx * gl.onCatalogueMapHeight * .2,
+                        child: Text(
                           "Couleur",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
@@ -3394,7 +3478,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 gl.selLay.defaultColor = c;
                               });
                             },
-                            currentColor: gl.selLay.defaultColor,
+                            currentColor: gl.layerReady ? gl.selLay.defaultColor : Colors.transparent,
                           ),
                           SizedBox(width: gl.eqPx * gl.iconSizeXS),
                         ],
@@ -3415,27 +3499,28 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
-                          SelectLayerSymbol(
-                            type: gl.selLay.type,
-                            iconChanged: (int i) {
-                              setState(() {
-                                gl.selLay.defaultPointIcon = i;
-                              });
-                              PopupDoYouReally(
-                                context,
-                                () {
-                                  setState(() {
-                                    for (Geometry g in gl.selLay.geometries) {
-                                      g.selectedPointIcon = i;
-                                    }
-                                  });
-                                },
-                                "Attention",
-                                "Voulez vous changer le symbole pour tous les entités de la layer?",
-                              );
-                            },
-                            current: gl.selLay.defaultPointIcon,
-                          ),
+                          if (gl.layerReady)
+                            SelectLayerSymbol(
+                              type: gl.selLay.type,
+                              iconChanged: (int i) {
+                                setState(() {
+                                  gl.selLay.defaultPointIcon = i;
+                                });
+                                PopupDoYouReally(
+                                  context,
+                                  () {
+                                    setState(() {
+                                      for (Geometry g in gl.selLay.geometries) {
+                                        g.selectedPointIcon = i;
+                                      }
+                                    });
+                                  },
+                                  "Attention",
+                                  "Voulez vous changer le symbole pour tous les entités de la layer?",
+                                );
+                              },
+                              current: gl.selLay.defaultPointIcon,
+                            ),
                           SizedBox(width: gl.eqPx * gl.iconSizeXS),
                         ],
                       ),
@@ -6035,7 +6120,7 @@ class PopupPdfMenu {
       popupForestimatorWindow(
         id: "aPDF",
         title: "Documentation",
-
+        bigVersion: true,
         pdfChild: PDFScreen(path: path, titre: titre, currentPage: currentPage),
       );
     });

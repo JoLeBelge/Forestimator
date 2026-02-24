@@ -185,7 +185,8 @@ class ForestimatorScrollView extends StatefulWidget {
     this.horizontal = false,
     this.arrowColor,
     this.sizeArrows,
-    this.scrollbar = false,
+    this.scrollbar = true,
+    this.id,
   });
   final double? height;
   final double? width;
@@ -195,6 +196,7 @@ class ForestimatorScrollView extends StatefulWidget {
   final Color? arrowColor;
   final double? sizeArrows;
   final bool scrollbar;
+  final String? id;
 
   @override
   State<StatefulWidget> createState() => _ForestimatorScrollView();
@@ -205,6 +207,14 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
 
   bool _atTop = true;
   bool _atBottom = true;
+
+  void _scrollTo(int element) {
+    _controller.animateTo(
+      gl.eqPx * (element * gl.iconSizeM - gl.eqPxW / 4),
+      duration: Duration(milliseconds: 300),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
 
   @override
   void initState() {
@@ -223,19 +233,42 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
         }
       });
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller.jumpTo(2);
-    });
+    if (widget.id != null && widget.id == "geoScrollBar") {
+      switch (widget.id) {
+        case "geoScrollBar":
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _scrollTo(gl.selLay.selectedGeometry);
+          });
+          break;
+
+        default:
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _controller.jumpTo(5);
+          });
+      }
+    }
   }
 
   @override
   void dispose() {
+    if (widget.id != null) {
+      gl.scrollToPosition.removeWhere((String str, void Function(int) f) => str == widget.id);
+    }
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.id != null) {
+      gl.scrollToPosition[widget.id!] = (int it) {
+        if (mounted) {
+          setState(() {
+            _scrollTo(it);
+          });
+        }
+      };
+    }
     double width = widget.width ?? gl.eqPx * 65;
     double height = widget.height ?? gl.eqPx * 20;
     double sizeArrows = widget.sizeArrows ?? width * .1;
@@ -246,18 +279,26 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
       height: height,
       child: Stack(
         children: [
-          Scrollbar(
-            scrollbarOrientation: widget.horizontal ? ScrollbarOrientation.bottom : ScrollbarOrientation.right,
-            thickness: widget.horizontal ? height * .03 : width * .03,
-            controller: _controller,
-            child: SingleChildScrollView(
-              controller: _controller,
-              padding: EdgeInsets.zero,
-              reverse: widget.reverse,
-              scrollDirection: widget.horizontal ? Axis.horizontal : Axis.vertical,
-              child: widget.child,
-            ),
-          ),
+          widget.scrollbar
+              ? Scrollbar(
+                scrollbarOrientation: widget.horizontal ? ScrollbarOrientation.top : ScrollbarOrientation.right,
+                thickness: widget.horizontal ? height * .02 : width * .02,
+                controller: _controller,
+                child: SingleChildScrollView(
+                  controller: _controller,
+                  padding: EdgeInsets.zero,
+                  reverse: widget.reverse,
+                  scrollDirection: widget.horizontal ? Axis.horizontal : Axis.vertical,
+                  child: widget.child,
+                ),
+              )
+              : SingleChildScrollView(
+                controller: _controller,
+                padding: EdgeInsets.zero,
+                reverse: widget.reverse,
+                scrollDirection: widget.horizontal ? Axis.horizontal : Axis.vertical,
+                child: widget.child,
+              ),
           widget.horizontal
               ? Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

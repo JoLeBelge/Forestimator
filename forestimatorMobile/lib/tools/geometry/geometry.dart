@@ -80,10 +80,6 @@ class Geometry {
     visibleOnMap = true;
     name = polygonName;
     selectedPointIcon = 4;
-    setColorInside(
-      gl.dico.mLayerBases["COMPOALL"]!.mDicoCol[gl.essenceChoice.indexOf(gl.essenceChoice[0])] ?? Colors.black,
-    );
-    setColorLine(colorInside.withAlpha(255));
   }
 
   void setTransparencyLine(double value) {

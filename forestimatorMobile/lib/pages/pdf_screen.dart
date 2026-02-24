@@ -22,7 +22,7 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      alignment: AlignmentGeometry.bottomRight,
+      alignment: AlignmentGeometry.center,
       children: <Widget>[
         OrientationBuilder(
           builder: (c, o) {
@@ -75,21 +75,33 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
                 ? Center(child: CircularProgressIndicator())
                 : Container()
             : Center(child: Text(errorMessage)),
-        Container(
-          alignment: AlignmentGeometry.bottomLeft,
-          child: FutureBuilder<PDFViewController>(
-            future: _controller.future,
-            builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
-              if (snapshot.hasData) {
-                return FloatingActionButton.extended(
-                  label: Text("Aller à la page ${pages! ~/ 2}"),
-                  onPressed: () async {
-                    await snapshot.data!.setPage(pages! ~/ 2);
-                  },
-                );
-              }
-              return Container();
-            },
+        SizedBox(
+          width: gl.eqPx * (gl.eqPxW - 5),
+          height: gl.eqPx * (gl.dsp.eqMaxWindowHeight - 5),
+          child: Container(
+            alignment: AlignmentGeometry.topCenter,
+            child: FutureBuilder<PDFViewController>(
+              future: _controller.future,
+              builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
+                if (snapshot.hasData) {
+                  return FloatingActionButton.extended(
+                    backgroundColor: gl.colorAgroBioTech,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.circular(12.0),
+                      side: BorderSide(color: Colors.white, width: gl.eqPx * .5),
+                    ),
+                    label: Text(
+                      "Aller à la page ${pages! ~/ 2}",
+                      style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXS, color: Colors.black),
+                    ),
+                    onPressed: () async {
+                      await snapshot.data!.setPage(pages! ~/ 2);
+                    },
+                  );
+                }
+                return Container();
+              },
+            ),
           ),
         ),
       ],

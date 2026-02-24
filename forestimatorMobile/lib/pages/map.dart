@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:fforestimator/dico/dico_apt.dart';
-import 'package:fforestimator/myicons.dart';
 import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
-
 import 'package:fforestimator/tools/layout_tools.dart' as lt;
 import 'package:fforestimator/tools/geometry/geometry.dart' as pl;
 import 'package:fforestimator/tools/geometry_layer.dart';
@@ -24,14 +22,14 @@ import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
-class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+class ForestimatorMap extends StatefulWidget {
+  const ForestimatorMap({super.key});
 
   @override
-  State<MapPage> createState() => _MapPageState();
+  State<ForestimatorMap> createState() => _ForestimatorMapState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _ForestimatorMapState extends State<ForestimatorMap> {
   final _mapController = MapController();
   final LayerHitNotifier<String> hitNotifier = ValueNotifier(null);
   LatLng? _pt;
@@ -71,9 +69,9 @@ class _MapPageState extends State<MapPage> {
       Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuSettingsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _mainMenuEssenceBoxPos = Offset(gl.dsp.alignX(-33), gl.dsp.alignY(gl.dsp.eqAlignTop));
-  Offset get _mainMenuEssenceAnimOnScreenPos => Offset(gl.dsp.alignX(-33), gl.dsp.alignY(gl.dsp.eqAlignTop));
-  Offset get _mainMenuEssenceAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
+  Offset _mainMenuEssenceBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(90));
+  Offset get _mainMenuEssenceAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(90));
+  Offset get _mainMenuEssenceAnimOffScreenPos => Offset(gl.dsp.alignX(gl.eqPxW), gl.dsp.alignY(90));
 
   Offset _mainMenuWarningsBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuWarningsAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(gl.dsp.eqAlignTop));
@@ -263,27 +261,29 @@ class _MapPageState extends State<MapPage> {
                                 InteractiveFlag.scrollWheelZoom,
                           ),
                           onLongPress: (tapPosition, point) async {
-                            _lastPressWasShort = false;
-                            if (!_doingAnaPt) {
-                              refreshView(() {
-                                _doingAnaPt = true;
-                              });
-                              await _runAnaPt(
-                                epsg4326.transform(epsg31370, proj4.Point(x: point.longitude, y: point.latitude)),
-                              );
-                              _pt = point;
-                              gl.refreshStack(() {
-                                popupForestimatorWindow(
-                                  id: "anaPres",
-                                  title: "Resultats de l'analyse",
-                                  child: AnaResultsMenu(() {
-                                    gl.refreshStack(() {});
-                                  }, gl.requestedLayers),
+                            if (!gl.Mode.polygon) {
+                              _lastPressWasShort = false;
+                              if (!_doingAnaPt) {
+                                refreshView(() {
+                                  _doingAnaPt = true;
+                                });
+                                await _runAnaPt(
+                                  epsg4326.transform(epsg31370, proj4.Point(x: point.longitude, y: point.latitude)),
                                 );
-                              });
-                              refreshView(() {
-                                _doingAnaPt = false;
-                              });
+                                _pt = point;
+                                gl.refreshStack(() {
+                                  popupForestimatorWindow(
+                                    id: "anaPres",
+                                    title: "Resultats de l'analyse",
+                                    child: AnaResultsMenu(() {
+                                      gl.refreshStack(() {});
+                                    }, gl.requestedLayers),
+                                  );
+                                });
+                                refreshView(() {
+                                  _doingAnaPt = false;
+                                });
+                              }
                             }
                           },
                           onTap:
@@ -298,32 +298,6 @@ class _MapPageState extends State<MapPage> {
                                     setState(() {
                                       _measurePath.add(point);
                                     }),
-                                  }
-                                  : gl.Mode.addVertexesPolygon
-                                  ? (tapPosition, point) async => {
-                                    if (gl.selLay.geometries.isNotEmpty)
-                                      {
-                                        if (_isPolygonWellDefined(gl.selGeo.getPolyPlusOneVertex(point)))
-                                          {
-                                            refreshView(() {
-                                              gl.selGeo.addPoint(point);
-                                            }),
-                                            if (gl.selGeo.type.contains("Point") && gl.selGeo.numPoints == 1)
-                                              {
-                                                refreshView(() {
-                                                  gl.selGeo.selectedVertex = 0;
-                                                  gl.Mode.showButtonAddVertexesPolygon = false;
-                                                  gl.Mode.showButtonMoveVertexesPolygon = true;
-                                                  gl.Mode.showButtonRemoveVertexesPolygon = true;
-                                                  gl.Mode.addVertexesPolygon = false;
-                                                  gl.Mode.moveVertexesPolygon = false;
-                                                  gl.Mode.removeVertexesPolygon = false;
-                                                }),
-                                              },
-                                          }
-                                        else
-                                          {PopupPolygonNotWellDefined(gl.notificationContext!)},
-                                      },
                                   }
                                   : gl.Mode.moveVertexesPolygon
                                   ? (tapPosition, point) async => {
@@ -349,9 +323,7 @@ class _MapPageState extends State<MapPage> {
                                       }
                                     }),
                                   }
-                                  : gl.Mode.essence
-                                  ? (tapPosition, point) async => {PopupNewEssenceObservationPoint(context, point)}
-                                  : gl.Mode.editPolygon
+                                  : gl.Mode.polygon
                                   ? (tapPosition, point) async => {}
                                   : (tapPosition, point) async => {_lastPressWasShort = true, _updatePtMarker(point)},
                           onPositionChanged: (position, e) async {
@@ -900,6 +872,11 @@ class _MapPageState extends State<MapPage> {
                                           gl.Mode.moveVertexesPolygon = false;
                                           gl.Mode.removeVertexesPolygon = false;
                                         });
+                                        if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
+                                          gl.selLay.removeGeometry(last: true);
+                                        } else if (gl.selGeo.type.contains("Polygon") && gl.selGeo.points.length < 3) {
+                                          gl.selLay.removeGeometry(last: true);
+                                        }
                                       },
                                       icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                     ),
@@ -910,7 +887,7 @@ class _MapPageState extends State<MapPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                  gl.Mode.showButtonRemoveVertexesPolygon
+                                  gl.Mode.showButtonRemoveVertexesPolygon && !gl.selLay.type.contains("Point")
                                       ? Container(
                                         color: _polygonMenuColorTools(gl.Mode.removeVertexesPolygon),
                                         child: SizedBox(
@@ -992,6 +969,14 @@ class _MapPageState extends State<MapPage> {
                                                   _stopMovingSelectedPoint();
                                                 });
                                               }
+                                              _mainMenuEssenceBoxPos =
+                                                  !gl.Mode.addVertexesPolygon
+                                                      ? _mainMenuEssenceAnimOffScreenPos
+                                                      : ((gl.selLay.type.contains("Point") &&
+                                                              gl.selGeo.points.length < 2)) ||
+                                                          (gl.selLay.type.contains("Polygon"))
+                                                      ? _mainMenuEssenceAnimOnScreenPos
+                                                      : _mainMenuEssenceAnimOffScreenPos;
                                             },
                                             icon: const Icon(Icons.add_circle),
                                           ),
@@ -1826,6 +1811,7 @@ class _MapPageState extends State<MapPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   lt.ForestimatorScrollView(
+                                    id: "geoScrollBar",
                                     horizontal: true,
                                     height: gl.eqPx * gl.iconSizeM,
                                     width: gl.eqPx * gl.chosenPolyBarWidth * .75,
@@ -1916,6 +1902,8 @@ class _MapPageState extends State<MapPage> {
                                                             ? "Point${gl.selLay.geometries.length + 1}"
                                                             : "Polygon${gl.selLay.geometries.length + 1}",
                                                   );
+                                                  _switchModeEditVertexesOn();
+                                                  gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
                                                 });
                                               }
                                               : () {},
@@ -1933,42 +1921,26 @@ class _MapPageState extends State<MapPage> {
                                   ? Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      !gl.selGeo.labelsVisibleOnMap
-                                          ? SizedBox(
-                                            height: gl.eqPx * gl.iconSizeM * .9,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  gl.selGeo.labelsVisibleOnMap = true;
-                                                });
-                                                gl.selGeo.serialize();
-                                                gl.refreshStack(() {
-                                                  gl.modeMapShowPolygons = true;
-                                                });
-                                              },
-                                              icon: Icon(
-                                                Icons.label,
-                                                size: gl.eqPx * gl.iconSizeS * .9,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          )
-                                          : SizedBox(
-                                            height: gl.eqPx * gl.iconSizeM * .9,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                gl.refreshStack(() {
-                                                  gl.selGeo.labelsVisibleOnMap = false;
-                                                });
-                                                gl.selGeo.serialize();
-                                              },
-                                              icon: Icon(
-                                                Icons.label_off,
-                                                size: gl.eqPx * gl.iconSizeS * .9,
-                                                color: Colors.white,
-                                              ),
+                                      if (!gl.selGeo.labelsVisibleOnMap && !gl.Mode.smallLabel)
+                                        SizedBox(
+                                          height: gl.eqPx * gl.iconSizeM * .9,
+                                          child: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                gl.selGeo.labelsVisibleOnMap = true;
+                                              });
+                                              gl.selGeo.serialize();
+                                              gl.refreshStack(() {
+                                                gl.modeMapShowPolygons = true;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              Icons.label,
+                                              size: gl.eqPx * gl.iconSizeS * .9,
+                                              color: Colors.white,
                                             ),
                                           ),
+                                        ),
                                       if (gl.selGeo.visibleOnMap)
                                         SizedBox(
                                           height: gl.eqPx * gl.iconSizeM * .9,
@@ -2139,6 +2111,19 @@ class _MapPageState extends State<MapPage> {
     ],
   );
 
+  void _switchModeEditVertexesOn() {
+    gl.refreshStack(() {
+      gl.modeMapShowPolygons = true;
+      gl.Mode.editPolygon = true;
+      gl.Mode.showButtonAddVertexesPolygon = true;
+      gl.Mode.showButtonMoveVertexesPolygon = false;
+      gl.Mode.showButtonRemoveVertexesPolygon = false;
+      gl.Mode.addVertexesPolygon = true;
+      gl.Mode.moveVertexesPolygon = false;
+      gl.Mode.removeVertexesPolygon = false;
+    });
+  }
+
   Widget get forestimatorTopMenuElements => Stack(
     alignment: AlignmentGeometry.center,
     children: [
@@ -2148,13 +2133,12 @@ class _MapPageState extends State<MapPage> {
         duration: Duration(milliseconds: 750),
         child: _forestimatorSettingButton,
       ),
-
-      if (gl.Mode.essence)
+      if (gl.Mode.essence || gl.Mode.addVertexesPolygon)
         AnimatedContainer(
           alignment: AlignmentGeometry.xy(_mainMenuEssenceBoxPos.dx, _mainMenuEssenceBoxPos.dy),
           curve: Curves.easeInOutBack,
           duration: Duration(milliseconds: 750),
-          child: _forestimatorEssenceModeButton,
+          child: _forestimatorAddEssenceVertexPoint,
         ),
       AnimatedContainer(
         alignment: AlignmentGeometry.xy(_mainMenuWarningsBoxPos.dx, _mainMenuWarningsBoxPos.dy),
@@ -2168,6 +2152,13 @@ class _MapPageState extends State<MapPage> {
         duration: Duration(milliseconds: 750),
         child: _forestimatorOnOffline,
       ),
+      if (gl.Mode.essence || gl.Mode.addVertexesPolygon)
+        AnimatedContainer(
+          alignment: AlignmentGeometry.xy(0, 0),
+          curve: Curves.easeInOutBack,
+          duration: Duration(milliseconds: 750),
+          child: _forestimatorCrosshair,
+        ),
     ],
   );
 
@@ -2214,31 +2205,37 @@ class _MapPageState extends State<MapPage> {
     ),
   );
 
-  Widget get _forestimatorEssenceModeButton => Container(
+  Widget get _forestimatorAddEssenceVertexPoint => Container(
     alignment: Alignment.center,
-    width: gl.eqPx * 15,
-    height: gl.eqPx * 15,
-    child: TextButton(
-      style: lt.essenceButtonstyle,
+    width: gl.eqPx * 12,
+    height: gl.eqPx * 12,
+    child: FloatingActionButton(
+      backgroundColor:
+          (!(gl.geoReady && gl.selLay.type.contains("Point") && gl.selGeo.points.isNotEmpty)) ||
+                  gl.Mode.essence ||
+                  gl.geoReady && gl.selLay.type.contains("Polygon")
+              ? gl.colorAgroBioTech
+              : Colors.grey,
       onPressed: () {
-        PopupDoYouReally(
-          context,
-          () {
-            setState(() {
-              gl.Mode.essence = false;
-            });
-            gl.Mode.serialize();
-          },
-          "Attention",
-          "Voulez vous fermer le mode Essence?",
-        );
+        if ((!(gl.geoReady && gl.selLay.type.contains("Point") && gl.selGeo.points.isNotEmpty)) ||
+            gl.Mode.essence ||
+            gl.geoReady && gl.selLay.type.contains("Polygon")) {
+          refreshView(() {
+            gl.Mode.addVertexesPolygon
+                ? gl.selGeo.addPoint(_mapController.camera.center)
+                : PopupNewEssenceObservationPoint(context, _mapController.camera.center);
+          });
+        }
       },
-      child: Icon(
-        CustomIcons.tree,
-        color: gl.Mode.essence ? Colors.black : Colors.white,
-        size: gl.eqPx * gl.iconSizeSettings,
-      ),
+      child: Icon(Icons.add, color: gl.Mode.essence ? Colors.black : Colors.white, size: gl.eqPx * gl.iconSizeSettings),
     ),
+  );
+
+  Widget get _forestimatorCrosshair => Container(
+    alignment: Alignment.center,
+    width: gl.eqPx * 10,
+    height: gl.eqPx * 10,
+    child: Icon(FontAwesomeIcons.crosshairs, color: Colors.black.withAlpha(180), size: gl.eqPx * 10),
   );
 
   Widget get _forestimatorOnOffline => SizedBox(
@@ -2859,46 +2856,45 @@ class _MapPageState extends State<MapPage> {
               },
               Icon(Icons.forest, size: gl.eqPx * gl.menuBarLength / 5),
             ),
-            if (!gl.Mode.essence)
-              _menuButton(
-                gl.eqPx * gl.menuBarLength / 4,
-                gl.eqPx * gl.menuBarThickness,
-                gl.Mode.polygon,
-                Colors.yellow,
-                () {
-                  setState(() {
-                    if (!gl.Mode.polygon) {
-                      if (!gl.layerReady) {
-                        gl.Mode.polygonList = true;
-                      }
-                      _polygonMode = true;
-                      _closeSwitchesMenu();
-                      _closeToolbarMenu();
-                      if (dummy) {
-                        close!();
-                      }
-                    } else {
-                      if (gl.layerReady) {
-                        if (gl.Mode.polygonList) {
-                          gl.Mode.polygonList = false;
-                          _polygonMode = true;
-                        } else {
-                          _closePolygonMenu();
-                        }
-                      } else {
+            _menuButton(
+              gl.eqPx * gl.menuBarLength / 4,
+              gl.eqPx * gl.menuBarThickness,
+              gl.Mode.polygon,
+              Colors.yellow,
+              () {
+                setState(() {
+                  if (!gl.Mode.polygon) {
+                    if (!gl.layerReady) {
+                      gl.Mode.polygonList = true;
+                    }
+                    _polygonMode = true;
+                    _closeSwitchesMenu();
+                    _closeToolbarMenu();
+                    if (dummy) {
+                      close!();
+                    }
+                  } else {
+                    if (gl.layerReady) {
+                      if (gl.Mode.polygonList) {
                         gl.Mode.polygonList = false;
+                        _polygonMode = true;
+                      } else {
                         _closePolygonMenu();
                       }
+                    } else {
+                      gl.Mode.polygonList = false;
+                      _closePolygonMenu();
                     }
-                  });
-                },
-                () {
-                  refreshView(() {
-                    _closePolygonMenu();
-                  });
-                },
-                Icon(Icons.hexagon_outlined, size: gl.eqPx * gl.menuBarLength / 5),
-              ),
+                  }
+                });
+              },
+              () {
+                refreshView(() {
+                  _closePolygonMenu();
+                });
+              },
+              Icon(Icons.hexagon_outlined, size: gl.eqPx * gl.menuBarLength / 5),
+            ),
             _menuButton(
               gl.eqPx * gl.menuBarLength / 4,
               gl.eqPx * gl.menuBarThickness,

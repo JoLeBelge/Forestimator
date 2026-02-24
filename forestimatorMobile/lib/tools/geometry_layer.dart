@@ -110,6 +110,11 @@ class GeometricLayer {
       });
       Geometry.removePolyFromShared(id, layerId: this.id);
     }
+    if (geometries.isEmpty) {
+      selectedGeometry = -1;
+    } else {
+      selectedGeometry--;
+    }
   }
 
   void visible(bool visibility) {

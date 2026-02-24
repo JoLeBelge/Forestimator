@@ -538,6 +538,7 @@ VoidSetter refreshStack = (void Function() f) {
   f();
 };
 VoidSetter rebuildSwitcherCatalogueButtons = (void Function() setter) {};
+Map<String, void Function(int)> scrollToPosition = {};
 VoidSetter refreshSearch = (void Function() setter) {};
 VoidSetter refreshSettingsMenu = (void Function() setter) {};
 VoidSetter rebuildOfflineCatalogue = (void Function() setter) {};
@@ -840,19 +841,18 @@ List<Color> predefinedPointSymbPalette = [
   Colors.white,
 ];
 
-List<String> essenceChoice = [
-  "Choisissez",
-  "Bouleaux",
-  "Chênes",
-  "Douglas",
-  "Epicéa",
-  "Hêtre",
-  "Mélèzes",
-  "Peupliers",
-  "Pins",
-  "Autres conifères",
-  "Entrer du texte",
-];
+Map<String, String> essenceChoice = {
+  "Bouleaux": "BO - Birchs",
+  "Chênes": "CH - Oaks",
+  "Douglas": "DO - Douglas_fir",
+  "Epicéa": "EP - Spruces",
+  "Hêtre": "HE - Beech",
+  "Mélèzes": "MZ - Larchs",
+  "Peupliers": "PE - Poplars",
+  "Pins": "PI - Pines",
+  "Autres conifères": "AUc - Others coniferous",
+  "Entrer du texte": "",
+};
 
 const String labelSendCompoFeature =
     "Vous pouvez nous communiquer des observations relatives à la composition dans le but d'améliorer la carte de composition. Veillez à complêter l'attribut 'essence' avec l'espèce observée. Nous attirons votre attention qu'une entitée (polygone ou point) ne peux être envoyée qu'une seule fois. Merci pour votre contribution !";
