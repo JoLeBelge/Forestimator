@@ -351,11 +351,6 @@ void groupLayers::extractInfo(double x, double y)
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale)
 {
     std::cout << " groupLayers::computeStatGlob " << std::endl;
-    /*char * test;
-    poGeomGlobale->exportToWkt(&test);
-    std::cout << " geometrie WKT :" << test << std::endl;
-    */
-
     clearStat();
 
     // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
@@ -368,61 +363,9 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale)
             std::map<std::string, int> stat = l->computeStat1(poGeomGlobale);
             mVLStat.push_back(std::make_shared<layerStatChart>(l, stat, poGeomGlobale));
         }
-
-        // mPBar->setValue(mPBar->value() + 1);
-        // m_app->processEvents();
     }
-    // mPBar->setValue(mPBar->maximum());
-    // return aRes;
+
     m_app->addLog("compute stat, " + std::to_string(getNumSelect4Download()) + " traitements", typeLog::anas); // add some web stats
-}
-
-void groupLayers::computeStatAllPol(OGRLayer *lay, std::string path)
-{
-    std::ofstream aFile(path.c_str());
-    aFile.precision(10);
-
-    aFile << "<layerStat>\n";
-    OGRFeature *poFeature;
-    OGRFeatureDefn *def = lay->GetLayerDefn();
-    lay->ResetReading();
-    while ((poFeature = lay->GetNextFeature()) != NULL)
-    {
-        // écriture des informations du polygones dans le fichiers résultats
-        aFile << "<feature>\n";
-        for (int f(0); f < def->GetFieldCount(); f++)
-        {
-            aFile << "<" << def->GetFieldDefn(f)->GetNameRef() << ">" << poFeature->GetFieldAsString(f) << "</" << def->GetFieldDefn(f)->GetNameRef() << ">"
-                                                                                                                                                         "\n";
-        }
-        OGRGeometry *poGeom = poFeature->GetGeometryRef();
-        poGeom->closeRings();
-        poGeom->flattenTo2D();
-        char *polWkt;
-        poGeom->exportToWkt(&polWkt);
-        for (auto &l : getSelectedLayer4Download())
-        {
-            aFile << "<processing>\n";
-            if (l->Code() == "MNH2019")
-            {
-                aFile << "<processingName>hdom2019</processingName>\n";
-                aFile << mDico->geoservice("hdom", "MNH2019", polWkt, typeAna::surfacique,NULL, 1);
-            }
-            else
-            {
-                if (l->l4Stat())
-                {
-                    aFile << "<processingName>" + l->Code() + "</processingName>\n";
-                    aFile << mDico->geoservice(l->Code(), "", polWkt, typeAna::surfacique,NULL, 1);
-                }
-            }
-            aFile << "</processing>\n";
-        }
-        aFile << "</feature>\n";
-    }
-    aFile << "</layerStat>\n";
-    aFile.close();
-    return;
 }
 
 /**

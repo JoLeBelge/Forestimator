@@ -2,6 +2,7 @@
 #define PARCELLAIRE_H
 #pragma once
 
+#include "cdicoapt.h"
 #include "grouplayers.h"
 #include <Wt/WBreak.h>
 #include <Wt/WContainerWidget.h>
@@ -86,12 +87,13 @@ public:
     {
         std::string geoJsonName;
         groupLayers *mGL;
-        std::string path;
+        cDicoApt * mDico;
+        //std::string path;
         cWebAptitude **app;
         void run() override;
 
     public:
-        TaskComputing(std::string geoJsonName, groupLayers *mGL, std::string path, cWebAptitude **app) : geoJsonName(geoJsonName), mGL(mGL), path(path), app(app)
+        TaskComputing(std::string geoJsonName, groupLayers *mGL, cDicoApt * aDico,cWebAptitude **app) : geoJsonName(geoJsonName), mGL(mGL),mDico(aDico), app(app)
         {}
     };
 

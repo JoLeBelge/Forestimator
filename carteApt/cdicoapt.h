@@ -7,7 +7,6 @@
 
 
 std::string removeAccents(std::string aStr);
-std::string putInBalise(std::string aCont,std::string aBalise);
 
 class cdicoAptBase;
 class color;
@@ -17,7 +16,7 @@ class ST;
 class cnsw;
 class cadastre;
 
-enum typeAna {ponctuel,surfacique,dicoTable,MassPonctuel};
+enum typeAna {ponctuel,surfacique,dicoTable,Mass};
 
 extern int globMaxSurf;
 
@@ -37,7 +36,7 @@ public:
     std::shared_ptr<cadastre> mCadastre;
 
     /*************************/
-    std::string geoservice(std::string aTool, std::string aArgs, std::string aPolyg, typeAna aType, OGRLayer *lay, bool xml=0);
+    std::string geoservice(std::string aTool, std::string aArgs, std::string aPolyg, typeAna aType, OGRLayer *lay);
     bool checkTool(std::string aTool);
     OGRLayer * uploadLayer(std::string aShpToUpload);
     OGRGeometry * checkPolyg(std::string aPolyg, int maxSurf=globMaxSurf);
