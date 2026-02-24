@@ -47,6 +47,7 @@ int launchForestimator(int argc, char **argv)
         server.addResource(&resource, "/api/${tool}/args/${toolarg}/polygon/${pol}");
         server.addResource(&resource, "/api/${tool}/polygon/${pol}");
         server.addResource(&resource, "/api/${tool}/point/${pt}");
+        server.addResource(&resource, "/api/${tool}/${pts}");
         server.addResource(&resource, "/api/${tool}/args/${toolarg}/point/${pt}");
         // seule url de la ressource ou tout les arguments sont vide
         server.addResource(&resource, "/api/help");

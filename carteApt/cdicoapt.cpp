@@ -100,14 +100,14 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
     const char *inputPath= this->File("ZBIOSIMP").c_str();
     mDS_zbio= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
-        if (boost::filesystem::exists(inputPath)){
+    if (boost::filesystem::exists(inputPath)){
 
-            if( mDS_zbio == NULL )
-            {
-                std::cout << inputPath << " : " ;
-                printf( " shp zbio : pas réussi à l'ouvrir." );
-            }
-        } else {std::cout << this->File("ZBIOSIMP") << " : n'existe pas" << std::endl;}
+        if( mDS_zbio == NULL )
+        {
+            std::cout << inputPath << " : " ;
+            printf( " shp zbio : pas réussi à l'ouvrir." );
+        }
+    } else {std::cout << this->File("ZBIOSIMP") << " : n'existe pas" << std::endl;}
 
     if (globTest){std::cout << "done " << std::endl;}
     boost::filesystem::create_directories(File("TMPDIR"));
@@ -264,7 +264,7 @@ OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg, int maxSurf){
         // j'ai commenté tout ce bloc de code car le MakeValid ne fonctionne pas toujours et la suite toGeometryCollection()->getGeometryRef(0)->IsValid() fait crasher l'app
         //pol=pol->MakeValid();
         // j'ai des pol invalides qui sont des multipolygones avec self intersection, je garde que le premier polygone. solution rapide...
-       /*if (!pol->IsValid() & pol->toGeometryCollection()->getNumGeometries()>1){
+        /*if (!pol->IsValid() & pol->toGeometryCollection()->getNumGeometries()>1){
             try{
                 //if(OGR_G_Area(pol->toGeometryCollection()->getGeometryRef(0))>100 & pol->toGeometryCollection()->getGeometryRef(0)->IsValid()){
                 pol->toGeometryCollection()->getGeometryRef(0)->IsValid();
@@ -294,14 +294,14 @@ OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg, int maxSurf){
     return pol;
 }
 
-std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::string aPolyg, typeAna aType, bool xml){
+std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::string aPolyg, typeAna aType, OGRLayer * lay, bool xml){
 
     //if (globTest) {std::cout << "Forestimator API " << aTool << " aArgs " << aArgs << " polygon " << aPolyg << std::endl;}
 
     std::string aResponse;
 
     GDALAllRegister();
-    if (checkTool(aTool)){
+    if (checkTool(aTool) || aType==typeAna::MassPonctuel){
 
         switch(aType){
         case typeAna::surfacique:{
@@ -314,10 +314,10 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         if (!xml){aResponse+="code_mnh;moy;cv;max;min;nb\n";}
                         for (std::string code : VMNH){
                             std::shared_ptr<layerBase> l=getLayerBase(code);
-                         //   statHdomBase stat(l,pol,1);
-                         //   basicStat bs= stat.bshdom();
-                         //   if (!xml){aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";}
-                         /*  else { aResponse="<code_mnh>"+ l->Code()+ "</code_mnh>\n"
+                            //   statHdomBase stat(l,pol,1);
+                            //   basicStat bs= stat.bshdom();
+                            //   if (!xml){aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";}
+                            /*  else { aResponse="<code_mnh>"+ l->Code()+ "</code_mnh>\n"
                                         +"<moy>"+ bs.getMean()+ "</moy>\n"
                                         +"<cv>"+ bs.getCV()+ "</cv>\n"
                                         +"<max>"+ bs.getMax()+ "</max>\n"
@@ -368,36 +368,36 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
 
                         // option pour avoir uniquement la classe majoritaire
                         if (aArgs=="maj"){
-                      std::pair<int,double> p= l->valMajoritaire(pol);
-                      //aResponse+="maj;pct\n";
-                      aResponse+=std::to_string(p.first)+";"+roundDouble(p.second,0);//+"\n";
+                            std::pair<int,double> p= l->valMajoritaire(pol);
+                            //aResponse+="maj;pct\n";
+                            aResponse+=std::to_string(p.first)+";"+roundDouble(p.second,0);//+"\n";
                         } else {
 
-                        std::map<int,double> stat=l->computeStat2(pol);
-                        std::string aL1,aL2;
-                        bool test(1);// detecte la première ligne
-                        for (auto kv:stat){
+                            std::map<int,double> stat=l->computeStat2(pol);
+                            std::string aL1,aL2;
+                            bool test(1);// detecte la première ligne
+                            for (auto kv:stat){
 
-                            if (!xml){
-                                if (test){
-                                    aL2=std::to_string(kv.first);
-                                    aL1=roundDouble(kv.second);
-                                    test=0;
-                                }else{
-                                    aL2+=";"+std::to_string(kv.first);
-                                    aL1+=";"+roundDouble(kv.second);
+                                if (!xml){
+                                    if (test){
+                                        aL2=std::to_string(kv.first);
+                                        aL1=roundDouble(kv.second);
+                                        test=0;
+                                    }else{
+                                        aL2+=";"+std::to_string(kv.first);
+                                        aL1+=";"+roundDouble(kv.second);
+                                    }
+                                } else {
+                                    // ici je met trois balise ; nom du field, valeur raster , et pourcentage
+                                    aResponse+="<classe>";
+                                    aResponse+=putInBalise(l->getValLabel(kv.first),"classeName");
+                                    aResponse+=putInBalise(std::to_string(kv.first),"classeRasterVal");
+                                    aResponse+=putInBalise(roundDouble(kv.second),"pourcentage");
+                                    aResponse+="</classe>";
                                 }
-                            } else {
-                                // ici je met trois balise ; nom du field, valeur raster , et pourcentage
-                                aResponse+="<classe>";
-                                aResponse+=putInBalise(l->getValLabel(kv.first),"classeName");
-                                aResponse+=putInBalise(std::to_string(kv.first),"classeRasterVal");
-                                aResponse+=putInBalise(roundDouble(kv.second),"pourcentage");
-                                aResponse+="</classe>";
                             }
-                        }
 
-                        if (!xml){aResponse+=aL2+"\n"+aL1+"\n";}
+                            if (!xml){aResponse+=aL2+"\n"+aL1+"\n";}
 
                         }
 
@@ -432,10 +432,10 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                     std::string typeOut=parsePointArg(aArgs);
                     int aVal=l->getValue(pt->getX(),pt->getY());
                     if (typeOut=="val"){
-                    aResponse=std::to_string(aVal);
+                        aResponse=std::to_string(aVal);
                     }
                     if (typeOut=="txt"){
-                       aResponse=l->getValLabel(aVal);
+                        aResponse=l->getValLabel(aVal);
                     }
                 }
             } else {
@@ -449,6 +449,45 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                 std::shared_ptr<layerBase> l=getLayerBase(aTool);
                 aResponse=l->getDicoValStr();
             }
+            break;
+        }
+        case typeAna::MassPonctuel:{
+            if (globTest){std::cout << "api traitement de masse anaPonctuelle, layers "  << aTool << std::endl;}
+            std::vector<std::string> codeList;
+            std::vector<std::string> aTmp;
+            boost::split( aTmp,aTool,boost::is_any_of(","),boost::token_compress_on);
+            for (std::string code: aTmp){
+
+                if (hasLayerBase(code)){
+                    codeList.push_back(code);
+                }
+            }
+            if (globTest){std::cout << "codeList for API mass ana Points has " << codeList.size() << " elements" << std::endl;}
+
+            for (std::string &code: codeList){
+                if (lay->FindFieldIndex(code.c_str(),0)==-1){
+                    OGRFieldDefn * oFLD(NULL);
+                    oFLD= new OGRFieldDefn(code.c_str(),  OFTReal);
+                    oFLD->SetJustify(OGRJustification::OJLeft);
+                    lay->CreateField(oFLD);
+                }
+            }
+
+            OGRFeature *poFeature;
+            while( (poFeature = lay->GetNextFeature()) != NULL )
+            {
+                if (poFeature->GetGeometryRef()->getIsoGeometryType()==1001 || poFeature->GetGeometryRef()->getIsoGeometryType()==1)
+                {
+                    OGRPoint * pt =poFeature->GetGeometryRef()->toPoint();
+                    for (std::string &code: codeList){
+                        std::shared_ptr<layerBase> l=getLayerBase(code);
+                        int aVal=l->getValue(pt->getX(),pt->getY());
+                        poFeature->SetField(code.c_str(),aVal);
+                    }
+                    lay->SetFeature(poFeature);
+                }
+            }
+
             break;
         }
         }
@@ -500,7 +539,7 @@ std::vector<std::string> cDicoApt::parseHdomArg(std::string aArgs){
         boost::split( aV,aArgs,boost::is_any_of(","),boost::token_compress_on);
         for (std::string code: aV){
             //if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::MNH)){
-                aRes.push_back(code);
+            aRes.push_back(code);
             //}
         }
     }
@@ -512,7 +551,6 @@ std::string cDicoApt::parsePointArg(std::string aArgs){
     if (aArgs==""){ aRes="val";} else if(aArgs=="txt"){aRes="txt";}
     return aRes;
 }
-
 
 std::map<int,double> cDicoApt::simplifieAptStat(std::map<int,double> aStat){
     std::map<int,double> aRes;
