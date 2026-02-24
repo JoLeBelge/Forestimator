@@ -203,7 +203,7 @@ class _MyApp extends State<MyApp> {
       _navigatorKey = GlobalKey<NavigatorState>();
       gl.notificationContext = _navigatorKey!.currentContext;
     });
-    Geometry.sendEssencePointsInBackground();
+    if (GeometricLayer.essenceLayerExists()) Geometry.sendEssencePointsInBackground();
   }
 
   @override
