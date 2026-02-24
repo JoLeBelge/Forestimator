@@ -38,12 +38,12 @@ void stationDescResource::handleRequest(const Http::Request &request,Http::Respo
             if (name=="toolarg") {aArgs=value;}
             if (name=="pol") {aPolyg=value;}
             if (name=="pt") {aPolyg=value;aMode=typeAna::ponctuel;}
-            if (name=="pts") {aPolyg=value;aMode=typeAna::MassPonctuel;}
+            if (name=="pts") {aPolyg=value;aMode=typeAna::Mass;}
 
         }
 
         OGRLayer * lay =NULL;
-        if (aMode==typeAna::MassPonctuel){
+        if (aMode==typeAna::Mass){
             boost::filesystem::path tmpPath = boost::filesystem::path(mDico->File("TMPDIR")) / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.geojson");
             std::ofstream ofs( tmpPath.c_str(), std::ofstream::out);
             ofs << request.in().rdbuf() ;

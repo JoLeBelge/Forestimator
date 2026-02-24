@@ -49,7 +49,7 @@ parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW)
     anaOnAllPolygBt->disable();
 
     fu->fileTooLarge().connect([=]
-                               { msg->setText("Le fichier est trop volumineux (max " + std::to_string(globVolMaxShp) + "Ko)."); });
+    { msg->setText("Le fichier est trop volumineux (max " + std::to_string(globVolMaxShp) + "Ko)."); });
     fu->changed().connect(this, &parcellaire::fuChanged);
     fu->uploaded().connect(this, &parcellaire::upload);
 
@@ -178,15 +178,15 @@ bool parcellaire::computeGlobalGeom(std::string extension, bool limitSize)
             {
                 // message box
                 auto messageBox =
-                    addChild(std::make_unique<Wt::WMessageBox>(
-                        "Import du shapefile polygone",
-                        tr("parcellaire.upload.size"),
-                        Wt::Icon::Information,
-                        Wt::StandardButton::Ok));
+                        addChild(std::make_unique<Wt::WMessageBox>(
+                                     "Import du shapefile polygone",
+                                     tr("parcellaire.upload.size"),
+                                     Wt::Icon::Information,
+                                     Wt::StandardButton::Ok));
 
                 messageBox->setModal(true);
                 messageBox->buttonClicked().connect([=]
-                                                    { removeChild(messageBox); });
+                { removeChild(messageBox); });
                 messageBox->show();
             }
         }
@@ -206,19 +206,19 @@ void parcellaire::display()
 {
     // std::cout << " parcellaire::display " << std::endl;
     std::string JScommand = std::string("parcellaire = new ol.layer.Vector({") +
-                            "source: new ol.source.Vector({" +
-                            "format: new ol.format.GeoJSON()," +
-                            "url: '" + geoJsonRelName() + "'})," +
-                            "style:new ol.style.Style({" +
-                            "stroke: new ol.style.Stroke({" +
-                            "color: 'blue'," +
-                            "width: 2})" +
-                            "  })," +
-                            "extent: [MINX,MINY,MAXX,MAXY]," +
-                            "});" +
-                            "updateGroupeLayers();" +
-                            "map.getView().fit(parcellaire.getExtent());" +
-                            "map.getView().setCenter([" + std::to_string(centerX) + "," + std::to_string(centerY) + " ]);";
+            "source: new ol.source.Vector({" +
+            "format: new ol.format.GeoJSON()," +
+            "url: '" + geoJsonRelName() + "'})," +
+            "style:new ol.style.Style({" +
+            "stroke: new ol.style.Stroke({" +
+            "color: 'blue'," +
+            "width: 2})" +
+            "  })," +
+            "extent: [MINX,MINY,MAXX,MAXY]," +
+            "});" +
+            "updateGroupeLayers();" +
+            "map.getView().fit(parcellaire.getExtent());" +
+            "map.getView().setCenter([" + std::to_string(centerX) + "," + std::to_string(centerY) + " ]);";
     // extent du parcellaire
     boost::replace_all(JScommand, "MAXX", std::to_string(mParcellaireExtent.MaxX));
     boost::replace_all(JScommand, "MAXY", std::to_string(mParcellaireExtent.MaxY));
@@ -304,15 +304,15 @@ void parcellaire::upload()
     {
         // geopackage
         auto messageBox =
-            addChild(std::make_unique<Wt::WMessageBox>(
-                "Chargement de polygones au format Geopackage",
-                tr("analyse.surf.msg.ImportGeopackage"),
-                Wt::Icon::Warning,
-                Wt::StandardButton::Ok));
+                addChild(std::make_unique<Wt::WMessageBox>(
+                             "Chargement de polygones au format Geopackage",
+                             tr("analyse.surf.msg.ImportGeopackage"),
+                             Wt::Icon::Warning,
+                             Wt::StandardButton::Ok));
 
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=]
-                                            { removeChild(messageBox); });
+        { removeChild(messageBox); });
         messageBox->show();
 
         mLabelName = "";
@@ -433,15 +433,15 @@ void parcellaire::downloadRaster()
     else
     {
         auto messageBox =
-            addChild(std::make_unique<Wt::WMessageBox>(
-                "Sélection des couches à exporter",
-                tr("download.lay.error.noLay"),
-                Wt::Icon::Information,
-                Wt::StandardButton::Ok));
+                addChild(std::make_unique<Wt::WMessageBox>(
+                             "Sélection des couches à exporter",
+                             tr("download.lay.error.noLay"),
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
 
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=]
-                                            { removeChild(messageBox); });
+        { removeChild(messageBox); });
         messageBox->show();
     }
 }
@@ -490,15 +490,15 @@ void parcellaire::selectPolygon(double x, double y)
                     {
                         // message box
                         auto messageBox =
-                            addChild(std::make_unique<Wt::WMessageBox>(
-                                "Analyse surfacique",
-                                tr("parcellaire.upload.size"),
-                                Wt::Icon::Information,
-                                Wt::StandardButton::Ok));
+                                addChild(std::make_unique<Wt::WMessageBox>(
+                                             "Analyse surfacique",
+                                             tr("parcellaire.upload.size"),
+                                             Wt::Icon::Information,
+                                             Wt::StandardButton::Ok));
 
                         messageBox->setModal(true);
                         messageBox->buttonClicked().connect([=]
-                                                            { removeChild(messageBox); });
+                        { removeChild(messageBox); });
                         messageBox->show();
                     }
                     break;
@@ -533,19 +533,19 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 void parcellaire::doComputingTask()
 {
     std::string uuid = boost::uuids::to_string(boost::uuids::random_generator()());
-    std::string filenameOut = mDico->File("TMPDIR") + uuid + ".xml";
+    //std::string filenameOut = mDico->File("TMPDIR") + uuid + ".xml";
 
     std::string ressourcePath = "results/" + uuid + ".xml";
     Wt::Mail::Message mail = tools::createMail(
-        "JO.Lisein@uliege.be",
-        "Lisein Jonathan",
-        m_app->getUser().email() == "" ? m_app->getUser().unverifiedEmail() : m_app->getUser().email(),
-        Wt::WString::tr("mail.anasMulti.title").toUTF8(),
-        Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName == "" ? mClientName : mLabelName).arg(ressourcePath).toUTF8());
+                "JO.Lisein@uliege.be",
+                "Lisein Jonathan",
+                m_app->getUser().email() == "" ? m_app->getUser().unverifiedEmail() : m_app->getUser().email(),
+                Wt::WString::tr("mail.anasMulti.title").toUTF8(),
+                Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName == "" ? mClientName : mLabelName).arg(ressourcePath).toUTF8());
 
-    parcellaire::TaskComputing *analyseSurfacique = new parcellaire::TaskComputing(geoJsonName(), mGL, filenameOut, &m_app);
+    parcellaire::TaskComputing *analyseSurfacique = new parcellaire::TaskComputing(geoJsonName(), mGL,mDico, &m_app);
     analyseSurfacique->setCallbackAfter([this, mail]() -> void
-                                        {
+    {
         tools::sendMail(mail);
         m_app->addLog("Surface analysis report sent to " + m_app->getUser().email(), typeLog::anasMulti); });
 
@@ -557,17 +557,26 @@ void parcellaire::TaskComputing::run()
     std::string input(geoJsonName);
     const char *inputPath = input.c_str();
     cout << input.c_str();
-    GDALDataset *mDS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
-    if (mDS != NULL)
+    // je dois réouvrir le shp à chaque layer car le traitement modifie le fichier
+    for (auto &l : mGL->getSelectedLayer4Download())
     {
-        OGRLayer *lay = mDS->GetLayer(0);
-        mGL->computeStatAllPol(lay, path);
-        GDALClose(mDS);
+        if (l->l4Stat())
+        {
+            GDALDataset *mDS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL));
+            if (mDS != NULL)
+            {
+                OGRLayer *lay = mDS->GetLayer(0);
+                // ajout d'une colonne dans la layer
+                mDico->geoservice(l->Code(), "", "", typeAna::Mass,lay);
+                GDALClose(mDS);
+            }
+            else
+            {
+                std::cout << "select dataset mDS is null " << std::endl;
+            }
+        }
     }
-    else
-    {
-        std::cout << "select dataset mDS is null " << std::endl;
-    }
+
 }
 
 void parcellaire::anaAllPol()
@@ -575,15 +584,15 @@ void parcellaire::anaAllPol()
     if (!m_app->isLoggedIn())
     {
         auto messageBox =
-            addChild(std::make_unique<Wt::WMessageBox>(
-                "Analyse surfacique",
-                tr("parcellaire.anaAllPol.connect"),
-                Wt::Icon::Information,
-                Wt::StandardButton::Ok));
+                addChild(std::make_unique<Wt::WMessageBox>(
+                             "Analyse surfacique",
+                             tr("parcellaire.anaAllPol.connect"),
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
 
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=]
-                                            {
+        {
             removeChild(messageBox);
             m_app->showDialogues(0); // les autres fenetres
             m_app->dialog_auth->show();
@@ -594,15 +603,15 @@ void parcellaire::anaAllPol()
     else
     {
         auto messageBox =
-            addChild(std::make_unique<Wt::WMessageBox>(
-                "Analyse surfacique",
-                tr("parcellaire.anaAllPol.envoiEmail"),
-                Wt::Icon::Information,
-                Wt::StandardButton::Ok));
+                addChild(std::make_unique<Wt::WMessageBox>(
+                             "Analyse surfacique",
+                             tr("parcellaire.anaAllPol.envoiEmail"),
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
 
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=]
-                                            { removeChild(messageBox); });
+        { removeChild(messageBox); });
         messageBox->show();
         this->doComputingTask(); // Demarre le threadpool
         return;
@@ -664,35 +673,35 @@ bool parcellaire::to31370AndGeoJson()
             epsgSel->addItem("WGS 84");
             epsgSel->setCurrentIndex(0);
             Wt::WPushButton *ok =
-                dialogBox->footer()->addNew<Wt::WPushButton>("OK");
+                    dialogBox->footer()->addNew<Wt::WPushButton>("OK");
             ok->setDefault(true);
             ok->clicked().connect([=]
-                                  { dialogBox->accept(); });
+            { dialogBox->accept(); });
             dialogBox->finished().connect([=]
-                                          {
-                                              int inputEPSG(31370);
-                                              if (epsgSel->currentIndex() == 1)
-                                              {
-                                                  inputEPSG = 4326;
-                                              }
-                                              std::cout << "epsg input " << inputEPSG << std::endl;
-                                              removeChild(dialogBox);
-                                              // to31370AndGeoJsonGDAL(inputEPSG);
-                                              OGRSpatialReference src;
-                                              src.importFromEPSG(inputEPSG);
+            {
+                int inputEPSG(31370);
+                if (epsgSel->currentIndex() == 1)
+                {
+                    inputEPSG = 4326;
+                }
+                std::cout << "epsg input " << inputEPSG << std::endl;
+                removeChild(dialogBox);
+                // to31370AndGeoJsonGDAL(inputEPSG);
+                OGRSpatialReference src;
+                src.importFromEPSG(inputEPSG);
 
-                                              if (mExtention == "shp")
-                                              {
-                                                  // création du prj file
-                                                  std::ofstream out;
-                                                  out.open(mFullPath + ".prj");
-                                                  char *wkt;
-                                                  src.exportToWkt(&wkt);
-                                                  out << wkt << "\n";
-                                                  out.close();
-                                              }
-                                              to31370AndGeoJsonGDAL();
-                                              return aRes; });
+                if (mExtention == "shp")
+                {
+                    // création du prj file
+                    std::ofstream out;
+                    out.open(mFullPath + ".prj");
+                    char *wkt;
+                    src.exportToWkt(&wkt);
+                    out << wkt << "\n";
+                    out.close();
+                }
+                to31370AndGeoJsonGDAL();
+                return aRes; });
             dialogBox->show();
             return aRes;
         }
@@ -734,6 +743,10 @@ void parcellaire::to31370AndGeoJsonGDAL()
 
     papszArgv = CSLAddString(papszArgv, "-t_srs"); // target src with reprojection
     papszArgv = CSLAddString(papszArgv, "EPSG:31370");
+    papszArgv = CSLAddString(papszArgv, "-dim");// pour retirer la dimension Z si elle existe.
+    papszArgv = CSLAddString(papszArgv, "2");
+
+
     GDALVectorTranslateOptions *option = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
     if (option)
     {

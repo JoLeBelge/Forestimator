@@ -121,9 +121,6 @@ public:
 
     void computeStatGlob(OGRGeometry *poGeomGlobale);
 
-    // avec un retour qui est un fichier texte à télécharger
-    void computeStatAllPol(OGRLayer *lay, std::string path);
-
     ST *mStation;
     std::vector<std::shared_ptr<Layer>> Layers() { return mVLs; }
     std::shared_ptr<Layer> getActiveLay();
@@ -133,7 +130,6 @@ public:
     // key ; code essence. Value ; code aptitude
     std::map<std::string, int> apts();
 
-    // Wt::WProgressBar *mPBar;
     //  pour faire un processEvent, seul moyen de refresh de la progressbar.
     cWebAptitude *m_app;
 
