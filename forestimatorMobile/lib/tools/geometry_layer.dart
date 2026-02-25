@@ -47,7 +47,6 @@ class GeometricLayer {
     ]);
     defaultAttributes[0].visibleOnMapLabel = true;
     name = "Observations Essences";
-    serialize();
   }
 
   GeometricLayer.polygon() {
@@ -275,8 +274,16 @@ class GeometricLayer {
     return false;
   }
 
-  void sendLayerPolys() async {
-    //TODO: sendLayer
+  static bool essenceLayerExists() {
+    int index = 0;
+    for (GeometricLayer g in gl.geoLayers) {
+      if (g.type == "Point" && g.subtype == "Essence") {
+        gl.selectedGeoLayer = index;
+        return true;
+      }
+      index++;
+    }
+    return false;
   }
 
   static GeometricLayer getEssenceLayer() {

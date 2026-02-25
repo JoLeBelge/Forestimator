@@ -21,90 +21,94 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: AlignmentGeometry.center,
-      children: <Widget>[
-        OrientationBuilder(
-          builder: (c, o) {
-            return SizedBox(
-              width: gl.eqPx * (gl.eqPxW - 10),
-              height: gl.eqPx * (gl.eqPxH - 30),
-              child: PDFView(
-                backgroundColor: Colors.transparent,
-                filePath: widget.path,
-                enableSwipe: true,
-                swipeHorizontal: true,
-                autoSpacing: false,
-                pageFling: true,
-                pageSnap: true,
-                defaultPage: widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
-                fitPolicy: FitPolicy.BOTH,
-                preventLinkNavigation: false, // if set to true the link is handled in flutter
-                onRender: (xpages) {
-                  setState(() {
-                    pages = xpages;
-                    isReady = true;
-                  });
-                },
-                onError: (error) {
-                  setState(() {
-                    errorMessage = error.toString();
-                  });
-                  gl.print(error.toString());
-                },
-                onPageError: (page, error) {
-                  setState(() {
-                    errorMessage = '$page: ${error.toString()}';
-                  });
-                  gl.print('$page: ${error.toString()}');
-                },
-                onViewCreated: (PDFViewController pdfViewController) {
-                  _controller.complete(pdfViewController);
-                },
-                onPageChanged: (int? page, int? total) {
-                  setState(() {
-                    gl.currentPage = page!;
-                  });
-                },
-              ),
-            );
-          },
-        ),
-        errorMessage.isEmpty
-            ? !isReady
-                ? Center(child: CircularProgressIndicator())
-                : Container()
-            : Center(child: Text(errorMessage)),
-        SizedBox(
-          width: gl.eqPx * (gl.eqPxW - 5),
-          height: gl.eqPx * (gl.dsp.eqMaxWindowHeight - 5),
-          child: Container(
-            alignment: AlignmentGeometry.topCenter,
-            child: FutureBuilder<PDFViewController>(
-              future: _controller.future,
-              builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
-                if (snapshot.hasData) {
-                  return FloatingActionButton.extended(
-                    backgroundColor: gl.colorAgroBioTech,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(12.0),
-                      side: BorderSide(color: Colors.white, width: gl.eqPx * .5),
-                    ),
-                    label: Text(
-                      "Aller à la page ${pages! ~/ 2}",
-                      style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXS, color: Colors.black),
-                    ),
-                    onPressed: () async {
-                      await snapshot.data!.setPage(pages! ~/ 2);
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return Stack(
+          alignment: AlignmentGeometry.center,
+          children: <Widget>[
+            OrientationBuilder(
+              builder: (c, o) {
+                return SizedBox(
+                  width: gl.eqPx * (gl.eqPxW - 10),
+                  height: gl.eqPx * (gl.eqPxH - 30),
+                  child: PDFView(
+                    backgroundColor: Colors.transparent,
+                    filePath: widget.path,
+                    enableSwipe: true,
+                    swipeHorizontal: true,
+                    autoSpacing: false,
+                    pageFling: true,
+                    pageSnap: true,
+                    defaultPage: widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
+                    fitPolicy: FitPolicy.BOTH,
+                    preventLinkNavigation: false, // if set to true the link is handled in flutter
+                    onRender: (xpages) {
+                      setState(() {
+                        pages = xpages;
+                        isReady = true;
+                      });
                     },
-                  );
-                }
-                return Container();
+                    onError: (error) {
+                      setState(() {
+                        errorMessage = error.toString();
+                      });
+                      gl.print(error.toString());
+                    },
+                    onPageError: (page, error) {
+                      setState(() {
+                        errorMessage = '$page: ${error.toString()}';
+                      });
+                      gl.print('$page: ${error.toString()}');
+                    },
+                    onViewCreated: (PDFViewController pdfViewController) {
+                      _controller.complete(pdfViewController);
+                    },
+                    onPageChanged: (int? page, int? total) {
+                      setState(() {
+                        gl.currentPage = page!;
+                      });
+                    },
+                  ),
+                );
               },
             ),
-          ),
-        ),
-      ],
+            errorMessage.isEmpty
+                ? !isReady
+                    ? Center(child: CircularProgressIndicator())
+                    : Container()
+                : Center(child: Text(errorMessage)),
+            SizedBox(
+              width: gl.eqPx * (gl.eqPxW - 5),
+              height: gl.eqPx * (gl.dsp.eqMaxWindowHeight - 5),
+              child: Container(
+                alignment: AlignmentGeometry.topLeft,
+                child: FutureBuilder<PDFViewController>(
+                  future: _controller.future,
+                  builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
+                    if (snapshot.hasData) {
+                      return FloatingActionButton.extended(
+                        backgroundColor: gl.colorAgroBioTech,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(12.0),
+                          side: BorderSide(color: Colors.white, width: gl.eqPx * .5),
+                        ),
+                        label: Text(
+                          "Aller à la page ${pages! ~/ 2}",
+                          style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXS, color: Colors.black),
+                        ),
+                        onPressed: () async {
+                          await snapshot.data!.setPage(pages! ~/ 2);
+                        },
+                      );
+                    }
+                    return Container();
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

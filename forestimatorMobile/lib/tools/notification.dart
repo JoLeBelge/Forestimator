@@ -231,11 +231,42 @@ class PopupDownloadFailed {
 }
 
 class PopupPolygonNotWellDefined {
-  PopupPolygonNotWellDefined(BuildContext context) {
+  PopupPolygonNotWellDefined() {
     gl.refreshStack(() {
       popupForestimatorMessage(
         title: "Attention",
         message: "Avec ce point, le polygone n'est pas bien défini, c'est-à-dire on ne peut pas croiser des segments.",
+      );
+    });
+  }
+}
+
+class PopupSearchMenu {
+  PopupSearchMenu(Function(LatLng) moveToPointOnMap, VoidCallback onDiscard) {
+    gl.refreshStack(() {
+      popupForestimatorWindow(
+        id: "SearchMenu",
+        title: "Recherche d'un lieu",
+        child: SearchMenu(moveToPoint: moveToPointOnMap),
+        onDiscard: onDiscard,
+      );
+    });
+  }
+}
+
+class PopupSettingsMenu {
+  PopupSettingsMenu() {
+    gl.refreshStack(() {
+      popupForestimatorWindow(
+        id: "SettingsMenu",
+        title: "Paramètres",
+        child: SettingsMenu(),
+        onDiscard: () {
+          gl.refreshStack(() {
+            gl.stack.pop("SettingsMenu");
+            gl.modeSettings = false;
+          });
+        },
       );
     });
   }
@@ -1042,7 +1073,8 @@ class PopupNewAttribute {
     ValueChanged<String> typeChanged,
     ValueChanged<String> attributeNameChanged,
     ValueChanged<dynamic> valueChanged,
-    VoidCallback onTapOutside,
+    VoidCallback onDecline,
+    VoidCallback onAccept,
     VoidCallback callbackOnStartTyping, {
     bool noValue = false,
   }) {
@@ -1064,19 +1096,20 @@ class PopupNewAttribute {
             });
             return;
           }
+          onAccept();
           gl.refreshStack(() {
             gl.stack.pop("AddAttribute");
           });
         },
         onDecline: () {
           gl.refreshStack(() {
-            onTapOutside();
+            onDecline();
             gl.stack.pop("AddAttribute");
           });
         },
         onDiscard: () {
           gl.refreshStack(() {
-            onTapOutside();
+            onDecline();
             gl.stack.pop("AddAttribute");
           });
         },
@@ -1095,7 +1128,7 @@ class PopupNewAttribute {
             SizedBox(
               width: gl.menuBarLength * gl.eqPx,
               child: TextFormField(
-                maxLength: 22,
+                maxLength: 255,
                 maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 onChanged: (String str) {
                   textEditor.text = cleanAttributeName(str.toString());
@@ -1113,7 +1146,7 @@ class PopupNewAttribute {
               SizedBox(
                 width: gl.menuBarLength * gl.eqPx,
                 child: TextFormField(
-                  maxLength: 22,
+                  maxLength: 255,
                   maxLengthEnforcement: MaxLengthEnforcement.enforced,
                   onChanged: (String str) {
                     switch (type) {
@@ -1554,7 +1587,11 @@ class _SelectAttributeType extends State<SelectAttributeType> {
 }
 
 class PopupSelectAttributeSet {
-  PopupSelectAttributeSet(BuildContext context, List<Attribute> lAttr, {void Function(void Function())? onPressed}) {
+  PopupSelectAttributeSet(
+    BuildContext context,
+    List<Attribute> lAttr, {
+    void Function(List<Attribute> Function())? onPressed,
+  }) {
     String wantedSet = "Observation Composition";
     gl.refreshStack(() {
       popupForestimatorMessage(
@@ -1563,7 +1600,7 @@ class PopupSelectAttributeSet {
         messageAccept: "Ajouter",
         messageDecline: "Annuler",
         onAccept: () {
-          void Function(void Function()) it =
+          void Function(List<Attribute> Function()) it =
               onPressed ??
               (function) {
                 function();
@@ -1572,18 +1609,20 @@ class PopupSelectAttributeSet {
             List<String> attributeNames = List<String>.generate(lAttr.length, (i) {
               return lAttr[i].name;
             });
+            List<Attribute> res = [];
             switch (wantedSet) {
               case "Observation Composition":
-                if (!(attributeNames.contains("essence") && attributeNames.contains("rmq"))) {
-                  lAttr.addAll([
+                if (!(attributeNames.contains("essence") || attributeNames.contains("rmq"))) {
+                  res = [
                     Attribute(name: "essence", type: "string", value: ""),
                     Attribute(name: "rmq", type: "string", value: ""),
-                  ]);
+                  ];
                 }
                 break;
               default:
             }
             gl.stack.pop("chooseSet");
+            return res;
           });
         },
         onDecline: () {
@@ -2342,8 +2381,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                     if (await gl.selLay.geometries[index].onlineSurfaceAnalysis()) {
                                                       gl.refreshStack(() {
                                                         popupForestimatorWindow(
-                                                          height: (gl.eqPxH - 10) * gl.eqPx,
-                                                          width: gl.eqPx * 98,
                                                           id: "anaSurfResult",
                                                           title: "Resultats de l'analyse",
                                                           child: AnaSurfResultsMenu(
@@ -2358,8 +2395,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                                 gl.stack.pop("anaSurfResult");
                                                               });
                                                             },
-                                                            height: (gl.eqPxH - 50) * gl.eqPx,
-                                                            width: gl.eqPx * 96,
                                                           ),
                                                         );
                                                       });
@@ -2746,38 +2781,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 ),
                                               ),
                                               onPressed: () {},
-                                              onLongPress: () {
-                                                PopupValueChange(
-                                                  "prop",
-                                                  gl.selGeo.attributes[i].name,
-                                                  (value) {
-                                                    gl
-                                                        .selLay
-                                                        .geometries[gl.selLay.selectedGeometry]
-                                                        .attributes[i]
-                                                        .name = cleanAttributeName(value.toString());
-                                                  },
-                                                  () {},
-                                                  () {
-                                                    String nom = gl.selGeo.attributes[i].name;
-                                                    if (controlDuplicateAttributeName(
-                                                      gl.selGeo.attributes[i].name,
-                                                      gl.selGeo.attributes,
-                                                    )) {
-                                                      gl.refreshStack(() {
-                                                        popupForestimatorMessage(
-                                                          id: "MSGduplicateName",
-                                                          title: "Erreur",
-                                                          message: "Le nom $nom existe déja!",
-                                                        );
-                                                      });
-                                                      return;
-                                                    } else {
-                                                      gl.selGeo.serialize();
-                                                    }
-                                                  },
-                                                );
-                                              },
                                               child: Container(
                                                 alignment: Alignment.centerLeft,
                                                 child: SingleChildScrollView(
@@ -2799,17 +2802,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                             width: gl.eqPx * 32,
                                             height: gl.eqPx * gl.iconSizeS,
                                             child: TextButton(
-                                              style: ButtonStyle(
-                                                animationDuration: Duration(seconds: 1),
-                                                backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                  <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
-                                                ),
-                                                padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                  <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                    WidgetState.any: EdgeInsetsGeometry.zero,
-                                                  },
-                                                ),
-                                              ),
+                                              style: lt.trNoPadButtonstyle,
                                               onPressed: () {},
                                               onLongPress: () {
                                                 PopupValueChange(
@@ -3022,6 +3015,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                     _getFixedAttribute("nom", gl.selLay.name, noValues: true),
                                   ] +
                                   List<Widget>.generate(gl.layerReady ? gl.selLay.defaultAttributes.length : 0, (i) {
+                                    String oldName = gl.selLay.defaultAttributes[i].name;
                                     return Column(
                                       children: [
                                         Row(
@@ -3089,13 +3083,17 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                               height: gl.eqPx * gl.iconSizeM,
                                               child: IconButton(
                                                 style: lt.trNoPadButtonstyle,
-                                                onPressed: () {},
-                                                onLongPress: () async {
+                                                onPressed: () {
                                                   setState(() {
                                                     gl.selLay.defaultAttributes[i].visibleOnMapLabel =
                                                         !gl.selLay.defaultAttributes[i].visibleOnMapLabel;
+                                                    gl.selLay.serialize();
                                                   });
-                                                  gl.selLay.serialize();
+                                                  for (Geometry g in gl.selLay.geometries) {
+                                                    g.attributes[i].visibleOnMapLabel =
+                                                        gl.selLay.defaultAttributes[i].visibleOnMapLabel;
+                                                    g.serialize();
+                                                  }
                                                 },
                                                 icon:
                                                     gl.selLay.defaultAttributes[i].visibleOnMapLabel
@@ -3136,6 +3134,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                         gl.selLay.defaultAttributes[i].name,
                                                         gl.selLay.defaultAttributes,
                                                       )) {
+                                                        gl.selLay.defaultAttributes[i].name = oldName;
                                                         gl.refreshStack(() {
                                                           popupForestimatorMessage(
                                                             id: "MSGduplicateName",
@@ -3146,6 +3145,9 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                         return;
                                                       } else {
                                                         gl.selLay.serialize();
+                                                        for (Geometry g in gl.selLay.geometries) {
+                                                          g.attributes[i].name = gl.selLay.defaultAttributes[i].name;
+                                                        }
                                                       }
                                                     },
                                                   );
@@ -3207,6 +3209,11 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                   gl.selLay.defaultAttributes.removeLast();
                                 });
                               },
+                              () {
+                                for (Geometry g in gl.selLay.geometries) {
+                                  g.attributes.add(gl.selLay.defaultAttributes.last.clone);
+                                }
+                              },
                               () {},
                               noValue: true,
                             );
@@ -3226,10 +3233,14 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                             PopupSelectAttributeSet(
                               context,
                               gl.selLay.defaultAttributes,
-                              onPressed: (void Function() it) {
+                              onPressed: (List<Attribute> Function() it) {
+                                List<Attribute> res = it();
                                 setState(() {
-                                  it();
+                                  gl.selLay.defaultAttributes.addAll(res);
                                 });
+                                for (Geometry g in gl.selLay.geometries) {
+                                  g.attributes.addAll(res);
+                                }
                               },
                             );
                           },
@@ -3403,7 +3414,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                         width: gl.eqPx * gl.onCatalogueWidth * .9,
                         height: gl.eqPx * gl.onCatalogueMapHeight * .2,
                         child: Text(
-                          gl.selLay.labelsVisibleOnMap ? "Labels visible" : "Labels non visible",
+                          gl.layerReady && gl.selLay.labelsVisibleOnMap ? "Labels visible" : "Labels non visible",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
                         ),
@@ -3719,10 +3730,9 @@ class _SearchResultCard extends State<SearchResultCard> {
 }
 
 class SearchMenu extends StatefulWidget {
-  final ValueChanged<LatLng> state;
-  final VoidCallback after;
+  final ValueChanged<LatLng> moveToPoint;
 
-  const SearchMenu({super.key, required this.state, required this.after});
+  const SearchMenu({super.key, required this.moveToPoint});
 
   @override
   State<StatefulWidget> createState() => _SearchMenu();
@@ -3739,142 +3749,78 @@ class _SearchMenu extends State<SearchMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: gl.backgroundTransparentBlackBox,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(12.0),
-        side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
-      ),
-      child: SizedBox(
-        width:
-            gl.dsp.orientation == Orientation.portrait
-                ? gl.eqPx * gl.popupWindowsPortraitWidth
-                : gl.eqPx * gl.popupWindowsLandscapeWidth,
-        height:
-            gl.dsp.orientation == Orientation.portrait
-                ? gl.eqPx * gl.popupWindowsPortraitHeight + 1
-                : gl.eqPx * gl.popupWindowsLandscapeHeight,
-        child: switchRowColWithOrientation([
-          if (gl.dsp.orientation == Orientation.landscape)
-            Container(
-              constraints: BoxConstraints(
-                maxHeight: (gl.popupWindowsLandscapeHeight - 5) * gl.eqPx,
-                maxWidth: gl.popupWindowsPortraitWidth * gl.eqPx,
+    return OrientationBuilder(
+      builder: (c, o) {
+        return AnimatedContainer(
+          duration: Duration(milliseconds: 100),
+          width:
+              gl.dsp.orientation == Orientation.portrait
+                  ? gl.eqPx * gl.popupWindowsPortraitWidth
+                  : gl.eqPx * gl.popupWindowsLandscapeWidth,
+          height:
+              gl.dsp.orientation == Orientation.portrait
+                  ? gl.eqPx * gl.popupWindowsPortraitHeight + 1
+                  : gl.eqPx * gl.popupWindowsLandscapeHeight,
+          child: switchRowColWithOrientation([
+            if (gl.dsp.orientation == Orientation.landscape)
+              Container(
+                constraints: BoxConstraints(
+                  maxHeight: (gl.popupWindowsLandscapeHeight - 5) * gl.eqPx,
+                  maxWidth: gl.popupWindowsPortraitWidth * gl.eqPx,
+                ),
+                child: ListView(children: <Widget>[] + searchResults),
               ),
-              child: ListView(children: <Widget>[] + searchResults),
-            ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(width: gl.eqPx * gl.iconSizeL),
-                      SizedBox(
-                        height: gl.eqPx * gl.fontSizeL * 1.1,
-                        width: gl.eqPx * gl.popupWindowsPortraitWidth * .6,
-                        child: Text(
-                          "Recherche d'un lieu",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: gl.eqPx * gl.fontSizeL, color: Colors.white),
-                        ),
-                      ),
-                      lt.forestimatorButton(widget.after, Icons.arrow_drop_up_outlined),
-                    ],
-                  ),
-                  SizedBox(
-                    height: gl.eqPx * gl.searchBarHeight,
-                    width: gl.eqPx * gl.searchBarWidth,
-                    child: Card(
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "Entrez le nom d'un lieu",
-                          prefixIcon: Icon(Icons.search, color: Colors.black),
-                        ),
-                        autocorrect: false,
-                        initialValue: lastSearchKey,
-                        onChanged: (searchString) async {
-                          if (searchString.length < 2) {
-                            return;
-                          }
-                          lastSearchKey = searchString;
-                          http.Response response;
-                          if (searchCache[searchString] != null) {
-                            response = searchCache[searchString]!;
-                          } else {
-                            var request = Uri.parse(
-                              'http://gxgfservcarto.gxabt.ulg.ac.be:6666/search?layer=address&q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
-                            );
-                            try {
-                              response = await http.get(request);
-                              searchCache[searchString] = response;
-                            } catch (e) {
-                              gl.print(e);
-
-                              response = http.Response("", 404);
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  children: [
+                    SizedBox(
+                      height: gl.eqPx * gl.searchBarHeight,
+                      width: gl.eqPx * gl.searchBarWidth,
+                      child: Card(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Entrez le nom d'un lieu",
+                            prefixIcon: Icon(Icons.search, color: Colors.black),
+                          ),
+                          autocorrect: false,
+                          initialValue: lastSearchKey,
+                          onChanged: (searchString) async {
+                            if (searchString.length < 2) {
+                              return;
                             }
-                          }
-                          List<Map<String, dynamic>> decodedJson;
-                          try {
-                            (decodedJson = (jsonDecode(response.body) as List).cast<Map<String, dynamic>>());
-                          } catch (e) {
-                            gl.print("Error with response from gecoding service! $e");
-                            (decodedJson = (jsonDecode(testNominatimJsonResult) as List).cast<Map<String, dynamic>>());
-                          }
-                          gl.poiMarkerList.clear();
-                          searchResults.clear();
-                          _selectedSearchResultCard = -1;
-                          mounted
-                              ? setState(() {
-                                gl.selectedSearchMarker = -1;
-                                int i = 0;
-                                for (var entry in decodedJson) {
-                                  String? typeDeResultat = prettyPrintNominatimResults[entry['addresstype']];
-                                  if (typeDeResultat == null) {
-                                    typeDeResultat = entry['addresstype'];
-                                    gl.print("Error: not a translated addresstype: ${entry['addresstype']}");
-                                  }
-                                  String? descriptionDeResultat = entry['display_name'];
-                                  if (descriptionDeResultat == null) {
-                                    descriptionDeResultat = "Erreur du serveur";
-                                    gl.print("Erreur du serveur geocoding : ${entry['display_name']}");
-                                  } else {
-                                    descriptionDeResultat = descriptionDeResultat.replaceAll(", België /", "");
-                                    descriptionDeResultat = descriptionDeResultat.replaceAll("/ Belgien", "");
-                                    descriptionDeResultat = descriptionDeResultat.replaceAll("Wallonie, ", "");
-                                    descriptionDeResultat = descriptionDeResultat.replaceAll("Belgique", "");
-                                  }
-                                  gl.poiMarkerList.add(
-                                    gl.PoiMarker(
-                                      index: i++,
-                                      position: LatLng(double.parse(entry['lat']), double.parse(entry['lon'])),
-                                      name: typeDeResultat!,
-                                      address: descriptionDeResultat,
-                                      city:
-                                          entry['address']['city'] ??
-                                          entry['address']['county'] ??
-                                          entry['address']['state'] ??
-                                          "",
-                                      postcode: entry['address']['postcode'] ?? "",
-                                    ),
-                                  );
-                                  searchResults.add(
-                                    SearchResultCard(
-                                      boxColor: lt.getColorFromName(typeDeResultat),
-                                      state: widget.state,
-                                      typeDeResultat: typeDeResultat,
-                                      entry: LatLng(double.parse(entry['lat']), double.parse(entry['lon'])),
-                                      descriptionDeResultat: descriptionDeResultat,
-                                      index: i,
-                                    ),
-                                  );
-                                }
-                              })
-                              : () {
-                                {
+                            lastSearchKey = searchString;
+                            http.Response response;
+                            if (searchCache[searchString] != null) {
+                              response = searchCache[searchString]!;
+                            } else {
+                              var request = Uri.parse(
+                                'http://gxgfservcarto.gxabt.ulg.ac.be:6666/search?layer=address&q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
+                              );
+                              try {
+                                response = await http.get(request);
+                                searchCache[searchString] = response;
+                              } catch (e) {
+                                gl.print(e);
+
+                                response = http.Response("", 404);
+                              }
+                            }
+                            List<Map<String, dynamic>> decodedJson;
+                            try {
+                              (decodedJson = (jsonDecode(response.body) as List).cast<Map<String, dynamic>>());
+                            } catch (e) {
+                              gl.print("Error with response from gecoding service! $e");
+                              (decodedJson =
+                                  (jsonDecode(testNominatimJsonResult) as List).cast<Map<String, dynamic>>());
+                            }
+                            gl.poiMarkerList.clear();
+                            searchResults.clear();
+                            _selectedSearchResultCard = -1;
+                            mounted
+                                ? setState(() {
                                   gl.selectedSearchMarker = -1;
                                   int i = 0;
                                   for (var entry in decodedJson) {
@@ -3893,12 +3839,11 @@ class _SearchMenu extends State<SearchMenu> {
                                       descriptionDeResultat = descriptionDeResultat.replaceAll("Wallonie, ", "");
                                       descriptionDeResultat = descriptionDeResultat.replaceAll("Belgique", "");
                                     }
-                                    Color boxColor = lt.getColorFromName(typeDeResultat!);
                                     gl.poiMarkerList.add(
                                       gl.PoiMarker(
                                         index: i++,
                                         position: LatLng(double.parse(entry['lat']), double.parse(entry['lon'])),
-                                        name: typeDeResultat,
+                                        name: typeDeResultat!,
                                         address: descriptionDeResultat,
                                         city:
                                             entry['address']['city'] ??
@@ -3910,8 +3855,8 @@ class _SearchMenu extends State<SearchMenu> {
                                     );
                                     searchResults.add(
                                       SearchResultCard(
-                                        boxColor: boxColor,
-                                        state: widget.state,
+                                        boxColor: lt.getColorFromName(typeDeResultat),
+                                        state: widget.moveToPoint,
                                         typeDeResultat: typeDeResultat,
                                         entry: LatLng(double.parse(entry['lat']), double.parse(entry['lon'])),
                                         descriptionDeResultat: descriptionDeResultat,
@@ -3919,28 +3864,76 @@ class _SearchMenu extends State<SearchMenu> {
                                       ),
                                     );
                                   }
-                                }
-                              };
-                        },
+                                })
+                                : () {
+                                  {
+                                    gl.selectedSearchMarker = -1;
+                                    int i = 0;
+                                    for (var entry in decodedJson) {
+                                      String? typeDeResultat = prettyPrintNominatimResults[entry['addresstype']];
+                                      if (typeDeResultat == null) {
+                                        typeDeResultat = entry['addresstype'];
+                                        gl.print("Error: not a translated addresstype: ${entry['addresstype']}");
+                                      }
+                                      String? descriptionDeResultat = entry['display_name'];
+                                      if (descriptionDeResultat == null) {
+                                        descriptionDeResultat = "Erreur du serveur";
+                                        gl.print("Erreur du serveur geocoding : ${entry['display_name']}");
+                                      } else {
+                                        descriptionDeResultat = descriptionDeResultat.replaceAll(", België /", "");
+                                        descriptionDeResultat = descriptionDeResultat.replaceAll("/ Belgien", "");
+                                        descriptionDeResultat = descriptionDeResultat.replaceAll("Wallonie, ", "");
+                                        descriptionDeResultat = descriptionDeResultat.replaceAll("Belgique", "");
+                                      }
+                                      Color boxColor = lt.getColorFromName(typeDeResultat!);
+                                      gl.poiMarkerList.add(
+                                        gl.PoiMarker(
+                                          index: i++,
+                                          position: LatLng(double.parse(entry['lat']), double.parse(entry['lon'])),
+                                          name: typeDeResultat,
+                                          address: descriptionDeResultat,
+                                          city:
+                                              entry['address']['city'] ??
+                                              entry['address']['county'] ??
+                                              entry['address']['state'] ??
+                                              "",
+                                          postcode: entry['address']['postcode'] ?? "",
+                                        ),
+                                      );
+                                      searchResults.add(
+                                        SearchResultCard(
+                                          boxColor: boxColor,
+                                          state: widget.moveToPoint,
+                                          typeDeResultat: typeDeResultat,
+                                          entry: LatLng(double.parse(entry['lat']), double.parse(entry['lon'])),
+                                          descriptionDeResultat: descriptionDeResultat,
+                                          index: i,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                };
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          if (gl.dsp.orientation == Orientation.portrait)
-            SizedBox(
-              height:
-                  (gl.popupWindowsPortraitHeight -
-                      gl.searchBarHeight -
-                      gl.fontSizeL * 1.1 -
-                      gl.popupReturnButtonHeight) *
-                  gl.eqPx,
-              child: ListView(children: <Widget>[] + searchResults),
+                  ],
+                ),
+              ],
             ),
-        ]),
-      ),
+            if (gl.dsp.orientation == Orientation.portrait)
+              SizedBox(
+                height:
+                    (gl.popupWindowsPortraitHeight -
+                        gl.searchBarHeight -
+                        gl.fontSizeL * 1.1 -
+                        gl.popupReturnButtonHeight) *
+                    gl.eqPx,
+                child: ListView(children: <Widget>[] + searchResults),
+              ),
+          ]),
+        );
+      },
     );
   }
 }
@@ -4737,10 +4730,7 @@ class ItemSettings {
 }
 
 class SettingsMenu extends StatefulWidget {
-  final VoidCallback after;
-  final VoidCallback state;
-
-  const SettingsMenu({super.key, required this.after, required this.state});
+  const SettingsMenu({super.key});
 
   @override
   State<StatefulWidget> createState() => _SettingsMenu();
@@ -4762,141 +4752,119 @@ class _SettingsMenu extends State<SettingsMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: gl.backgroundTransparentBlackBox,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(12.0),
-        side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
-      ),
-      child: SizedBox(
-        width:
-            gl.dsp.orientation == Orientation.portrait
-                ? gl.eqPx * gl.popupWindowsPortraitWidth
-                : gl.eqPx * gl.popupWindowsLandscapeWidth,
-        height:
-            gl.dsp.orientation == Orientation.portrait
-                ? gl.eqPx * gl.popupWindowsPortraitHeight + 1
-                : gl.eqPx * gl.popupWindowsLandscapeHeight,
-        child: switchRowColWithOrientation([
-          Column(
-            children: [
-              Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.zero,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(width: gl.eqPx * gl.iconSizeL),
-                    Text(
-                      "Paramètres",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400,
-                        fontSize: gl.eqPx * gl.fontSizeL,
-                      ),
-                    ),
-                    lt.forestimatorButton(widget.after, Icons.arrow_drop_up_outlined),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height:
-                    gl.dsp.orientation == Orientation.portrait
-                        ? (gl.popupWindowsPortraitHeight - gl.searchBarHeight - gl.popupReturnButtonHeight) * gl.eqPx
-                        : (gl.popupWindowsLandscapeHeight - gl.searchBarHeight) * gl.eqPx,
-                width: gl.popupWindowsPortraitWidth * gl.eqPx,
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  children: _injectMenuEntries((int i, ItemSettings item) {
-                    return Container(
-                      alignment: Alignment.center,
-                      child:
-                          openedItem[i]
-                              ? Card(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
-                                surfaceTintColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                color: gl.colorAgroBioTech.withAlpha(75),
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadiusGeometry.circular(12.0),
-                                    side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
-                                  ),
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return AnimatedContainer(
+          duration: Duration(milliseconds: 100),
+          width:
+              gl.dsp.orientation == Orientation.portrait
+                  ? gl.eqPx * gl.popupWindowsPortraitWidth
+                  : gl.eqPx * gl.popupWindowsLandscapeWidth,
+          height:
+              gl.dsp.orientation == Orientation.portrait
+                  ? gl.eqPx * gl.popupWindowsPortraitHeight + 1
+                  : gl.eqPx * gl.popupWindowsLandscapeHeight,
+          child: switchRowColWithOrientation([
+            Column(
+              children: [
+                SizedBox(
+                  height:
+                      gl.dsp.orientation == Orientation.portrait
+                          ? (gl.popupWindowsPortraitHeight - gl.searchBarHeight - gl.popupReturnButtonHeight) * gl.eqPx
+                          : (gl.popupWindowsLandscapeHeight - gl.searchBarHeight) * gl.eqPx,
+                  width: gl.popupWindowsPortraitWidth * gl.eqPx,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    children: _injectMenuEntries((int i, ItemSettings item) {
+                      return Container(
+                        alignment: Alignment.center,
+                        child:
+                            openedItem[i]
+                                ? Card(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
                                   surfaceTintColor: Colors.transparent,
                                   shadowColor: Colors.transparent,
-                                  color: Colors.white.withAlpha(200),
-                                  child: Column(
-                                    children: [
-                                      Column(
-                                        children: [
-                                          TextButton(
-                                            key: Key('$i'),
-                                            onPressed: () {
-                                              setState(() {
-                                                openedItem[i] = !openedItem[i];
-                                              });
-                                            },
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              constraints: BoxConstraints(
-                                                minWidth: gl.eqPx * gl.onCatalogueWidth,
-                                                minHeight: gl.eqPx * gl.onCatalogueMapHeight,
-                                              ),
-                                              child: Text(
-                                                item.name,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: gl.eqPx * gl.fontSizeM,
+                                  color: gl.colorAgroBioTech.withAlpha(75),
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadiusGeometry.circular(12.0),
+                                      side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+                                    ),
+                                    surfaceTintColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    color: Colors.white.withAlpha(200),
+                                    child: Column(
+                                      children: [
+                                        Column(
+                                          children: [
+                                            TextButton(
+                                              key: Key('$i'),
+                                              onPressed: () {
+                                                setState(() {
+                                                  openedItem[i] = !openedItem[i];
+                                                });
+                                              },
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                constraints: BoxConstraints(
+                                                  minWidth: gl.eqPx * gl.onCatalogueWidth,
+                                                  minHeight: gl.eqPx * gl.onCatalogueMapHeight,
+                                                ),
+                                                child: Text(
+                                                  item.name,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: gl.eqPx * gl.fontSizeM,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                                          item.entry,
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              : TextButton(
-                                key: Key('$i'),
-                                onPressed: () {
-                                  setState(() {
-                                    openedItem[i] = !openedItem[i];
-                                  });
-                                },
-                                child: Card(
-                                  color: gl.colorAgroBioTech.withAlpha(200),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    constraints: BoxConstraints(
-                                      minWidth: gl.eqPx * gl.onCatalogueWidth * .95,
-                                      minHeight: gl.eqPx * gl.onCatalogueMapHeight * .95,
-                                    ),
-                                    child: Text(
-                                      item.name,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: gl.eqPx * gl.fontSizeM,
-                                      ),
+                                            lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                                            item.entry,
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
+                                )
+                                : TextButton(
+                                  key: Key('$i'),
+                                  onPressed: () {
+                                    setState(() {
+                                      openedItem[i] = !openedItem[i];
+                                    });
+                                  },
+                                  child: Card(
+                                    color: gl.colorAgroBioTech.withAlpha(200),
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      constraints: BoxConstraints(
+                                        minWidth: gl.eqPx * gl.onCatalogueWidth * .95,
+                                        minHeight: gl.eqPx * gl.onCatalogueMapHeight * .95,
+                                      ),
+                                      child: Text(
+                                        item.name,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: gl.eqPx * gl.fontSizeM,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                    );
-                  }),
+                      );
+                    }),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ]),
-      ),
+              ],
+            ),
+          ]),
+        );
+      },
     );
   }
 
@@ -6147,161 +6115,103 @@ class _LayerSwitcher extends State<LayerSwitcher> {
         f();
       }
     };
-    return Card(
-      color: gl.backgroundTransparentBlackBox,
-      child: SizedBox(
-        width:
-            gl.dsp.orientation == Orientation.portrait
-                ? gl.eqPx * gl.layerswitcherBoxWidth
-                : gl.eqPx * gl.layerswitcherBoxWidth * 2.2,
-        height:
-            gl.dsp.orientation == Orientation.portrait
-                ? gl.offlineMode
-                    ? (gl.layerSwitcherBoxHeightPortraitOffline +
-                            gl.layerswitcherButtonsBoxHeight +
-                            (gl.poiMarkerList.isNotEmpty && gl.selLay.geometries.isNotEmpty
-                                ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
-                                    ? gl.layerswitcherControlBoxHeight
-                                    : 0.0))) *
-                        gl.eqPx
-                    : (gl.layerSwitcherBoxHeightPortrait +
-                            gl.layerswitcherButtonsBoxHeight +
-                            (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
-                                ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                : (gl.poiMarkerList.isNotEmpty || (gl.layerReady && gl.selLay.geometries.isNotEmpty)
-                                    ? gl.layerswitcherControlBoxHeight
-                                    : 0.0))) *
-                        gl.eqPx
-                : gl.layerSwitcherBoxHeightLandscape * gl.eqPx,
-        child: switchRowColWithOrientation([
-          if (((gl.layerReady && gl.selLay.geometries.isNotEmpty) || gl.poiMarkerList.isNotEmpty) &&
-              gl.dsp.orientation == Orientation.portrait)
-            SizedBox(
-              width: gl.eqPx * gl.layerswitcherBoxWidth,
-              height:
-                  (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
-                      ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                      : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
-                          ? gl.layerswitcherControlBoxHeight
-                          : 0.0)) *
-                  gl.eqPx,
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                    height: gl.eqPx * gl.fontSizeL,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Couches points/polygones",
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
-                        ),
-                      ],
-                    ),
-                  ),
-                  UpperLayerControl(switchToLocationInSearchMenu: widget.switchToLocationInSearchMenu),
-                ],
-              ),
-            ),
-          SizedBox(
-            width: gl.eqPx * gl.layerswitcherBoxWidth,
+    return OrientationBuilder(
+      builder: (c, o) {
+        return Card(
+          color: gl.backgroundTransparentBlackBox,
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 100),
+            width:
+                gl.dsp.orientation == Orientation.portrait
+                    ? gl.eqPx * gl.layerswitcherBoxWidth
+                    : gl.eqPx * gl.layerswitcherBoxWidth * 2.2,
             height:
-                gl.eqPx *
-                (gl.offlineMode ? gl.layerSwitcherBoxHeightPortraitOffline : gl.layerSwitcherBoxHeightPortrait),
-            child: Column(
-              children: [
+                gl.dsp.orientation == Orientation.portrait
+                    ? gl.offlineMode
+                        ? (gl.layerSwitcherBoxHeightPortraitOffline +
+                                gl.layerswitcherButtonsBoxHeight +
+                                (gl.poiMarkerList.isNotEmpty && gl.selLay.geometries.isNotEmpty
+                                    ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
+                                    : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
+                                        ? gl.layerswitcherControlBoxHeight
+                                        : 0.0))) *
+                            gl.eqPx
+                        : (gl.layerSwitcherBoxHeightPortrait +
+                                gl.layerswitcherButtonsBoxHeight +
+                                (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
+                                    ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
+                                    : (gl.poiMarkerList.isNotEmpty || (gl.layerReady && gl.selLay.geometries.isNotEmpty)
+                                        ? gl.layerswitcherControlBoxHeight
+                                        : 0.0))) *
+                            gl.eqPx
+                    : gl.layerSwitcherBoxHeightLandscape * gl.eqPx,
+            child: switchRowColWithOrientation([
+              if (((gl.layerReady && gl.selLay.geometries.isNotEmpty) || gl.poiMarkerList.isNotEmpty) &&
+                  gl.dsp.orientation == Orientation.portrait)
                 SizedBox(
                   width: gl.eqPx * gl.layerswitcherBoxWidth,
-                  height: gl.eqPx * gl.fontSizeXL,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  height:
+                      (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
+                          ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
+                          : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
+                              ? gl.layerswitcherControlBoxHeight
+                              : 0.0)) *
+                      gl.eqPx,
+                  child: Column(
                     children: [
-                      Text(
-                        "Couches thématiques",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                      SizedBox(
+                        width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                        height: gl.eqPx * gl.fontSizeL,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Couches points/polygones",
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                            ),
+                          ],
+                        ),
                       ),
+                      UpperLayerControl(switchToLocationInSearchMenu: widget.switchToLocationInSearchMenu),
                     ],
                   ),
                 ),
-                SizedBox(
-                  width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                  height:
-                      gl.eqPx *
-                          (gl.offlineMode
-                              ? gl.layerSwitcherBoxHeightPortraitOffline
-                              : gl.layerSwitcherBoxHeightPortrait) -
-                      gl.eqPx * gl.fontSizeXL,
-                  child: SwitcherBox(),
-                ),
-              ],
-            ),
-          ),
-          if (gl.dsp.orientation == Orientation.portrait)
-            SizedBox(
-              width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-              height: gl.eqPx * gl.layerswitcherButtonsBoxHeight,
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                    height: gl.eqPx * gl.fontSizeXL,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Catalogues des couches",
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                    height: gl.eqPx * gl.layerswitcherButtonsBoxHeight - gl.eqPx * gl.fontSizeXL,
-                    child: ViewCatalogueControl(gl.rebuildSwitcherBox),
-                  ),
-                ],
-              ),
-            ),
-          if (gl.dsp.orientation == Orientation.landscape)
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (gl.geoReady || gl.poiMarkerList.isNotEmpty)
-                  SizedBox(
-                    width: gl.eqPx * gl.layerswitcherBoxWidth,
-                    height:
-                        (gl.poiMarkerList.isNotEmpty && gl.selLay.geometries.isNotEmpty
-                            ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                            : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
-                                ? gl.layerswitcherControlBoxHeight
-                                : 0.0)) *
-                        gl.eqPx,
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                          height: gl.eqPx * gl.fontSizeL,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Controlez les couches visibles",
-                                textAlign: TextAlign.justify,
-                                style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
-                              ),
-                            ],
+              SizedBox(
+                width: gl.eqPx * gl.layerswitcherBoxWidth,
+                height:
+                    gl.eqPx *
+                    (gl.offlineMode ? gl.layerSwitcherBoxHeightPortraitOffline : gl.layerSwitcherBoxHeightPortrait),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: gl.eqPx * gl.layerswitcherBoxWidth,
+                      height: gl.eqPx * gl.fontSizeXL,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Couches thématiques",
+                            textAlign: TextAlign.justify,
+                            style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
                           ),
-                        ),
-                        UpperLayerControl(switchToLocationInSearchMenu: widget.switchToLocationInSearchMenu),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                    SizedBox(
+                      width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                      height:
+                          gl.eqPx *
+                              (gl.offlineMode
+                                  ? gl.layerSwitcherBoxHeightPortraitOffline
+                                  : gl.layerSwitcherBoxHeightPortrait) -
+                          gl.eqPx * gl.fontSizeXL,
+                      child: SwitcherBox(),
+                    ),
+                  ],
+                ),
+              ),
+              if (gl.dsp.orientation == Orientation.portrait)
                 SizedBox(
                   width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
                   height: gl.eqPx * gl.layerswitcherButtonsBoxHeight,
@@ -6329,10 +6239,73 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                     ],
                   ),
                 ),
-              ],
-            ),
-        ]),
-      ),
+              if (gl.dsp.orientation == Orientation.landscape)
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (gl.geoReady || gl.poiMarkerList.isNotEmpty)
+                      SizedBox(
+                        width: gl.eqPx * gl.layerswitcherBoxWidth,
+                        height:
+                            (gl.poiMarkerList.isNotEmpty && gl.selLay.geometries.isNotEmpty
+                                ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
+                                : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
+                                    ? gl.layerswitcherControlBoxHeight
+                                    : 0.0)) *
+                            gl.eqPx,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                              height: gl.eqPx * gl.fontSizeL,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Controlez les couches visibles",
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            UpperLayerControl(switchToLocationInSearchMenu: widget.switchToLocationInSearchMenu),
+                          ],
+                        ),
+                      ),
+                    SizedBox(
+                      width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                      height: gl.eqPx * gl.layerswitcherButtonsBoxHeight,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                            height: gl.eqPx * gl.fontSizeXL,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Catalogues des couches",
+                                  textAlign: TextAlign.justify,
+                                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                            height: gl.eqPx * gl.layerswitcherButtonsBoxHeight - gl.eqPx * gl.fontSizeXL,
+                            child: ViewCatalogueControl(gl.rebuildSwitcherBox),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+            ]),
+          ),
+        );
+      },
     );
   }
 }
@@ -6493,24 +6466,14 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                       }),
                     ),
                     onPressed: () {
-                      gl.stack.add(
-                        "SearchMenu",
-                        SearchMenu(
-                          state: widget.switchToLocationInSearchMenu,
-                          after: () {
-                            gl.refreshStack(() {
-                              gl.stack.pop("SearchMenu");
-                            });
-                          },
-                        ),
-                        Duration(milliseconds: 400),
-                        gl.Anim.onScreenPosCenter,
-                        Offset(0, -2000),
-                      );
-                      gl.refreshStack(() {});
+                      PopupSearchMenu(widget.switchToLocationInSearchMenu, () {
+                        gl.refreshStack(() {
+                          gl.stack.pop("SearchMenu");
+                        });
+                      });
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 1.0),
+                      padding: EdgeInsets.symmetric(horizontal: 0.0),
                       alignment: Alignment.centerLeft,
                       constraints: BoxConstraints(
                         maxHeight: gl.eqPx * 10,
@@ -6519,7 +6482,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                         minWidth: gl.eqPx * 50,
                       ),
                       child: Text(
-                        "Marqueurs des lieux cherchés",
+                        "Marqueurs des lieux",
                         textAlign: TextAlign.left,
                         style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
                       ),
@@ -6981,86 +6944,223 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height:
-          gl.dsp.orientation == Orientation.portrait
-              ? (gl.popupWindowsPortraitHeight - gl.searchBarHeight - gl.popupReturnButtonHeight) * gl.eqPx
-              : (gl.popupWindowsLandscapeHeight - gl.searchBarHeight) * gl.eqPx,
-      width: gl.popupWindowsPortraitWidth * gl.eqPx,
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        children: [
-          Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
-            surfaceTintColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            color: gl.colorAgroBioTech.withAlpha(75),
-            child: Column(
-              children: [
-                Card(
-                  color: gl.colorAgroBioTech.withAlpha(200),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.all(3),
-                    constraints: BoxConstraints(
-                      maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                      minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                      minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Stack(
-                          alignment: AlignmentGeometry.center,
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return AnimatedContainer(
+          duration: Duration(milliseconds: 100),
+          height: (gl.eqPxH - 30) * gl.eqPx,
+          width: gl.eqPx * 96,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+            children: [
+              Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
+                surfaceTintColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                color: gl.colorAgroBioTech.withAlpha(75),
+                child: Column(
+                  children: [
+                    Card(
+                      color: gl.colorAgroBioTech.withAlpha(200),
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(3),
+                        constraints: BoxConstraints(
+                          maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                          minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                          minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            lt.forestimatorButton(() async {
-                              popupPdfSaveDialog((String pdf, String locationName) async {
-                                if (pdf.isEmpty) {
-                                  pdf =
-                                      "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
-                                }
-                                if (pdf.length < 4 || pdf.substring(pdf.length - 4) != ".pdf") {
-                                  pdf = "$pdf.pdf";
-                                }
-                                if (locationName.isEmpty) {
-                                  locationName = "une position";
-                                }
-                                String dir = "/storage/emulated/0/Download";
-                                if (Platform.isIOS) {
-                                  dir = (await getApplicationDocumentsDirectory()).path;
-                                }
-                                makePdf(widget.requestedLayers, pdf, dir, locationName);
-                                // confirmation que le pdf a été créé
-                                gl.stack.add(
-                                  "popPDF",
-                                  popupPDFSaved(pdf, () {
-                                    gl.stack.pop("popPDF");
-                                  }),
-                                  Duration(milliseconds: 400),
-                                  gl.Anim.onScreenPosCenter,
-                                  Offset(0, -250),
-                                );
-                                gl.refreshStack(() {});
-                              });
-                              gl.refreshStack(() {});
-                            }, Icons.save_alt),
-                            Container(
-                              alignment: Alignment.topRight,
-                              width: gl.eqPx * gl.iconSizeM,
-                              height: gl.eqPx * gl.iconSizeM,
-                              child: Icon(
-                                Icons.picture_as_pdf_sharp,
-                                size: gl.eqPx * gl.iconSizeXS * .7,
-                                color: Colors.red,
+                            Stack(
+                              alignment: AlignmentGeometry.center,
+                              children: [
+                                lt.forestimatorButton(() async {
+                                  popupPdfSaveDialog((String pdf, String locationName) async {
+                                    if (pdf.isEmpty) {
+                                      pdf =
+                                          "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
+                                    }
+                                    if (pdf.length < 4 || pdf.substring(pdf.length - 4) != ".pdf") {
+                                      pdf = "$pdf.pdf";
+                                    }
+                                    if (locationName.isEmpty) {
+                                      locationName = "une position";
+                                    }
+                                    String dir = "/storage/emulated/0/Download";
+                                    if (Platform.isIOS) {
+                                      dir = (await getApplicationDocumentsDirectory()).path;
+                                    }
+                                    makePdf(widget.requestedLayers, pdf, dir, locationName);
+                                    // confirmation que le pdf a été créé
+                                    gl.stack.add(
+                                      "popPDF",
+                                      popupPDFSaved(pdf, () {
+                                        gl.stack.pop("popPDF");
+                                      }),
+                                      Duration(milliseconds: 400),
+                                      gl.Anim.onScreenPosCenter,
+                                      Offset(0, -250),
+                                    );
+                                    gl.refreshStack(() {});
+                                  });
+                                  gl.refreshStack(() {});
+                                }, Icons.save_alt),
+                                Container(
+                                  alignment: Alignment.topRight,
+                                  width: gl.eqPx * gl.iconSizeM,
+                                  height: gl.eqPx * gl.iconSizeM,
+                                  child: Icon(
+                                    Icons.picture_as_pdf_sharp,
+                                    size: gl.eqPx * gl.iconSizeXS * .7,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(
+                              width: gl.eqPx * 65,
+                              child: Text(
+                                "Par couche selectionnée",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: gl.eqPx * gl.fontSizeM,
+                                ),
                               ),
                             ),
                           ],
                         ),
-
-                        SizedBox(
-                          width: gl.eqPx * 65,
+                      ),
+                    ),
+                    Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(12.0),
+                        side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
+                      ),
+                      surfaceTintColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      color: Colors.white.withAlpha(200),
+                      child: ListBody(
+                        children: _injectLayerResults(
+                          (int i, ResultCard result, String mCode, int mRastValue) => TextButton(
+                            style: ButtonStyle(
+                              minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                WidgetState.any: Size(
+                                  gl.eqPx * gl.onCatalogueWidth * .7,
+                                  gl.eqPx * gl.onCatalogueCategoryHeight,
+                                ),
+                              }),
+                            ),
+                            key: Key('$i'),
+                            onPressed: result.documentation,
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: gl.eqPx * gl.iconSizeS,
+                                        height: gl.eqPx * gl.iconSizeS,
+                                        child: Stack(
+                                          children: [
+                                            Icon(result.leading, color: Colors.black, size: gl.eqPx * gl.iconSizeS),
+                                            if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A") ||
+                                                (gl.dico.getLayerBase(mCode).hasDoc() &&
+                                                    mCode == "CS_A" &&
+                                                    mRastValue < 99))
+                                              Container(
+                                                alignment: Alignment.topRight,
+                                                width: gl.eqPx * gl.iconSizeM,
+                                                height: gl.eqPx * gl.iconSizeM,
+                                                child: Icon(
+                                                  Icons.picture_as_pdf_sharp,
+                                                  size: gl.eqPx * gl.iconSizeXS * .7,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
+                                      SizedBox(
+                                        width: gl.eqPx * gl.onCatalogueWidth * .65,
+                                        child: Text(
+                                          result.layerName,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: gl.eqPx * gl.fontSizeS,
+                                            fontWeight: FontWeight.w300,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        color: Colors.black12,
+                                        padding: EdgeInsets.all(1),
+                                        constraints: BoxConstraints(
+                                          minHeight: gl.eqPx * gl.iconSizeS,
+                                          minWidth: gl.eqPx * gl.iconSizeS,
+                                        ),
+                                        child: Container(
+                                          color:
+                                              result.legendColor == Colors.transparent
+                                                  ? Colors.white
+                                                  : result.legendColor,
+                                        ),
+                                      ),
+                                      SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
+                                      SizedBox(
+                                        width: gl.eqPx * gl.onCatalogueWidth * .65,
+                                        child: Text(
+                                          result.colorCode,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: gl.eqPx * gl.fontSizeS,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (AptsFEE(widget.requestedLayers).ready)
+                Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
+                  surfaceTintColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  color: gl.colorAgroBioTech.withAlpha(75),
+                  child: Column(
+                    children: [
+                      Card(
+                        color: gl.colorAgroBioTech.withAlpha(200),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(3),
+                          constraints: BoxConstraints(
+                            maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                            minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                            minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
+                          ),
                           child: Text(
-                            "Par couche selectionnée",
+                            "Aptitude du Fichier Ecologique des Essences",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.black,
@@ -7069,195 +7169,62 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      Card(
+                        color: Colors.white.withAlpha(200),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(12.0),
+                          side: BorderSide(color: Color.fromRGBO(205, 225, 138, 1.0), width: 2.0),
+                        ),
+                        child: _tabAptFEE(context, AptsFEE(widget.requestedLayers)),
+                      ),
+                    ],
                   ),
                 ),
+              if (PropositionGS(widget.requestedLayers).ready)
                 Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(12.0),
-                    side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
                   surfaceTintColor: Colors.transparent,
                   shadowColor: Colors.transparent,
-                  color: Colors.white.withAlpha(200),
-                  child: ListBody(
-                    children: _injectLayerResults(
-                      (int i, ResultCard result, String mCode, int mRastValue) => TextButton(
-                        style: ButtonStyle(
-                          minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                            WidgetState.any: Size(
-                              gl.eqPx * gl.onCatalogueWidth * .7,
-                              gl.eqPx * gl.onCatalogueCategoryHeight,
-                            ),
-                          }),
-                        ),
-                        key: Key('$i'),
-                        onPressed: result.documentation,
+                  color: gl.colorAgroBioTech.withAlpha(75),
+                  child: Column(
+                    children: [
+                      Card(
+                        color: gl.colorAgroBioTech.withAlpha(200),
                         child: Container(
                           alignment: Alignment.center,
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: gl.eqPx * gl.iconSizeS,
-                                    height: gl.eqPx * gl.iconSizeS,
-                                    child: Stack(
-                                      children: [
-                                        Icon(result.leading, color: Colors.black, size: gl.eqPx * gl.iconSizeS),
-                                        if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A") ||
-                                            (gl.dico.getLayerBase(mCode).hasDoc() &&
-                                                mCode == "CS_A" &&
-                                                mRastValue < 99))
-                                          Container(
-                                            alignment: Alignment.topRight,
-                                            width: gl.eqPx * gl.iconSizeM,
-                                            height: gl.eqPx * gl.iconSizeM,
-                                            child: Icon(
-                                              Icons.picture_as_pdf_sharp,
-                                              size: gl.eqPx * gl.iconSizeXS * .7,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
-                                  SizedBox(
-                                    width: gl.eqPx * gl.onCatalogueWidth * .65,
-                                    child: Text(
-                                      result.layerName,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: gl.eqPx * gl.fontSizeS,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
-                              Row(
-                                children: [
-                                  Container(
-                                    color: Colors.black12,
-                                    padding: EdgeInsets.all(1),
-                                    constraints: BoxConstraints(
-                                      minHeight: gl.eqPx * gl.iconSizeS,
-                                      minWidth: gl.eqPx * gl.iconSizeS,
-                                    ),
-                                    child: Container(
-                                      color:
-                                          result.legendColor == Colors.transparent ? Colors.white : result.legendColor,
-                                    ),
-                                  ),
-                                  SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
-                                  SizedBox(
-                                    width: gl.eqPx * gl.onCatalogueWidth * .65,
-                                    child: Text(
-                                      result.colorCode,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: gl.eqPx * gl.fontSizeS,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                          padding: EdgeInsets.all(3),
+                          constraints: BoxConstraints(
+                            maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                            minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                            minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
+                          ),
+                          child: Text(
+                            "Propositions d'Essences du Guide des Stations",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontSize: gl.eqPx * gl.fontSizeM,
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      Card(
+                        color: Colors.white.withAlpha(200),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(12.0),
+                          side: BorderSide(color: Color.fromRGBO(205, 225, 138, 1.0), width: 2.0),
+                        ),
+                        child: _tabPropositionCS(context, PropositionGS(widget.requestedLayers)),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
-          if (AptsFEE(widget.requestedLayers).ready)
-            Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              color: gl.colorAgroBioTech.withAlpha(75),
-              child: Column(
-                children: [
-                  Card(
-                    color: gl.colorAgroBioTech.withAlpha(200),
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(3),
-                      constraints: BoxConstraints(
-                        maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                        minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                        minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
-                      ),
-                      child: Text(
-                        "Aptitude du Fichier Ecologique des Essences",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400,
-                          fontSize: gl.eqPx * gl.fontSizeM,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Card(
-                    color: Colors.white.withAlpha(200),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(12.0),
-                      side: BorderSide(color: Color.fromRGBO(205, 225, 138, 1.0), width: 2.0),
-                    ),
-                    child: _tabAptFEE(context, AptsFEE(widget.requestedLayers)),
-                  ),
-                ],
-              ),
-            ),
-          if (PropositionGS(widget.requestedLayers).ready)
-            Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              color: gl.colorAgroBioTech.withAlpha(75),
-              child: Column(
-                children: [
-                  Card(
-                    color: gl.colorAgroBioTech.withAlpha(200),
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(3),
-                      constraints: BoxConstraints(
-                        maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                        minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                        minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
-                      ),
-                      child: Text(
-                        "Propositions d'Essences du Guide des Stations",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400,
-                          fontSize: gl.eqPx * gl.fontSizeM,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Card(
-                    color: Colors.white.withAlpha(200),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(12.0),
-                      side: BorderSide(color: Color.fromRGBO(205, 225, 138, 1.0), width: 2.0),
-                    ),
-                    child: _tabPropositionCS(context, PropositionGS(widget.requestedLayers)),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -7402,14 +7369,14 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
     );
   }
 
-  void popupPdfSaveDialog(void Function(String, String) after) {
+  void popupPdfSaveDialog(void Function(String, String) onAccept) {
     popupForestimatorMessage(
       id: "davepdf",
       title: "Saufgardez un pdf",
       messageAccept: "Enregistrer",
       messageDecline: "Annuler",
       onAccept: () {
-        after(controllerPdfName!.text, controllerLocationName!.text);
+        onAccept(controllerPdfName!.text, controllerLocationName!.text);
         gl.stack.pop("davepdf");
       },
       onDecline: () {
@@ -7422,6 +7389,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                 child: Column(
                   children: [
                     TextField(
+                      style: TextStyle(color: Colors.white),
                       controller: controllerPdfName,
                       autofocus: true,
                       decoration: InputDecoration(
@@ -7429,7 +7397,11 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                             "forestimatorAnalyse${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf",
                       ),
                     ),
-                    TextField(controller: controllerLocationName, decoration: InputDecoration(hintText: "Point 5")),
+                    TextField(
+                      controller: controllerLocationName,
+                      decoration: InputDecoration(hintText: "Point 5"),
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ],
                 ),
               )
@@ -7687,9 +7659,7 @@ class AnaSurfResultsMenu extends StatefulWidget {
   final Map<String, dynamic> json;
   final VoidCallback state;
   final VoidCallback after;
-  final double height;
-  final double width;
-  const AnaSurfResultsMenu(this.json, this.after, this.state, {super.key, required this.height, required this.width});
+  const AnaSurfResultsMenu(this.json, this.after, this.state, {super.key});
 
   @override
   State<StatefulWidget> createState() => _AnaSurfResultsMenu();
@@ -7701,143 +7671,147 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return switchRowColWithOrientation([
-      SizedBox(
-        height: widget.height,
-        width: widget.width,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 0),
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              color: gl.backgroundTransparentBlackBox,
-              child: Column(
-                children: [
-                  Card(
-                    color: gl.colorAgroBioTech.withAlpha(200),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          alignment: Alignment.center,
-                          height: gl.eqPx * gl.fontSizeXL * 2,
-                          width: gl.eqPx * gl.popupWindowsPortraitWidth * .8,
-                          child: Text(
-                            "Par couche",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: gl.eqPx * gl.fontSizeL,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(12.0),
-                      side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
-                    ),
-                    surfaceTintColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    color: Colors.white.withAlpha(200),
-                    child: ListBody(
-                      children: _injectLayerResults(
-                        (int i, Item item, String mCode, int mRastValue) => TextButton(
-                          style: ButtonStyle(
-                            minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                              WidgetState.any: Size(
-                                gl.eqPx * gl.onCatalogueWidth * .7,
-                                gl.eqPx * gl.onCatalogueCategoryHeight,
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return switchRowColWithOrientation([
+          SizedBox(
+            height: (gl.eqPxH - 30) * gl.eqPx,
+            width: gl.eqPx * 96,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
+                  surfaceTintColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  color: gl.backgroundTransparentBlackBox,
+                  child: Column(
+                    children: [
+                      Card(
+                        color: gl.colorAgroBioTech.withAlpha(200),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              alignment: Alignment.center,
+                              height: gl.eqPx * gl.fontSizeXL * 2,
+                              width: gl.eqPx * gl.popupWindowsPortraitWidth * .8,
+                              child: Text(
+                                "Par couche",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: gl.eqPx * gl.fontSizeL,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
-                            }),
-                          ),
-                          key: Key('$i'),
-                          onPressed: () {
-                            if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A")) {
-                              PopupPdfMenu(mCode);
-                            }
-                            if (gl.dico.getLayerBase(mCode).hasDoc() && mCode == "CS_A" && mRastValue < 99) {
-                              PopupPdfMenu(
-                                "",
-                                path:
-                                    '${gl.pathExternalStorage}/${gl.dico.getLayerBase(mCode).getFicheRoute(us: mRastValue)}',
-                              );
-                            }
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Column(
-                              children: [
-                                Row(
+                            ),
+                          ],
+                        ),
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(12.0),
+                          side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
+                        ),
+                        surfaceTintColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        color: Colors.white.withAlpha(200),
+                        child: ListBody(
+                          children: _injectLayerResults(
+                            (int i, Item item, String mCode, int mRastValue) => TextButton(
+                              style: ButtonStyle(
+                                minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                  WidgetState.any: Size(
+                                    gl.eqPx * gl.onCatalogueWidth * .7,
+                                    gl.eqPx * gl.onCatalogueCategoryHeight,
+                                  ),
+                                }),
+                              ),
+                              key: Key('$i'),
+                              onPressed: () {
+                                if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A")) {
+                                  PopupPdfMenu(mCode);
+                                }
+                                if (gl.dico.getLayerBase(mCode).hasDoc() && mCode == "CS_A" && mRastValue < 99) {
+                                  PopupPdfMenu(
+                                    "",
+                                    path:
+                                        '${gl.pathExternalStorage}/${gl.dico.getLayerBase(mCode).getFicheRoute(us: mRastValue)}',
+                                  );
+                                }
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Column(
                                   children: [
-                                    SizedBox(
-                                      width: gl.eqPx * gl.iconSizeS,
-                                      height: gl.eqPx * gl.iconSizeS,
-                                      child: Stack(
-                                        children: [
-                                          Icon(
-                                            switch (gl.dico.getLayerBase(mCode).mGroupe) {
-                                              "ST" => CustomIcons.mountain,
-                                              "PEUP" => CustomIcons.forest,
-                                              "CS" => CustomIcons.mountains,
-                                              "REF" => CustomIcons.map,
-                                              _ => CustomIcons.soil,
-                                            },
-                                            color: Colors.black,
-                                            size: gl.eqPx * gl.iconSizeS,
-                                          ),
-                                          if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A") ||
-                                              (gl.dico.getLayerBase(mCode).hasDoc() &&
-                                                  mCode == "CS_A" &&
-                                                  mRastValue < 99))
-                                            Container(
-                                              alignment: Alignment.topRight,
-                                              width: gl.eqPx * gl.iconSizeM,
-                                              height: gl.eqPx * gl.iconSizeM,
-                                              child: Icon(
-                                                Icons.picture_as_pdf_sharp,
-                                                size: gl.eqPx * gl.iconSizeXS * .7,
-                                                color: Colors.red,
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: gl.eqPx * gl.iconSizeS,
+                                          height: gl.eqPx * gl.iconSizeS,
+                                          child: Stack(
+                                            children: [
+                                              Icon(
+                                                switch (gl.dico.getLayerBase(mCode).mGroupe) {
+                                                  "ST" => CustomIcons.mountain,
+                                                  "PEUP" => CustomIcons.forest,
+                                                  "CS" => CustomIcons.mountains,
+                                                  "REF" => CustomIcons.map,
+                                                  _ => CustomIcons.soil,
+                                                },
+                                                color: Colors.black,
+                                                size: gl.eqPx * gl.iconSizeS,
                                               ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
-                                    SizedBox(
-                                      width: gl.eqPx * gl.onCatalogueWidth * .65,
-                                      child: Text(
-                                        item.name,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: gl.eqPx * gl.fontSizeS,
-                                          fontWeight: FontWeight.w400,
+                                              if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A") ||
+                                                  (gl.dico.getLayerBase(mCode).hasDoc() &&
+                                                      mCode == "CS_A" &&
+                                                      mRastValue < 99))
+                                                Container(
+                                                  alignment: Alignment.topRight,
+                                                  width: gl.eqPx * gl.iconSizeM,
+                                                  height: gl.eqPx * gl.iconSizeM,
+                                                  child: Icon(
+                                                    Icons.picture_as_pdf_sharp,
+                                                    size: gl.eqPx * gl.iconSizeXS * .7,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
+                                        SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
+                                        SizedBox(
+                                          width: gl.eqPx * gl.onCatalogueWidth * .65,
+                                          child: Text(
+                                            item.name,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: gl.eqPx * gl.fontSizeS,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                    lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
+                                    item.entry,
                                   ],
                                 ),
-                                lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
-                                item.entry,
-                              ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    ]);
+          ),
+        ]);
+      },
+    );
   }
 
   List<Widget> _injectLayerResults(Widget Function(int, Item, String, int) generate) {

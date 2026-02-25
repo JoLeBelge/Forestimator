@@ -6,6 +6,7 @@ import 'package:area_polygon/area_polygon.dart';
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/anaPt/requested_layer.dart';
+import 'package:fforestimator/tools/geometry_layer.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -397,10 +398,10 @@ class Geometry {
 
   static Future<bool> sendInBackground() async {
     bool allFinished = true;
-    if (gl.selectedGeoLayer < 0) return true;
-    for (int i = 0; i < gl.selLay.geometries.length; i++) {
-      if (gl.selLay.geometries[i].type == "Point-essence" && !gl.selLay.geometries[i].sentToServer) {
-        if (!await gl.selLay.geometries[i].sendGeometryToServer()) allFinished = false;
+    GeometricLayer essences = GeometricLayer.getEssenceLayer();
+    for (int i = 0; i < essences.geometries.length; i++) {
+      if (!essences.geometries[i].sentToServer) {
+        if (!await essences.geometries[i].sendGeometryToServer()) allFinished = false;
       }
     }
     gl.Mode.essencePointsToSync = !allFinished;

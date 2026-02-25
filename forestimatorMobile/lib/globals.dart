@@ -21,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
 // TODO: Add bounding box as properties & map view
+
 typedef VoidSetter = void Function(void Function());
 
 const String forestimatorMobileVersion = "3.0.0 - build 30"; //02/2026
@@ -538,7 +539,6 @@ VoidSetter refreshStack = (void Function() f) {
   f();
 };
 VoidSetter rebuildSwitcherCatalogueButtons = (void Function() setter) {};
-Map<String, void Function(int)> scrollToPosition = {};
 VoidSetter refreshSearch = (void Function() setter) {};
 VoidSetter refreshSettingsMenu = (void Function() setter) {};
 VoidSetter rebuildOfflineCatalogue = (void Function() setter) {};

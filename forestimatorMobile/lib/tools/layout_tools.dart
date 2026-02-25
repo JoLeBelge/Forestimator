@@ -251,24 +251,12 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
 
   @override
   void dispose() {
-    if (widget.id != null) {
-      gl.scrollToPosition.removeWhere((String str, void Function(int) f) => str == widget.id);
-    }
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.id != null) {
-      gl.scrollToPosition[widget.id!] = (int it) {
-        if (mounted) {
-          setState(() {
-            _scrollTo(it);
-          });
-        }
-      };
-    }
     double width = widget.width ?? gl.eqPx * 65;
     double height = widget.height ?? gl.eqPx * 20;
     double sizeArrows = widget.sizeArrows ?? width * .1;
