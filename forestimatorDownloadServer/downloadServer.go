@@ -75,7 +75,7 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Serve file with download headers
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", "AnalyseSurfaciqueForestimator.xml"))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
 	http.ServeFile(w, r, filePath)
 }
 
