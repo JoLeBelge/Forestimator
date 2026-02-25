@@ -533,7 +533,7 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 void parcellaire::doComputingTask()
 {
     //std::string uuid = boost::uuids::to_string(boost::uuids::random_generator()());
-    std::string ressourcePath = geoJsonName();
+    std::string ressourcePath = "/results/"+ mName + ".geojson";
     Wt::Mail::Message mail = tools::createMail(
                 "JO.Lisein@uliege.be",
                 "Lisein Jonathan",
