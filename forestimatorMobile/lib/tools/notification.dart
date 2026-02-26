@@ -2408,6 +2408,38 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 ),
                                               )
                                               : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
+                                          (gl.selLay.geometries[index].type.contains("Point") &&
+                                                  gl.selLay.geometries[index].points.isNotEmpty)
+                                              ? Container(
+                                                alignment: Alignment.center,
+                                                width: gl.eqPx * gl.iconSizeS,
+                                                height: gl.eqPx * gl.iconSizeS,
+                                                child: IconButton(
+                                                  style: lt.trNoPadButtonstyle,
+                                                  onPressed: () async {
+                                                    if (!_doingAnaPt) {
+                                                      _doingAnaPt = true;
+                                                      await gl.selLay.geometries[index].runAnaPt();
+                                                      gl.refreshStack(() {
+                                                        popupForestimatorWindow(
+                                                          id: "anaPres",
+                                                          title: "Resultats de l'analyse",
+                                                          child: AnaResultsMenu(() {
+                                                            gl.refreshStack(() {});
+                                                          }, gl.requestedLayers),
+                                                        );
+                                                      });
+                                                      _doingAnaPt = false;
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.location_pin,
+                                                    color: Colors.black,
+                                                    size: gl.eqPx * gl.iconSizeXS,
+                                                  ),
+                                                ),
+                                              )
+                                              : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
                                         ],
                                       ),
                                       (gl.selLay.geometries[index].center.longitude != 0.0 &&
@@ -3364,7 +3396,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                         width: gl.eqPx * gl.onCatalogueWidth * .9,
                         height: gl.eqPx * gl.onCatalogueMapHeight * .2,
                         child: Text(
-                          "Type",
+                          "Géométrie",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
                         ),
@@ -3386,7 +3418,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                         width: gl.eqPx * gl.onCatalogueWidth * .9,
                         height: gl.eqPx * gl.onCatalogueMapHeight * .2,
                         child: Text(
-                          gl.layerReady && gl.selLay.labelsVisibleOnMap ? "Labels visible" : "Labels non visible",
+                          gl.layerReady && gl.selLay.labelsVisibleOnMap ? "Labels visibles" : "Labels non visibles",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
                         ),
@@ -4245,7 +4277,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   },
                   icon: Icon(Icons.info_outline, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
                 ),
-                variableBooleanSlider("Mode Essence", gl.Mode.essence, (bool it) {
+                variableBooleanSlider("Observations des essences", gl.Mode.essence, (bool it) {
                   if (gl.Mode.userDataFilled) {
                     setState(() {
                       gl.Mode.essence = it;

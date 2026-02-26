@@ -417,7 +417,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             break;
         }
         case typeAna::Mass:{
-            if (globTest){std::cout << "api traitement de masse anaPonctuelle, layers "  << aTool << std::endl;}
+            if (globTest){std::cout << "api traitement de masse, layers "  << aTool << std::endl;}
             std::vector<std::string> codeList;
             std::vector<std::string> aTmp;
             boost::split( aTmp,aTool,boost::is_any_of(","),boost::token_compress_on);
@@ -427,17 +427,13 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                     codeList.push_back(code);
                 }
             }
-            //if (globTest){std::cout << "codeList for API mass ana Points has " << codeList.size() << " elements" << std::endl;
-            //    std::cout << "lay geom type " << lay->GetGeomType() << std::endl;}
+
+            if (globTest){    std::cout << "lay geom type " << wkbFlatten(lay->GetGeomType()) << std::endl;}
 
             for (std::string &code: codeList){
                 if (lay->FindFieldIndex(code.c_str(),0)==-1){
                     OGRFieldDefn * oFLD(NULL);
-                    //if (lay->GetGeomType()==wkbPolygon || lay->GetGeomType()==wkbMultiPolygon){
-                        oFLD= new OGRFieldDefn(code.c_str(),  OFTString);
-                    //}else{
-                    //    oFLD= new OGRFieldDefn(code.c_str(),  OFTReal);
-                    //}
+                    oFLD= new OGRFieldDefn(code.c_str(),  OFTString);
                     oFLD->SetJustify(OGRJustification::OJLeft);
                     lay->CreateField(oFLD);
                 }

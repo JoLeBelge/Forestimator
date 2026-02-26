@@ -6,7 +6,7 @@ int globVolMaxShp(10000);    // en ko // n'as pas l'air de fonctionner comme je 
 
 extern bool globTest;
 
-parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW) : mGL(aGL), centerX(0.0), centerY(0.0), mClientName(""), mName(""), mFullPath(""), m_app(app), fu(NULL), msg(NULL), hasValidShp(0), downloadRasterBt(NULL), mStatW(statW), poGeomGlobale(NULL), mLabelName("")
+parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW) : mGL(aGL), centerX(0.0), centerY(0.0), mClientName(""), mName(""), mFullPath(""), m_app(app), fu(NULL), msg(NULL), hasValidShp(0), downloadRasterBt(NULL), mStatW(statW), mLabelName("")
 {
     // std::cout << "creation parcellaire " << std::endl;
     mDico = aGL->Dico();
@@ -84,13 +84,12 @@ void parcellaire::cleanShpFile()
     {
         boost::filesystem::remove(file);
     }
-    // if (poGeomGlobale!=NULL){OGRGeometryFactory::destroyGeometry(poGeomGlobale);} // segfault
+
     hasValidShp = 0;
-    // je devrait réinitialiser les nom mFullPath et autre ici aussi?
     mExtention = "";
 }
 
-bool parcellaire::computeGlobalGeom(std::string extension, bool limitSize)
+bool parcellaire::computeExtentAndSurf(std::string extension, bool limitSize)
 {
     // std::cout << "computeGlobalGeom " << std::endl;
     bool aRes(0);
@@ -104,90 +103,95 @@ bool parcellaire::computeGlobalGeom(std::string extension, bool limitSize)
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);
-        // union de tout les polygones du shp
-        OGRFeature *poFeature;
-        OGRGeometry *poGeom;
-        OGRGeometry *poGeom2;
-        std::unique_ptr<OGRMultiPolygon> multi = std::make_unique<OGRMultiPolygon>();
-        OGRErr err = OGRERR_NONE;
-        OGRMultiPolygon *poGeomM;
 
-        int nbValidPol(0);
-        while ((poFeature = lay->GetNextFeature()) != NULL)
-        {
-            // OGRGeometry * tmp=OGRGeometryFactory::forceTo((poFeature->GetGeometryRef()));
-            poFeature->GetGeometryRef()->flattenTo2D();
-            switch (poFeature->GetGeometryRef()->getGeometryType())
-            {
-            case (wkbPolygon):
-            {
-                poGeom = poFeature->GetGeometryRef();
-                poGeom->closeRings();
-                poGeom = poGeom->Buffer(0.0);
-                // poGeom->Simplify(1.0);
-                err = multi->addGeometry(poGeom);
-                if (err == OGRERR_NONE)
-                    nbValidPol++;
-                break;
-            }
+        if (wkbFlatten(lay->GetGeomType())==wkbPoint || wkbFlatten(lay->GetGeomType())==wkbMultiPoint ){
+            OGR_L_GetExtent(lay,&mParcellaireExtent,1);
+            centerX = (mParcellaireExtent.MaxX + mParcellaireExtent.MinX) / 2;
+            centerY = (mParcellaireExtent.MaxY + mParcellaireExtent.MinY) / 2;
+            return 1;
+        } else {
 
-            case wkbMultiPolygon:
+            OGRFeature *poFeature;
+            OGRGeometry *poGeom;
+            OGRGeometry *poGeom2;
+            std::unique_ptr<OGRMultiPolygon> multi = std::make_unique<OGRMultiPolygon>();
+            OGRErr err = OGRERR_NONE;
+            OGRMultiPolygon *poGeomM;
+             // union de tout les polygones du shp
+            int nbValidPol(0);
+            while ((poFeature = lay->GetNextFeature()) != NULL)
             {
-                poGeomM = poFeature->GetGeometryRef()->toMultiPolygon();
-                int n(poGeomM->getNumGeometries());
-                for (int i(0); i < n; i++)
+                poFeature->GetGeometryRef()->flattenTo2D();
+                switch (poFeature->GetGeometryRef()->getGeometryType())
                 {
-                    poGeom = poGeomM->getGeometryRef(i);
+                case (wkbPolygon):
+                {
+                    poGeom = poFeature->GetGeometryRef();
                     poGeom->closeRings();
                     poGeom = poGeom->Buffer(0.0);
-                    // if (poFeature->GetGeometryRef()->getGeometryType()==wkbPolygon)
                     err = multi->addGeometry(poGeom);
                     if (err == OGRERR_NONE)
                         nbValidPol++;
+                    break;
                 }
-                break;
-            }
-            default:
-                std::cout << "Geometrie " << poFeature->GetFID() << ", type de geometrie non pris en charge ; " << poFeature->GetGeometryRef()->getGeometryName() << ", id " << poFeature->GetGeometryRef()->getGeometryType() << std::endl;
 
-                break;
+                case wkbMultiPolygon:
+                {
+                    poGeomM = poFeature->GetGeometryRef()->toMultiPolygon();
+                    int n(poGeomM->getNumGeometries());
+                    for (int i(0); i < n; i++)
+                    {
+                        poGeom = poGeomM->getGeometryRef(i);
+                        poGeom->closeRings();
+                        poGeom = poGeom->Buffer(0.0);
+                        err = multi->addGeometry(poGeom);
+                        if (err == OGRERR_NONE)
+                            nbValidPol++;
+                    }
+                    break;
+                }
+                default:
+                    std::cout << "Geometrie " << poFeature->GetFID() << ", type de geometrie non pris en charge ; " << poFeature->GetGeometryRef()->getGeometryName() << ", id " << poFeature->GetGeometryRef()->getGeometryType() << std::endl;
+
+                    break;
+                }
+                if (err != OGRERR_NONE)
+                {
+                    std::cout << "problem avec ajout de la geometrie " << poFeature->GetFID() << ", erreur : " << err << std::endl;
+                }
+                //OGRFeature::DestroyFeature(poFeature);
             }
-            if (err != OGRERR_NONE)
+
+            // test si
+            if (nbValidPol > 0)
             {
-                std::cout << "problem avec ajout de la geometrie " << poFeature->GetFID() << ", erreur : " << err << std::endl;
-            }
-            OGRFeature::DestroyFeature(poFeature);
-        }
+                poGeom2 = multi->UnionCascaded();
 
-        // test si
-        if (nbValidPol > 0)
-        {
-            poGeom2 = multi->UnionCascaded();
+                poGeom2 = poGeom2->Buffer(1.0); // ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
+                OGRGeometry *poGeomGlobale = poGeom2->Simplify(1.0);
+                int aSurfha = OGR_G_Area(poGeomGlobale) / 10000;
+                if (!limitSize || aSurfha < globSurfMax)
+                {
+                    poGeomGlobale->getEnvelope(&mParcellaireExtent);
+                    centerX = (mParcellaireExtent.MaxX + mParcellaireExtent.MinX) / 2;
+                    centerY = (mParcellaireExtent.MaxY + mParcellaireExtent.MinY) / 2;
+                    aRes = 1;
+                }
+                else
+                {
+                    // message box
+                    auto messageBox =
+                            addChild(std::make_unique<Wt::WMessageBox>(
+                                         "Import du shapefile polygone",
+                                         tr("parcellaire.upload.size"),
+                                         Wt::Icon::Information,
+                                         Wt::StandardButton::Ok));
 
-            poGeom2 = poGeom2->Buffer(1.0); // ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
-            poGeomGlobale = poGeom2->Simplify(1.0);
-            int aSurfha = OGR_G_Area(poGeomGlobale) / 10000;
-            if (!limitSize || aSurfha < globSurfMax)
-            {
-                poGeomGlobale->getEnvelope(&mParcellaireExtent);
-                centerX = (mParcellaireExtent.MaxX + mParcellaireExtent.MinX) / 2;
-                centerY = (mParcellaireExtent.MaxY + mParcellaireExtent.MinY) / 2;
-                aRes = 1;
-            }
-            else
-            {
-                // message box
-                auto messageBox =
-                        addChild(std::make_unique<Wt::WMessageBox>(
-                                     "Import du shapefile polygone",
-                                     tr("parcellaire.upload.size"),
-                                     Wt::Icon::Information,
-                                     Wt::StandardButton::Ok));
-
-                messageBox->setModal(true);
-                messageBox->buttonClicked().connect([=]
-                { removeChild(messageBox); });
-                messageBox->show();
+                    messageBox->setModal(true);
+                    messageBox->buttonClicked().connect([=]
+                    { removeChild(messageBox); });
+                    messageBox->show();
+                }
             }
         }
     }
@@ -212,12 +216,17 @@ void parcellaire::display()
             "style:new ol.style.Style({" +
             "stroke: new ol.style.Stroke({" +
             "color: 'blue'," +
-            "width: 2})" +
+            "width: 2})," +
+            "image: new ol.style.Circle({"+
+              "radius: 7,"+
+              "fill: new ol.style.Fill({color: 'red'}),"+
+              "stroke: new ol.style.Stroke({color: 'white', width: 2}),"+
+            "}),"+
             "  })," +
-            "extent: [MINX,MINY,MAXX,MAXY]," +
+            //"extent: [MINX,MINY,MAXX,MAXY]," +
             "});" +
             "updateGroupeLayers();" +
-            "map.getView().fit(parcellaire.getExtent());" +
+            "map.getView().fit([MINX,MINY,MAXX,MAXY]);" +
             "map.getView().setCenter([" + std::to_string(centerX) + "," + std::to_string(centerY) + " ]);";
     // extent du parcellaire
     boost::replace_all(JScommand, "MAXX", std::to_string(mParcellaireExtent.MaxX));
@@ -243,7 +252,7 @@ void parcellaire::upload()
     // computeStatButton->disable();
     downloadRasterBt->disable();
     // anaOnAllPolygBt->disable();
-    // cleanShpFile();
+
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
     mClientName = p.stem().c_str();
 
@@ -284,7 +293,7 @@ void parcellaire::upload()
             if (to31370AndGeoJson())
             {
                 mGL->m_app->addLog("upload a shp");
-                if (computeGlobalGeom())
+                if (computeExtentAndSurf())
                 {
                     hasValidShp = true;
                     downloadRasterBt->enable();
@@ -319,7 +328,7 @@ void parcellaire::upload()
         if (to31370AndGeoJson())
         {
             mGL->m_app->addLog("upload a shp gpkg");
-            if (computeGlobalGeom())
+            if (computeExtentAndSurf())
             {
                 hasValidShp = true;
                 downloadRasterBt->enable();
@@ -449,11 +458,7 @@ void parcellaire::downloadRaster()
 bool parcellaire::cropImWithShp(std::shared_ptr<layerBase> l, std::string aOut)
 {
     bool aRes(0);
-    std::cout << " cropImWithShp" << std::endl;
-    // enveloppe de la géométrie globale
-    OGREnvelope ext;
-    poGeomGlobale->getEnvelope(&ext);
-    aRes = l->cropIm(aOut, ext);
+    aRes = l->cropIm(aOut, mParcellaireExtent);
     return aRes;
 }
 
@@ -520,7 +525,7 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
     mName = p.filename().stem().c_str();
     mLabelName = aLabelName;
 
-    if (computeGlobalGeom("geojson", 0))
+    if (computeExtentAndSurf("geojson", 0))
     {
         hasValidShp = true;
         downloadRasterBt->enable();
@@ -732,18 +737,10 @@ void parcellaire::to31370AndGeoJsonGDAL()
         return;
     }
 
-    /*if (inputEPSG!=-1){
-        std::string command ="EPSG:"+std::to_string(inputEPSG);
-        papszArgv = CSLAddString(papszArgv, "-s_srs");
-        papszArgv = CSLAddString(papszArgv, command.c_str());
-        std::cout << "command " << command << std::endl;
-    }*/
-
     papszArgv = CSLAddString(papszArgv, "-t_srs"); // target src with reprojection
     papszArgv = CSLAddString(papszArgv, "EPSG:31370");
     papszArgv = CSLAddString(papszArgv, "-dim");// pour retirer la dimension Z si elle existe.
     papszArgv = CSLAddString(papszArgv, "2");
-
 
     GDALVectorTranslateOptions *option = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
     if (option)
@@ -759,10 +756,7 @@ void parcellaire::to31370AndGeoJsonGDAL()
             std::cout << "changement de src par GDALVectorTranslate vers geojson; echec" << std::endl;
         }
     }
-    else
-    {
-        std::cout << "options shp to geojson pas correctement parsées " << std::endl;
-    }
+
     GDALVectorTranslateOptionsFree(option);
     if (papszArgv != nullptr)
     {
@@ -803,7 +797,7 @@ void parcellaire::to31370AndGeoJsonGDAL()
     }
 
     mGL->m_app->addLog("upload a shp");
-    if (computeGlobalGeom())
+    if (computeExtentAndSurf())
     {
         hasValidShp = true;
         downloadRasterBt->enable();
