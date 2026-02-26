@@ -389,6 +389,48 @@ class Geometry {
     return true;
   }
 
+  List<LatLng> get boundingBox => [LatLng(minLat(), minLng()), LatLng(maxLat(), maxLng())];
+
+  double minLat() {
+    double res = double.infinity;
+    for (LatLng it in points) {
+      if (it.latitude < res) {
+        res = it.latitude;
+      }
+    }
+    return res;
+  }
+
+  double minLng() {
+    double res = double.infinity;
+    for (LatLng it in points) {
+      if (it.longitude < res) {
+        res = it.longitude;
+      }
+    }
+    return res;
+  }
+
+  double maxLat() {
+    double res = -double.infinity;
+    for (LatLng it in points) {
+      if (it.latitude > res) {
+        res = it.latitude;
+      }
+    }
+    return res;
+  }
+
+  double maxLng() {
+    double res = -double.infinity;
+    for (LatLng it in points) {
+      if (it.longitude > res) {
+        res = it.longitude;
+      }
+    }
+    return res;
+  }
+
   static void sendEssencePointsInBackground() async {
     if (!gl.Mode.essencePointsToSync) {
       gl.Mode.essencePointsToSync = true;

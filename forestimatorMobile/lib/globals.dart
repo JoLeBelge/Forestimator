@@ -15,12 +15,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO: Add state to SENT status with callback in timer.
-// TODO: ajout de variables au layer -> appliquer a tous les geos ou seulement nouveaux? Avec ou sans valeur predefini?
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
 // TODO: Florentin BUG
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
-// TODO: Add bounding box as properties & map view
 
 typedef VoidSetter = void Function(void Function());
 
@@ -127,6 +125,7 @@ class Mode {
   static bool polygon = false;
   static bool polygonList = false;
   static bool editAttributes = false;
+  static bool variableSets = false;
   static bool editPolygon = false;
   static bool editPoint = false;
   static bool editPointMarker = false;
@@ -196,8 +195,8 @@ class Display {
     aspect = MediaQuery.of(context).size.aspectRatio;
     dpi = MediaQuery.of(context).devicePixelRatio;
     orientation = MediaQuery.of(context).orientation;
-    //_tabletMode();
-    //_squareMode();
+    _tabletMode();
+    _squareMode();
     _enforceEquiWidthHeight();
     if (Mode.square || Mode.overrideModeSquare) {
       minEquiPixelsDisplayLandscapeHeight = minEquiPixelsDisplayLandscapeWidth * .8;

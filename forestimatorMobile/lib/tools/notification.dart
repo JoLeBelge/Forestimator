@@ -1784,7 +1784,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                       )
                       : Container(width: gl.eqPx * gl.iconSizeM),
                   Text(
-                    _titleLayer ? "Liste des layer" : "Layer",
+                    _titleLayer ? "Liste des layers" : "Layer",
                     textAlign: TextAlign.justify,
                     style: TextStyle(fontSize: gl.eqPx * gl.fontSizeL, color: Colors.white),
                   ),
@@ -2654,6 +2654,8 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                     _getFixedAttribute("circonference", "${(gl.selGeo.perimeter).round() / 1000}"),
 
                                   _getFixedAttribute("coordinates", gl.selGeo.getPolyPointsString()),
+                                  if (gl.selGeo.type == "Polygon")
+                                    _getFixedAttribute("bounding_box", gl.selGeo.boundingBox.toString()),
                                 ] +
                                 List<Widget>.generate(gl.selGeo.attributes.length, (i) {
                                   return Column(
@@ -3015,7 +3017,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                     _getFixedAttribute("nom", gl.selLay.name, noValues: true),
                                   ] +
                                   List<Widget>.generate(gl.layerReady ? gl.selLay.defaultAttributes.length : 0, (i) {
-                                    String oldName = gl.selLay.defaultAttributes[i].name;
+                                    //String oldName = gl.selLay.defaultAttributes[i].name;
                                     return Column(
                                       children: [
                                         Row(
@@ -3116,7 +3118,8 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                               child: TextButton(
                                                 style: lt.trNoPadButtonstyle,
                                                 onPressed: () {},
-                                                onLongPress: () {
+                                                // Pour changer le nom de l'attribut
+                                                /*onLongPress: () {
                                                   PopupValueChange(
                                                     "prop",
                                                     gl.selLay.defaultAttributes[i].name,
@@ -3151,7 +3154,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                       }
                                                     },
                                                   );
-                                                },
+                                                },*/
                                                 child: Container(
                                                   alignment: Alignment.centerLeft,
                                                   child: SingleChildScrollView(
@@ -3228,36 +3231,37 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                             ],
                           ),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            PopupSelectAttributeSet(
-                              context,
-                              gl.selLay.defaultAttributes,
-                              onPressed: (List<Attribute> Function() it) {
-                                List<Attribute> res = it();
-                                setState(() {
-                                  gl.selLay.defaultAttributes.addAll(res);
-                                });
-                                for (Geometry g in gl.selLay.geometries) {
-                                  g.attributes.addAll(res);
-                                }
-                              },
-                            );
-                          },
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.add_circle_outline_outlined,
-                                color: Colors.black,
-                                size: gl.iconSizeS * gl.eqPx,
-                              ),
-                              Text(
-                                "Un set de variables",
-                                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
-                              ),
-                            ],
+                        if (gl.Mode.variableSets)
+                          TextButton(
+                            onPressed: () {
+                              PopupSelectAttributeSet(
+                                context,
+                                gl.selLay.defaultAttributes,
+                                onPressed: (List<Attribute> Function() it) {
+                                  List<Attribute> res = it();
+                                  setState(() {
+                                    gl.selLay.defaultAttributes.addAll(res);
+                                  });
+                                  for (Geometry g in gl.selLay.geometries) {
+                                    g.attributes.addAll(res);
+                                  }
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.add_circle_outline_outlined,
+                                  color: Colors.black,
+                                  size: gl.iconSizeS * gl.eqPx,
+                                ),
+                                Text(
+                                  "Un set de variables",
+                                  style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ],
@@ -3534,6 +3538,17 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                             ),
                           SizedBox(width: gl.eqPx * gl.iconSizeXS),
                         ],
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Container(
+                        padding: EdgeInsets.zero,
+                        width: gl.eqPx * gl.onCatalogueWidth * .9,
+                        height: gl.eqPx * gl.onCatalogueMapHeight * .2,
+                        child: Text(
+                          "Supprimez la couche",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                        ),
                       ),
                       lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                       Container(
@@ -4088,203 +4103,205 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
-        return Container(
-          padding: EdgeInsets.all(7.5),
-          child: Column(
-            children: [
-              lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-              Row(
-                children: [
-                  SizedBox(
-                    width: gl.eqPx * 40,
-                    child: Text("Prénom", style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS)),
-                  ),
-                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                  Container(
-                    alignment: Alignment.center,
-                    width: gl.eqPx * 40,
-                    height: gl.eqPx * gl.iconSizeXS,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        animationDuration: Duration(seconds: 1),
-                        backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                          WidgetState.any: Colors.transparent,
-                        }),
-                        padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                          <WidgetStatesConstraint, EdgeInsetsGeometry>{WidgetState.any: EdgeInsetsGeometry.zero},
-                        ),
-                      ),
-                      onPressed: () {},
-                      onLongPress: () {
-                        PopupValueChange(
-                          "string",
-                          gl.UserData.forename,
-                          (value) {
-                            setState(() {
-                              gl.UserData.forename = value;
-                              gl.Mode.userDataFilled = gl.UserData.validUserData();
-                              gl.Mode.serialize();
-                            });
-                            widget.onChanged();
-                          },
-                          () {},
-                          () {
-                            gl.UserData.serialize();
-                          },
-                        );
-                      },
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        width: gl.eqPx * 40,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Text(
-                            gl.UserData.forename,
-                            style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-              Row(
-                children: [
-                  SizedBox(
-                    width: gl.eqPx * 40,
-                    child: Text("Nom", style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS)),
-                  ),
-                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                  Container(
-                    alignment: Alignment.center,
-                    width: gl.eqPx * 40,
-                    height: gl.eqPx * gl.iconSizeXS,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        animationDuration: Duration(seconds: 1),
-                        backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                          WidgetState.any: Colors.transparent,
-                        }),
-                        padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                          <WidgetStatesConstraint, EdgeInsetsGeometry>{WidgetState.any: EdgeInsetsGeometry.zero},
-                        ),
-                      ),
-                      onPressed: () {},
-                      onLongPress: () {
-                        PopupValueChange(
-                          "string",
-                          gl.UserData.name,
-                          (value) {
-                            setState(() {
-                              gl.UserData.name = value;
-                              gl.Mode.userDataFilled = gl.UserData.validUserData();
-                              gl.Mode.serialize();
-                            });
-                            widget.onChanged();
-                          },
-                          () {},
-                          () {
-                            gl.UserData.serialize();
-                          },
-                        );
-                      },
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        width: gl.eqPx * 40,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Text(
-                            gl.UserData.name,
-                            style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-              Row(
-                children: [
-                  SizedBox(
-                    width: gl.eqPx * 40,
-                    child: Text("Mail", style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS)),
-                  ),
-                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                  Container(
-                    alignment: Alignment.center,
-                    width: gl.eqPx * 40,
-                    height: gl.eqPx * gl.iconSizeXS,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        animationDuration: Duration(seconds: 1),
-                        backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                          WidgetState.any: Colors.transparent,
-                        }),
-                        padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                          <WidgetStatesConstraint, EdgeInsetsGeometry>{WidgetState.any: EdgeInsetsGeometry.zero},
-                        ),
-                      ),
-                      onPressed: () {},
-                      onLongPress: () {
-                        PopupValueChange(
-                          "mail",
-                          gl.UserData.mail,
-                          (value) {
-                            setState(() {
-                              gl.UserData.mail = value;
-                              gl.Mode.userDataFilled = gl.UserData.validUserData();
-                              gl.Mode.serialize();
-                            });
-                            widget.onChanged();
-                          },
-                          () {},
-                          () {
-                            gl.UserData.serialize();
-                          },
-                        );
-                      },
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        width: gl.eqPx * 40,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Text(
-                            gl.UserData.mail,
-                            style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-              variableBooleanSlider("Mode Essence", gl.Mode.essence, (bool it) {
-                if (gl.Mode.userDataFilled) {
-                  setState(() {
-                    gl.Mode.essence = it;
-                  });
-                } else {
-                  PopupUserData(
-                    context,
-                    () {},
-                    () {
-                      setState(() {
-                        gl.Mode.essence = it;
-                      });
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+            Row(
+              children: [
+                SizedBox(
+                  width: gl.eqPx * 30,
+                  height: gl.eqPx * gl.iconSizeXS,
+                  child: Text("Prénom", style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM)),
+                ),
+                lt.stroke(vertical: true, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                Container(
+                  alignment: Alignment.center,
+                  width: gl.eqPx * 50,
+                  height: gl.eqPx * gl.iconSizeXS,
+                  child: TextButton(
+                    style: lt.trNoPadButtonstyle,
+                    onPressed: () {},
+                    onLongPress: () {
+                      PopupValueChange(
+                        "string",
+                        gl.UserData.forename,
+                        (value) {
+                          setState(() {
+                            gl.UserData.forename = value;
+                            gl.Mode.userDataFilled = gl.UserData.validUserData();
+                            gl.Mode.serialize();
+                          });
+                          widget.onChanged();
+                        },
+                        () {},
+                        () {
+                          gl.UserData.serialize();
+                        },
+                      );
                     },
-                    oldForename: gl.UserData.forename,
-                    oldName: gl.UserData.name,
-                    oldMail: gl.UserData.mail,
-                  );
-                }
-                gl.refreshStack(() {});
-                gl.Mode.serialize();
-              }, false),
-            ],
-          ),
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      width: gl.eqPx * 50,
+                      height: gl.eqPx * gl.iconSizeXS,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          gl.UserData.forename,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+            Row(
+              children: [
+                SizedBox(
+                  width: gl.eqPx * 30,
+                  child: Text("Nom", style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM)),
+                ),
+                lt.stroke(vertical: true, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                Container(
+                  alignment: Alignment.center,
+                  width: gl.eqPx * 50,
+                  height: gl.eqPx * gl.iconSizeXS,
+                  child: TextButton(
+                    style: lt.trNoPadButtonstyle,
+                    onPressed: () {},
+                    onLongPress: () {
+                      PopupValueChange(
+                        "string",
+                        gl.UserData.name,
+                        (value) {
+                          setState(() {
+                            gl.UserData.name = value;
+                            gl.Mode.userDataFilled = gl.UserData.validUserData();
+                            gl.Mode.serialize();
+                          });
+                          widget.onChanged();
+                        },
+                        () {},
+                        () {
+                          gl.UserData.serialize();
+                        },
+                      );
+                    },
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      width: gl.eqPx * 50,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          gl.UserData.name,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+            Row(
+              children: [
+                SizedBox(
+                  width: gl.eqPx * 30,
+                  child: Text("Mail", style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM)),
+                ),
+                lt.stroke(vertical: true, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                Container(
+                  alignment: Alignment.center,
+                  width: gl.eqPx * 50,
+                  height: gl.eqPx * gl.iconSizeXS,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      animationDuration: Duration(seconds: 1),
+                      backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
+                        WidgetState.any: Colors.transparent,
+                      }),
+                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                        <WidgetStatesConstraint, EdgeInsetsGeometry>{WidgetState.any: EdgeInsetsGeometry.zero},
+                      ),
+                    ),
+                    onPressed: () {},
+                    onLongPress: () {
+                      PopupValueChange(
+                        "mail",
+                        gl.UserData.mail,
+                        (value) {
+                          setState(() {
+                            gl.UserData.mail = value;
+                            gl.Mode.userDataFilled = gl.UserData.validUserData();
+                            gl.Mode.serialize();
+                          });
+                          widget.onChanged();
+                        },
+                        () {},
+                        () {
+                          gl.UserData.serialize();
+                        },
+                      );
+                    },
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      width: gl.eqPx * 50,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          gl.UserData.mail,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    gl.refreshStack(() {
+                      popupForestimatorMessage(
+                        height: gl.eqPx * 90,
+                        width: gl.eqPx * 90,
+                        title: "Information",
+                        message:
+                            "Cette option vous permet de contribuer à la collecte des données nécessaires à la création et à l'amélioration d'une carte des essences forestières en Wallonie. Elle vous offre la possibilité d’enregistrer des observations sous forme de positions géographiques associées à l’essence forestière présente. Ces données sont instantanément transmises à notre laboratoire de recherche.",
+                      );
+                    });
+                  },
+                  icon: Icon(Icons.info_outline, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
+                ),
+                variableBooleanSlider("Mode Essence", gl.Mode.essence, (bool it) {
+                  if (gl.Mode.userDataFilled) {
+                    setState(() {
+                      gl.Mode.essence = it;
+                    });
+                  } else {
+                    PopupUserData(
+                      context,
+                      () {},
+                      () {
+                        setState(() {
+                          gl.Mode.essence = it;
+                        });
+                      },
+                      oldForename: gl.UserData.forename,
+                      oldName: gl.UserData.name,
+                      oldMail: gl.UserData.mail,
+                    );
+                  }
+                  gl.refreshStack(() {});
+                  gl.Mode.serialize();
+                }, false),
+              ],
+            ),
+          ],
         );
       },
     );
@@ -4419,6 +4436,13 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           setState(() {
             gl.Mode.smallLabel = it;
             gl.Mode.labelCross = !it;
+          });
+          gl.refreshStack(() {});
+          gl.Mode.serialize();
+        }, false),
+        variableBooleanSlider("Ensemble de variables", gl.Mode.variableSets, (bool it) {
+          setState(() {
+            gl.Mode.variableSets = it;
           });
           gl.refreshStack(() {});
           gl.Mode.serialize();
