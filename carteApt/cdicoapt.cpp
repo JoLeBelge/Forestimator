@@ -433,11 +433,11 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             for (std::string &code: codeList){
                 if (lay->FindFieldIndex(code.c_str(),0)==-1){
                     OGRFieldDefn * oFLD(NULL);
-                    if (lay->GetGeomType()==wkbPolygon || lay->GetGeomType()==wkbMultiPolygon){
+                    //if (lay->GetGeomType()==wkbPolygon || lay->GetGeomType()==wkbMultiPolygon){
                         oFLD= new OGRFieldDefn(code.c_str(),  OFTString);
-                    }else{
-                        oFLD= new OGRFieldDefn(code.c_str(),  OFTReal);
-                    }
+                    //}else{
+                    //    oFLD= new OGRFieldDefn(code.c_str(),  OFTReal);
+                    //}
                     oFLD->SetJustify(OGRJustification::OJLeft);
                     lay->CreateField(oFLD);
                 }
@@ -452,7 +452,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                     for (std::string &code: codeList){
                         std::shared_ptr<layerBase> l=getLayerBase(code);
                         int aVal=l->getValue(pt->getX(),pt->getY());
-                        poFeature->SetField(code.c_str(),aVal);
+                        poFeature->SetField(code.c_str(),l->getValLabel(aVal).c_str());
                     }
 
                 }
@@ -473,10 +473,10 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                             int test(1);
                             for (auto kv:stat){
                                 if (test){
-                                    aRes+=std::to_string(kv.first)+":"+roundDouble(kv.second);
+                                    aRes+=l->getValLabel(kv.first)+":"+roundDouble(kv.second)+"%";
                                     test=0;
                                 }else{
-                                    aRes+=";"+std::to_string(kv.first)+":"+roundDouble(kv.second);
+                                    aRes+=";"+l->getValLabel(kv.first)+":"+roundDouble(kv.second)+"%";
                                 }
                             }
                             break;
@@ -493,7 +493,6 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             break;
         }
         }
-
     } else {aResponse="arguments pour geotraitement ; vous avez rentré une valeur mais qui semble fausse. peut-être le nom de la couche ou du traitement. Consultez la page d'aide.\n";}
 
     return aResponse;

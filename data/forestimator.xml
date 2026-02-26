@@ -796,8 +796,10 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
  <message id="mail.anasMulti.body">
     Bonjour {1},
 
-    Vous trouverez ci-dessous un lien pour télécharger les résultats de l'analyse surfacique pour vos polygones ({2}). 
+    Vous trouverez ci-dessous un lien pour télécharger les résultats de l'analyse surfacique pour vos polygones ({2}).
     
+    Les résulats sont ajoutés à la table d'attribut de votre couche vectorielle qui vous est fournie au format geojson.
+        
     https://forestimator.gembloux.ulg.ac.be/{3}
     
     En vous souhaitant bonne réception,

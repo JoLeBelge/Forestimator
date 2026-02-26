@@ -16,7 +16,7 @@ import (
 
 const (
 	portForestimatorWeb        = 8500
-	portForestimatorDownloader = 8001
+	portForestimatorDownloader = 8501
 	portOpenForis              = 8380
 	bufferSize                 = 1 << 20
 	updateIntervall            = 100 * time.Millisecond
