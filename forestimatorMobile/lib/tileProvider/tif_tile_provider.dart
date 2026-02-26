@@ -59,16 +59,10 @@ class TifFileTileProvider extends TileProvider {
   @override
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) {
     int tileSize = 256;
-    // final tileSizePoint = Point(tileSize, tileSize);
-
-    // final nwPoint = coordinates.scaleBy(tileSizePoint) - daptation for flutter_map 7.0.0 (scaleBy depreciated)
-
     final Offset nwPoint = Offset(coordinates.x.toDouble() * tileSize, coordinates.y.toDouble() * tileSize);
-
     final nwCoords = mycrs.offsetToLatLng(nwPoint, coordinates.z.toDouble());
     final nw = mycrs.projection.project(nwCoords);
     Rect b = mycrs.projection.bounds!;
-
     double resolution = 10.0;
     int xOffset = ((nw.dx - b.topLeft.dx) / resolution).round();
     int yOffset =

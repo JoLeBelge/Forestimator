@@ -297,6 +297,7 @@ class GeometricLayer {
     }
     gl.geoLayers.add(GeometricLayer.essence());
     gl.selectedGeoLayer = gl.geoLayers.length - 1;
+    gl.geoLayers.last.serialize();
     return gl.geoLayers.last;
   }
 }

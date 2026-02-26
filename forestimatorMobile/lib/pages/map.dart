@@ -82,7 +82,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   Offset get _mainMenuOnOfflineAnimOffScreenPos =>
       Offset(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _boxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-2000));
+  Offset _boxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-20000));
   Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), 0);
   Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-2000));
 
@@ -504,7 +504,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   MarkerLayer(markers: _getPointsToDraw()),
                                   PolygonLayer(polygons: _getPolygonesToDraw()),
                                 ]
-                                : (gl.modeMapShowPolygons && gl.Mode.polygon)
+                                : (gl.Mode.polygon)
                                 ? <Widget>[
                                   MouseRegion(
                                     hitTestBehavior: HitTestBehavior.deferToChild,
@@ -533,10 +533,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   ),
                                   MarkerLayer(markers: _getPointsToDraw(hitButton: true)),
                                 ]
-                                : <Widget>[
+                                : gl.modeMapShowPolygons
+                                ? <Widget>[
                                   PolygonLayer<String>(polygons: _getPolygonesToDraw()),
                                   MarkerLayer(markers: _getPointsToDraw(hitButton: false)),
-                                ]) +
+                                ]
+                                : <Widget>[]) +
                             <Widget>[
                               MarkerLayer(markers: _placeVertexMovePointer() + _placeAnaPtMarker()),
                               if (gl.modeMapShowPolygons) MarkerLayer(markers: _getPolygonesLabels()),
@@ -1936,24 +1938,21 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                     width: gl.eqPx * gl.iconSizeM,
                                     child: IconButton(
                                       style: lt.borderlessStyle,
-                                      onPressed:
-                                          gl.selLay.subtype != "Essence"
-                                              ? () {
-                                                setState(() {
-                                                  gl.selLay.addGeometry(
-                                                    name:
-                                                        gl.selLay.type == "Point"
-                                                            ? "Point${gl.selLay.geometries.length + 1}"
-                                                            : "Polygon${gl.selLay.geometries.length + 1}",
-                                                  );
-                                                  _switchModeEditVertexesOn();
-                                                  gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
-                                                });
-                                              }
-                                              : () {},
+                                      onPressed: () {
+                                        setState(() {
+                                          gl.selLay.addGeometry(
+                                            name:
+                                                gl.selLay.type == "Point"
+                                                    ? "Point${gl.selLay.geometries.length + 1}"
+                                                    : "Polygon${gl.selLay.geometries.length + 1}",
+                                          );
+                                          _switchModeEditVertexesOn();
+                                          gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
+                                        });
+                                      },
                                       icon: Icon(
                                         Icons.add_circle,
-                                        color: gl.selLay.subtype != "Essence" ? gl.colorAgroBioTech : Colors.grey,
+                                        color: gl.colorAgroBioTech,
                                         size: gl.eqPx * gl.iconSizeS,
                                       ),
                                     ),
@@ -2276,19 +2275,23 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             gl.Mode.essence ||
             gl.geoReady && gl.selLay.type.contains("Polygon")) {
           refreshView(() {
-            gl.Mode.addVertexesPolygon
+            gl.Mode.addVertexesPolygon && gl.selLay.subtype != "Essence"
                 ? {
-                  gl.selGeo.addPoint(_mapController.camera.center),
-                  if (gl.selGeo.type.contains("Point"))
-                    {
-                      gl.selLay.addGeometry(
-                        name:
-                            gl.selLay.type == "Point"
-                                ? "Point${gl.selLay.geometries.length + 1}"
-                                : "Polygon${gl.selLay.geometries.length + 1}",
-                      ),
-                      gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1,
-                    },
+                  _isPolygonWellDefined(gl.selGeo.getPolyPlusOneVertex(_mapController.camera.center))
+                      ? {
+                        gl.selGeo.addPoint(_mapController.camera.center),
+                        if (gl.selGeo.type.contains("Point"))
+                          {
+                            gl.selLay.addGeometry(
+                              name:
+                                  gl.selLay.type == "Point"
+                                      ? "Point${gl.selLay.geometries.length + 1}"
+                                      : "Polygon${gl.selLay.geometries.length + 1}",
+                            ),
+                            gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1,
+                          },
+                      }
+                      : PopupPolygonNotWellDefined(),
                 }
                 : PopupNewEssenceObservationPoint(context, _mapController.camera.center);
           });
@@ -2860,7 +2863,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
               : _layToolBoxAnimOffScreenPos;
       _boxPos = mode && gl.Mode.polygonList ? _animOnScreenPos : _animOffScreenPos;
       _mainMenuSettingsBoxPos = mode ? _mainMenuSettingsAnimOffScreenPos : _mainMenuSettingsAnimOnScreenPos;
-      _mainMenuEssenceBoxPos = mode ? _mainMenuEssenceAnimOffScreenPos : _mainMenuEssenceAnimOnScreenPos;
+      _mainMenuEssenceBoxPos = gl.Mode.essence ? _mainMenuEssenceAnimOnScreenPos : _mainMenuEssenceAnimOffScreenPos;
       _mainMenuWarningsBoxPos = mode ? _mainMenuWarningsAnimOffScreenPos : _mainMenuWarningsAnimOnScreenPos;
       _mainMenuOnOfflineBoxPos = mode ? _mainMenuOnOfflineAnimOffScreenPos : _mainMenuOnOfflineAnimOnScreenPos;
     });
@@ -3150,23 +3153,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           });
                         },
                         icon: Icon(Icons.more_horiz_outlined),
-                      ),
-                    ),
-                  if (gl.Mode.expertTools && gl.modeDevelopper)
-                    Container(
-                      color: !gl.Mode.recordPath ? Colors.transparent : Colors.yellow.withAlpha(128),
-                      child: IconButton(
-                        color: gl.Mode.recordPath ? Colors.white : Colors.yellow.withAlpha(128),
-                        iconSize: gl.eqPx * gl.iconSizeM,
-                        isSelected: gl.Mode.recordPath,
-                        onPressed: () {
-                          setState(() {
-                            gl.Mode.recordPath = !gl.Mode.recordPath;
-                            _modeAnaPtPreview = !gl.Mode.recordPath;
-                            if (gl.Mode.recordPath) {}
-                          });
-                        },
-                        icon: Icon(Icons.nordic_walking),
                       ),
                     ),
                   Container(

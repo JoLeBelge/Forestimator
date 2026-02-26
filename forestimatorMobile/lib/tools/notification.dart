@@ -2408,38 +2408,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 ),
                                               )
                                               : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
-                                          (gl.selLay.geometries[index].type.contains("Point") &&
-                                                  gl.selLay.geometries[index].points.isNotEmpty)
-                                              ? Container(
-                                                alignment: Alignment.center,
-                                                width: gl.eqPx * gl.iconSizeS,
-                                                height: gl.eqPx * gl.iconSizeS,
-                                                child: IconButton(
-                                                  style: lt.trNoPadButtonstyle,
-                                                  onPressed: () async {
-                                                    if (!_doingAnaPt) {
-                                                      _doingAnaPt = true;
-                                                      await gl.selLay.geometries[index].runAnaPt();
-                                                      gl.refreshStack(() {
-                                                        popupForestimatorWindow(
-                                                          id: "anaPres",
-                                                          title: "Resultats de l'analyse",
-                                                          child: AnaResultsMenu(() {
-                                                            gl.refreshStack(() {});
-                                                          }, gl.requestedLayers),
-                                                        );
-                                                      });
-                                                      _doingAnaPt = false;
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.location_pin,
-                                                    color: Colors.black,
-                                                    size: gl.eqPx * gl.iconSizeXS,
-                                                  ),
-                                                ),
-                                              )
-                                              : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
                                         ],
                                       ),
                                       (gl.selLay.geometries[index].center.longitude != 0.0 &&
@@ -5466,35 +5434,37 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
     gl.resetSelected = resetSelected;
     if (gl.firstTimeUse) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        popupForestimatorMessage(
-          id: "DLrecomended",
-          title: "Bienvenu",
-          message:
-              "Autorisez-vous l'aplication à télécharger un jeu de 6 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 214 Mo.",
-          messageAccept: "Oui",
-          onAccept: () async {
-            gl.refreshStack(() {
-              gl.firstTimeUse = false;
-            });
-            gl.shared!.setBool('firstTimeUse', gl.firstTimeUse);
-            for (var key in gl.downloadableLayerKeys) {
-              downloadLayer(key);
-            }
-            gl.refreshStack(() {
-              gl.stack.pop("DLrecomended");
-            });
-          },
-          messageDecline: "Non",
-          onDecline: () async {
-            gl.refreshStack(() {
-              gl.firstTimeUse = false;
-            });
-            gl.shared!.setBool('firstTimeUse', gl.firstTimeUse);
-            gl.refreshStack(() {
-              gl.stack.pop("DLrecomended");
-            });
-          },
-        );
+        gl.refreshStack(() {
+          popupForestimatorMessage(
+            id: "DLrecomended",
+            title: "Bienvenu",
+            message:
+                "Autorisez-vous l'aplication à télécharger un jeu de 6 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 214 Mo.",
+            messageAccept: "Oui",
+            onAccept: () async {
+              gl.refreshStack(() {
+                gl.firstTimeUse = false;
+              });
+              gl.shared!.setBool('firstTimeUse', gl.firstTimeUse);
+              for (var key in gl.downloadableLayerKeys) {
+                downloadLayer(key);
+              }
+              gl.refreshStack(() {
+                gl.stack.pop("DLrecomended");
+              });
+            },
+            messageDecline: "Non",
+            onDecline: () async {
+              gl.refreshStack(() {
+                gl.firstTimeUse = false;
+              });
+              gl.shared!.setBool('firstTimeUse', gl.firstTimeUse);
+              gl.refreshStack(() {
+                gl.stack.pop("DLrecomended");
+              });
+            },
+          );
+        });
       });
     }
   }
@@ -6154,9 +6124,9 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                     ? gl.offlineMode
                         ? (gl.layerSwitcherBoxHeightPortraitOffline +
                                 gl.layerswitcherButtonsBoxHeight +
-                                (gl.poiMarkerList.isNotEmpty && gl.selLay.geometries.isNotEmpty
+                                (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
                                     ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                    : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
+                                    : (gl.poiMarkerList.isNotEmpty || (gl.layerReady && gl.selLay.geometries.isNotEmpty)
                                         ? gl.layerswitcherControlBoxHeight
                                         : 0.0))) *
                             gl.eqPx
@@ -6596,7 +6566,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                         minWidth: gl.eqPx * 50,
                       ),
                       child: Text(
-                        "Couche des polygones",
+                        "Layer${gl.geoLayers.length > 1 ? "s (${gl.geoLayers.length})" : ""}",
                         textAlign: TextAlign.left,
                         style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
                       ),
