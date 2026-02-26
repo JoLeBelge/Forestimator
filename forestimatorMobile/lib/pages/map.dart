@@ -73,6 +73,9 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   Offset get _mainMenuEssenceAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(90));
   Offset get _mainMenuEssenceAnimOffScreenPos => Offset(gl.dsp.alignX(gl.eqPxW), gl.dsp.alignY(90));
 
+  Offset _mainMenuFinishBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(90));
+  Offset get _mainMenuFinishAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(70));
+
   Offset _mainMenuWarningsBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuWarningsAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuWarningsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
@@ -862,24 +865,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           style: lt.borderlessStyle,
                                           iconSize: gl.eqPx * gl.iconSizeS,
                                           color: Colors.lightGreenAccent,
-                                          onPressed: () {
-                                            refreshView(() {
-                                              _stopMovingSelectedPoint();
-                                              gl.Mode.editPolygon = false;
-                                              gl.Mode.showButtonAddVertexesPolygon = true;
-                                              gl.Mode.showButtonMoveVertexesPolygon = false;
-                                              gl.Mode.showButtonRemoveVertexesPolygon = false;
-                                              gl.Mode.addVertexesPolygon = false;
-                                              gl.Mode.moveVertexesPolygon = false;
-                                              gl.Mode.removeVertexesPolygon = false;
-                                            });
-                                            if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
-                                              gl.selLay.removeGeometry(last: true);
-                                            } else if (gl.selGeo.type.contains("Polygon") &&
-                                                gl.selGeo.points.length < 3) {
-                                              gl.selLay.removeGeometry(last: true);
-                                            }
-                                          },
+                                          onPressed: _closeEditingMenu,
                                           icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                         ),
                                       ),
@@ -2178,6 +2164,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       gl.Mode.addVertexesPolygon = true;
       gl.Mode.moveVertexesPolygon = false;
       gl.Mode.removeVertexesPolygon = false;
+      _mainMenuFinishBoxPos = _mainMenuFinishAnimOnScreenPos;
       if (gl.geoReady) {
         _mainMenuEssenceBoxPos =
             !gl.Mode.addVertexesPolygon
@@ -2190,6 +2177,25 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         _mainMenuEssenceBoxPos = _mainMenuEssenceAnimOnScreenPos;
       }
     });
+  }
+
+  void _closeEditingMenu() {
+    refreshView(() {
+      _stopMovingSelectedPoint();
+      gl.Mode.editPolygon = false;
+      gl.Mode.showButtonAddVertexesPolygon = true;
+      gl.Mode.showButtonMoveVertexesPolygon = false;
+      gl.Mode.showButtonRemoveVertexesPolygon = false;
+      gl.Mode.addVertexesPolygon = false;
+      gl.Mode.moveVertexesPolygon = false;
+      gl.Mode.removeVertexesPolygon = false;
+      _mainMenuFinishBoxPos = _mainMenuFinishAnimOnScreenPos;
+    });
+    if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
+      gl.selLay.removeGeometry(last: true);
+    } else if (gl.selGeo.type.contains("Polygon") && gl.selGeo.points.length < 3) {
+      gl.selLay.removeGeometry(last: true);
+    }
   }
 
   Widget get forestimatorTopMenuElements => Stack(
@@ -2207,6 +2213,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           curve: Curves.easeInOutBack,
           duration: Duration(milliseconds: 750),
           child: _forestimatorAddEssenceVertexPoint,
+        ),
+      if (gl.Mode.addVertexesPolygon)
+        AnimatedContainer(
+          alignment: AlignmentGeometry.xy(_mainMenuFinishBoxPos.dx, _mainMenuFinishBoxPos.dy),
+          curve: Curves.easeInOutBack,
+          duration: Duration(milliseconds: 750),
+          child: _forestimatorFinishEditing,
         ),
       AnimatedContainer(
         alignment: AlignmentGeometry.xy(_mainMenuWarningsBoxPos.dx, _mainMenuWarningsBoxPos.dy),
@@ -2298,6 +2311,21 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         }
       },
       child: Icon(Icons.add, color: gl.Mode.essence ? Colors.black : Colors.white, size: gl.eqPx * gl.iconSizeSettings),
+    ),
+  );
+
+  Widget get _forestimatorFinishEditing => Container(
+    alignment: Alignment.center,
+    width: gl.eqPx * 12,
+    height: gl.eqPx * 12,
+    child: FloatingActionButton(
+      backgroundColor: gl.colorBack,
+      onPressed: _closeEditingMenu,
+      child: Icon(
+        Icons.verified_outlined,
+        color: gl.Mode.essence ? Colors.black : Colors.white,
+        size: gl.eqPx * gl.iconSizeSettings,
+      ),
     ),
   );
 
