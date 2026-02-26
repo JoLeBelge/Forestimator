@@ -6126,7 +6126,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                                 gl.layerswitcherButtonsBoxHeight +
                                 (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
                                     ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                    : (gl.poiMarkerList.isNotEmpty || (gl.layerReady && gl.selLay.geometries.isNotEmpty)
+                                    : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
                                         ? gl.layerswitcherControlBoxHeight
                                         : 0.0))) *
                             gl.eqPx
@@ -6134,20 +6134,20 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                                 gl.layerswitcherButtonsBoxHeight +
                                 (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
                                     ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                    : (gl.poiMarkerList.isNotEmpty || (gl.layerReady && gl.selLay.geometries.isNotEmpty)
+                                    : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
                                         ? gl.layerswitcherControlBoxHeight
                                         : 0.0))) *
                             gl.eqPx
                     : gl.layerSwitcherBoxHeightLandscape * gl.eqPx,
             child: switchRowColWithOrientation([
-              if (((gl.layerReady && gl.selLay.geometries.isNotEmpty) || gl.poiMarkerList.isNotEmpty) &&
+              if (((gl.geoLayers.isNotEmpty) || gl.poiMarkerList.isNotEmpty) &&
                   gl.dsp.orientation == Orientation.portrait)
                 SizedBox(
                   width: gl.eqPx * gl.layerswitcherBoxWidth,
                   height:
                       (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
                           ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                          : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
+                          : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
                               ? gl.layerswitcherControlBoxHeight
                               : 0.0)) *
                       gl.eqPx,
@@ -6522,7 +6522,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
               ),
             ),
           ),
-        if (gl.layerReady && gl.selLay.geometries.isNotEmpty)
+        if (gl.geoLayers.isNotEmpty)
           SizedBox(
             height: gl.eqPx * gl.layerSwitcherTileHeight,
             child: Card(
