@@ -227,7 +227,7 @@ public:
     bool wms2jpg(OGREnvelope *extent, int aSx, int aSy, std::string aOut) const;
 
     std::string getValLabel(int aVal){
-        std::string aRes("");
+        std::string aRes("NoData");
         if (mDicoVal.find(aVal)!=mDicoVal.end()){aRes=mDicoVal.at(aVal);}
         return aRes;
     }

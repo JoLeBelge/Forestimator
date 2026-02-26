@@ -53,8 +53,8 @@ public:
     void display();
     // effectue des vérification du shp (polygone, src)
     void checkShp();
-    // merge de tout les polygones pour avoir une géométrie globale et y calculer la surface totale
-    bool computeGlobalGeom(std::string extension = "", bool limitSize = 1);
+    // calculer la surface totale (si polygone) et définir l'extent du parcellaire
+    bool computeExtentAndSurf(std::string extension = "", bool limitSize = 1);
 
     void visuStat(OGRFeature *poFeature);
     void upload();
@@ -114,7 +114,7 @@ private:
     double centerX, centerY;
     OGREnvelope mParcellaireExtent;
     bool hasValidShp;
-    OGRGeometry *poGeomGlobale;
+    //OGRGeometry *poGeomGlobale;
 };
 
 #endif // PARCELLAIRE_H

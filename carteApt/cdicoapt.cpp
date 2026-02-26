@@ -427,17 +427,13 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                     codeList.push_back(code);
                 }
             }
-            //if (globTest){std::cout << "codeList for API mass ana Points has " << codeList.size() << " elements" << std::endl;
-            //    std::cout << "lay geom type " << lay->GetGeomType() << std::endl;}
+
+            //    std::cout << "lay geom type " << lay->GetGeomType() << std::endl;
 
             for (std::string &code: codeList){
                 if (lay->FindFieldIndex(code.c_str(),0)==-1){
                     OGRFieldDefn * oFLD(NULL);
-                    //if (lay->GetGeomType()==wkbPolygon || lay->GetGeomType()==wkbMultiPolygon){
-                        oFLD= new OGRFieldDefn(code.c_str(),  OFTString);
-                    //}else{
-                    //    oFLD= new OGRFieldDefn(code.c_str(),  OFTReal);
-                    //}
+                    oFLD= new OGRFieldDefn(code.c_str(),  OFTString);
                     oFLD->SetJustify(OGRJustification::OJLeft);
                     lay->CreateField(oFLD);
                 }
