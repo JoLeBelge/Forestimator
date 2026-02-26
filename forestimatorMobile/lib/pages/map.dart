@@ -1733,48 +1733,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         alignment: Alignment.topLeft,
                                         width: gl.eqPx * gl.chosenPolyBarWidth * .75,
                                         child: Text(
-                                          "Changez le symbole du polygone.",
+                                          "Changez la couleur du polygone.",
                                           textAlign: TextAlign.center,
                                           style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeS),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                                  if (gl.geoReady)
-                                    lt.ForestimatorScrollView(
-                                      width: gl.eqPx * gl.chosenPolyBarWidth,
-                                      height: gl.eqPx * gl.iconSizeXS * 2.5,
-                                      sizeArrows: gl.eqPx * gl.iconSizeM,
-                                      horizontal: true,
-                                      child: Row(
-                                        children: List<Widget>.generate(gl.selectableIconGeo.length, (k) {
-                                          return Container(
-                                            color:
-                                                gl.selGeo.selectedPointIcon == k
-                                                    ? gl.colorAgroBioTech
-                                                    : Colors.transparent,
-                                            child: SizedBox(
-                                              height: gl.eqPx * gl.iconSizeL,
-                                              child: IconButton(
-                                                onPressed: () {
-                                                  refreshView(() {
-                                                    gl.selGeo.selectedPointIcon = k;
-                                                  });
-                                                },
-                                                icon: Icon(
-                                                  gl.selectableIconGeo[k],
-                                                  size: gl.iconSizeM * gl.eqPx,
-                                                  color: Colors.white,
-                                                ),
-                                                color: Colors.white,
-                                                iconSize: gl.eqPx * gl.iconSizeM,
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                      ),
-                                    ),
                                   lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                   if (gl.geoReady)
                                     lt.ForestimatorScrollView(
@@ -2386,7 +2351,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     } else if (gl.Mode.editPointMarker) {
       result += gl.chosenPolyBarHeight * 2;
     } else if (gl.Mode.editPolyMarker) {
-      result += gl.chosenPolyBarHeight * 1.0;
+      result += gl.chosenPolyBarHeight * 0.2;
     }
     return result;
   }
