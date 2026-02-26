@@ -417,7 +417,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             break;
         }
         case typeAna::Mass:{
-            if (globTest){std::cout << "api traitement de masse anaPonctuelle, layers "  << aTool << std::endl;}
+            if (globTest){std::cout << "api traitement de masse, layers "  << aTool << std::endl;}
             std::vector<std::string> codeList;
             std::vector<std::string> aTmp;
             boost::split( aTmp,aTool,boost::is_any_of(","),boost::token_compress_on);
@@ -428,7 +428,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                 }
             }
 
-            //    std::cout << "lay geom type " << lay->GetGeomType() << std::endl;
+            if (globTest){    std::cout << "lay geom type " << wkbFlatten(lay->GetGeomType()) << std::endl;}
 
             for (std::string &code: codeList){
                 if (lay->FindFieldIndex(code.c_str(),0)==-1){

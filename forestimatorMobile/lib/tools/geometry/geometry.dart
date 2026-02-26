@@ -48,6 +48,8 @@ class Geometry {
   Map<String, dynamic> decodedJson = {};
   List<Attribute> attributes = [];
 
+  bool _writeToMemory = false;
+
   Geometry({String polygonName = ""}) {
     name = polygonName;
     Random randomColor = Random();
@@ -539,6 +541,10 @@ class Geometry {
   }
 
   void serialize({String layerId = ""}) async {
+    if (_writeToMemory) {
+      return;
+    }
+    _writeToMemory = true;
     String prefix = identifier;
     await gl.shared!.setBool('$prefix.sent', sentToServer);
     await gl.shared!.setString('$prefix.name', name);
@@ -563,6 +569,7 @@ class Geometry {
     }
 
     gl.print("polygone $name saved to prefs");
+    _writeToMemory = false;
   }
 
   void _writeColorToMemory(String prefix, Color color) async {

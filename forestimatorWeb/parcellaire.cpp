@@ -223,10 +223,10 @@ void parcellaire::display()
               "stroke: new ol.style.Stroke({color: 'white', width: 2}),"+
             "}),"+
             "  })," +
-            "extent: [MINX,MINY,MAXX,MAXY]," +
+            //"extent: [MINX,MINY,MAXX,MAXY]," +
             "});" +
             "updateGroupeLayers();" +
-            "map.getView().fit(parcellaire.getExtent());" +
+            "map.getView().fit([MINX,MINY,MAXX,MAXY]);" +
             "map.getView().setCenter([" + std::to_string(centerX) + "," + std::to_string(centerY) + " ]);";
     // extent du parcellaire
     boost::replace_all(JScommand, "MAXX", std::to_string(mParcellaireExtent.MaxX));
