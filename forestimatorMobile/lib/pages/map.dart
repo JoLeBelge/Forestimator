@@ -87,11 +87,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), 0);
   Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-2000));
 
-  Offset _anaToolbarBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqlignBottom));
   Offset get _anaToolbarAnimOnScreenPos =>
       Offset(gl.dsp.alignX(-gl.eqPxW * .5 + 0), gl.dsp.alignY(gl.dsp.eqlignBottom - gl.menuBarThickness));
   Offset get _anaToolbarAnimOffScreenPos =>
       Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqlignBottom - gl.menuBarThickness));
+
+  Offset get _mainmenuBarPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.dsp.eqlignBottom));
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -576,7 +577,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                       forestimatorTopMenuElements,
                       forestimatorGeoMenu,
                       forestimatorAnalysisToolbar,
-                      _mainMenuBar(),
                     ] +
                     [if (gl.modeDevelopper && gl.Mode.debugScanlines) lt.gridlines()] +
                     List<Widget>.from(gl.stack.widgets.reversed),
@@ -2107,7 +2107,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     alignment: AlignmentGeometry.center,
     children: [
       AnimatedContainer(
-        alignment: AlignmentGeometry.xy(_anaToolbarBoxPos.dx, _anaToolbarBoxPos.dy),
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? _toolbarExtended
+                    ? AlignmentGeometry.xy(_anaToolbarAnimOnScreenPos.dx, _anaToolbarAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_anaToolbarAnimOffScreenPos.dx, _anaToolbarAnimOffScreenPos.dy)
+                : _toolbarExtended
+                ? AlignmentGeometry.xy(_anaToolbarAnimOnScreenPos.dx, _anaToolbarAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_anaToolbarAnimOffScreenPos.dx, _anaToolbarAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
         child: toolBar,
@@ -2174,20 +2181,28 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         duration: Duration(milliseconds: 750),
         child: _forestimatorSettingButton,
       ),
-      if (gl.Mode.essence || gl.Mode.addVertexesPolygon)
-        AnimatedContainer(
-          alignment:
-              gl.dsp.orientation.name == "Portrait"
-                  ? gl.Mode.essence || gl.Mode.addVertexesPolygon
-                      ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
-                      : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
-                  : gl.Mode.essence || gl.Mode.addVertexesPolygon
-                  ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
-                  : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
-          curve: Curves.easeInOutBack,
-          duration: Duration(milliseconds: 750),
-          child: _forestimatorAddEssenceVertexPoint,
-        ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? AlignmentGeometry.xy(_mainmenuBarPos.dx, _mainmenuBarPos.dy)
+                : AlignmentGeometry.xy(_mainmenuBarPos.dx, _mainmenuBarPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _mainMenuBar(),
+      ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? gl.Mode.essence || gl.Mode.addVertexesPolygon
+                    ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
+                : gl.Mode.essence || gl.Mode.addVertexesPolygon
+                ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _forestimatorAddEssenceVertexPoint,
+      ),
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
@@ -2240,20 +2255,19 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         duration: Duration(milliseconds: 750),
         child: _forestimatorOnOffline,
       ),
-      if (gl.Mode.debugInfo)
-        AnimatedContainer(
-          alignment:
-              gl.dsp.orientation.name == "Portrait"
-                  ? gl.Mode.debugInfo
-                      ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
-                      : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy)
-                  : gl.Mode.debugInfo
-                  ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
-                  : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy),
-          curve: Curves.easeInOutBack,
-          duration: Duration(milliseconds: 750),
-          child: _forestimatorDebugInfo,
-        ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? gl.Mode.debugInfo
+                    ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
+                    : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy)
+                : gl.Mode.debugInfo
+                ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
+                : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _forestimatorDebugInfo,
+      ),
     ],
   );
 
@@ -2938,7 +2952,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   set _toolBarMenu(bool mode) {
     setState(() {
       _toolbarExtended = mode;
-      _anaToolbarBoxPos = mode ? _anaToolbarAnimOnScreenPos : _anaToolbarAnimOffScreenPos;
     });
   }
 

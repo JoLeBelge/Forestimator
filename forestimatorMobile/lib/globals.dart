@@ -103,8 +103,8 @@ class Anim {
   static Offset get offScreenPosMessages => Offset(0, -400);
   static Offset get offScreenPosWindows => Offset(0, -6666);
 
-  static Offset get debugOnScreenPos => Offset(dsp.alignX(-eqPxW * .5 + 2), dsp.alignY(-70));
-  static Offset get debugOffScreenPos => Offset(dsp.alignX(-eqPxW * .5 + 2), dsp.alignY(-700));
+  static Offset get debugOnScreenPos => Offset(dsp.alignX(eqPxW * .5), dsp.alignY(dsp.eqAlignTop + 10));
+  static Offset get debugOffScreenPos => Offset(dsp.alignX(eqPxW * .5), dsp.alignY(-250));
 }
 
 class Mode {
