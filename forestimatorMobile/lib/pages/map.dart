@@ -85,7 +85,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       Offset(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
   Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), 0);
-  Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-2000));
+  Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-8000));
 
   Offset get _anaToolbarAnimOnScreenPos =>
       Offset(gl.dsp.alignX(-gl.eqPxW * .5 + 0), gl.dsp.alignY(gl.dsp.eqlignBottom - gl.menuBarThickness));
@@ -574,12 +574,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   ),
                             ],
                       ),
-                      forestimatorTopMenuElements,
+                      if (!gl.dsp.showKeyboard) forestimatorTopMenuElements,
                       forestimatorGeoMenu,
-                      forestimatorAnalysisToolbar,
+                      if (!gl.dsp.showKeyboard) forestimatorAnalysisToolbar,
                     ] +
                     [if (gl.modeDevelopper && gl.Mode.debugScanlines) lt.gridlines()] +
-                    List<Widget>.from(gl.stack.widgets.reversed),
+                    List<Widget>.from(gl.stack.widgets.reversed) +
+                    [_forestimatorDebugElements],
               );
             },
           ),
@@ -592,8 +593,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     alignment: AlignmentGeometry.center,
     children: [
       SizedBox(
-        width: gl.eqPx * gl.eqPxW,
-        height: gl.eqPx * gl.eqPxH,
+        height: double.infinity,
+        width: double.infinity,
         child: AnimatedContainer(
           alignment:
               gl.dsp.orientation.name == "Portrait"
@@ -613,8 +614,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         ),
       ),
       SizedBox(
-        height: gl.eqPx * gl.eqPxH,
-        width: gl.eqPx * gl.eqPxW,
+        height: double.infinity,
+        width: double.infinity,
         child: AnimatedContainer(
           alignment:
               gl.dsp.orientation.name == "Portrait"
@@ -2244,7 +2245,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       ),
       AnimatedContainer(
         alignment:
-            gl.dsp.orientation.name == "Portrait"
+            gl.dsp.orientation.name == "portrait"
                 ? !gl.Mode.polygon
                     ? AlignmentGeometry.xy(_mainMenuOnOfflineAnimOnScreenPos.dx, _mainMenuOnOfflineAnimOnScreenPos.dy)
                     : AlignmentGeometry.xy(_mainMenuOnOfflineAnimOffScreenPos.dx, _mainMenuOnOfflineAnimOffScreenPos.dy)
@@ -2255,18 +2256,27 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         duration: Duration(milliseconds: 750),
         child: _forestimatorOnOffline,
       ),
-      AnimatedContainer(
-        alignment:
-            gl.dsp.orientation.name == "Portrait"
-                ? gl.Mode.debugInfo
-                    ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
-                    : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy)
-                : gl.Mode.debugInfo
-                ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
-                : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy),
-        curve: Curves.easeInOutBack,
-        duration: Duration(milliseconds: 750),
-        child: _forestimatorDebugInfo,
+    ],
+  );
+
+  Widget get _forestimatorDebugElements => Stack(
+    children: [
+      SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: AnimatedContainer(
+          alignment:
+              gl.dsp.orientation.name == "portrait"
+                  ? gl.Mode.debugInfo
+                      ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
+                      : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy)
+                  : gl.Mode.debugInfo
+                  ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
+                  : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy),
+          curve: Curves.easeInOutBack,
+          duration: Duration(milliseconds: 750),
+          child: _forestimatorDebugInfo,
+        ),
       ),
     ],
   );
@@ -2385,14 +2395,28 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           "Orientation: ${gl.dsp.orientation.name}",
           style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
         ),
-        Text("eqPxH: ${gl.dsp.equiheight}", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS)),
-        Text("eqPxW: ${gl.dsp.equiwidth}", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS)),
+        Text(
+          "eqPxH: ${gl.dsp.equiheight.toStringAsFixed(1)}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+        Text(
+          "eqPxW: ${gl.dsp.equiwidth.toStringAsFixed(1)}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+        Text(
+          "eqPx: ${gl.dsp.equipixel.toStringAsFixed(1)}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
         Text(
           "Padding Top: ${gl.dsp.paddingTop}",
           style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
         ),
         Text(
           "Padding Bottom: ${gl.dsp.paddingBot}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+        Text(
+          "ViewInset Bottom: ${MediaQuery.of(context).viewInsets.bottom}",
           style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
         ),
       ],

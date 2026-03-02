@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/myicons.dart';
 import 'package:fforestimator/tools/customLayer/path_layer.dart';
@@ -172,6 +173,8 @@ class Mode {
 class Display {
   double paddingTop = -1;
   double paddingBot = -1;
+  double insetTop = -1;
+  double insetBot = -1;
   double width = -1;
   double height = -1;
   double dpi = -1;
@@ -180,6 +183,7 @@ class Display {
   double equipixel = -1;
   double equiwidth = -1;
   double equiheight = -1;
+  bool showKeyboard = false;
 
   Display.empty();
 
@@ -189,7 +193,7 @@ class Display {
   double get eqAlignTop => paddingTop / equipixel - equiheight / 2;
   double get eqlignBottom => -paddingBot / equipixel + equiheight / 2;
 
-  double get eqMaxWindowHeight => (height - paddingTop - paddingBot) / equipixel;
+  double get eqMaxWindowHeight => (height - 2 * math.max(paddingTop, paddingBot)) / equipixel;
 
   Display(BuildContext context) {
     paddingTop = MediaQuery.of(context).padding.top;
@@ -199,8 +203,11 @@ class Display {
     aspect = MediaQuery.of(context).size.aspectRatio;
     dpi = MediaQuery.of(context).devicePixelRatio;
     orientation = MediaQuery.of(context).orientation;
-    _tabletMode();
-    _squareMode();
+    insetTop = MediaQuery.of(context).viewInsets.top;
+    insetBot = MediaQuery.of(context).viewInsets.bottom;
+    insetBot > 0 ? showKeyboard = true : showKeyboard = false;
+    //_tabletMode();
+    //_squareMode();
     _enforceEquiWidthHeight();
     if (Mode.square || Mode.overrideModeSquare) {
       minEquiPixelsDisplayLandscapeHeight = minEquiPixelsDisplayLandscapeWidth * .8;
