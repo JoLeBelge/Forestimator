@@ -58,34 +58,32 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   double iconSize = 50.0;
   ScrollController propertiesTableScrollController = ScrollController();
 
-  Offset _layToolBoxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0));
   Offset get _layToolBoxAnimOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _layToolBoxAnimOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-250));
   Offset get _layToolBoxAnimUnderListPos =>
       Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.eqPxH / 2.0 + computePolygonTitleHeight() * 3));
 
-  Offset _mainMenuSettingsBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuSettingsAnimOnScreenPos =>
       Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuSettingsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _mainMenuEssenceBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(90));
-  Offset get _mainMenuEssenceAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(90));
-  Offset get _mainMenuEssenceAnimOffScreenPos => Offset(gl.dsp.alignX(gl.eqPxW), gl.dsp.alignY(90));
+  Offset get _mainMenuEssenceAnimOnScreenPos =>
+      Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(gl.dsp.eqlignBottom - 20));
+  Offset get _mainMenuEssenceAnimOffScreenPos =>
+      Offset(gl.dsp.alignX(gl.eqPxW), gl.dsp.alignY(gl.dsp.eqlignBottom - 20));
 
-  Offset _mainMenuFinishBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(90));
-  Offset get _mainMenuFinishAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(70));
+  Offset get _mainMenuFinishAnimOnScreenPos =>
+      Offset(gl.dsp.alignX(gl.eqPxW * .5 - 2), gl.dsp.alignY(gl.dsp.eqlignBottom - 40));
+  Offset get _mainMenuFinishAnimOffScreenPos =>
+      Offset(gl.dsp.alignX(gl.eqPxW), gl.dsp.alignY(gl.dsp.eqlignBottom - 40));
 
-  Offset _mainMenuWarningsBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuWarningsAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuWarningsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _mainMenuOnOfflineBoxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuOnOfflineAnimOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuOnOfflineAnimOffScreenPos =>
       Offset(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset _boxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-20000));
   Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), 0);
   Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-2000));
 
@@ -597,7 +595,18 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         width: gl.eqPx * gl.eqPxW,
         height: gl.eqPx * gl.eqPxH,
         child: AnimatedContainer(
-          alignment: Alignment(_layToolBoxPos.dx, _layToolBoxPos.dy),
+          alignment:
+              gl.dsp.orientation.name == "Portrait"
+                  ? gl.Mode.polygon && gl.layerReady
+                      ? gl.Mode.polygonList
+                          ? AlignmentGeometry.xy(_layToolBoxAnimUnderListPos.dx, _layToolBoxAnimUnderListPos.dy)
+                          : AlignmentGeometry.xy(_layToolBoxAnimOnScreenPos.dx, _layToolBoxAnimOnScreenPos.dy)
+                      : AlignmentGeometry.xy(_layToolBoxAnimOffScreenPos.dx, _layToolBoxAnimOffScreenPos.dy)
+                  : gl.Mode.polygon && gl.layerReady
+                  ? gl.Mode.polygonList
+                      ? AlignmentGeometry.xy(_layToolBoxAnimUnderListPos.dx, _layToolBoxAnimUnderListPos.dy)
+                      : AlignmentGeometry.xy(_layToolBoxAnimOnScreenPos.dx, _layToolBoxAnimOnScreenPos.dy)
+                  : AlignmentGeometry.xy(_layToolBoxAnimOffScreenPos.dx, _layToolBoxAnimOffScreenPos.dy),
           curve: Curves.linearToEaseOut,
           duration: Duration(milliseconds: 1500),
           child: forestimatorBuildGeoMenu,
@@ -607,7 +616,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         height: gl.eqPx * gl.eqPxH,
         width: gl.eqPx * gl.eqPxW,
         child: AnimatedContainer(
-          alignment: AlignmentGeometry.xy(_boxPos.dx, _boxPos.dy),
+          alignment:
+              gl.dsp.orientation.name == "Portrait"
+                  ? gl.Mode.polygon && gl.Mode.polygonList
+                      ? AlignmentGeometry.xy(_animOnScreenPos.dx, _animOnScreenPos.dy)
+                      : AlignmentGeometry.xy(_animOffScreenPos.dx, _animOffScreenPos.dy)
+                  : gl.Mode.polygon && gl.Mode.polygonList
+                  ? AlignmentGeometry.xy(_animOnScreenPos.dx, _animOnScreenPos.dy)
+                  : AlignmentGeometry.xy(_animOffScreenPos.dx, _animOffScreenPos.dy),
           curve: Curves.linearToEaseOut,
           duration: Duration(milliseconds: 1500),
           child: GeoLayerListMenu(
@@ -962,14 +978,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                       _stopMovingSelectedPoint();
                                                     });
                                                   }
-                                                  _mainMenuEssenceBoxPos =
-                                                      !gl.Mode.addVertexesPolygon
-                                                          ? _mainMenuEssenceAnimOffScreenPos
-                                                          : ((gl.selLay.type.contains("Point") &&
-                                                                  gl.selGeo.points.length < 2)) ||
-                                                              (gl.selLay.type.contains("Polygon"))
-                                                          ? _mainMenuEssenceAnimOnScreenPos
-                                                          : _mainMenuEssenceAnimOffScreenPos;
                                                 },
                                                 icon: const Icon(Icons.add_circle),
                                               ),
@@ -2129,18 +2137,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       gl.Mode.addVertexesPolygon = true;
       gl.Mode.moveVertexesPolygon = false;
       gl.Mode.removeVertexesPolygon = false;
-      _mainMenuFinishBoxPos = _mainMenuFinishAnimOnScreenPos;
-      if (gl.geoReady) {
-        _mainMenuEssenceBoxPos =
-            !gl.Mode.addVertexesPolygon
-                ? _mainMenuEssenceAnimOffScreenPos
-                : ((gl.selLay.type.contains("Point") && gl.selGeo.points.length < 2)) ||
-                    (gl.selLay.type.contains("Polygon"))
-                ? _mainMenuEssenceAnimOnScreenPos
-                : _mainMenuEssenceAnimOffScreenPos;
-      } else {
-        _mainMenuEssenceBoxPos = _mainMenuEssenceAnimOnScreenPos;
-      }
     });
   }
 
@@ -2154,7 +2150,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       gl.Mode.addVertexesPolygon = false;
       gl.Mode.moveVertexesPolygon = false;
       gl.Mode.removeVertexesPolygon = false;
-      _mainMenuFinishBoxPos = _mainMenuFinishAnimOnScreenPos;
     });
     if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
       gl.selLay.removeGeometry(last: true);
@@ -2167,43 +2162,97 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     alignment: AlignmentGeometry.center,
     children: [
       AnimatedContainer(
-        alignment: AlignmentGeometry.xy(_mainMenuSettingsBoxPos.dx, _mainMenuSettingsBoxPos.dy),
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? !gl.Mode.polygon
+                    ? AlignmentGeometry.xy(_mainMenuSettingsAnimOnScreenPos.dx, _mainMenuSettingsAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_mainMenuSettingsAnimOffScreenPos.dx, _mainMenuSettingsAnimOffScreenPos.dy)
+                : !gl.Mode.polygon
+                ? AlignmentGeometry.xy(_mainMenuSettingsAnimOnScreenPos.dx, _mainMenuSettingsAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_mainMenuSettingsAnimOffScreenPos.dx, _mainMenuSettingsAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
         child: _forestimatorSettingButton,
       ),
       if (gl.Mode.essence || gl.Mode.addVertexesPolygon)
         AnimatedContainer(
-          alignment: AlignmentGeometry.xy(_mainMenuEssenceBoxPos.dx, _mainMenuEssenceBoxPos.dy),
+          alignment:
+              gl.dsp.orientation.name == "Portrait"
+                  ? gl.Mode.essence || gl.Mode.addVertexesPolygon
+                      ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
+                      : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
+                  : gl.Mode.essence || gl.Mode.addVertexesPolygon
+                  ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
+                  : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
           curve: Curves.easeInOutBack,
           duration: Duration(milliseconds: 750),
           child: _forestimatorAddEssenceVertexPoint,
         ),
-      if (gl.Mode.addVertexesPolygon)
-        AnimatedContainer(
-          alignment: AlignmentGeometry.xy(_mainMenuFinishBoxPos.dx, _mainMenuFinishBoxPos.dy),
-          curve: Curves.easeInOutBack,
-          duration: Duration(milliseconds: 750),
-          child: _forestimatorFinishEditing,
-        ),
       AnimatedContainer(
-        alignment: AlignmentGeometry.xy(_mainMenuWarningsBoxPos.dx, _mainMenuWarningsBoxPos.dy),
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? gl.Mode.addVertexesPolygon
+                    ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy)
+                : gl.Mode.addVertexesPolygon
+                ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _forestimatorFinishEditing,
+      ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? gl.Mode.essence || gl.Mode.addVertexesPolygon
+                    ? AlignmentGeometry.center
+                    : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
+                : gl.Mode.essence || gl.Mode.addVertexesPolygon
+                ? AlignmentGeometry.center
+                : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _forestimatorCrosshair,
+      ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? !gl.Mode.polygon
+                    ? AlignmentGeometry.xy(_mainMenuWarningsAnimOnScreenPos.dx, _mainMenuWarningsAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_mainMenuWarningsAnimOffScreenPos.dx, _mainMenuWarningsAnimOffScreenPos.dy)
+                : !gl.Mode.polygon
+                ? AlignmentGeometry.xy(_mainMenuWarningsAnimOnScreenPos.dx, _mainMenuWarningsAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_mainMenuWarningsAnimOffScreenPos.dx, _mainMenuWarningsAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
         child: _forestimatorWarnings,
       ),
       AnimatedContainer(
-        alignment: AlignmentGeometry.xy(_mainMenuOnOfflineBoxPos.dx, _mainMenuOnOfflineBoxPos.dy),
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? !gl.Mode.polygon
+                    ? AlignmentGeometry.xy(_mainMenuOnOfflineAnimOnScreenPos.dx, _mainMenuOnOfflineAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_mainMenuOnOfflineAnimOffScreenPos.dx, _mainMenuOnOfflineAnimOffScreenPos.dy)
+                : !gl.Mode.polygon
+                ? AlignmentGeometry.xy(_mainMenuOnOfflineAnimOnScreenPos.dx, _mainMenuOnOfflineAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_mainMenuOnOfflineAnimOffScreenPos.dx, _mainMenuOnOfflineAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
         child: _forestimatorOnOffline,
       ),
-      if (gl.Mode.essence || gl.Mode.addVertexesPolygon)
+      if (gl.Mode.debugInfo)
         AnimatedContainer(
-          alignment: AlignmentGeometry.xy(0, 0),
+          alignment:
+              gl.dsp.orientation.name == "Portrait"
+                  ? gl.Mode.debugInfo
+                      ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
+                      : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy)
+                  : gl.Mode.debugInfo
+                  ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
+                  : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy),
           curve: Curves.easeInOutBack,
           duration: Duration(milliseconds: 750),
-          child: _forestimatorCrosshair,
+          child: _forestimatorDebugInfo,
         ),
     ],
   );
@@ -2294,11 +2343,46 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     ),
   );
 
-  Widget get _forestimatorCrosshair => Container(
-    alignment: Alignment.center,
-    width: gl.eqPx * 10,
-    height: gl.eqPx * 10,
-    child: Icon(FontAwesomeIcons.crosshairs, color: Colors.black.withAlpha(180), size: gl.eqPx * 10),
+  Widget get _forestimatorCrosshair => Stack(
+    alignment: AlignmentGeometry.center,
+    children: [
+      Container(
+        alignment: Alignment.center,
+        width: gl.eqPx * 10,
+        height: gl.eqPx * 10,
+        child: Icon(FontAwesomeIcons.crosshairs, color: Colors.black.withAlpha(180), size: gl.eqPx * 10),
+      ),
+      Container(
+        alignment: Alignment.center,
+        width: gl.eqPx * 10,
+        height: gl.eqPx * 10,
+        child: Icon(FontAwesomeIcons.crosshairs, color: Colors.white.withAlpha(50), size: gl.eqPx * 8),
+      ),
+    ],
+  );
+
+  Widget get _forestimatorDebugInfo => Container(
+    color: Colors.black,
+    width: gl.eqPx * 40,
+    height: gl.eqPx * 40,
+    child: Column(
+      children: [
+        Text(
+          "Orientation: ${gl.dsp.orientation.name}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+        Text("eqPxH: ${gl.dsp.equiheight}", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS)),
+        Text("eqPxW: ${gl.dsp.equiwidth}", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS)),
+        Text(
+          "Padding Top: ${gl.dsp.paddingTop}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+        Text(
+          "Padding Bottom: ${gl.dsp.paddingBot}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+      ],
+    ),
   );
 
   Widget get _forestimatorOnOffline => SizedBox(
@@ -2848,17 +2932,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   set _polygonMode(bool mode) {
     setState(() {
       gl.Mode.polygon = mode;
-      _layToolBoxPos =
-          mode && gl.layerReady
-              ? gl.Mode.polygonList
-                  ? _layToolBoxAnimUnderListPos
-                  : _layToolBoxAnimOnScreenPos
-              : _layToolBoxAnimOffScreenPos;
-      _boxPos = mode && gl.Mode.polygonList ? _animOnScreenPos : _animOffScreenPos;
-      _mainMenuSettingsBoxPos = mode ? _mainMenuSettingsAnimOffScreenPos : _mainMenuSettingsAnimOnScreenPos;
-      _mainMenuEssenceBoxPos = gl.Mode.essence ? _mainMenuEssenceAnimOnScreenPos : _mainMenuEssenceAnimOffScreenPos;
-      _mainMenuWarningsBoxPos = mode ? _mainMenuWarningsAnimOffScreenPos : _mainMenuWarningsAnimOnScreenPos;
-      _mainMenuOnOfflineBoxPos = mode ? _mainMenuOnOfflineAnimOffScreenPos : _mainMenuOnOfflineAnimOnScreenPos;
     });
   }
 

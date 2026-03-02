@@ -102,6 +102,9 @@ class Anim {
   static Offset get onScreenPosCenter => Offset(0, 0);
   static Offset get offScreenPosMessages => Offset(0, -400);
   static Offset get offScreenPosWindows => Offset(0, -6666);
+
+  static Offset get debugOnScreenPos => Offset(dsp.alignX(-eqPxW * .5 + 2), dsp.alignY(-70));
+  static Offset get debugOffScreenPos => Offset(dsp.alignX(-eqPxW * .5 + 2), dsp.alignY(-700));
 }
 
 class Mode {
@@ -112,6 +115,7 @@ class Mode {
   static bool essencePointsToSync = false;
 
   static bool debugScanlines = false;
+  static bool debugInfo = false;
   static bool recordPath = false;
   static bool keyboardExpanded = false;
   static bool square = false;
@@ -182,14 +186,14 @@ class Display {
   double alignX(double px) => (2.0 / width) * (equipixel * px);
   double alignY(double px) => (2.0 / height) * (equipixel * px);
 
-  double get eqAlignTop => paddingTop / equipixel * 2 - equiheight / 2;
-  double get eqlignBottom => -paddingBot / equipixel * 2 + equiheight / 2;
+  double get eqAlignTop => paddingTop / equipixel - equiheight / 2;
+  double get eqlignBottom => -paddingBot / equipixel + equiheight / 2;
 
   double get eqMaxWindowHeight => (height - paddingTop - paddingBot) / equipixel;
 
   Display(BuildContext context) {
     paddingTop = MediaQuery.of(context).padding.top;
-    paddingTop = MediaQuery.of(context).padding.bottom;
+    paddingBot = MediaQuery.of(context).padding.bottom;
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     aspect = MediaQuery.of(context).size.aspectRatio;

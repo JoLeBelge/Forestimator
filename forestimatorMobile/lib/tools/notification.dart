@@ -4447,6 +4447,12 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           gl.refreshStack(() {});
           gl.Mode.serialize();
         }, false),
+        variableBooleanSlider("Debug Info Window", gl.Mode.debugInfo, (bool it) {
+          setState(() {
+            gl.Mode.debugInfo = it;
+          });
+          gl.Mode.serialize();
+        }, false),
       ],
     );
   }
