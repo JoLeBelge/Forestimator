@@ -85,13 +85,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       Offset(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
   Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), 0);
-  Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-2000));
+  Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-8000));
 
-  Offset _anaToolbarBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqlignBottom));
   Offset get _anaToolbarAnimOnScreenPos =>
       Offset(gl.dsp.alignX(-gl.eqPxW * .5 + 0), gl.dsp.alignY(gl.dsp.eqlignBottom - gl.menuBarThickness));
   Offset get _anaToolbarAnimOffScreenPos =>
       Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqlignBottom - gl.menuBarThickness));
+
+  Offset get _mainmenuBarPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.dsp.eqlignBottom));
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -573,13 +574,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   ),
                             ],
                       ),
-                      forestimatorTopMenuElements,
+                      if (!gl.dsp.showKeyboard) forestimatorTopMenuElements,
                       forestimatorGeoMenu,
-                      forestimatorAnalysisToolbar,
-                      _mainMenuBar(),
+                      if (!gl.dsp.showKeyboard) forestimatorAnalysisToolbar,
                     ] +
                     [if (gl.modeDevelopper && gl.Mode.debugScanlines) lt.gridlines()] +
-                    List<Widget>.from(gl.stack.widgets.reversed),
+                    List<Widget>.from(gl.stack.widgets.reversed) +
+                    [_forestimatorDebugElements],
               );
             },
           ),
@@ -592,8 +593,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     alignment: AlignmentGeometry.center,
     children: [
       SizedBox(
-        width: gl.eqPx * gl.eqPxW,
-        height: gl.eqPx * gl.eqPxH,
+        height: double.infinity,
+        width: double.infinity,
         child: AnimatedContainer(
           alignment:
               gl.dsp.orientation.name == "Portrait"
@@ -613,8 +614,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         ),
       ),
       SizedBox(
-        height: gl.eqPx * gl.eqPxH,
-        width: gl.eqPx * gl.eqPxW,
+        height: double.infinity,
+        width: double.infinity,
         child: AnimatedContainer(
           alignment:
               gl.dsp.orientation.name == "Portrait"
@@ -2107,7 +2108,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     alignment: AlignmentGeometry.center,
     children: [
       AnimatedContainer(
-        alignment: AlignmentGeometry.xy(_anaToolbarBoxPos.dx, _anaToolbarBoxPos.dy),
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? _toolbarExtended
+                    ? AlignmentGeometry.xy(_anaToolbarAnimOnScreenPos.dx, _anaToolbarAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_anaToolbarAnimOffScreenPos.dx, _anaToolbarAnimOffScreenPos.dy)
+                : _toolbarExtended
+                ? AlignmentGeometry.xy(_anaToolbarAnimOnScreenPos.dx, _anaToolbarAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_anaToolbarAnimOffScreenPos.dx, _anaToolbarAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
         child: toolBar,
@@ -2174,20 +2182,28 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         duration: Duration(milliseconds: 750),
         child: _forestimatorSettingButton,
       ),
-      if (gl.Mode.essence || gl.Mode.addVertexesPolygon)
-        AnimatedContainer(
-          alignment:
-              gl.dsp.orientation.name == "Portrait"
-                  ? gl.Mode.essence || gl.Mode.addVertexesPolygon
-                      ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
-                      : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
-                  : gl.Mode.essence || gl.Mode.addVertexesPolygon
-                  ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
-                  : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
-          curve: Curves.easeInOutBack,
-          duration: Duration(milliseconds: 750),
-          child: _forestimatorAddEssenceVertexPoint,
-        ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? AlignmentGeometry.xy(_mainmenuBarPos.dx, _mainmenuBarPos.dy)
+                : AlignmentGeometry.xy(_mainmenuBarPos.dx, _mainmenuBarPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _mainMenuBar(),
+      ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? gl.Mode.essence || gl.Mode.addVertexesPolygon
+                    ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
+                : gl.Mode.essence || gl.Mode.addVertexesPolygon
+                ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _forestimatorAddEssenceVertexPoint,
+      ),
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
@@ -2229,7 +2245,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       ),
       AnimatedContainer(
         alignment:
-            gl.dsp.orientation.name == "Portrait"
+            gl.dsp.orientation.name == "portrait"
                 ? !gl.Mode.polygon
                     ? AlignmentGeometry.xy(_mainMenuOnOfflineAnimOnScreenPos.dx, _mainMenuOnOfflineAnimOnScreenPos.dy)
                     : AlignmentGeometry.xy(_mainMenuOnOfflineAnimOffScreenPos.dx, _mainMenuOnOfflineAnimOffScreenPos.dy)
@@ -2240,10 +2256,17 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         duration: Duration(milliseconds: 750),
         child: _forestimatorOnOffline,
       ),
-      if (gl.Mode.debugInfo)
-        AnimatedContainer(
+    ],
+  );
+
+  Widget get _forestimatorDebugElements => Stack(
+    children: [
+      SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: AnimatedContainer(
           alignment:
-              gl.dsp.orientation.name == "Portrait"
+              gl.dsp.orientation.name == "portrait"
                   ? gl.Mode.debugInfo
                       ? AlignmentGeometry.xy(gl.Anim.debugOnScreenPos.dx, gl.Anim.debugOnScreenPos.dy)
                       : AlignmentGeometry.xy(gl.Anim.debugOffScreenPos.dx, gl.Anim.debugOffScreenPos.dy)
@@ -2254,6 +2277,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           duration: Duration(milliseconds: 750),
           child: _forestimatorDebugInfo,
         ),
+      ),
     ],
   );
 
@@ -2371,14 +2395,28 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           "Orientation: ${gl.dsp.orientation.name}",
           style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
         ),
-        Text("eqPxH: ${gl.dsp.equiheight}", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS)),
-        Text("eqPxW: ${gl.dsp.equiwidth}", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS)),
+        Text(
+          "eqPxH: ${gl.dsp.equiheight.toStringAsFixed(1)}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+        Text(
+          "eqPxW: ${gl.dsp.equiwidth.toStringAsFixed(1)}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+        Text(
+          "eqPx: ${gl.dsp.equipixel.toStringAsFixed(1)}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
         Text(
           "Padding Top: ${gl.dsp.paddingTop}",
           style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
         ),
         Text(
           "Padding Bottom: ${gl.dsp.paddingBot}",
+          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+        ),
+        Text(
+          "ViewInset Bottom: ${MediaQuery.of(context).viewInsets.bottom}",
           style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
         ),
       ],
@@ -2938,7 +2976,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   set _toolBarMenu(bool mode) {
     setState(() {
       _toolbarExtended = mode;
-      _anaToolbarBoxPos = mode ? _anaToolbarAnimOnScreenPos : _anaToolbarAnimOffScreenPos;
     });
   }
 

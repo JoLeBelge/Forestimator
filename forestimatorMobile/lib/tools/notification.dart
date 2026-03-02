@@ -371,7 +371,6 @@ void popupForestimatorMessage({
   Icon? leadingSymbol,
   String? message,
   Widget? child,
-  Widget? pdfChild,
   VoidCallback? onDiscard,
   VoidCallback? onAccept,
   String? messageAccept,
@@ -380,74 +379,139 @@ void popupForestimatorMessage({
   double? height,
   double? width,
   Duration? duration,
+  bool? bigVersion,
 }) {
   int count = ++messageCount;
   gl.stack.add(
     id ?? "popMsg$count",
-    Card(
-      margin: EdgeInsetsGeometry.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(gl.eqPx * 5),
-        side: BorderSide(color: gl.colorAgroBioTech, width: gl.eqPx),
-      ),
-      color: gl.backgroundTransparentBlackBox,
-      child: Container(
-        alignment: AlignmentGeometry.center,
-        height: height ?? gl.eqPx * 65,
-        width: width ?? gl.eqPx * 70,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
+    PopupForestimatorMessage(
+      count,
+      id,
+      title,
+      leadingSymbol,
+      message,
+      child,
+      onDiscard,
+      onAccept,
+      messageAccept,
+      onDecline,
+      messageDecline,
+      height,
+      width,
+      duration,
+    ),
+    duration ?? Duration(milliseconds: 300),
+    gl.Anim.onScreenPosCenter,
+    gl.Anim.offScreenPosWindows,
+  );
+}
+
+class PopupForestimatorMessage extends StatelessWidget {
+  final String? id;
+  final String? title;
+  final Icon? leadingSymbol;
+  final String? message;
+  final Widget? child;
+  final VoidCallback? onDiscard;
+  final VoidCallback? onAccept;
+  final String? messageAccept;
+  final VoidCallback? onDecline;
+  final String? messageDecline;
+  final double? height;
+  final double? width;
+  final Duration? duration;
+  final int count;
+
+  const PopupForestimatorMessage(
+    this.count,
+    this.id,
+    this.title,
+    this.leadingSymbol,
+    this.message,
+    this.child,
+    this.onDiscard,
+    this.onAccept,
+    this.messageAccept,
+    this.onDecline,
+    this.messageDecline,
+    this.height,
+    this.width,
+    this.duration, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OrientationBuilder(
+      builder: (c, o) {
+        double cWidth = width ?? gl.eqPx * 70;
+        double cHeight = height ?? gl.eqPx * 65;
+        if (cHeight > 100 * gl.eqPx && gl.dsp.orientation.name != "portrait") cHeight = gl.eqPx * 95;
+        if (cHeight > 100 * gl.eqPx && gl.dsp.orientation.name == "portrait") cHeight -= gl.dsp.insetBot;
+        return Card(
+          margin: EdgeInsetsGeometry.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(gl.eqPx * 5),
+            side: BorderSide(color: gl.colorAgroBioTech, width: gl.eqPx),
+          ),
+          color: gl.backgroundTransparentBlackBox,
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 100),
+            alignment: AlignmentGeometry.center,
+            height: cHeight,
+            width: cWidth,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
                   children: [
-                    Container(
-                      alignment: AlignmentGeometry.center,
-                      height: gl.eqPx * 15,
-                      width: gl.eqPx * 15,
-                      child: leadingSymbol ?? forestimatorIcon(width: gl.eqPx * 12, height: gl.eqPx * 12),
-                    ),
-                    Container(
-                      alignment: AlignmentGeometry.center,
-                      height: gl.eqPx * 15,
-                      width: gl.eqPx * 40,
-                      child: Text(
-                        title ?? "Message $count",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: gl.eqPx * gl.fontSizeS,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          alignment: AlignmentGeometry.center,
+                          height: gl.eqPx * 15,
+                          width: gl.eqPx * 15,
+                          child: leadingSymbol ?? forestimatorIcon(width: gl.eqPx * 12, height: gl.eqPx * 12),
                         ),
-                      ),
+                        Container(
+                          alignment: AlignmentGeometry.center,
+                          height: gl.eqPx * 15,
+                          width: gl.eqPx * 40,
+                          child: Text(
+                            title ?? "Message $count",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: gl.eqPx * gl.fontSizeS,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: gl.eqPx * 15,
+                          width: gl.eqPx * 15,
+                          child: lt.forestimatorButton(
+                            onDiscard ??
+                                () {
+                                  gl.stack.pop(id ?? "popMsg$count");
+                                },
+                            Icons.arrow_drop_up_outlined,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: gl.eqPx * 15,
-                      width: gl.eqPx * 15,
-                      child: lt.forestimatorButton(
-                        onDiscard ??
-                            () {
-                              gl.stack.pop(id ?? "popMsg$count");
-                            },
-                        Icons.arrow_drop_up_outlined,
-                      ),
-                    ),
+                    lt.stroke(0, gl.eqPx * 1, gl.colorAgroBioTech),
                   ],
                 ),
-                lt.stroke(0, gl.eqPx * 1, gl.colorAgroBioTech),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    pdfChild ??
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                         lt.ForestimatorScrollView(
-                          height: (height ?? gl.eqPx * 65) - gl.eqPx * 30,
-                          width: (width ?? gl.eqPx * 70) - gl.eqPx * 5,
+                          height: cHeight - gl.eqPx * 30,
+                          width: cWidth - gl.eqPx * 5,
                           child:
                               child ??
                               Text(
@@ -459,57 +523,56 @@ void popupForestimatorMessage({
                                 ),
                               ),
                         ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (onAccept != null && messageAccept != null)
-                      Container(
-                        alignment: AlignmentGeometry.center,
-                        height: gl.eqPx * 10,
-                        width: gl.eqPx * 25,
-                        child: TextButton(
-                          style: dialogButtonStyle(borderWidth: gl.eqPx),
-                          onPressed: onAccept,
-                          child: Text(
-                            messageAccept,
-                            style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        if (onAccept != null && messageAccept != null)
+                          Container(
+                            alignment: AlignmentGeometry.center,
+                            height: gl.eqPx * 10,
+                            width: gl.eqPx * 25,
+                            child: TextButton(
+                              style: dialogButtonStyle(borderWidth: gl.eqPx),
+                              onPressed: onAccept,
+                              child: Text(
+                                messageAccept ?? "",
+                                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    if (onDecline != null && messageDecline != null)
-                      Container(
-                        alignment: AlignmentGeometry.center,
-                        height: gl.eqPx * 10,
-                        width: gl.eqPx * 25,
-                        child: TextButton(
-                          style: dialogButtonStyle(borderWidth: gl.eqPx),
-                          onPressed: onDecline,
-                          child: Text(
-                            messageDecline,
-                            style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
+                        if (onDecline != null && messageDecline != null)
+                          Container(
+                            alignment: AlignmentGeometry.center,
+                            height: gl.eqPx * 10,
+                            width: gl.eqPx * 25,
+                            child: TextButton(
+                              style: dialogButtonStyle(borderWidth: gl.eqPx),
+                              onPressed: onDecline,
+                              child: Text(
+                                messageDecline ?? "",
+                                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                      ],
+                    ),
+                    Container(height: gl.eqPx * 2),
                   ],
                 ),
-                Container(height: gl.eqPx * 2),
               ],
             ),
-          ],
-        ),
-      ),
-    ),
-    duration ?? Duration(milliseconds: 200),
-    gl.Anim.onScreenPosCenter,
-    gl.Anim.offScreenPosMessages,
-  );
+          ),
+        );
+      },
+    );
+  }
 }
 
 void popupForestimatorWindow({
@@ -582,8 +645,9 @@ class PopupForestimatorWindow extends StatelessWidget {
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (c, o) {
-        double cWidth = width ?? (gl.eqPxW - 2) * gl.eqPx;
-        double cHeight = height ?? (gl.eqPxH - 10) * gl.eqPx;
+        double cWidth = width ?? gl.dsp.width * gl.eqPx - 4;
+        double cHeight = height ?? gl.dsp.eqMaxWindowHeight * gl.eqPx;
+        cHeight -= gl.dsp.insetBot;
         return Card(
           margin: EdgeInsetsGeometry.zero,
           shape: RoundedRectangleBorder(
@@ -731,15 +795,15 @@ class PopupNewGeometricLayer {
     gl.refreshStack(() {
       popupForestimatorMessage(
         height: 100 * gl.eqPx,
-        id: "NewEntity",
-        title: "Nouvelle Entité",
+        id: "NewLayer",
+        title: "Nouvelle Layer",
         onAccept: () {
           onAccept(type, name, color);
-          gl.stack.pop("NewEntity");
+          gl.stack.pop("NewLayer");
         },
         messageAccept: "Créer",
         onDecline: () {
-          gl.stack.pop("NewEntity");
+          gl.stack.pop("NewLayer");
         },
         messageDecline: "Annuler",
         child: Column(
@@ -1205,9 +1269,8 @@ class PopupNewEssenceObservationPoint {
   }) {
     gl.refreshStack(() {
       _AddEssence.reset();
-      double height = 170 * gl.eqPx;
       popupForestimatorMessage(
-        height: height,
+        height: 180 * gl.eqPx,
         id: "addESS",
         title: "Observation essence",
         onDiscard: () {
@@ -1216,7 +1279,7 @@ class PopupNewEssenceObservationPoint {
           });
         },
         child: AddEssence(
-          height: height,
+          height: 180 * gl.eqPx,
           messageAccept: "Placer",
           messageDecline: "Annuler",
           onAccept: (String ess, Color col) {
@@ -1275,6 +1338,7 @@ class _AddEssence extends State<AddEssence> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         AnimatedContainer(
           duration: Duration(milliseconds: 200),
@@ -1319,7 +1383,7 @@ class _AddEssence extends State<AddEssence> {
 
         AnimatedContainer(
           duration: Duration(milliseconds: 200),
-          height: _selected == gl.essenceChoice.length - 1 ? 65 * gl.eqPx : 50 * gl.eqPx,
+          height: _selected == gl.essenceChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
           width: gl.menuBarLength * gl.eqPx,
           child: Column(
             children: [
@@ -1755,7 +1819,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
         side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
       ),
       child: SizedBox(
-        height: gl.eqPx * gl.eqPxH * .85,
+        height: gl.dsp.eqMaxWindowHeight * gl.eqPx - gl.dsp.insetBot,
         width: gl.eqPx * gl.eqPxW * .95,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2023,7 +2087,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                 ],
               ),
             ),
-            if (gl.dsp.orientation == Orientation.portrait && _titleLayer)
+            if (gl.dsp.orientation == Orientation.portrait && _titleLayer && !gl.dsp.showKeyboard)
               TextButton(
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
@@ -2049,7 +2113,20 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                 ),
                 onPressed: () {
                   PopupNewGeometricLayer(context, (String type, String name, Color color) {
-                    setState(() {
+                    if (mounted) {
+                      setState(() {
+                        switch (type) {
+                          case "Point":
+                            gl.geoLayers.add(GeometricLayer.point());
+                            break;
+                          case "Polygon":
+                            gl.geoLayers.add(GeometricLayer.polygon());
+                            break;
+                        }
+                        gl.geoLayers.last.defaultColor = color;
+                        gl.geoLayers.last.name = name;
+                      });
+                    } else {
                       switch (type) {
                         case "Point":
                           gl.geoLayers.add(GeometricLayer.point());
@@ -2060,7 +2137,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                       }
                       gl.geoLayers.last.defaultColor = color;
                       gl.geoLayers.last.name = name;
-                    });
+                    }
                     gl.selectedGeoLayer = gl.geoLayers.length - 1;
                     gl.geoLayers.last.serialize();
                     gl.refreshStack(() {
@@ -2087,7 +2164,6 @@ class LayerPropertiesPage extends StatefulWidget {
 }
 
 class _LayerPropertiesPage extends State<LayerPropertiesPage> {
-  bool _doingAnaPt = false;
   TextEditingController? controllerPdfName;
   TextEditingController? controllerLocationName;
 
@@ -2408,7 +2484,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 ),
                                               )
                                               : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
-                                          (gl.selLay.geometries[index].type.contains("Point") &&
+                                          /*  (gl.selLay.geometries[index].type.contains("Point") &&
                                                   gl.selLay.geometries[index].points.isNotEmpty)
                                               ? Container(
                                                 alignment: Alignment.center,
@@ -2439,7 +2515,8 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                   ),
                                                 ),
                                               )
-                                              : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
+                                              : */
+                                          SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
                                         ],
                                       ),
                                       (gl.selLay.geometries[index].center.longitude != 0.0 &&
@@ -3774,13 +3851,13 @@ class _SearchMenu extends State<SearchMenu> {
                   : gl.eqPx * gl.popupWindowsLandscapeWidth,
           height:
               gl.dsp.orientation == Orientation.portrait
-                  ? gl.eqPx * gl.popupWindowsPortraitHeight + 1
-                  : gl.eqPx * gl.popupWindowsLandscapeHeight,
+                  ? (gl.eqPx * gl.popupWindowsPortraitHeight + 1) - gl.dsp.insetBot
+                  : gl.eqPx * gl.popupWindowsLandscapeHeight - gl.dsp.insetBot,
           child: switchRowColWithOrientation([
             if (gl.dsp.orientation == Orientation.landscape)
               Container(
                 constraints: BoxConstraints(
-                  maxHeight: (gl.popupWindowsLandscapeHeight - 5) * gl.eqPx,
+                  maxHeight: (gl.popupWindowsLandscapeHeight - 5) * gl.eqPx - gl.dsp.insetBot,
                   maxWidth: gl.popupWindowsPortraitWidth * gl.eqPx,
                 ),
                 child: ListView(children: <Widget>[] + searchResults),
@@ -3940,10 +4017,11 @@ class _SearchMenu extends State<SearchMenu> {
               SizedBox(
                 height:
                     (gl.popupWindowsPortraitHeight -
-                        gl.searchBarHeight -
-                        gl.fontSizeL * 1.1 -
-                        gl.popupReturnButtonHeight) *
-                    gl.eqPx,
+                            gl.searchBarHeight -
+                            gl.fontSizeL * 1.1 -
+                            gl.popupReturnButtonHeight) *
+                        gl.eqPx -
+                    gl.dsp.insetBot,
                 child: ListView(children: <Widget>[] + searchResults),
               ),
           ]),
@@ -6980,8 +7058,8 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
       builder: (context, orientation) {
         return AnimatedContainer(
           duration: Duration(milliseconds: 100),
-          height: (gl.eqPxH - 30) * gl.eqPx,
-          width: gl.eqPx * 96,
+          height: (gl.eqPxH - 30) * gl.eqPx - gl.dsp.insetBot,
+          width: (gl.eqPxH - 5) * gl.eqPx,
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 0),
             children: [
@@ -6992,82 +7070,6 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                 color: gl.colorAgroBioTech.withAlpha(75),
                 child: Column(
                   children: [
-                    Card(
-                      color: gl.colorAgroBioTech.withAlpha(200),
-                      child: Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(3),
-                        constraints: BoxConstraints(
-                          maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                          minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                          minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Stack(
-                              alignment: AlignmentGeometry.center,
-                              children: [
-                                lt.forestimatorButton(() async {
-                                  popupPdfSaveDialog((String pdf, String locationName) async {
-                                    if (pdf.isEmpty) {
-                                      pdf =
-                                          "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
-                                    }
-                                    if (pdf.length < 4 || pdf.substring(pdf.length - 4) != ".pdf") {
-                                      pdf = "$pdf.pdf";
-                                    }
-                                    if (locationName.isEmpty) {
-                                      locationName = "une position";
-                                    }
-                                    String dir = "/storage/emulated/0/Download";
-                                    if (Platform.isIOS) {
-                                      dir = (await getApplicationDocumentsDirectory()).path;
-                                    }
-                                    makePdf(widget.requestedLayers, pdf, dir, locationName);
-                                    // confirmation que le pdf a été créé
-                                    gl.stack.add(
-                                      "popPDF",
-                                      popupPDFSaved(pdf, () {
-                                        gl.stack.pop("popPDF");
-                                      }),
-                                      Duration(milliseconds: 400),
-                                      gl.Anim.onScreenPosCenter,
-                                      Offset(0, -250),
-                                    );
-                                    gl.refreshStack(() {});
-                                  });
-                                  gl.refreshStack(() {});
-                                }, Icons.save_alt),
-                                Container(
-                                  alignment: Alignment.topRight,
-                                  width: gl.eqPx * gl.iconSizeM,
-                                  height: gl.eqPx * gl.iconSizeM,
-                                  child: Icon(
-                                    Icons.picture_as_pdf_sharp,
-                                    size: gl.eqPx * gl.iconSizeXS * .7,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(
-                              width: gl.eqPx * 65,
-                              child: Text(
-                                "Par couche selectionnée",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: gl.eqPx * gl.fontSizeM,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                     Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -7253,6 +7255,82 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                     ],
                   ),
                 ),
+              Card(
+                color: gl.colorAgroBioTech.withAlpha(200),
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.all(3),
+                  constraints: BoxConstraints(
+                    maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                    minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                    minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Stack(
+                        alignment: AlignmentGeometry.center,
+                        children: [
+                          lt.forestimatorButton(() async {
+                            popupPdfSaveDialog((String pdf, String locationName) async {
+                              if (pdf.isEmpty) {
+                                pdf =
+                                    "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
+                              }
+                              if (pdf.length < 4 || pdf.substring(pdf.length - 4) != ".pdf") {
+                                pdf = "$pdf.pdf";
+                              }
+                              if (locationName.isEmpty) {
+                                locationName = "une position";
+                              }
+                              String dir = "/storage/emulated/0/Download";
+                              if (Platform.isIOS) {
+                                dir = (await getApplicationDocumentsDirectory()).path;
+                              }
+                              makePdf(widget.requestedLayers, pdf, dir, locationName);
+                              // confirmation que le pdf a été créé
+                              gl.stack.add(
+                                "popPDF",
+                                popupPDFSaved(pdf, () {
+                                  gl.stack.pop("popPDF");
+                                }),
+                                Duration(milliseconds: 400),
+                                gl.Anim.onScreenPosCenter,
+                                Offset(0, -250),
+                              );
+                              gl.refreshStack(() {});
+                            });
+                            gl.refreshStack(() {});
+                          }, Icons.save_alt),
+                          Container(
+                            alignment: Alignment.topRight,
+                            width: gl.eqPx * gl.iconSizeM,
+                            height: gl.eqPx * gl.iconSizeM,
+                            child: Icon(
+                              Icons.picture_as_pdf_sharp,
+                              size: gl.eqPx * gl.iconSizeXS * .7,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(
+                        width: gl.eqPx * 80,
+                        child: Text(
+                          "Saufgardez l'analyse comme pdf",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400,
+                            fontSize: gl.eqPx * gl.fontSizeM,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         );
