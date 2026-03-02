@@ -17,9 +17,6 @@ void cWebAptitude::handlePathChange()
         top_stack->setCurrentIndex(0);
         menuitem_documentation->select();
 
-        //navigation->setTitle(tr("titre.presentation"));
-        // mApp->addMetaHeader("description", tr("desc.pres"), "fr");
-
         // une description différentes pour chaques page de documentation. Il faut préhalablement retirer la description, sinon ça n'aura pas d'effet
         // fonctionne pas si session avec javascript, mais pour les robots ça va quand-même. Sur mon navigateur, le meta descr c'est celui de la première page consultée de la session
         // check si j'ai un header description pour cette sous-section, sinon celui général à la page documentation
@@ -94,7 +91,6 @@ dialog::dialog(const WString& windowTitle, Wt::WMenuItem * aMenu, const WEnviron
             mMenu->decorationStyle().setBackgroundColor(col_not_sel);
             mShow=0;
         }else{
-            //this->positionAt(widget,Wt::Orientation::Vertical);
             mShow=1;
             this->myshow();
             mMenu->decorationStyle().setBackgroundColor(col_sel);
@@ -108,16 +104,14 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     : Wt::WApplication(env),
       session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db")
 {
-    //std::cout << "internal path : " << internalPath()<< std::endl;
-    //
-    //std::string ointernalPath(internalPath());
+
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
     messageResourceBundle().use(docRoot() + "/forestimator-documentation");
     messageResourceBundle().use(docRoot() + "/forestimator-CS");
 
     // export de tout les messages html vers un fichier csv qui sera traduit en text avec ./html2text -from_encoding UTF8 -nobs -o /home/jo/app/Forestimator/data/tmp/Forestimator.txt /home/jo/app/Forestimator/data/tmp/texteForestimator.csv pour correction orthographique
-    bool forestimator(0);
+    /*bool forestimator(0);
     if (globTest & 0){
         std::cout << " export des messages xml \n\n\n" << std::endl;
         std::ifstream theFile;
@@ -180,8 +174,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
         }
         std::cout << " ---------------- export done\n" << std::endl;
         aOut.close();
-    }
-
+    }*/
 
     setTitle("Forestimator");
     loadStyles();
@@ -190,7 +183,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     root()->setMargin(0);
     root()->setPadding(0);
 
-    //layout->addWidget(std::move(loadAuthWidget()));
     dialog_auth = layout->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Connexion"));
     dialog_auth->setResizable(true);
     dialog_auth->setModal(true);
@@ -208,11 +200,8 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     setLoadingIndicator(std::make_unique<Wt::WOverlayLoadingIndicator>());
     loadingIndicator()->setMessage(Wt::WString::tr("defaultLoadingI"));
 
-    // std::cout << "nombre de couleurs: " << mDico->colors.size() << std::endl;
     for (const auto & kv : mDico->colors){
-        // std::cout << kv.first << ", " << kv.second->cat() << std::endl;
         color * col=kv.second.get();
-        //std::cout << "add getStyleName() " << col.getStyleName() << std::endl;
         WCssDecorationStyle styleBgrd;
         styleBgrd.setBackgroundColor(WColor(col->mR,col->mG,col->mB));
         if (col->dark()){styleBgrd.setForegroundColor(WColor("white"));}
@@ -275,7 +264,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     top_stack->setCurrentIndex(1);
     // load RESULT page TODO
 
-
     /*** page principale application map ***/
 
     /*	MAP	*/
@@ -290,9 +278,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     /*  Panel droit avec boutons et couches selectionnees */
     auto content_couches = layout_app->addWidget(std::make_unique<WContainerWidget>());
     content_couches->setId("content_couches");
-    //content_couches->setOverflow(Overflow::Auto);
     content_couches->addStyleClass("content_couches");
-    //load_content_couches(content_couches); // moved after mGroupL initialization !! non c'est juste la création du panier qu'il faut mettre après, le reste (création conteneur et layout) je dois le faire ici pour avoir mes Menuitem avant de créer class dialogu
     auto layoutD = content_couches->setLayout(std::make_unique<WHBoxLayout>());
     content_couches->setPadding(0);
     layoutD->setContentsMargins(0,0,0,0);
@@ -309,7 +295,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     content_panier->setOverflow(Overflow::Scroll);
 
     auto menu = menu_gauche->addWidget(Wt::cpp14::make_unique<WMenu>());
-    //menu->setStyleClass("nav nav-pills nav-stacked");
     menu->setStyleClass("nav-stacked");
     menu->addStyleClass("nav-apt");
 
@@ -325,7 +310,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
             menuitem_panier->setIcon("resources/right_angle_circle_icon_149877.png");
             content_panier->show();
         }
-        //menuitem_panier->renderSelected(false);
 
     });
     menuitem_panier->setToolTip(WString::tr("menu.button.tooltip.panier_collapse"));
@@ -351,15 +335,10 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     dialog_info = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&environment()));
 
     auto content_info = dialog_info->contents()->addWidget(std::make_unique<WContainerWidget>());
-    //content_info->setOverflow(Overflow::Auto);
     content_info->addStyleClass("content_info");
 
     // analyse
     dialog_anal = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&environment()));
-
-    //auto content_anal = dialog_anal->contents()->addWidget(std::make_unique<WContainerWidget>());
-    //content_anal->setOverflow(Overflow::Auto);
-    //content_anal->addStyleClass("content_anal");
 
     // catalogue
     dialog_catalog = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&environment()));
@@ -385,7 +364,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     if (globTest){ printf("create GL\n");}
     mGroupL = new groupLayers(this);
-    //load_content_couches(content_couches);
     if (globTest){ printf("done\n");}
 
     mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(this));
@@ -475,16 +453,14 @@ void cWebAptitude::loadStyles(){
     styleSheet().addRule(".currentEss", EssStyle);
 
     // init the OpenLayers javascript api
-    require("jslib/v6.4.3-dist/ol.js");
-    useStyleSheet("jslib/v6.4.3-dist/ol.css");
-    require("jslib/proj4js-2.6.1/dist/proj4.js");
-    require("jslib/proj4js-2.6.1/dist/proj4-src.js");
+    require("jslib/v10.8.0-package/dist/ol.js");
+    useStyleSheet("jslib/v10.8.0-package/ol.css");
+    require("jslib/proj4js-2.20.3-dist/proj4.js");
+    require("jslib/proj4js-2.20.3-dist/proj4-src.js");
     enableUpdates();
 }
 
 std::unique_ptr<Wt::Auth::AuthWidget> cWebAptitude::loadAuthWidget(){
-    // auth widget (login)
-    if (globTest){printf("Auth widget...");}
     session_.login().changed().connect(this, &cWebAptitude::authEvent);
     std::unique_ptr<Wt::Auth::AuthWidget> authWidget_ = std::make_unique<Wt::Auth::AuthWidget>(Session::auth(), session_.users(), session_.login());
     authWidget=authWidget_.get();
@@ -493,16 +469,11 @@ std::unique_ptr<Wt::Auth::AuthWidget> cWebAptitude::loadAuthWidget(){
     authWidget->setRegistrationEnabled(true);
     authWidget->processEnvironment();
     authWidget->addStyleClass("Wt-auth-login-container");
-    //authWidget->setInternalPathEncoding(true);
-    //authWidget->setInternalBasePath("/auth");
-    //authWidget->
-
-    if (globTest){printf("done\n");}
     return authWidget_;
 }
 
 void cWebAptitude::authEvent() {
-    std::cout << "autEvent..." << std::endl;
+    if (globTest){std::cout << "autEvent..." << std::endl;}
     if(!loaded_)return;
     if (session_.login().loggedIn()) {
         const Wt::Auth::User& u = session_.login().user();
@@ -549,8 +520,5 @@ void cWebAptitude::clientIDcookies(){
         int16_t bitNum = (int16_t)rand()%0x10000;
         Http::Cookie coClientID(cookies_clientIDName, std::to_string(bitNum), std::chrono::seconds(604800));
         setCookie(coClientID);
-        //if (globTest) {std::cout << "cookies set " << bitNum << std::endl;}
-        /*} else {
-         if (globTest) {std::cout << "cookies get " << *environment().getCookie(cookies_clientIDName) << std::endl;}
-    */}
+    }
 }
