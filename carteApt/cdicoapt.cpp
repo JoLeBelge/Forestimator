@@ -428,8 +428,6 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                 }
             }
 
-            if (globTest){    std::cout << "lay geom type " << wkbFlatten(lay->GetGeomType()) << std::endl;}
-
             for (std::string &code: codeList){
                 if (lay->FindFieldIndex(code.c_str(),0)==-1){
                     OGRFieldDefn * oFLD(NULL);
@@ -442,7 +440,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             OGRFeature *poFeature;
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
-                if (poFeature->GetGeometryRef()->getIsoGeometryType()==1001 || poFeature->GetGeometryRef()->getIsoGeometryType()==1)
+                if (wkbFlatten(lay->GetGeomType())==1)
                 {
                     OGRPoint * pt =poFeature->GetGeometryRef()->toPoint();
                     for (std::string &code: codeList){
@@ -482,8 +480,9 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         poFeature->SetField(code.c_str(),aRes.c_str());
                         // next forestimator layer
                     }
-                    lay->SetFeature(poFeature);
+                    // end if polygon feature
                 }
+                lay->SetFeature(poFeature);
                 // next feature
             }
             break;

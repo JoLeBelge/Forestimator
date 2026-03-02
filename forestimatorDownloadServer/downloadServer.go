@@ -75,7 +75,7 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Serve file with download headers
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=Forestimator%q", filename[8:]))
 	http.ServeFile(w, r, filePath)
 }
 
