@@ -277,8 +277,8 @@ void formOGF::loadStyles()
     // init the OpenLayers javascript api
     require("jslib/v10.8.0-package/dist/ol.js");
     useStyleSheet("jslib/v10.8.0-package/ol.css");
-    require("jslib/proj4js-2.20.3/dist/proj4.js");
-    require("jslib/proj4js-2.20.3/dist/proj4-src.js");
+    require("jslib/proj4js-2.20.3-dist/proj4.js");
+    require("jslib/proj4js-2.20.3-dist/proj4-src.js");
     enableUpdates();
 }
 
