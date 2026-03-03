@@ -1,5 +1,5 @@
--attendre les modifications du logiciels (géométrie points et attributs)
 
--début des exercices (le premier en tout cas.)
+-update
+-exercices ; offline mode, mode observations essence, etc
 
--Demander un deuxième feedback à quelqu'un d'extérieur: Charlotte? Nicolas D.? 
+-Demander un deuxième feedback à quelqu'un d'extérieur: Nicolas Dassonville
