@@ -134,13 +134,15 @@
 \newglossaryentry{analysePt}
 {
 	name={analyse ponctuelle},
-	description={L'affichage pour une position donnée de la valeur d'une couche cartographique ou d'un ensemble de couches cartographiques, permettant dans ce dernier cas de dresser un bilan global de la situation pour cette position : type de station, composition du peuplement, caractérisation dendrométrique}
+	description={L'affichage pour une position donnée de la valeur d'une couche cartographique ou d'un ensemble de couches cartographiques, permettant dans ce dernier cas de dresser un bilan global de la situation pour cette position : type de station, composition du peuplement, caractérisation dendrométrique},
+	plural={analyses ponctuelles},
 }
 
 \newglossaryentry{analyseSurf}
 {
 	name={analyse surfacique},
-	description={Le calcul et l'affichage, pour surface définie au moyen d'un polygone, des valeurs d'une ou de plusieurs couches cartographiques. La proportion de surface pour chaque valeurs est également renseigné, par exemple pour l'aptitude du Hêtre ; 70\% de la surface en Optimum, 30 \% de la surface en Tolérance élargie}
+	description={Le calcul et l'affichage, pour surface définie au moyen d'un polygone, des valeurs d'une ou de plusieurs couches cartographiques. La proportion de surface pour chaque valeurs est également renseigné, par exemple pour l'aptitude du Hêtre ; 70\% de la surface en Optimum, 30 \% de la surface en Tolérance élargie},
+	plural={analyses surfaciques},
 }
 
 \newglossaryentry{ForestimatorM}
@@ -423,51 +425,82 @@ Appuyez sur le symbole \includegraphics[width=0.05\textwidth]{icons/hexagon.png}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.35\textwidth]{PolygonMenu1.png}
-	\caption{Menu des points et polygones. A gauche la vue globale listant les différentes \gls{layers}, à droite la vue compacte avec les outils permettant d'ajouter ou de modifier des entités pour une \gls{layers}. Utilisez les boutons \includegraphics[width=0.05\textwidth]{icons/hexagon.png} ou \includegraphics[width=0.05\textwidth]{icons/reduire.png} pour passer de la vue globale à la vue compacte.}
+	\includegraphics[width=0.6\textwidth]{PolygonMenu1.png}
+	\caption{Menu des points et polygones. A gauche la vue globale listant les différentes \glspl{layer}, à droite la vue compacte avec les outils permettant d'ajouter ou de modifier des entités pour une \gls{layer}. Utilisez les boutons \includegraphics[width=0.05\textwidth]{icons/hexagon.png} ou \includegraphics[width=0.05\textwidth]{icons/reduire.png} pour passer de la vue globale à la vue compacte.}
 \end{figure}
 
-\subsection{Procédure de création de polygone, d'ajout et d'édition de sommet}
-\begin{instructionbox}{Créer un nouveau polygone}
+\subsection{Procédure de création d'une layer de points et d'ajout d'entités}
+
+\begin{instructionbox}{Créer une nouvelle layer de points}
 	\begin{enumerate}
-		\item Appuyez sur le bouton \og +\fg.
-		\item Une boîte de dialogue s'ouvre. Donnez un nom court au nouveau polygone et appuyez sur \og OK \fg.
-		\item Un nouvel élément apparaît en haut de la liste des couches cartographiques de polygone. Les informations relative au polygone y sont affichées : le nom, sa surface et son périmètre.
-		\item Vous pouvez changer la couleur du polygone tel qu'il est représenté sur la carte au moyen de l'icône de couleur en haut à droite.
-		\item Vous pouvez supprimer le polygone en appuyant sur l'icone de corbeille. \includegraphics[width=0.05\textwidth]{icons/trashcan.png} à gauche.
-		\item Vous pouvez effectuer une analyse surfacique pour ce polygone. Cette analyse surfacique requiert une certaine puissance de calcul et est dès lors effectué sur un serveur de Gembloux Agro-Bio tech. Une connexion à internet est donc obligatoirement nécessaire pour cette opération.
-		\item Fermez la liste.
-		\item En haut, vous voyez maintenant un encart portant le nom de votre polygone. Appuyez sur le symbole de centrage pour centrer la vue sur le polygone.
+		\item Ouvrez la vue globale du menu des points/polygones en appuyant sur \includegraphics[width=0.05\textwidth]{icons/hexagon.png}.
+		\item Appuyez sur le bouton \og +\fg pour créer une nouvelle layer.
+		\item Une boîte de dialogue s'ouvre. Choisissez le type de géométrie (point), renseignez un nom pour la layer (ex. \textit{mes points}) et appuyez sur \og Créer \fg.
+		\includegraphics[width=0.4\textwidth]{createLayerPt.png}
+		\item Votre layer apparaît dans la liste la liste des couches cartographiques de points/polygones. 
+	\end{enumerate}
+\end{instructionbox}
+
+\begin{instructionbox}{Ajouter des points}
+	\begin{enumerate}
+		\item Passez en vue compacte du menu des points/polygones en appuyant sur \includegraphics[width=0.05\textwidth]{icons/hexagon.png} ou sur \includegraphics[width=0.05\textwidth]{icons/reduire.png}.
+		\item Appuyez sur le bouton \includegraphics[width=0.05\textwidth]{icons/add.png} pour ajouter des points.
+		\item La position au centre de la carte est matérialisée par le symbole \includegraphics[width=0.05\textwidth]{icons/target.png}.
+		\item Déplacez la carte pour positionner le centre sur votre position d'intérêt et cliquez sur \includegraphics[width=0.05\textwidth]{icons/add_entity.png} en bas à droite de la carte pour ajouter un point. 
+		\includegraphics[width=0.35\textwidth]{addEntityPt1.png}
+	\end{enumerate}
+\end{instructionbox}
+
+\begin{instructionbox}{Modifier le symbole d'un point }
+	\begin{enumerate}
+		\item Sélectionnez une entité point dans la layer de point (ex. l'entité numéro 4).
+		\includegraphics[width=0.35\textwidth]{symbolPt0.png}
+		\item Ouvrez le menu d'édition de la symbologie en appuyant sur le bouton \includegraphics[width=0.05\textwidth]{icons/symbology.png}.
+		\item Choisissez le symbole et la couleur de votre choix.
+		\includegraphics[width=0.6\textwidth]{symbolPt1.png}
+	\end{enumerate}
+\end{instructionbox}
+
+
+\subsection{Procédure de création d'une layer de polygones et d'ajout d'entités}
+
+\begin{instructionbox}{Créer une nouvelle layer de polygones}
+	\begin{enumerate}
+		\item Ouvrez la vue globale du menu des points/polygones en appuyant sur \includegraphics[width=0.05\textwidth]{icons/hexagon.png}.
+		\item Appuyez sur le bouton \og +\fg pour créer une nouvelle layer.
+		\item Une boîte de dialogue s'ouvre. Choisissez le type de géométrie (polygone), renseignez un nom pour la layer (ex. \textit{parcelles}) et appuyez sur \og Créer \fg.
+		\item Votre layer apparaît dans la liste la liste des couches cartographiques de points/polygones. 
 	\end{enumerate}
 \end{instructionbox}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.35\textwidth]{NewPoly1.png}
-	\caption{Nouveau polygone créé par l'utilisateur.}
+	\caption{Nouvelle couche de polygone créé par l'utilisateur.}
 \end{figure}
 
-\begin{instructionbox}{Ajouter des sommets/vertex}
+\begin{instructionbox}{Ajouter des polygones}
 	\begin{enumerate}
-		\item À gauche, un nouveau menu apparaît avec un \includegraphics[width=0.05\textwidth]{icons/add_circle.png}. Appuyez dessus pour ajouter des sommets en appuyant sur la carte.
-		\item Si vous appuyez sur au moins trois points, un triangle apparaît. L'un des trois côtés du triangle est représenté au moyen d'une ligne plus épaisse. C'est ce segment de droite qui sera divisée en deux par le prochain sommet que vous placerez sur la carte.
-		\item Pour changer le segment de droite à modifier, vous pouvez appuyer sur un autre sommet.
+		\item Passez en vue compacte du menu des points/polygones en appuyant sur \includegraphics[width=0.05\textwidth]{icons/hexagon.png} ou sur \includegraphics[width=0.05\textwidth]{icons/reduire.png}.
+		\item Appuyez sur le bouton \includegraphics[width=0.05\textwidth]{icons/add.png} pour ajouter des polygones.
+		\item La position au centre de la carte est matérialisée par le symbole \includegraphics[width=0.05\textwidth]{icons/target.png}.
+		\item Déplacez la carte pour positionner le centre sur votre position d'intérêt et cliquez sur \includegraphics[width=0.05\textwidth]{icons/add_entity.png} en bas à droite de la carte pour dessiner le contour du polygone. 
+		\includegraphics[width=0.35\textwidth]{NewPoly3.png}
+		\item Une fois le contour dessiné, validez la géométrie du polygone en appuyant sur \includegraphics[width=0.05\textwidth]{icons/validGeom.png}.
 	\end{enumerate}
 \end{instructionbox}
 
-\begin{instructionbox}{Supprimer ou déplacer un sommet}
+\begin{instructionbox}{Editer la géométrie d'un polygone existant}
 	\begin{enumerate}
-		\item Une fois le polygone dessiné, appuyez sur un sommet. Le menu de gauche change : le \includegraphics[width=0.05\textwidth]{icons/add_circle.png} disparaît et un \includegraphics[width=0.05\textwidth]{icons/remove_circle.png} et une icône \includegraphics[width=0.05\textwidth]{icons/open_with.png} apparaissent.
-		\item Le \includegraphics[width=0.05\textwidth]{icons/remove_circle.png} permet de supprimer le sommet sélectionné.
-		\item L'icône \includegraphics[width=0.05\textwidth]{icons/open_with.png} permet de déplacer le sommet sélectionné. Après le déplacement, appuyez à nouveau sur l'icône de manière à finaliser l'édition.
+		\item Sélectionnez l'entité à modifier, puis appuyez sur le bouton d'édition de la géométrie 
+		 \includegraphics[width=0.05\textwidth]{icons/editGeom.png}.
+		 \includegraphics[width=0.7\textwidth]{editPoly.png}
+		\item Sélectionner un des \textit{sommets} délimitant le contour du polygone. Ce dernier apparaît dès lors en rouge. Utilisez les boutons \includegraphics[width=0.05\textwidth]{icons/move.png} ou \includegraphics[width=0.05\textwidth]{icons/remove.png} pour déplacer ou supprimer le \textit{sommet}
+		\includegraphics[width=0.35\textwidth]{NewPoly4.png}
+		\item Une fois vos modifications effectuées, validez la géométrie du polygone en appuyant sur \includegraphics[width=0.05\textwidth]{icons/validGeom.png}.
 	\end{enumerate}
 \end{instructionbox}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.35\textwidth]{NewPoly5.png}
-	\caption{Suppression ou déplacement d'un sommet.}
-\end{figure}
 
 \section{Analyses}
 
@@ -478,7 +511,7 @@ Forestimator Mobile offre deux possibilités d'analyse, soit ponctuelle, soit su
 L'\gls{analysePt} est très simple à réaliser et permet de questionner la valeur que prends une ou plusieurs couches thématiques pour une position donnée.
 \begin{instructionbox}{Analyse ponctuelle en une étape}
 	\begin{enumerate}
-		\item Depuis l'écran principal de Forestimator, effectuer un \textbf{appui long} sur la carte pour obtenir directement une analyse complète de toutes les couches sélectionnées.
+		\item Depuis l'écran principal de Forestimator, effectuer un \textbf{appui long} sur la carte pour obtenir directement une analyse complète de toutes les couches sélectionnées à cet effet.
 	\end{enumerate}
 \end{instructionbox}
 
@@ -496,14 +529,14 @@ L'\gls{analysePt} est très simple à réaliser et permet de questionner la vale
 	\item Dans le sélectionneur de couche, veillez à ce que la première couche ne soit pas un fond de carte. Utiliser par exemple la couche du guide des stations.
     \item Depuis l'écran principal de Forestimator, appuyez simplement quelque part sur la carte (\textbf{appui court}).
     \item Un aperçu court en une ligne apparaît dans une fenêtre et vous renseigne, pour cette position, la légende et la couleur de la couche cartographique numéro 1.
-    \item Si vous appuyez à nouveau sur cette fenêtre d'aperçu, vous réaliserez une analyse avec une série de couches sélectionnées.
+    \item Si vous appuyez à nouveau sur cette fenêtre d'aperçu, vous réaliserez une analyse avec la série de couches sélectionnées à cet effet.
 \end{enumerate}
 \end{instructionbox}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.35\textwidth]{anaPreview.png}
-    \caption{Analyse ponctuelle : un \textbf{appui court} sur une carte thématique permet d'afficher la légende pour cette position, dans cet exemple la station est un \textit{versant chaud sur sol superficiel}. Un deuxième appui court sur la légende pour cette position permet la visualisation des valeurs, toujours pour cette position, d'un ensemble de couches cartographiques. }
+    \caption{Analyse ponctuelle : un \textbf{appui court} sur une carte thématique permet d'afficher la légende pour cette position, dans cet exemple la station est un \textit{sol peu profond des plateaux}. Un deuxième appui court sur la légende pour cette position permet la visualisation des valeurs, toujours pour cette position, d'un ensemble de couches cartographiques. }
 \end{figure}
 
 \subsection{Tableau d'aptitude et de recommandation des essences}
@@ -519,13 +552,13 @@ Les résultats de l'analyse ponctuel sont présenté couche par couche, à l'exc
 	
 
 \subsection{Analyse surfacique}
-\begin{instructionbox}{Réaliser une analyse de surface}
+\begin{instructionbox}{Réaliser une analyse surfacique pour un de vos polygones}
 \begin{enumerate}
-    \item Appuyez sur le symbole \includegraphics[width=0.05\textwidth]{icons/hexagon.png} du menu principal (en bas de la carte).
-    \item Accédez au le menu des \glspl{polygones} et appuyant sur l'encart en haut de l'écran.
-    \item Sélectionnez le polygone pour lequel vous souhaitez effectuer l'analyse surfacique.
-    \item Appuyez maintenant sur l'icône \includegraphics[width=0.05\textwidth]{icons/analytics.png} pour lancer l'analyse.
-    \item Les résultats de l'analyse sont présentés par couche.
+    \item Appuyez sur le symbole \includegraphics[width=0.05\textwidth]{icons/hexagon.png} du menu principal (en bas de la carte) pour accéder à la liste de vos \glspl{layer}.
+    \includegraphics[width=0.35\textwidth]{LayerList.png}
+    \item Sélectionnez la layer de polygone et accédez au propriété de la layer en cliquant sur le bouton \includegraphics[width=0.05\textwidth]{icons/arrow.png}.
+    \item Effectuez une analyse surfacique pour l'entité de votre choix en cliquant sur le bouton \includegraphics[width=0.05\textwidth]{icons/analytics.png}.
+    \includegraphics[width=0.35\textwidth]{polEntityList.png}
 \end{enumerate}
 \end{instructionbox}
 
@@ -535,9 +568,9 @@ Les résultats de l'analyse ponctuel sont présenté couche par couche, à l'exc
 	\caption{Résultat d'une analyse surfacique pour un polygone.}
 \end{figure}
 
-\subsection{Procédure : Sélectionner une couche thématique pour l'analyse}
+\subsection{Procédure de sélectionner une couche thématique pour l'analyse}
 
-Les analyses ponctuelles et surfacique sont des analyses effectuées sur une série de couche cartographique. Cette série est prédéfinie, mais vous pouvez ajouter d'autre couche de votre intérêt de manière à les utiliser lors de vos analyses.
+Les analyses ponctuelles et surfaciques sont des analyses effectuées sur une série de \glspl{couche}. Cette série est prédéfinie, mais vous pouvez ajouter d'autre couche de votre intérêt de manière à les utiliser lors de vos analyses.
 
 \begin{instructionbox}{Sélectionner une couche pour l'analyse}
 \begin{enumerate}
@@ -545,18 +578,11 @@ Les analyses ponctuelles et surfacique sont des analyses effectuées sur une sé
     \item Appuyez ensuite sur l'icône \includegraphics[width=0.05\textwidth]{icons/layers.png} pour ouvrir le catalogue.
     \item Recherchez la couche que vous souhaitez analyser et ouvrez-la en appuyant sur le titre.
     \item Appuyez sur \includegraphics[width=0.05\textwidth]{icons/pentagram.png} pour l'inclure dans l'analyse de surface ou sur \includegraphics[width=0.05\textwidth]{icons/locationPin.png} pour l'inclure dans l'analyse ponctuelle.
-    \item Appuyez sur le bouton de fermeture.
+    \item Fermez le catalogue avec le bouton \includegraphics[width=0.05\textwidth]{icons/reduire.png}.
+    \item Fermez le sélecteur de couche avec le bouton \includegraphics[width=0.05\textwidth]{icons/eye.png}.
     \item Vous pouvez maintenant effectuer votre analyse.
 \end{enumerate}
 \end{instructionbox}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.35\textwidth]{anaPt.png}
-    \caption{Analyse ponctuelle.}
-\end{figure}
-
-
 
 \chapter{Documentation sous forme de capsule vidéo}
 
@@ -583,23 +609,56 @@ Le reportage vidéo de Julie Fohal réalisé début 2025 présente l'application
 \section{Analyse ponctuelle}
 
 Cet exercice illustre pas à pas les étapes permettant d'afficher une carte des hauteurs des arbres, d'effectuer une analyse ponctuelle de manière à déterminer la hauteur dominante et d'exporter le résultat de l'analyse sous forme d'un rapport au format pdf. 
-\subsection{naviger jusqu'au bois de Grand-Leez}
+\subsection{Naviger jusqu'au bois de Grand-Leez}
 
 La navigation peut s'effectuer de manière manuelle, c'est à dire en dézoomant la carte principale, en navigant vers le bois de Grand-Leez qui se situe à l'ouest de Gembloux, puis en zoomant à nouveau. Mais il est plus simple d'utiliser l'outil de géolocalisation et d'entrer le nom du village (voir figure \ref{fig:geolocGL})
 
 \begin{figure}[H]
-
 	\centering
 	\includegraphics[width=0.8\textwidth]{navGrandLeez.png}
 	\caption{Navigation jusqu'à Grand-Leez au moyen de la recherche de lieu par nom.}
 	\label{fig:geolocGL}
 \end{figure}
 
+\subsection{Affichage de la hauteur des arbres en 2021}
+
+Ouvrez le sélecteur de couche (bouton \includegraphics[width=0.05\textwidth]{icons/eye.png}) et ensuite ouvrez le catalogue de couches (bouton \includegraphics[width=0.05\textwidth]{icons/layers.png}). Recherchez la couche dénommée \textit{MNH LiDAR de 2021} qui est dans la catégorie \textit{Cartographie des peuplements forestiers}. Sélectionnez cette couche pour en cliquant sur le symbole \includegraphics[width=0.05\textwidth]{icons/layers.png} à droite du nom de la couche. Fermez ensuite le catalogue et désactivez la transparence de la couche \textit{MNH LiDAR de 2021} dans le sélecteur.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{gl-MNH.png}
+	\caption{Sélection du \textit{MNH LiDAR de 2021} pour affichage (à gauche) et mise à 0 de la transparence pour cette couche (à droite).}
+	\label{fig:gl-cata}
+\end{figure}
+
+\subsection{Analyse ponctuelle pour les Douglas du bois de Grand-Leez}
+
+Zoomez ensuite sur les Douglas qui sont dans le bois de Grand-Leez. Un appui court sur un des Douglas vous renseignera la hauteur de ce dernier. Un appui long sur ces mêmes Douglas effectuera une analyse ponctuelle.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{gl-loca.png}
+	\caption{Localisation précise des Douglas dans le bois de Grand-Leez.}
+	\label{fig:gl-loca}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{gl-ana.png}
+	\caption{Un appui court sur la carte nous renseigne la hauteur des Douglas (à gauche) Un appui long effectue une analyse ponctuelle pour cette position (à droite). }
+	\label{fig:gl-ana}
+\end{figure}
+Vous pouvez générer un rapport au format pdf contenant l'analyse ponctuelle effectuée en utilisant le bouton en bas de la page de résultat de l'analyse. Le rapport se présente comme illustré à la figure \ref{fig:gl-pdf}. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{gl-pdf.png}
+	\caption{Le résultat d'une analyse ponctuelle peut être exportée au format pdf. }
+	\label{fig:gl-pdf}
+\end{figure}
+
 \section{Utilisation du mode hors ligne}
 
 \subsection{Mode en ligne/hors ligne}
-
-
 
 \subsection{Avant d'utiliser le mode hors ligne}
 \begin{itemize}
