@@ -84,9 +84,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   Offset get _mainMenuOnOfflineAnimOffScreenPos =>
       Offset(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
 
-  Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), 0);
-  Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-8000));
-
   Offset get _anaToolbarAnimOnScreenPos =>
       Offset(gl.dsp.alignX(-gl.eqPxW * .5 + 0), gl.dsp.alignY(gl.dsp.eqlignBottom - gl.menuBarThickness));
   Offset get _anaToolbarAnimOffScreenPos =>
@@ -608,7 +605,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           child: forestimatorBuildGeoMenu,
         ),
       ),
-      SizedBox(
+      /*SizedBox(
         height: double.infinity,
         width: double.infinity,
         child: AnimatedContainer(
@@ -641,7 +638,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             windowHeight: gl.dsp.orientation == Orientation.portrait ? (gl.eqPxH - 25) : gl.popupWindowsLandscapeHeight,
           ),
         ),
-      ),
+      ),*/
     ],
   );
 
@@ -2156,7 +2153,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     });
     if (gl.geoReady && gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
       gl.selLay.removeGeometry(last: true);
-    } else if (gl.geoReady &&  gl.selGeo.type.contains("Polygon") && gl.selGeo.points.length < 3) {
+    } else if (gl.geoReady && gl.selGeo.type.contains("Polygon") && gl.selGeo.points.length < 3) {
       gl.selLay.removeGeometry(last: true);
     }
   }
@@ -2966,6 +2963,27 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     setState(() {
       gl.Mode.polygon = mode;
     });
+    if (gl.Mode.polygon) {
+      if (gl.Mode.polygonList) {
+        popupLayerListMenu(
+          (LatLng pos) {
+            if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+              centerOnLatLng(pos);
+            }
+          },
+          () {
+            setState(() {
+              gl.Mode.polygonList = false;
+              if (!gl.layerReady) {
+                _closePolygonMenu();
+              } else {
+                _polygonMode = true;
+              }
+            });
+          },
+        );
+      }
+    }
   }
 
   set _toolBarMenu(bool mode) {
@@ -3385,50 +3403,52 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           if (!gl.Mode.smallLabel && gl.selLay.geometries[i].getNCheckedAttributes() > 1)
                             lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                         ] +
-                        List<Widget>.generate(gl.selLay.geometries[i].getNCheckedAttributes(), (j) {
-                          return Container(
-                            padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
-                            color: Colors.transparent,
-                            height: gl.eqPx * gl.iconSizeXS,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                if (!gl.Mode.smallLabel)
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    width: gl.eqPx * 15,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Text(
-                                        gl.selLay.geometries[i].attributes[j].name,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: gl.Mode.smallLabel ? Colors.black : Colors.white,
-                                          fontSize: gl.eqPx * gl.fontSizeXS,
+                        List<Widget>.generate(gl.selLay.geometries[i].attributes.length, (j) {
+                          return gl.selLay.geometries[i].attributes[j].visibleOnMapLabel
+                              ? Container(
+                                padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
+                                color: Colors.transparent,
+                                height: gl.eqPx * gl.iconSizeXS,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    if (!gl.Mode.smallLabel)
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        width: gl.eqPx * 15,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            gl.selLay.geometries[i].attributes[j].name,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: gl.Mode.smallLabel ? Colors.black : Colors.white,
+                                              fontSize: gl.eqPx * gl.fontSizeXS,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    if (!gl.Mode.smallLabel)
+                                      lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      width: gl.eqPx * 15,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Text(
+                                          gl.selLay.geometries[i].attributes[j].value.toString(),
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: gl.Mode.smallLabel ? Colors.black : Colors.white,
+                                            fontSize: gl.eqPx * gl.fontSizeXS,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                if (!gl.Mode.smallLabel)
-                                  lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  width: gl.eqPx * 15,
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Text(
-                                      gl.selLay.geometries[i].attributes[j].value.toString(),
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: gl.Mode.smallLabel ? Colors.black : Colors.white,
-                                        fontSize: gl.eqPx * gl.fontSizeXS,
-                                      ),
-                                    ),
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
+                              )
+                              : SizedBox();
                         }),
                   ),
                 ),
@@ -3531,47 +3551,49 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           if (gl.selLay.geometries[i].getNCheckedAttributes() > 1)
                             lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                         ] +
-                        List<Widget>.generate(gl.selLay.geometries[i].getNCheckedAttributes(), (j) {
-                          return Container(
-                            padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
-                            color: Colors.transparent,
-                            height: gl.eqPx * gl.iconSizeXS,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                if (!gl.Mode.smallLabel)
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    width: gl.eqPx * 15,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Text(
-                                        gl.selLay.geometries[i].attributes[j].name,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
+                        List<Widget>.generate(gl.selLay.geometries[i].attributes.length, (j) {
+                          return gl.selLay.geometries[i].attributes[j].visibleOnMapLabel
+                              ? Container(
+                                padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
+                                color: Colors.transparent,
+                                height: gl.eqPx * gl.iconSizeXS,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    if (!gl.Mode.smallLabel)
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        width: gl.eqPx * 15,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            gl.selLay.geometries[i].attributes[j].name,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
+                                          ),
+                                        ),
+                                      ),
+                                    if (!gl.Mode.smallLabel)
+                                      lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      width: gl.eqPx * 15,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Text(
+                                          gl.selLay.geometries[i].attributes[j].value.toString(),
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: gl.Mode.smallLabel ? Colors.black : Colors.white,
+                                            fontSize: gl.eqPx * gl.fontSizeXS,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                if (!gl.Mode.smallLabel)
-                                  lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  width: gl.eqPx * 15,
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Text(
-                                      gl.selLay.geometries[i].attributes[j].value.toString(),
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: gl.Mode.smallLabel ? Colors.black : Colors.white,
-                                        fontSize: gl.eqPx * gl.fontSizeXS,
-                                      ),
-                                    ),
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
+                              )
+                              : SizedBox();
                         }),
                   ),
                 ),

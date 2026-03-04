@@ -191,6 +191,8 @@ class Display {
   double get eqlignBottom => -paddingBot / equipixel + equiheight / 2;
 
   double get eqMaxWindowHeight => (height - 2 * math.max(paddingTop, paddingBot)) / equipixel;
+  double get maxWinPaddingHeight =>
+      eqMaxWindowHeight * eqPx - insetBot > 0 ? eqMaxWindowHeight * eqPx - insetBot : eqPx;
 
   Display(BuildContext context) {
     paddingTop = MediaQuery.of(context).padding.top;
@@ -211,6 +213,8 @@ class Display {
       minEquiPixelsDisplayPortraitHeight = minEquiPixelsDisplayPortraitWidth * .8;
     }
   }
+
+  set context(BuildContext context) => dsp = Display(context);
 
   void _tabletMode() {
     if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
