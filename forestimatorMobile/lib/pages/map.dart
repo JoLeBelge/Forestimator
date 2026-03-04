@@ -332,11 +332,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             if (!e) return;
                             _mapControllerInit = true;
                             updateLocation();
-                            if (gl.selectedpathLayer > -1 && !gl.pathLayers[gl.selectedpathLayer].finished) {
-                              gl.pathLayers[gl.selectedpathLayer].addPosition(
-                                LatLng(position.center.latitude, position.center.longitude),
-                              );
-                            }
                             if (_modeMoveMeasurePath) {
                               _measurePath.removeAt(selectedMeasurePointToMove);
                               _measurePath.insert(
@@ -766,7 +761,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   color: Colors.white,
                                 ),
                                 expandedInsets: EdgeInsets.zero,
-                                textStyle: TextStyle(color: Colors.transparent, fontSize: 0),
+                                textStyle: TextStyle(color: Colors.transparent, fontSize: .01),
                                 menuStyle: MenuStyle(
                                   backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
                                     WidgetState.any: gl.backgroundTransparentBlackBox,
@@ -2159,9 +2154,9 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       gl.Mode.moveVertexesPolygon = false;
       gl.Mode.removeVertexesPolygon = false;
     });
-    if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
+    if (gl.geoReady && gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
       gl.selLay.removeGeometry(last: true);
-    } else if (gl.selGeo.type.contains("Polygon") && gl.selGeo.points.length < 3) {
+    } else if (gl.geoReady &&  gl.selGeo.type.contains("Polygon") && gl.selGeo.points.length < 3) {
       gl.selLay.removeGeometry(last: true);
     }
   }
