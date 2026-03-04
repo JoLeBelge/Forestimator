@@ -400,7 +400,7 @@ void popupForestimatorMessage({
       width,
       duration,
     ),
-    duration ?? Duration(milliseconds: 300),
+    duration ?? Duration(milliseconds: 400),
     gl.Anim.onScreenPosCenter,
     gl.Anim.offScreenPosWindows,
   );
@@ -662,7 +662,7 @@ class PopupForestimatorWindow extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (!big)
+                if (!big && gl.dsp.insetBot < 1)
                   Column(
                     children: [
                       Row(
@@ -707,9 +707,7 @@ class PopupForestimatorWindow extends StatelessWidget {
                   alignment: AlignmentGeometry.xy(0, 0),
                   children: [
                     pdfChild ??
-                        lt.ForestimatorScrollView(
-                          height: cHeight - gl.eqPx * 17,
-                          width: cWidth - gl.eqPx * 5,
+                        SingleChildScrollView(
                           child:
                               child ??
                               Text(
@@ -1767,7 +1765,7 @@ class GeoLayerListMenu extends StatefulWidget {
   State<StatefulWidget> createState() => _GeoLayerListMenu();
 }
 
-class _GeoLayerListMenu extends State<GeoLayerListMenu> {
+class _GeoLayerListMenu extends State<GeoLayerListMenu>with WidgetsBindingObserver{
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
   final ScrollController _controller = ScrollController();
@@ -1777,7 +1775,8 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
   bool _titleLayer = true;
 
   void _scrollDown() {
-    _controller.animateTo(
+   if( mounted) {
+     _controller.animateTo(
       _controller.position.maxScrollExtent +
           (gl.dsp.orientation == Orientation.portrait
               ? gl.eqPx * gl.polyListSelectedCardHeight
@@ -1785,10 +1784,27 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
       duration: Duration(seconds: 1),
       curve: Curves.fastOutSlowIn,
     );
+   }
+  }
+ @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    setState(() {
+      gl.dsp.insetBot = MediaQuery.of(context).viewInsets.bottom;  
+    });
+    gl.refreshStack(() {
+      gl.dsp.insetBot = MediaQuery.of(context).viewInsets.bottom;  
+    });
+  }  
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pageController.dispose();
     super.dispose();
   }
@@ -1800,19 +1816,10 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
         gl.eqPx *
         (widget.windowHeight -
             (gl.fontSizeXL * 1.2) -
-            gl.popupReturnButtonHeight -
-            (gl.polyNewPolygonButtonHeight * .9) -
+            (gl.polyNewPolygonButtonHeight * .9)-
             2.5 - //lt.stroke
-            10);
-    if (!_titleLayer) {
-      listPartHeight =
-          gl.eqPx *
-          (widget.windowHeight -
-              (gl.fontSizeXL * 1.2) -
-              2.5 - //lt.stroke
-              10);
-    }
-    return Card(
+            10) -gl.dsp.insetBot;
+    return OrientationBuilder(builder: (c, o){return Card(
       color: gl.backgroundTransparentBlackBox,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -2113,7 +2120,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                 ),
                 onPressed: () {
                   PopupNewGeometricLayer(context, (String type, String name, Color color) {
-                    if (mounted) {
+                   if (mounted) {
                       setState(() {
                         switch (type) {
                           case "Point":
@@ -2151,7 +2158,8 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
         ),
       ),
     );
-  }
+  });}
+    
 }
 
 class LayerPropertiesPage extends StatefulWidget {
@@ -3745,7 +3753,9 @@ class _SearchResultCard extends State<SearchResultCard> {
   @override
   Widget build(BuildContext context) {
     bool selected = _selectedSearchResultCard == widget.index ? true : false;
-    return TextButton(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [ TextButton(
       onPressed: () {
         widget.state(widget.entry);
         gl.refreshStack(() {
@@ -3817,7 +3827,7 @@ class _SearchResultCard extends State<SearchResultCard> {
           ],
         ),
       ),
-    );
+    ),]);
   }
 }
 
@@ -3830,7 +3840,7 @@ class SearchMenu extends StatefulWidget {
   State<StatefulWidget> createState() => _SearchMenu();
 }
 
-class _SearchMenu extends State<SearchMenu> {
+class _SearchMenu extends State<SearchMenu> with WidgetsBindingObserver {
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
   final Duration animationDuration = Duration(seconds: 1);
@@ -3840,22 +3850,44 @@ class _SearchMenu extends State<SearchMenu> {
   static List<SearchResultCard> searchResults = [];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    setState(() {
+      gl.dsp.insetBot = MediaQuery.of(context).viewInsets.bottom;  
+    });
+    gl.refreshStack(() {
+      gl.dsp.insetBot = MediaQuery.of(context).viewInsets.bottom;  
+    });
+  }  
+ 
+  @override
+  void dispose() {  
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (c, o) {
         return AnimatedContainer(
+          alignment: Alignment.center,
           duration: Duration(milliseconds: 100),
           width:
               gl.dsp.orientation == Orientation.portrait
                   ? gl.eqPx * gl.popupWindowsPortraitWidth
                   : gl.eqPx * gl.popupWindowsLandscapeWidth,
-          height:
-              gl.dsp.orientation == Orientation.portrait
-                  ? (gl.eqPx * gl.popupWindowsPortraitHeight + 1) - gl.dsp.insetBot
-                  : gl.eqPx * gl.popupWindowsLandscapeHeight - gl.dsp.insetBot,
+          height: (gl.eqPx * (gl.dsp.eqMaxWindowHeight - 20)) - gl.dsp.insetBot,
           child: switchRowColWithOrientation([
             if (gl.dsp.orientation == Orientation.landscape)
               Container(
+                alignment: Alignment.center,
                 constraints: BoxConstraints(
                   maxHeight: (gl.popupWindowsLandscapeHeight - 5) * gl.eqPx - gl.dsp.insetBot,
                   maxWidth: gl.popupWindowsPortraitWidth * gl.eqPx,
@@ -3865,7 +3897,7 @@ class _SearchMenu extends State<SearchMenu> {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
+                Row(mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
                       height: gl.eqPx * gl.searchBarHeight,
@@ -3880,6 +3912,7 @@ class _SearchMenu extends State<SearchMenu> {
                           autocorrect: false,
                           initialValue: lastSearchKey,
                           onChanged: (searchString) async {
+                            gl.refreshStack((){});
                             if (searchString.length < 2) {
                               return;
                             }
@@ -4014,12 +4047,11 @@ class _SearchMenu extends State<SearchMenu> {
               ],
             ),
             if (gl.dsp.orientation == Orientation.portrait)
-              SizedBox(
+              Container(
+                 alignment: Alignment.center,
                 height:
                     (gl.popupWindowsPortraitHeight -
-                            gl.searchBarHeight -
-                            gl.fontSizeL * 1.1 -
-                            gl.popupReturnButtonHeight) *
+                            gl.searchBarHeight) *
                         gl.eqPx -
                     gl.dsp.insetBot,
                 child: ListView(children: <Widget>[] + searchResults),
@@ -5502,7 +5534,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
   }
 }
 
-class OnlineMapMenu extends StatefulWidget {
+class OnlineMapMenu extends StatefulWidget with WidgetsBindingObserver {
   final VoidSetter? stateOfLayerSwitcher;
   final bool offlineMode;
   final int selectionMode;
@@ -5521,7 +5553,7 @@ class OnlineMapMenu extends StatefulWidget {
   State<StatefulWidget> createState() => _OnlineMapMenu();
 }
 
-class _OnlineMapMenu extends State<OnlineMapMenu> {
+class _OnlineMapMenu extends State<OnlineMapMenu>  with WidgetsBindingObserver {
   static bool modified = false;
   static int selectedCategory = -1;
   static int selectedMap = -1;
@@ -5542,6 +5574,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     modified = false;
     if (!"123".contains(widget.selectedMapCode)) {
       selectedCategory = -1;
@@ -5585,6 +5618,24 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
     }
   }
 
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    setState(() {
+      gl.dsp.insetBot = MediaQuery.of(context).viewInsets.bottom;  
+    });
+    gl.refreshStack(() {
+      gl.dsp.insetBot = MediaQuery.of(context).viewInsets.bottom;  
+    });
+  }
+
+  @override
+  void dispose() {  
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   static void resetSelected(bool category, bool layer) {
     if (category) selectedCategory = -1;
     if (layer) selectedMap = -1;
@@ -5611,15 +5662,13 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
     };
     return OrientationBuilder(
       builder: (c, o) {
+        double cHeight = (gl.dsp.eqMaxWindowHeight - 20)* gl.eqPx - gl.dsp.insetBot;
         return SizedBox(
           width:
               gl.dsp.orientation == Orientation.portrait
                   ? gl.eqPx * gl.popupWindowsPortraitWidth
                   : gl.eqPx * gl.popupWindowsLandscapeWidth,
-          height:
-              gl.dsp.orientation == Orientation.portrait
-                  ? gl.eqPx * gl.popupWindowsPortraitHeight
-                  : gl.eqPx * gl.popupWindowsLandscapeHeight,
+          height: cHeight,
           child: switchRowColWithOrientation([
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -5700,9 +5749,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
 
                 SizedBox(
                   height:
-                      gl.dsp.orientation == Orientation.portrait
-                          ? (gl.popupWindowsPortraitHeight - gl.searchBarHeight - gl.popupReturnButtonHeight) * gl.eqPx
-                          : (gl.popupWindowsLandscapeHeight - gl.searchBarHeight) * gl.eqPx,
+                    cHeight - gl.searchBarHeight * gl.eqPx,
+
                   width: gl.popupWindowsPortraitWidth * gl.eqPx,
                   child:
                       _showCatalogue
@@ -6357,16 +6405,16 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                       SizedBox(
                         width: gl.eqPx * gl.layerswitcherBoxWidth,
                         height:
-                            (gl.poiMarkerList.isNotEmpty && gl.selLay.geometries.isNotEmpty
+                            (gl.poiMarkerList.isNotEmpty && (gl.layerReady && gl.selLay.geometries.isNotEmpty)
                                 ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
+                                : (gl.poiMarkerList.isNotEmpty || (gl.layerReady && gl.selLay.geometries.isNotEmpty)
                                     ? gl.layerswitcherControlBoxHeight
                                     : 0.0)) *
                             gl.eqPx,
                         child: Column(
                           children: [
                             SizedBox(
-                              width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                              width: gl.eqPx * gl.layerswitcherBoxWidth,
                               height: gl.eqPx * gl.fontSizeL,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
