@@ -446,8 +446,12 @@ class PopupForestimatorMessage extends StatelessWidget {
       builder: (c, o) {
         double cWidth = width ?? gl.eqPx * 70;
         double cHeight = height ?? gl.eqPx * 65;
-        if (cHeight > 100 * gl.eqPx && gl.dsp.orientation.name != "portrait") cHeight = gl.eqPx * 95;
-        if (cHeight > 100 * gl.eqPx && gl.dsp.orientation.name == "portrait") cHeight -= gl.dsp.insetBot;
+        if (cHeight > 100 * gl.eqPx && gl.dsp.orientation.name != "portrait") {
+          cHeight = gl.eqPx * 95;
+        }
+        if (cHeight > 100 * gl.eqPx && gl.dsp.orientation.name == "portrait") {
+          cHeight -= gl.dsp.insetBot;
+        }
         return Card(
           margin: EdgeInsetsGeometry.zero,
           shape: RoundedRectangleBorder(
@@ -3902,7 +3906,10 @@ class _SearchMenu extends State<SearchMenu> with WidgetsBindingObserver {
               gl.dsp.orientation == Orientation.portrait
                   ? gl.eqPx * gl.popupWindowsPortraitWidth
                   : gl.eqPx * gl.popupWindowsLandscapeWidth,
-          height: (gl.eqPx * (gl.dsp.eqMaxWindowHeight - 20)) - gl.dsp.insetBot,
+          height:
+              gl.dsp.orientation == Orientation.portrait
+                  ? (gl.eqPx * gl.popupWindowsPortraitHeight + 1) - gl.dsp.insetBot
+                  : gl.eqPx * gl.popupWindowsLandscapeHeight - gl.dsp.insetBot,
           child: switchRowColWithOrientation([
             if (gl.dsp.orientation == Orientation.landscape)
               Container(
@@ -6419,9 +6426,9 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                       SizedBox(
                         width: gl.eqPx * gl.layerswitcherBoxWidth,
                         height:
-                            (gl.poiMarkerList.isNotEmpty && (gl.layerReady && gl.selLay.geometries.isNotEmpty)
+                            (gl.poiMarkerList.isNotEmpty && gl.selLay.geometries.isNotEmpty
                                 ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                : (gl.poiMarkerList.isNotEmpty || (gl.layerReady && gl.selLay.geometries.isNotEmpty)
+                                : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
                                     ? gl.layerswitcherControlBoxHeight
                                     : 0.0)) *
                             gl.eqPx,
@@ -7380,7 +7387,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                       SizedBox(
                         width: gl.eqPx * 80,
                         child: Text(
-                          "Saufgardez l'analyse comme pdf",
+                          "Sauvegardez l'analyse comme pdf",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.black,
@@ -7544,7 +7551,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
   void popupPdfSaveDialog(void Function(String, String) onAccept) {
     popupForestimatorMessage(
       id: "davepdf",
-      title: "Saufgardez un pdf",
+      title: "Sauvegardez un pdf",
       messageAccept: "Enregistrer",
       messageDecline: "Annuler",
       onAccept: () {

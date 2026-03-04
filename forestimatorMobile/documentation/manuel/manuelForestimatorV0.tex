@@ -76,30 +76,36 @@
 	
 \newglossaryentry{guideStation}
 {name={guide des stations},
-	description={Un guide des stations se présente sous la forme d'un éventail de types de station représentatifs de l'ensemble des contextes forestiers existant au sein d’une région forestière donnée. Il s’appuie sur une typologie des stations établie de manière scientifique, basée sur des critères géomorphologiques et pédologiques relativement pointus, aussi appelée catalogue des stations.}}
+	description={Un guide des stations se présente sous la forme d'un éventail de types de station représentatifs de l'ensemble des contextes forestiers existant au sein d’une région forestière donnée. Il s’appuie sur une typologie des stations établie de manière scientifique, basée sur des critères géomorphologiques et pédologiques relativement pointus, aussi appelée catalogue des stations}}
 
 \newglossaryentry{FEE}
 {name={fichier écologique des essences},
-	description={Véritable couteaux suisse de la gestion forestière, cette boite à outils regroupe la description de l'autécologie des essences (fiche-essence) et une grille d'analyse des conditions environnementales (écogramme) qui sont classés en régime hydrique, trophique et climatique.}}
+	description={Véritable couteaux suisse de la gestion forestière, cette boite à outils regroupe la description de l'autécologie des essences (fiche-essence) et une grille d'analyse des conditions environnementales (écogramme) qui sont classés en régime hydrique, trophique et climatique}}
 
 	
 \newglossaryentry{polygones}
 {
 	name={polygone},
-	description={se refère à la géométrie permettant de délimiter une surface représentant une parcelle forestière ou une entitée adminisatrive.}
+	description={se refère à la géométrie permettant de délimiter une surface représentant une parcelle forestière ou une entitée adminisatrive},
 	plural={polygones}
+}
+
+\newglossaryentry{layer}
+{
+	name={layer},
+	description={couches cartographiques permettant à l'utilisateur d'encoder des points ou des polygones. La dénomination technique exacte, évitée dans ce document par souci de simplicité, est textit{couche vectorielle}}
 }
 
 \newglossaryentry{online}
 {
 	name={mode en ligne},
-	description={Forestimator Mobile fonctionne avec une connexion internet qui lui permet l'affichage des cartes, la réalisation des recherche de lieux et les analyses ponctuelles et surfacique.}
+	description={Forestimator Mobile fonctionne avec une connexion internet qui lui permet l'affichage des cartes, la réalisation des recherche de lieux et les analyses ponctuelles et surfacique}
 }
 
 \newglossaryentry{offline}
 {
 	name={mode hors ligne},
-	description={Forestimator Mobile fonctionne sans aucune connexion internet. Ce mode est très utile pour travailler sur le terrain dans des zones non couvertes par le réseaux de télécommunication. Les cartes affichées sont toutes préalablement téléchargées et sauvées sur le smartphone. La réalisation d'analyses ponctuelles est réalisée exclusivement avec ces couches cartographiques sauvées localement.}
+	description={Forestimator Mobile fonctionne sans aucune connexion internet. Ce mode est très utile pour travailler sur le terrain dans des zones non couvertes par le réseaux de télécommunication. Les cartes affichées sont toutes préalablement téléchargées et sauvées sur le smartphone. La réalisation d'analyses ponctuelles est réalisée exclusivement avec ces couches cartographiques sauvées localement}
 }
 
 \newglossaryentry{station}
@@ -107,53 +113,54 @@
 	name={station forestière},
 	description={Une étendue de terrain de superficie variable, homogène dans ses conditions
 		physiques et biologiques : climat, topographie, sol, composition floristique et structure de la
-		végétation spontanée.},
+		végétation spontanée},
 	plural={stations forestières}
 }
 
 \newglossaryentry{couche}
 {
 	name={couche cartographique},
-	description={Une information spatialisée couvrant un territoire définis (ex: Wallonie) et stoqué sous format numérique. Par abus de language, une couche cartographique est également désigné par le terme plus courant de \textbf{carte}, même si cette terminologie fait référence à l'impression sous format papier d'une couche cartographique.}
-	firstplural={couches cartographiques}
-	%firstplural={\glsentrydesc{LED}s (\glsentryplural{LED})}
+	description={Une information spatialisée couvrant un territoire définis (ex: Wallonie) et stoqué sous format numérique. Par abus de language, une couche cartographique est également désigné par le terme plus courant de \textbf{carte}, même si cette terminologie fait référence à l'impression sous format papier d'une couche cartographique},
+	plural={couches cartographiques}
 }
 
 
 \newglossaryentry{catalogue}
 {
 	name={catalogue des couches},
-	description={L'ensemble des couches cartographiques qui sont classées par thématiques (\textbf{conditions stationnelles}, \textbf{peuplements forestiers}). Il existe une version en ligne du catalogue, ainsi qu'une version hors ligne si certaines couches ont été précédemment téléchargées pour un usage sans connexion internet.}
+	description={L'ensemble des couches cartographiques qui sont classées par thématiques (\textbf{conditions stationnelles}, \textbf{peuplements forestiers}, \textit{etc}.). Il existe une version en ligne du catalogue, ainsi qu'une version hors ligne si certaines couches ont été précédemment téléchargées pour un usage sans connexion internet}
 }
 
 \newglossaryentry{analysePt}
 {
 	name={analyse ponctuelle},
-	description={L'affichage pour une position donnée de la valeur d'une couche cartographique ou d'un ensemble de couches cartographiques, permettant dans ce dernier cas de dresser un bilan global de la situation pour cette position : type de station, composition du peuplement, caractérisation dendrométrique}
+	description={L'affichage pour une position donnée de la valeur d'une couche cartographique ou d'un ensemble de couches cartographiques, permettant dans ce dernier cas de dresser un bilan global de la situation pour cette position : type de station, composition du peuplement, caractérisation dendrométrique},
+	plural={analyses ponctuelles},
 }
 
 \newglossaryentry{analyseSurf}
 {
 	name={analyse surfacique},
-	description={Le calcul et l'affichage, pour surface définie au moyen d'un polygone, des valeurs d'une ou de plusieurs couches cartographiques. La proportion de surface pour chaque valeurs est également renseigné, par exemple pour l'aptitude du Hêtre ; 70\% de la surface en Optimum, 30 \% de la surface en Tolérance élargie.}
+	description={Le calcul et l'affichage, pour surface définie au moyen d'un polygone, des valeurs d'une ou de plusieurs couches cartographiques. La proportion de surface pour chaque valeurs est également renseigné, par exemple pour l'aptitude du Hêtre ; 70\% de la surface en Optimum, 30 \% de la surface en Tolérance élargie},
+	plural={analyses surfaciques},
 }
 
 \newglossaryentry{ForestimatorM}
 {
 	name={Forestimator Mobile},
-	description={L'application smartphone ou tablette de Forestimator, distribuée par l'app store pour IOS et par le play store pour Android. Disponible depuis 2025.}
+	description={L'application smartphone ou tablette de Forestimator, distribuée par l'app store pour IOS et par le play store pour Android. Disponible depuis 2025}
 }
 
 \newglossaryentry{ForestimatorWeb}
 {
 	name={Forestimator Web},
-	description={Le portail cartographique web Forestimator, utilisé depuis un ordinateur via un navigateur web, en fonctionnement depuis 2021.}
+	description={Le portail cartographique web Forestimator, utilisé depuis un ordinateur via un navigateur web, en fonctionnement depuis 2021}
 }
 
 \newglossaryentry{coucheDendro}
 {
 	name={couches dendrométriques},
-	description={L'estimation des dimensions des arbres (diamètre, hauteur, volume, circonférence) et des peuplements pour évaluer leur volume de bois a bénéficié des développements technologiques des outils de télédétection (acquisition aéroportée LiDAR, suivi de la végétation par prise de vue satellitaire multispectrale) et de la puissance des algorithmes d'intelligence artificielle, en particulier ceux fonctionnant au départ d'image. Dans le catalogue de forestimator, une série de couches ont trait aux caractéristiques dendrométriques des peuplements tels qu'ils se présentaient en 2021 : nombre de tige à l'hectare (Nha), surface terrière (Gha), volume de bois à l'hectare (Vha), circonférence et hauteur dominante (Cdom et Hdom) et proportion de feuillus.}
+	description={L'estimation des dimensions des arbres (diamètre, hauteur, volume, circonférence) et des peuplements pour évaluer leur volume de bois a bénéficié des développements technologiques des outils de télédétection (acquisition aéroportée LiDAR, suivi de la végétation par prise de vue satellitaire multispectrale) et de la puissance des algorithmes d'intelligence artificielle, en particulier ceux fonctionnant au départ d'image. Dans le catalogue de forestimator, une série de couches ont trait aux caractéristiques dendrométriques des peuplements tels qu'ils se présentaient en 2021 : nombre de tige à l'hectare (Nha), surface terrière (Gha), volume de bois à l'hectare (Vha), circonférence et hauteur dominante (Cdom et Hdom) et proportion de feuillus}
 }
 
 
@@ -178,7 +185,7 @@
 \chapter{Manuel d'utilisation de Forestimator Mobile}
 
 \section{Introduction}
-Forestimator est un portail cartographique regroupant une série de \glspl{couche}\footnote{en anglais \textit{layers}. Nous désignerons également ces couches par le terme \textbf{carte}, bien que cette terminologie soit à l'origine réservée à la version papier d'une couche cartographique.}  dédiées à la description des forêts et des conditions environnementales en Wallonie. Il permet aux utilisateurs de visualiser des cartes, d'effectuer des analyses sur des surfaces ou simplement pour une position spécifique. Pour plus d'informations, consultez la documentation officielle : \url{https://forestimator.gembloux.ulg.ac.be/documentation/} ainsi que l'article de présentation de Forestimator Web \citep{lisein_forestimator_2022}.
+Forestimator est un portail cartographique regroupant une série de \glspl{couche}\footnote{en anglais \textit{layers}. Nous désignerons également ces couches par le terme \textbf{carte}, bien que cette terminologie soit à l'origine réservée à la version papier d'une couche cartographique.}  dédiées à la description des forêts et des conditions environnementales en Wallonie. Il permet aux utilisateurs de visualiser des cartes, d'effectuer des analyses sur des surfaces ou simplement pour une position spécifique. Forestimator Mobile permet également de réaliser des observations sur le terrain sous forme de points ou de surfaces accompagnés d'annotations. Pour plus d'informations, consultez la documentation officielle : \url{https://forestimator.gembloux.ulg.ac.be/documentation/} ainsi que l'article de présentation de Forestimator Web \citep{lisein_forestimator_2022}.
 
 Il existe une version web et une application mobile de Forestimator. La version web s'utilise au bureau via un ordinateur, alors que Forestimator Mobile est conçu aussi bien au bureau que sur le terrain. Ce manuel est dédié à \gls{ForestimatorM}, disponible sur Android et iOS. La première partie de ce document illustre le fonctionnement de Forestimator Mobile. A la fin de la première partie se trouve un glossaire, qui permet de définir le vocabulaire technique utilisé (voir \ref{ref:glossaire}). Les termes définit de manière vulgarisée font référence aux concepts sous-jacents la description cartographique des forêts et à l'interface graphique de Forestimator Mobile. Dans la deuxième partie du document, une mise en pratique plus complète est illustrée au moyen d'exercices.
 
@@ -208,7 +215,7 @@ La description des \glspl{station} et des peuplements forestiers découle de pro
 \section{Présentation globale}
 
 \subsection{Permissions}
-Lors de la toute première utilisation, l'application demandera des permissions. Celles-ci ne sont jamais nécessaires pour le fonctionnement de l'application, mais certaines tâches spécifiques ne peuvent être réalisées sans elles.
+Lors de la toute première utilisation, les permissions nécessaires au bon fonctionnement de l'application feront l'objet d'une demande. Celles-ci ne sont pas strictement nécessaires au fonctionnement de l'application, mais certaines tâches spécifiques ne peuvent être réalisées sans elles.
 
 \begin{figure}[H]
     \centering
@@ -234,24 +241,25 @@ Lors du démarrage de l'application, vous verrez l'écran principal avec la cart
 En bas de l'écran, vous trouverez la barre de menu principale qui est constituée de trois éléments :
 \begin{itemize}
     \item \textbf{À gauche :} \includegraphics[width=0.05\textwidth]{icons/tree.png} (icône d'arbre) pour ouvrir le menu des outils de géolocalisation. La géolocalisation est effectuée soit au moyen du GPS de votre smartphone, soit au moyen de recherche d'un lieu via son appellation.
-    \item \textbf{Au centre :} \includegraphics[width=0.05\textwidth]{icons/hexagon.png} (icône d'hexagone) pour ouvrir le menu des polygones. Ces \glspl{polygones} représentent des surfaces de sols qui sont associés à une parcelle forestière ou à une parcelle cadastrale.
+    \item \textbf{Au centre :} \includegraphics[width=0.05\textwidth]{icons/hexagon.png} (icône d'hexagone) pour ouvrir le menu des points et polygones de l'utilisateur. Les \glspl{polygones} représentent des surfaces de sols qui sont associés à une parcelle forestière ou à une parcelle cadastrale.
     \item \textbf{À droite :} \includegraphics[width=0.05\textwidth]{icons/eye.png} (icône d'œil) pour ouvrir le sélecteur de couches qui permet d'accéder au \textbf{\gls{catalogue}}.
 \end{itemize}
 
 \subsection{Barre de menu supérieure}
 En haut de l'écran, vous trouverez :
 \begin{itemize}
-    \item \textbf{À gauche :} \includegraphics[width=0.05\textwidth]{icons/settings.png} (icône de paramètres) pour accéder aux réglages globaux et aux informations relatifs à l'application.
-    \item \textbf{Au centre :} Dans la bannière se trouve l'intitulé \og Forestimator online \fg{} qui permet de basculer entre les modes en ligne et hors ligne. Le \gls{offline} est une utilisation sans connexion à internet pour un usage dans un territoire non couvert par un réseau mobile\footnote{zones blanches, comme par exemple dans certains vallons forestiers}
+    \item \textbf{À gauche :} \includegraphics[width=0.05\textwidth]{icons/settings.png} (icône de paramètres) pour accéder aux réglages globaux et aux informations relatives à l'application.
+    \item \textbf{Au centre :} Dans la bannière se trouve l'intitulé \og Forestimator en ligne \fg{} qui permet de basculer entre les modes en ligne et hors ligne. Le \gls{offline} est une utilisation sans connexion à internet pour un usage dans un territoire non couvert par un réseau mobile\footnote{zones blanches, comme par exemple dans certains vallons forestiers}
 \end{itemize}
 
 \subsection{Paramètres}
 
-Dans les paramètres, vous pouvez modifier les permissions accordées et consulter les informations relatives à l'application. Les différentes sections reprises dans les paramètres sont les suivantes :
+Dans les paramètres, vous pouvez modifier les permissions accordées à l'application et consulter diverses informations. Les différentes sections reprises dans les paramètres sont les suivantes :
 \begin{itemize}
 	\item \textbf{Permissions :} Consultez et modifiez les permissions accordées.
+	\item \textbf{Données Utilisateur :} Votre nom, prénom et adresse email qui sont nécessaire si vous souhaitez participer à la l'observation collaborative des différentes essences forestières en Wallonie dans le but d'améliorer les cartes de composition.
 	\item \textbf{À propos :} Indique la version de Forestimator et les informations sur le financement.
-	\item \textbf{Contact :} Adresse du site web principal et l'adresse email pour poser des questions ou signaler des bugs.
+	\item \textbf{Contact :} Adresse du site web principal et l'adresse email pour poser des questions et signaler des bugs.
 	\item \textbf{Confidentialité :} Informations sur l'utilisation des données à caractère personnel.
 \end{itemize}
 
@@ -268,7 +276,7 @@ Dans les paramètres, vous pouvez modifier les permissions accordées et consult
 
 Le sélecteur de couches est l'équivalent du panneau des calques dans les autres logiciels de dessin ou de cartographie (QGIS, illustrator). Il permet d'accéder à toutes les couches du projets, d'en modifier la visibilité et de contrôler leur ordre d'affichage. L'accès au \gls{catalogue} se fait également via le sélecteur de couches.
 
-Appuyez sur l'icône \includegraphics[width=0.05\textwidth]{icons/eye.png} de la barre de menu inférieur pour ouvrir le sélecteur de couche. Le sélecteur de couches est organisé en trois parties. La première en haut permet de contrôler la visibilité des couches de points et de polygones. La deuxième permet l'affichage de un à trois couche(s) thématique(s), et la troisième partie en bas permet un accès direct aux catalogues.
+Appuyez sur l'icône \includegraphics[width=0.05\textwidth]{icons/eye.png} de la barre de menu inférieur pour ouvrir le sélecteur de couche. Ce même bouton permet de cacher la fenêtre du sélecteur à l'issue du choix de la carte à afficher. Le sélecteur de couches est organisé en trois parties. La première en haut permet de contrôler la visibilité des couches de points et de polygones. La deuxième permet l'affichage de un à trois couche(s) thématique(s), et la troisième partie en bas permet un accès direct aux catalogues.
 
 \begin{figure}[H]
 	\centering
@@ -277,7 +285,7 @@ Appuyez sur l'icône \includegraphics[width=0.05\textwidth]{icons/eye.png} de la
 \end{figure}
 
 \subsection{Visibilité des couches de points et polygones}
-Dans la partie supérieure du sélecteur, vous pouvez contrôler la visibilité des marqueurs de localisation résultant de la recherche de lieu sur base de leur nom, ainsi que la visibilité des polygones délimitant vos parcelles forestières.
+Dans la partie supérieure du sélecteur, vous pouvez contrôler la visibilité des marqueurs de localisation résultant de la recherche de lieu sur base de leur nom, ainsi que la visibilité de couches de points ou de polygones délimitant vos parcelles forestières.
 
 \subsection{Sélection des couches thématiques}
 Au milieu du sélecteur sont disposés trois encarts permettant de sélectionner autant de couches thématiques. L'affichage de ces trois couches est réalisée de haut en bas, le contenu de la deuxième et troisième couches peut donc être partiellement caché par la première couche. Vous pouvez régler une transparence de 50\% pour cette première couche, de manière à distinguer le contenu des deux autres couches thématique.
@@ -298,8 +306,10 @@ Dans la partie inférieure, vous pouvez accéder aux catalogues :
 
 \begin{instructionbox}{Sélectionner une couche thématique depuis un des trois encarts du sélecteur}
 \begin{enumerate}
-    \item Appuyez sur un des trois encarts présent dans le sélecteur de couche. Si aucune carte n'est précédemment sélectionnée, un seul encart est présent dans lequel vous pouvez lire \og Appuyez ici pour ajouter une couche du catalogue \fg.
+    \item Appuyez sur un des trois encarts présents dans le sélecteur de couche.
+     \includegraphics[width=0.4\textwidth]{selecteur2.png}
     \item Le catalogue s'affiche et vous permet de naviguer parmi les différentes couches thématiques. Si vous appuyez sur l'icône \includegraphics[width=0.05\textwidth]{icons/layers.png}, vous pouvez sélectionner cette couche spécifique. Un cercle vert avec un numéro de 1 à 3 apparaît alors à la place de l'icône. Ce numéro représente l'ordre d'affichage de la couche.
+    \includegraphics[width=0.4\textwidth]{encartCouche2.png}
 \end{enumerate}
 \end{instructionbox}
 
@@ -307,7 +317,8 @@ Dans la partie inférieure, vous pouvez accéder aux catalogues :
 \begin{enumerate}
     \item Ouvrez le sélecteur de couches.
     \item Appuyez sur le bouton \includegraphics[width=0.05\textwidth]{icons/layers.png} pour ouvrir le catalogue online.
-    \item Sur l'enacart d'une couche, appuyez sur l'icône \includegraphics[width=0.05\textwidth]{icons/layers.png} pour la sélectionner.
+    \item Sur l'encart d'une couche, appuyez sur l'icône \includegraphics[width=0.05\textwidth]{icons/layers.png} pour la sélectionner.
+    \includegraphics[width=0.4\textwidth]{encartCouche.png}
     \item Après avoir appuyé, un cercle vert avec un numéro apparaît, indiquant dans quel emplacement de couche se trouve la couche dans le sélecteur.
     \item Vous pouvez sélectionner jusqu'à trois couches. La dernière que vous avez sélectionnée sera toujours à la première position dans le sélecteur.
 \end{enumerate}
@@ -317,7 +328,7 @@ Dans la partie inférieure, vous pouvez accéder aux catalogues :
 \begin{enumerate}
     \item Appuyez sur un des encart du sélecteur pour ouvrir le catalogue.
     \item Appuyez maintenant sur le cercle vert avec le numéro représentant la position de la couche pour désélectionner celle-ci.
-    \item Appuyez sur le bouton \textit{Fermer} pour cacher le catalogue.
+    \item Appuyez sur le bouton \includegraphics[width=0.05\textwidth]{icons/reduire.png} pour cacher le catalogue.
 \end{enumerate}
 \end{instructionbox}
 
@@ -333,9 +344,9 @@ Le \gls{catalogue} vous permet de parcourir toutes les couches disponibles. Le c
 \end{figure}
 
 \subsection{Description des catégories}
-Les couches cartographiques sont classées par catégories :
+Les \glspl{couche} sont classées par catégories :
 \begin{itemize}
-	\item \textbf{Cartes de référence} : les couches permettant de se repérer, tels que la carte topographique et les orthophotographies de la Région Wallonne.
+	\item \textbf{Cartes de référence} : les couches permettant de se repérer, tels que la carte topographique et les orthophotographies de la Région wallonne.
 	\vspace{0.5cm}
 	\item \textbf{Conditions stationnelles} : les couches de descriptions des \glspl{station} en liens avec le \gls{FEE}. Vous y trouverez les informations concernant le type de sol, le niveau hydrique et trophique ou encore la situation topographique des stations forestières. 
 	\vspace{0.5cm}
@@ -345,14 +356,16 @@ Les couches cartographiques sont classées par catégories :
 	\vspace{0.5cm}
 	\item \textbf{État sanitaire de la pessière} : cartographie du dépérissement initié par la crise des scolytes \citep{gilles_spatial_2024}.
 	\vspace{0.5cm}
-	\item \textbf{Adéquation des essences aux conditions stationnelles} :  carte d'aptitude du \gls{FEE}, une carte par espèce.
+	\item \textbf{Adéquation des essences aux conditions stationnelles} :  carte d'aptitude du \gls{FEE}, une carte pour chacune des essences forestières de production.
 	\vspace{0.5cm}
-	\item \textbf{Essences proposées par les guides des stations} : carte de vulnérabilité et de recommandation, une carte par espèce.
-	%\item Couches thématiques (catalogue de stations)
+	\item \textbf{Essences proposées par les guides des stations} : carte de vulnérabilité et de recommandation, une carte pour chacune des essences forestières de production.
 \end{itemize}
 
 \subsection{Description des symboles associés à une couche cartographique}
-En regardant de près l'encart d'une couche dans le catalogue, vous pouvez distinguer plusieurs petits symboles à gauche du nom de celle-ci. À droite se trouve soit un cercle avec un numéro (lorsque la couche est sélectionnée dans le sélecteur de couches), soit une icône \includegraphics[width=0.05\textwidth]{icons/layers.png}.
+En regardant de près l'encart d'une couche dans le catalogue, vous pouvez distinguer plusieurs petits symboles à gauche du nom de celle-ci. 
+\includegraphics[width=0.35\textwidth]{encartCouche3.png}
+
+À droite se trouve soit un cercle avec un numéro (lorsque la couche est sélectionnée dans le sélecteur de couches), soit une icône \includegraphics[width=0.05\textwidth]{icons/layers.png}.
 
 Les symboles localisés dans la partie gauche résument plusieurs caractéristiques qui sont plus amplement détaillées lorsque vous appuyez sur l'encart. Les caractéristiques d'une couche sont structurées de la manière suivante :
 \begin{itemize}
@@ -367,7 +380,7 @@ Les symboles localisés dans la partie gauche résument plusieurs caractéristiq
 \subsection{Consulter et modifier les options d'une couche}
 \begin{instructionbox}{Modifier les options d'une couche}
 	\begin{enumerate}
-		\item En appuyant sur l'encart d'une couche, vous avez accès à la description complète et vous pouvez modifier certaines propriétés : sélectionner la couche pour les analyses ponctuelles et surfacique, ou encore effectuer son téléchargement pour un usage en \gls{offline}.
+		\item En appuyant sur l'encart d'une couche, vous avez accès à sa description complète et vous pouvez modifier certaines propriétés : sélectionner la couche pour les analyses ponctuelles et surfacique, ou encore effectuer son téléchargement pour un usage en \gls{offline}.
 	\end{enumerate}
 \end{instructionbox}
 
@@ -395,74 +408,99 @@ Vous ouvrez le menu des outils de géolocalisation en appuyant sur l'icône \inc
 \begin{itemize}
 	\item \textbf{Icône GPS :} \includegraphics[width=0.05\textwidth]{icons/gps.png} Indique si votre téléphone mobile a accès à votre position. Si elle passe du gris au rouge, votre position a été déterminée. En appuyant dessus, l'écran se centre sur votre position GPS.
 	\item \textbf{Analyse ponctuelle :} \includegraphics[width=0.05\textwidth]{icons/analytics.png} Si votre position est visible dans l'emprise de la carte affichée, une icône supplémentaire apparaît. En appuyant dessus, vous obtenez une \textbf{analyse ponctuelle} pour votre position GPS. L'analyse ponctuelle est une description, pour une position donnée, du contenu de l'ensemble des couches cartographiques les plus intéressantes.
-	\item Le dernier symbole est une loupe \includegraphics[width=0.05\textwidth]{icons/search.png}. Elle permet de \textbf{rechercher une localisation} en Wallonie sur base d'un nom de lieu ou d'un mot clé. % Les résultats proviennent du serveur Nominatim d'OpenStreetMap.
+	\item Le dernier symbole est une loupe \includegraphics[width=0.05\textwidth]{icons/search2.png}. Elle permet de \textbf{rechercher une localisation} en Wallonie sur base d'un nom de lieu ou d'un mot clé. 
 \end{itemize}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.35\textwidth]{Recherche1.png}
-	\caption{Résultat de recherche d'un lieu sur base de son nom, exemple avec Gembloux}
+	\caption{Résultat de recherche d'un lieu sur base de son nom, exemple avec Gembloux. Des marqueurs de position sont ajouté à la carte pour les lieux recherchés.}
 \end{figure}
 
 
-\section{Menu des polygones}
+\section{Menu des points et polygones de l'utilisateur}
 
 
-Appuyez sur le symbole \includegraphics[width=0.05\textwidth]{icons/hexagon.png} (hexagone) de la barre de menu pour ouvrir le menu des \glspl{polygones}. La première fois, un encart apparaît en haut de l'écran avec le texte : \og Tappez ici pour ajouter un polygone \fg. Les polygones permettent de délimiter une surface de manière à la visualiser sur la carte de Forestimator et a y effectuer des analyses, par exemple dans le but de décrire les peuplements en place. Les polygones sont dessinés en ajoutant progressivement les points délimitant son périmètre. Ces points se nomment \textit{vertex} en anglais ou \textit{sommet} en français. Outre la géométrie des polygones, vous avez la possibilité de choisir un nom ainsi qu'une couleur de rendu.
+Appuyez sur le symbole \includegraphics[width=0.05\textwidth]{icons/hexagon.png} (hexagone) de la barre de menu pour ouvrir le menu permettant l'ajout de points et de \glspl{polygones}. Ces couches vectorielles sont renseignées sous le terme de \gls{layer}. Les polygones permettent de délimiter une surface de manière à la visualiser sur la carte de Forestimator et a y effectuer des analyses, par exemple dans le but de décrire les peuplements en place. Les polygones sont dessinés en ajoutant progressivement les points délimitant son périmètre (\textit{vertex} en anglais ou \textit{sommet} en français). En plus de la position des polygones ou des points d'intérêt, vous avez la possibilité de modifier le nom associé à chacune des entités, de choisir le symbole, la couleur de rendu et l'étiquette affichée sur la carte pour cette entité. 
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.35\textwidth]{PolygonMenu.png}
-	\caption{Menu des polygones.}
+	\includegraphics[width=0.6\textwidth]{PolygonMenu1.png}
+	\caption{Menu des points et polygones. A gauche la vue globale listant les différentes \glspl{layer}, à droite la vue compacte avec les outils permettant d'ajouter ou de modifier des entités pour une \gls{layer}. Utilisez les boutons \includegraphics[width=0.05\textwidth]{icons/hexagon.png} ou \includegraphics[width=0.05\textwidth]{icons/reduire.png} pour passer de la vue globale à la vue compacte.}
 \end{figure}
 
-\subsection{Procédure de création de polygone, d'ajout et d'édition de sommet}
-\begin{instructionbox}{Créer un nouveau polygone}
+\subsection{Procédure de création d'une layer de points et d'ajout d'entités}
+
+\begin{instructionbox}{Créer une nouvelle layer de points}
 	\begin{enumerate}
-		\item Appuyez sur le bouton \og +\fg.
-		\item Une boîte de dialogue s'ouvre. Donnez un nom court au nouveau polygone et appuyez sur \og OK \fg.
-		\item Un nouvel élément apparaît en haut de la liste des couches cartographiques de polygone. Les informations relative au polygone y sont affichées : le nom, sa surface et son périmètre.
-		\item Vous pouvez changer la couleur du polygone tel qu'il est représenté sur la carte au moyen de l'icône de couleur en haut à droite.
-		\item Vous pouvez supprimer le polygone en appuyant sur l'icone de corbeille. \includegraphics[width=0.05\textwidth]{icons/trashcan.png} à gauche.
-		\item Vous pouvez effectuer une analyse surfacique pour ce polygone. Cette analyse surfacique requiert une certaine puissance de calcul et est dès lors effectué sur un serveur de Gembloux Agro-Bio tech. Une connexion à internet est donc obligatoirement nécessaire pour cette opération.
-		\item Fermez la liste.
-		\item En haut, vous voyez maintenant un encart portant le nom de votre polygone. Appuyez sur le symbole de centrage pour centrer la vue sur le polygone.
+		\item Ouvrez la vue globale du menu des points/polygones en appuyant sur \includegraphics[width=0.05\textwidth]{icons/hexagon.png}.
+		\item Appuyez sur le bouton \og +\fg pour créer une nouvelle layer.
+		\item Une boîte de dialogue s'ouvre. Choisissez le type de géométrie (point), renseignez un nom pour la layer (ex. \textit{mes points}) et appuyez sur \og Créer \fg.
+		\includegraphics[width=0.4\textwidth]{createLayerPt.png}
+		\item Votre layer apparaît dans la liste la liste des couches cartographiques de points/polygones. 
+	\end{enumerate}
+\end{instructionbox}
+
+\begin{instructionbox}{Ajouter des points}
+	\begin{enumerate}
+		\item Passez en vue compacte du menu des points/polygones en appuyant sur \includegraphics[width=0.05\textwidth]{icons/hexagon.png} ou sur \includegraphics[width=0.05\textwidth]{icons/reduire.png}.
+		\item Appuyez sur le bouton \includegraphics[width=0.05\textwidth]{icons/add.png} pour ajouter des points.
+		\item La position au centre de la carte est matérialisée par le symbole \includegraphics[width=0.05\textwidth]{icons/target.png}.
+		\item Déplacez la carte pour positionner le centre sur votre position d'intérêt et cliquez sur \includegraphics[width=0.05\textwidth]{icons/add_entity.png} en bas à droite de la carte pour ajouter un point. 
+		\includegraphics[width=0.35\textwidth]{addEntityPt1.png}
+	\end{enumerate}
+\end{instructionbox}
+
+\begin{instructionbox}{Modifier le symbole d'un point }
+	\begin{enumerate}
+		\item Sélectionnez une entité point dans la layer de point (ex. l'entité numéro 4).
+		\includegraphics[width=0.35\textwidth]{symbolPt0.png}
+		\item Ouvrez le menu d'édition de la symbologie en appuyant sur le bouton \includegraphics[width=0.05\textwidth]{icons/symbology.png}.
+		\item Choisissez le symbole et la couleur de votre choix.
+		\includegraphics[width=0.6\textwidth]{symbolPt1.png}
+	\end{enumerate}
+\end{instructionbox}
+
+
+\subsection{Procédure de création d'une layer de polygones et d'ajout d'entités}
+
+\begin{instructionbox}{Créer une nouvelle layer de polygones}
+	\begin{enumerate}
+		\item Ouvrez la vue globale du menu des points/polygones en appuyant sur \includegraphics[width=0.05\textwidth]{icons/hexagon.png}.
+		\item Appuyez sur le bouton \og +\fg pour créer une nouvelle layer.
+		\item Une boîte de dialogue s'ouvre. Choisissez le type de géométrie (polygone), renseignez un nom pour la layer (ex. \textit{parcelles}) et appuyez sur \og Créer \fg.
+		\item Votre layer apparaît dans la liste la liste des couches cartographiques de points/polygones. 
 	\end{enumerate}
 \end{instructionbox}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.35\textwidth]{NewPoly1.png}
-	\caption{Nouveau polygone créé par l'utilisateur.}
+	\caption{Nouvelle couche de polygone créé par l'utilisateur.}
 \end{figure}
 
-\begin{instructionbox}{Ajouter des sommets/vertex}
+\begin{instructionbox}{Ajouter des polygones}
 	\begin{enumerate}
-		\item À gauche, un nouveau menu apparaît avec un \includegraphics[width=0.05\textwidth]{icons/add_circle.png}. Appuyez dessus pour ajouter des sommets en appuyant sur la carte.
-		\item Si vous appuyez sur au moins trois points, un triangle apparaît. L'un des trois côtés du triangle est représenté au moyen d'une ligne plus épaisse. C'est ce segment de droite qui sera divisée en deux par le prochain sommet que vous placerez sur la carte.
-		\item Pour changer le segment de droite à modifier, vous pouver appuyer sur un autre sommet.
+		\item Passez en vue compacte du menu des points/polygones en appuyant sur \includegraphics[width=0.05\textwidth]{icons/hexagon.png} ou sur \includegraphics[width=0.05\textwidth]{icons/reduire.png}.
+		\item Appuyez sur le bouton \includegraphics[width=0.05\textwidth]{icons/add.png} pour ajouter des polygones.
+		\item La position au centre de la carte est matérialisée par le symbole \includegraphics[width=0.05\textwidth]{icons/target.png}.
+		\item Déplacez la carte pour positionner le centre sur votre position d'intérêt et cliquez sur \includegraphics[width=0.05\textwidth]{icons/add_entity.png} en bas à droite de la carte pour dessiner le contour du polygone. 
+		\includegraphics[width=0.35\textwidth]{NewPoly3.png}
+		\item Une fois le contour dessiné, validez la géométrie du polygone en appuyant sur \includegraphics[width=0.05\textwidth]{icons/validGeom.png}.
 	\end{enumerate}
 \end{instructionbox}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.35\textwidth]{NewPoly4.png}
-	\caption{Ajout de sommets.}
-\end{figure}
-
-\begin{instructionbox}{Supprimer ou déplacer un sommet}
+\begin{instructionbox}{Editer la géométrie d'un polygone existant}
 	\begin{enumerate}
-		\item Une fois le polygone dessiné, appuyez sur un sommet. Le menu de gauche change : le \includegraphics[width=0.05\textwidth]{icons/add_circle.png} disparaît et un \includegraphics[width=0.05\textwidth]{icons/remove_circle.png} et une icône \includegraphics[width=0.05\textwidth]{icons/open_with.png} apparaissent.
-		\item Le \includegraphics[width=0.05\textwidth]{icons/remove_circle.png} permet de supprimer le sommet sélectionné.
-		\item L'icône \includegraphics[width=0.05\textwidth]{icons/open_with.png} permet de déplacer le sommet sélectionné. Après le déplacement, appuyez à nouveau sur l'icône de manière à finaliser l'édition.
+		\item Sélectionnez l'entité à modifier, puis appuyez sur le bouton d'édition de la géométrie 
+		 \includegraphics[width=0.05\textwidth]{icons/editGeom.png}.
+		 \includegraphics[width=0.7\textwidth]{editPoly.png}
+		\item Sélectionner un des \textit{sommets} délimitant le contour du polygone. Ce dernier apparaît dès lors en rouge. Utilisez les boutons \includegraphics[width=0.05\textwidth]{icons/move.png} ou \includegraphics[width=0.05\textwidth]{icons/remove.png} pour déplacer ou supprimer le \textit{sommet}
+		\includegraphics[width=0.35\textwidth]{NewPoly4.png}
+		\item Une fois vos modifications effectuées, validez la géométrie du polygone en appuyant sur \includegraphics[width=0.05\textwidth]{icons/validGeom.png}.
 	\end{enumerate}
 \end{instructionbox}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.35\textwidth]{NewPoly5.png}
-	\caption{Suppression ou déplacement d'un sommet.}
-\end{figure}
 
 \section{Analyses}
 
@@ -473,7 +511,7 @@ Forestimator Mobile offre deux possibilités d'analyse, soit ponctuelle, soit su
 L'\gls{analysePt} est très simple à réaliser et permet de questionner la valeur que prends une ou plusieurs couches thématiques pour une position donnée.
 \begin{instructionbox}{Analyse ponctuelle en une étape}
 	\begin{enumerate}
-		\item Depuis l'écran principal de Forestimator, effectuer un \textbf{appui long} sur la carte pour obtenir directement une analyse complète de toutes les couches sélectionnées.
+		\item Depuis l'écran principal de Forestimator, effectuer un \textbf{appui long} sur la carte pour obtenir directement une analyse complète de toutes les couches sélectionnées à cet effet.
 	\end{enumerate}
 \end{instructionbox}
 
@@ -491,14 +529,14 @@ L'\gls{analysePt} est très simple à réaliser et permet de questionner la vale
 	\item Dans le sélectionneur de couche, veillez à ce que la première couche ne soit pas un fond de carte. Utiliser par exemple la couche du guide des stations.
     \item Depuis l'écran principal de Forestimator, appuyez simplement quelque part sur la carte (\textbf{appui court}).
     \item Un aperçu court en une ligne apparaît dans une fenêtre et vous renseigne, pour cette position, la légende et la couleur de la couche cartographique numéro 1.
-    \item Si vous appuyez à nouveau sur cette fenêtre d'aperçu, vous réaliserez une analyse avec une série de couches sélectionnées.
+    \item Si vous appuyez à nouveau sur cette fenêtre d'aperçu, vous réaliserez une analyse avec la série de couches sélectionnées à cet effet.
 \end{enumerate}
 \end{instructionbox}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.35\textwidth]{anaPreview.png}
-    \caption{Analyse ponctuelle : un \textbf{appui court} sur une carte thématique permet d'afficher la légende pour cette position, dans cet exemple la station est un \textit{versant chaud sur sol superficiel}. Un deuxième appui court sur la légende pour cette position permet la visualisation des valeurs, toujours pour cette position, d'un ensemble de couches cartographiques. }
+    \caption{Analyse ponctuelle : un \textbf{appui court} sur une carte thématique permet d'afficher la légende pour cette position, dans cet exemple la station est un \textit{sol peu profond des plateaux}. Un deuxième appui court sur la légende pour cette position permet la visualisation des valeurs, toujours pour cette position, d'un ensemble de couches cartographiques. }
 \end{figure}
 
 \subsection{Tableau d'aptitude et de recommandation des essences}
@@ -514,13 +552,13 @@ Les résultats de l'analyse ponctuel sont présenté couche par couche, à l'exc
 	
 
 \subsection{Analyse surfacique}
-\begin{instructionbox}{Réaliser une analyse de surface}
+\begin{instructionbox}{Réaliser une analyse surfacique pour un de vos polygones}
 \begin{enumerate}
-    \item Appuyez sur le symbole \includegraphics[width=0.05\textwidth]{icons/hexagon.png} du menu principal (en bas de la carte).
-    \item Accédez au le menu des \glspl{polygones} et appuyant sur l'encart en haut de l'écran.
-    \item Sélectionnez le polygone pour lequel vous souhaitez effectuer l'analyse surfacique.
-    \item Appuyez maintenant sur l'icône \includegraphics[width=0.05\textwidth]{icons/analytics.png} pour lancer l'analyse.
-    \item Les résultats de l'analyse sont présentés par couche.
+    \item Appuyez sur le symbole \includegraphics[width=0.05\textwidth]{icons/hexagon.png} du menu principal (en bas de la carte) pour accéder à la liste de vos \glspl{layer}.
+    \includegraphics[width=0.35\textwidth]{LayerList.png}
+    \item Sélectionnez la layer de polygone et accédez au propriété de la layer en cliquant sur le bouton \includegraphics[width=0.05\textwidth]{icons/arrow.png}.
+    \item Effectuez une analyse surfacique pour l'entité de votre choix en cliquant sur le bouton \includegraphics[width=0.05\textwidth]{icons/analytics.png}.
+    \includegraphics[width=0.35\textwidth]{polEntityList.png}
 \end{enumerate}
 \end{instructionbox}
 
@@ -530,9 +568,9 @@ Les résultats de l'analyse ponctuel sont présenté couche par couche, à l'exc
 	\caption{Résultat d'une analyse surfacique pour un polygone.}
 \end{figure}
 
-\subsection{Procédure : Sélectionner une couche thématique pour l'analyse}
+\subsection{Procédure de sélectionner une couche thématique pour l'analyse}
 
-Les analyses ponctuelles et surfacique sont des analyses effectuées sur une série de couche cartographique. Cette série est prédéfinie, mais vous pouvez ajouter d'autre couche de votre intérêt de manière à les utiliser lors de vos analyses.
+Les analyses ponctuelles et surfaciques sont des analyses effectuées sur une série de \glspl{couche}. Cette série est prédéfinie, mais vous pouvez ajouter d'autre couche de votre intérêt de manière à les utiliser lors de vos analyses.
 
 \begin{instructionbox}{Sélectionner une couche pour l'analyse}
 \begin{enumerate}
@@ -540,18 +578,11 @@ Les analyses ponctuelles et surfacique sont des analyses effectuées sur une sé
     \item Appuyez ensuite sur l'icône \includegraphics[width=0.05\textwidth]{icons/layers.png} pour ouvrir le catalogue.
     \item Recherchez la couche que vous souhaitez analyser et ouvrez-la en appuyant sur le titre.
     \item Appuyez sur \includegraphics[width=0.05\textwidth]{icons/pentagram.png} pour l'inclure dans l'analyse de surface ou sur \includegraphics[width=0.05\textwidth]{icons/locationPin.png} pour l'inclure dans l'analyse ponctuelle.
-    \item Appuyez sur le bouton de fermeture.
+    \item Fermez le catalogue avec le bouton \includegraphics[width=0.05\textwidth]{icons/reduire.png}.
+    \item Fermez le sélecteur de couche avec le bouton \includegraphics[width=0.05\textwidth]{icons/eye.png}.
     \item Vous pouvez maintenant effectuer votre analyse.
 \end{enumerate}
 \end{instructionbox}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.35\textwidth]{anaPt.png}
-    \caption{Analyse ponctuelle.}
-\end{figure}
-
-
 
 \chapter{Documentation sous forme de capsule vidéo}
 
@@ -578,24 +609,56 @@ Le reportage vidéo de Julie Fohal réalisé début 2025 présente l'application
 \section{Analyse ponctuelle}
 
 Cet exercice illustre pas à pas les étapes permettant d'afficher une carte des hauteurs des arbres, d'effectuer une analyse ponctuelle de manière à déterminer la hauteur dominante et d'exporter le résultat de l'analyse sous forme d'un rapport au format pdf. 
-\subsection{naviger jusqu'au bois de Grand-Leez}
+\subsection{Naviger jusqu'au bois de Grand-Leez}
 
 La navigation peut s'effectuer de manière manuelle, c'est à dire en dézoomant la carte principale, en navigant vers le bois de Grand-Leez qui se situe à l'ouest de Gembloux, puis en zoomant à nouveau. Mais il est plus simple d'utiliser l'outil de géolocalisation et d'entrer le nom du village (voir figure \ref{fig:geolocGL})
 
 \begin{figure}[H]
-
 	\centering
 	\includegraphics[width=0.8\textwidth]{navGrandLeez.png}
 	\caption{Navigation jusqu'à Grand-Leez au moyen de la recherche de lieu par nom.}
 	\label{fig:geolocGL}
 \end{figure}
 
+\subsection{Affichage de la hauteur des arbres en 2021}
+
+Ouvrez le sélecteur de couche (bouton \includegraphics[width=0.05\textwidth]{icons/eye.png}) et ensuite ouvrez le catalogue de couches (bouton \includegraphics[width=0.05\textwidth]{icons/layers.png}). Recherchez la couche dénommée \textit{MNH LiDAR de 2021} qui est dans la catégorie \textit{Cartographie des peuplements forestiers}. Sélectionnez cette couche pour en cliquant sur le symbole \includegraphics[width=0.05\textwidth]{icons/layers.png} à droite du nom de la couche. Fermez ensuite le catalogue et désactivez la transparence de la couche \textit{MNH LiDAR de 2021} dans le sélecteur.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{gl-MNH.png}
+	\caption{Sélection du \textit{MNH LiDAR de 2021} pour affichage (à gauche) et mise à 0 de la transparence pour cette couche (à droite).}
+	\label{fig:gl-cata}
+\end{figure}
+
+\subsection{Analyse ponctuelle pour les Douglas du bois de Grand-Leez}
+
+Zoomez ensuite sur les Douglas qui sont dans le bois de Grand-Leez. Un appui court sur un des Douglas vous renseignera la hauteur de ce dernier. Un appui long sur ces mêmes Douglas effectuera une analyse ponctuelle.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{gl-loca.png}
+	\caption{Localisation précise des Douglas dans le bois de Grand-Leez.}
+	\label{fig:gl-loca}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{gl-ana.png}
+	\caption{Un appui court sur la carte nous renseigne la hauteur des Douglas (à gauche) Un appui long effectue une analyse ponctuelle pour cette position (à droite). }
+	\label{fig:gl-ana}
+\end{figure}
+Vous pouvez générer un rapport au format pdf contenant l'analyse ponctuelle effectuée en utilisant le bouton en bas de la page de résultat de l'analyse. Le rapport se présente comme illustré à la figure \ref{fig:gl-pdf}. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{gl-pdf.png}
+	\caption{Le résultat d'une analyse ponctuelle peut être exportée au format pdf. }
+	\label{fig:gl-pdf}
+\end{figure}
+
 \section{Utilisation du mode hors ligne}
 
 \subsection{Mode en ligne/hors ligne}
-
-
-%Pour les personnes loin à l'étranger, il existe un mode hors ligne que vous pouvez utiliser pour consulter les cartes et analyser en déplacement.
 
 \subsection{Avant d'utiliser le mode hors ligne}
 \begin{itemize}

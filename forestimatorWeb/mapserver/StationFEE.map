@@ -343,7 +343,7 @@ LAYER
        END
    END
  METADATA
-      "wms_title"           "Catalogue de station Ardenne"
+      "wms_title"           "Catalogue de station Ardenne et FFC"
       "wms_srs"             "EPSG:31370"
    END
    TEMPLATE "../template.html"
