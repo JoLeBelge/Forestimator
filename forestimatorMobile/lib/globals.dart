@@ -16,9 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO: Add state to SENT status with callback in timer.
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
-// TODO: Florentin BUG
-// TODO: Many Keyboard switch Bugs...
-// TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
+// TODO: Some Keyboard switch Bugs remaining
 
 typedef VoidSetter = void Function(void Function());
 
