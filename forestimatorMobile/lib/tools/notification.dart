@@ -1826,7 +1826,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu>with WidgetsBindingObserv
         side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
       ),
       child: SizedBox(
-        height: gl.dsp.eqMaxWindowHeight * gl.eqPx - gl.dsp.insetBot,
+        height: (gl.dsp.eqMaxWindowHeight * gl.eqPx - gl.dsp.insetBot) > 0 ? (gl.dsp.eqMaxWindowHeight * gl.eqPx - gl.dsp.insetBot) : gl.eqPx  * 10,
         width: gl.eqPx * gl.eqPxW * .95,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
