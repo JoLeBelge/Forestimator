@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/myicons.dart';
-import 'package:fforestimator/tools/customLayer/path_layer.dart';
 import 'package:fforestimator/tools/geometry/geometry.dart' as pol;
 import 'package:fforestimator/tools/geometry_layer.dart';
 import 'package:fforestimator/tools/stack_animated.dart';
@@ -421,9 +420,6 @@ double get eqPxW => dsp.equiwidth;
 
 List<GeometricLayer> geoLayers = [];
 int selectedGeoLayer = -1;
-
-List<PathLayer> pathLayers = [];
-int selectedpathLayer = -1;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
 String queryApiRastDownload = "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
