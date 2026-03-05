@@ -36,7 +36,7 @@ android/key.properties
 .pub-cache/
 .pub/
 /build/
-#/assets/db/fforestimator.db
+/assets/db/fforestimator.db
 
 # Symbolication related
 app.*.symbols

@@ -451,6 +451,9 @@ class PopupForestimatorMessage extends StatelessWidget {
         if (cHeight > 95 * gl.eqPx && gl.dsp.orientation == Orientation.landscape) {
           cHeight = gl.eqPx * 95;
         }
+        if (cWidth > 95 * gl.eqPx && gl.dsp.orientation == Orientation.portrait) {
+          cWidth = gl.eqPx * 70;
+        }
         if (gl.eqPx * gl.dsp.eqMaxWindowHeight - gl.dsp.insetBot < cHeight) cHeight -= gl.dsp.insetBot;
         return Card(
           margin: EdgeInsetsGeometry.zero,
@@ -756,10 +759,10 @@ class PopupForestimatorWindow extends StatelessWidget {
   }
 }
 
-class PopupColorChooser {
+class PopupColorChoser {
   Color pickerColor = Color(0xff443a49);
 
-  PopupColorChooser(
+  PopupColorChoser(
     Color currentColor,
     BuildContext context,
     ValueChanged<Color> colorChange,
@@ -769,7 +772,8 @@ class PopupColorChooser {
     pickerColor = currentColor;
     gl.refreshStack(() {
       popupForestimatorMessage(
-        height: gl.eqPx * 100,
+        height: gl.dsp.orientation == Orientation.landscape ? gl.dsp.eqMaxWindowHeight * gl.eqPx : gl.eqPx * 130,
+        width: gl.dsp.orientation == Orientation.landscape ? gl.eqPx * 150 : gl.eqPx * 70,
         id: "colorPicker",
         title: "Choisissez une couleur",
         child: ColorPicker(pickerColor: pickerColor, onColorChanged: colorChange, colorPickerWidth: gl.eqPx * 50),
@@ -948,26 +952,34 @@ class _SelectPolyColor extends State<SelectPolyColor> {
   Color currentColor = Colors.black;
   @override
   Widget build(BuildContext context) {
+    void set(Function f) {
+      mounted
+          ? setState(() {
+            f();
+          })
+          : f();
+    }
+
     if (currentColor == Colors.black) currentColor = widget.currentColor;
     return TextButton(
       style: lt.trNoPadButtonstyle,
       onPressed: () {
-        PopupColorChooser(
+        PopupColorChoser(
           currentColor,
           gl.notificationContext!,
           (Color color) {
-            setState(() {
+            set(() {
               widget.colorChanged(color);
               currentColor = color;
             });
           },
           () {
-            setState(() {
+            set(() {
               widget.onDecline(widget.currentColor);
             });
           },
           () {
-            setState(() {
+            set(() {
               widget.onAccept(currentColor);
             });
           },
@@ -2354,7 +2366,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                             child: IconButton(
                                               style: lt.trNoPadButtonstyle,
                                               onPressed: () {
-                                                PopupColorChooser(
+                                                PopupColorChoser(
                                                   gl.selLay.geometries[index].colorInside,
                                                   gl.notificationContext!,
                                                   //change color
@@ -2428,7 +2440,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                         () {},
                                                         () {
                                                           PopupDoYouReally(
-                                                            context,
                                                             () {
                                                               gl.selLay.geometries[index].sendGeometryToServer();
                                                             },
@@ -2444,7 +2455,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                       );
                                                     } else {
                                                       PopupDoYouReally(
-                                                        context,
                                                         () {
                                                           gl.selLay.geometries[index].sendGeometryToServer();
                                                         },
@@ -2573,7 +2583,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                           style: lt.trNoPadButtonstyle,
                                           onPressed: () {
                                             PopupDoYouReally(
-                                              gl.notificationContext!,
                                               () {
                                                 setState(() {
                                                   gl.selLay.removeGeometry(id: gl.selLay.geometries[index].id);
@@ -3562,32 +3571,51 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                           Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
                           SelectPolyColor(
                             onAccept: (Color c) {
-                              setState(() {
-                                gl.selLay.defaultColor = c;
-                                PopupDoYouReally(
-                                  context,
-                                  () {
-                                    gl.refreshStack(() {
-                                      for (Geometry g in gl.selLay.geometries) {
-                                        g.colorInside = c;
-                                        g.colorLine = c.withAlpha(255);
-                                      }
-                                    });
-                                  },
-                                  "Attention",
-                                  "Voulez vous changer la couleur pour tous les entités de la layer?",
-                                );
-                              });
+                              mounted
+                                  ? setState(() {
+                                    gl.selLay.defaultColor = c;
+                                    PopupDoYouReally(
+                                      () {
+                                        gl.refreshStack(() {
+                                          for (Geometry g in gl.selLay.geometries) {
+                                            g.colorInside = c;
+                                            g.colorLine = c.withAlpha(255);
+                                          }
+                                        });
+                                      },
+                                      "Attention",
+                                      "Voulez vous changer la couleur pour tous les entités de la layer?",
+                                    );
+                                  })
+                                  : {
+                                    gl.selLay.defaultColor = c,
+                                    PopupDoYouReally(
+                                      () {
+                                        gl.refreshStack(() {
+                                          for (Geometry g in gl.selLay.geometries) {
+                                            g.colorInside = c;
+                                            g.colorLine = c.withAlpha(255);
+                                          }
+                                        });
+                                      },
+                                      "Attention",
+                                      "Voulez vous changer la couleur pour tous les entités de la layer?",
+                                    ),
+                                  };
                             },
                             onDecline: (Color c) {
-                              setState(() {
-                                gl.selLay.defaultColor = c;
-                              });
+                              mounted
+                                  ? setState(() {
+                                    gl.selLay.defaultColor = c;
+                                  })
+                                  : gl.selLay.defaultColor = c;
                             },
                             colorChanged: (Color c) {
-                              setState(() {
-                                gl.selLay.defaultColor = c;
-                              });
+                              mounted
+                                  ? setState(() {
+                                    gl.selLay.defaultColor = c;
+                                  })
+                                  : gl.selLay.defaultColor = c;
                             },
                             currentColor: gl.layerReady ? gl.selLay.defaultColor : Colors.transparent,
                           ),
@@ -3618,7 +3646,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                   gl.selLay.defaultPointIcon = i;
                                 });
                                 PopupDoYouReally(
-                                  context,
                                   () {
                                     setState(() {
                                       for (Geometry g in gl.selLay.geometries) {
@@ -3655,7 +3682,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                           style: lt.trNoPadButtonstyle,
                           onPressed: () {
                             PopupDoYouReally(
-                              gl.notificationContext!,
                               () {
                                 setState(() {
                                   GeometricLayer.deleteLayer(gl.selectedGeoLayer);
@@ -7102,14 +7128,7 @@ class _SwitcherBox extends State<SwitcherBox> {
 class PopupDoYouReally {
   String labelYes;
   String labelNo;
-  PopupDoYouReally(
-    BuildContext context,
-    VoidCallback onAccept,
-    String title,
-    String message, [
-    this.labelYes = "Oui",
-    this.labelNo = "Non",
-  ]) {
+  PopupDoYouReally(VoidCallback onAccept, String title, String message, [this.labelYes = "Oui", this.labelNo = "Non"]) {
     gl.refreshStack(() {
       popupForestimatorMessage(
         id: "DOYOU",

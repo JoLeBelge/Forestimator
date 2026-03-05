@@ -223,7 +223,7 @@ class Display {
 
   set context(BuildContext context) => dsp = Display(context);
 
-  void _tabletMode() {
+  void tabletMode() {
     if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
         dpi < 1.75 && dpi * (width < height ? width : height) > 1320 ||
         dpi < 1.55 && dpi * (width < height ? width : height) > 1000 ||
@@ -246,7 +246,7 @@ class Display {
     }
   }
 
-  void _squareMode() {
+  void squareMode() {
     if ((aspect > .8 && aspect < 1 / .8) || Mode.tablet || Mode.overrideModeSquare) {
       Mode.square = true;
       orientation = Orientation.landscape;
