@@ -567,12 +567,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             ],
                       ),
                       if (!gl.dsp.showKeyboard) forestimatorTopMenuElements,
-                      forestimatorGeoMenu,
+                      if (!gl.dsp.showKeyboard) forestimatorGeoMenu,
                       if (!gl.dsp.showKeyboard) forestimatorAnalysisToolbar,
                     ] +
-                    [if (gl.modeDevelopper && gl.Mode.debugScanlines) lt.gridlines()] +
-                    List<Widget>.from(gl.stack.widgets.reversed) +
-                    [_forestimatorDebugElements],
+                    [
+                      if (gl.modeDevelopper && gl.Mode.debugScanlines) lt.gridlines(),
+                      if (!gl.dsp.showKeyboard) _forestimatorDebugElements,
+                    ] +
+                    List<Widget>.from(gl.stack.widgets.reversed),
               );
             },
           ),
@@ -605,40 +607,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           child: forestimatorBuildGeoMenu,
         ),
       ),
-      /*SizedBox(
-        height: double.infinity,
-        width: double.infinity,
-        child: AnimatedContainer(
-          alignment:
-              gl.dsp.orientation.name == "Portrait"
-                  ? gl.Mode.polygon && gl.Mode.polygonList
-                      ? AlignmentGeometry.xy(_animOnScreenPos.dx, _animOnScreenPos.dy)
-                      : AlignmentGeometry.xy(_animOffScreenPos.dx, _animOffScreenPos.dy)
-                  : gl.Mode.polygon && gl.Mode.polygonList
-                  ? AlignmentGeometry.xy(_animOnScreenPos.dx, _animOnScreenPos.dy)
-                  : AlignmentGeometry.xy(_animOffScreenPos.dx, _animOffScreenPos.dy),
-          curve: Curves.linearToEaseOut,
-          duration: Duration(milliseconds: 1500),
-          child: GeoLayerListMenu(
-            mapmove: (LatLng pos) {
-              if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                centerOnLatLng(pos);
-              }
-            },
-            after: () {
-              setState(() {
-                gl.Mode.polygonList = false;
-                if (!gl.layerReady) {
-                  _closePolygonMenu();
-                } else {
-                  _polygonMode = true;
-                }
-              });
-            },
-            windowHeight: gl.dsp.orientation == Orientation.portrait ? (gl.eqPxH - 25) : gl.popupWindowsLandscapeHeight,
-          ),
-        ),
-      ),*/
     ],
   );
 
@@ -1199,7 +1167,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         controller: propertiesTableScrollController,
                                         child: Container(
                                           color: gl.backgroundTransparentBlackBox.withAlpha(100),
-                                          height: gl.eqPx * gl.attributeTableHeight,
+                                          height:
+                                              gl.dsp.orientation == Orientation.landscape
+                                                  ? gl.eqPx * computePolygonTitleHeight() / 2.1
+                                                  : gl.eqPx * gl.attributeTableHeight,
                                           child:
                                               gl.geoReady
                                                   ? ListView(
@@ -1317,8 +1288,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                                           },
                                                                         ),
                                                                       ),
-                                                                      onPressed: () {},
-                                                                      onLongPress: () async {
+                                                                      onPressed: () async {
                                                                         refreshView(() {
                                                                           gl
                                                                               .selLay
@@ -1381,7 +1351,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                                         ),
                                                                       ),
                                                                       onPressed: () {},
-                                                                      onLongPress: () {
+                                                                      /*onLongPress: () {
                                                                         PopupValueChange(
                                                                           "prop",
                                                                           gl.selGeo.attributes[i].name,
@@ -1414,7 +1384,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                                             }
                                                                           },
                                                                         );
-                                                                      },
+                                                                      },*/
                                                                       child: Container(
                                                                         alignment: Alignment.centerLeft,
                                                                         child: SingleChildScrollView(
@@ -1457,8 +1427,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                                           },
                                                                         ),
                                                                       ),
-                                                                      onPressed: () {},
-                                                                      onLongPress: () {
+                                                                      onPressed: () {
                                                                         PopupValueChange(
                                                                           gl.selGeo.attributes[i].type,
                                                                           gl.selGeo.attributes[i].value,
@@ -2466,6 +2435,9 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       result += gl.chosenPolyBarHeight * 2;
     } else if (gl.Mode.editPolyMarker) {
       result += gl.chosenPolyBarHeight * 0.2;
+    }
+    if (gl.dsp.orientation == Orientation.landscape && result > gl.dsp.eqMaxWindowHeight) {
+      result = gl.dsp.eqMaxWindowHeight;
     }
     return result;
   }

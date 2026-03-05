@@ -445,13 +445,13 @@ class PopupForestimatorMessage extends StatelessWidget {
     return OrientationBuilder(
       builder: (c, o) {
         double cWidth = width ?? gl.eqPx * 70;
-        double cHeight = height ?? gl.eqPx * 65;
-        if (cHeight > 100 * gl.eqPx && gl.dsp.orientation.name != "portrait") {
+        double cHeight =
+            height ??
+            (gl.dsp.orientation == Orientation.landscape && gl.dsp.showKeyboard ? gl.eqPx * 20 : gl.eqPx * 70);
+        if (cHeight > 95 * gl.eqPx && gl.dsp.orientation == Orientation.landscape) {
           cHeight = gl.eqPx * 95;
         }
-        if (cHeight > 100 * gl.eqPx && gl.dsp.orientation.name == "portrait") {
-          cHeight -= gl.dsp.insetBot;
-        }
+        if (gl.eqPx * gl.dsp.eqMaxWindowHeight - gl.dsp.insetBot < cHeight) cHeight -= gl.dsp.insetBot;
         return Card(
           margin: EdgeInsetsGeometry.zero,
           shape: RoundedRectangleBorder(
@@ -469,41 +469,42 @@ class PopupForestimatorMessage extends StatelessWidget {
               children: [
                 Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          alignment: AlignmentGeometry.center,
-                          height: gl.eqPx * 15,
-                          width: gl.eqPx * 15,
-                          child: leadingSymbol ?? forestimatorIcon(width: gl.eqPx * 12, height: gl.eqPx * 12),
-                        ),
-                        Container(
-                          alignment: AlignmentGeometry.center,
-                          height: gl.eqPx * 15,
-                          width: gl.eqPx * 40,
-                          child: Text(
-                            title ?? "Message $count",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: gl.eqPx * gl.fontSizeS,
+                    if (!gl.Mode.keyboardExpanded)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            alignment: AlignmentGeometry.center,
+                            height: gl.eqPx * 15,
+                            width: gl.eqPx * 15,
+                            child: leadingSymbol ?? forestimatorIcon(width: gl.eqPx * 12, height: gl.eqPx * 12),
+                          ),
+                          Container(
+                            alignment: AlignmentGeometry.center,
+                            height: gl.eqPx * 15,
+                            width: gl.eqPx * 40,
+                            child: Text(
+                              title ?? "Message $count",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: gl.eqPx * gl.fontSizeS,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: gl.eqPx * 15,
-                          width: gl.eqPx * 15,
-                          child: lt.forestimatorButton(
-                            onDiscard ??
-                                () {
-                                  gl.stack.pop(id ?? "popMsg$count");
-                                },
-                            Icons.arrow_drop_up_outlined,
+                          SizedBox(
+                            height: gl.eqPx * 15,
+                            width: gl.eqPx * 15,
+                            child: lt.forestimatorButton(
+                              onDiscard ??
+                                  () {
+                                    gl.stack.pop(id ?? "popMsg$count");
+                                  },
+                              Icons.arrow_drop_up_outlined,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
                     lt.stroke(0, gl.eqPx * 1, gl.colorAgroBioTech),
                   ],
                 ),
@@ -514,7 +515,7 @@ class PopupForestimatorMessage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         lt.ForestimatorScrollView(
-                          height: cHeight - gl.eqPx * 30,
+                          height: cHeight - (gl.Mode.keyboardExpanded ? gl.eqPx : gl.eqPx * 30),
                           width: cWidth - gl.eqPx * 5,
                           child:
                               child ??
@@ -531,45 +532,46 @@ class PopupForestimatorMessage extends StatelessWidget {
                     ),
                   ],
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        if (onAccept != null && messageAccept != null)
-                          Container(
-                            alignment: AlignmentGeometry.center,
-                            height: gl.eqPx * 10,
-                            width: gl.eqPx * 25,
-                            child: TextButton(
-                              style: dialogButtonStyle(borderWidth: gl.eqPx),
-                              onPressed: onAccept,
-                              child: Text(
-                                messageAccept ?? "",
-                                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
+                if (!gl.Mode.keyboardExpanded)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          if (onAccept != null && messageAccept != null)
+                            Container(
+                              alignment: AlignmentGeometry.center,
+                              height: gl.eqPx * 10,
+                              width: gl.eqPx * 25,
+                              child: TextButton(
+                                style: dialogButtonStyle(borderWidth: gl.eqPx),
+                                onPressed: onAccept,
+                                child: Text(
+                                  messageAccept ?? "",
+                                  style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
+                                ),
                               ),
                             ),
-                          ),
-                        if (onDecline != null && messageDecline != null)
-                          Container(
-                            alignment: AlignmentGeometry.center,
-                            height: gl.eqPx * 10,
-                            width: gl.eqPx * 25,
-                            child: TextButton(
-                              style: dialogButtonStyle(borderWidth: gl.eqPx),
-                              onPressed: onDecline,
-                              child: Text(
-                                messageDecline ?? "",
-                                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
+                          if (onDecline != null && messageDecline != null)
+                            Container(
+                              alignment: AlignmentGeometry.center,
+                              height: gl.eqPx * 10,
+                              width: gl.eqPx * 25,
+                              child: TextButton(
+                                style: dialogButtonStyle(borderWidth: gl.eqPx),
+                                onPressed: onDecline,
+                                child: Text(
+                                  messageDecline ?? "",
+                                  style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS),
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                    Container(height: gl.eqPx * 2),
-                  ],
-                ),
+                        ],
+                      ),
+                      Container(height: gl.eqPx * 2),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -1461,7 +1463,7 @@ class PopupValueChange {
     VoidCallback onTapOutside,
     VoidCallback onAccept,
   ) {
-    TextEditingController textEditor = TextEditingController(text: oldValue);
+    TextEditingController textEditor = TextEditingController(text: oldValue.toString());
     gl.refreshStack(() {
       popupForestimatorMessage(
         id: "ValChange",
@@ -1823,15 +1825,95 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
         return SizedBox(
           height: listPartHeight > 0 ? listPartHeight : gl.eqPx * 10,
           width: gl.eqPx * gl.eqPxW * .95,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              !_titleLayer
-                  ? Container(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      style: lt.trNoPadButtonstyle,
-                      icon: Icon(Icons.arrow_back, color: Colors.white, size: gl.eqPx * gl.iconSizeM),
+          child: switchRowColWithOrientation([
+            Row(
+              children: [
+                _titleLayer && !gl.dsp.showKeyboard
+                    ? TextButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
+                          WidgetState.any: Colors.white,
+                        }),
+                        shape: WidgetStateProperty<OutlinedBorder>.fromMap(<WidgetStatesConstraint, OutlinedBorder>{
+                          WidgetState.any: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
+                        }),
+                        fixedSize: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(gl.eqPx * gl.iconSizeL, gl.eqPx * gl.iconSizeL),
+                        }),
+                        padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                          WidgetState.any: EdgeInsetsGeometry.zero,
+                        }),
+                      ),
+                      key: Key('autsch-5-addPoly'),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add, size: (gl.polyNewPolygonButtonHeight - 4) * gl.eqPx, color: Colors.black),
+                        ],
+                      ),
+                      onPressed: () {
+                        PopupNewGeometricLayer(context, (String type, String name, Color color) {
+                          if (mounted) {
+                            setState(() {
+                              switch (type) {
+                                case "Point":
+                                  gl.geoLayers.add(GeometricLayer.point());
+                                  break;
+                                case "Polygon":
+                                  gl.geoLayers.add(GeometricLayer.polygon());
+                                  break;
+                              }
+                              gl.geoLayers.last.defaultColor = color;
+                              gl.geoLayers.last.name = name;
+                            });
+                          } else {
+                            switch (type) {
+                              case "Point":
+                                gl.geoLayers.add(GeometricLayer.point());
+                                break;
+                              case "Polygon":
+                                gl.geoLayers.add(GeometricLayer.polygon());
+                                break;
+                            }
+                            gl.geoLayers.last.defaultColor = color;
+                            gl.geoLayers.last.name = name;
+                          }
+                          gl.selectedGeoLayer = gl.geoLayers.length - 1;
+                          gl.geoLayers.last.serialize();
+                          gl.refreshStack(() {
+                            gl.selectedGeoLayer = gl.geoLayers.length - 1;
+                          });
+                          _scrollDown();
+                        });
+                      },
+                    )
+                    : !_titleLayer
+                    ? TextButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
+                          WidgetState.any: Colors.white,
+                        }),
+                        shape: WidgetStateProperty<OutlinedBorder>.fromMap(<WidgetStatesConstraint, OutlinedBorder>{
+                          WidgetState.any: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
+                        }),
+                        fixedSize: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(gl.eqPx * gl.iconSizeL, gl.eqPx * gl.iconSizeL),
+                        }),
+                        padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                          WidgetState.any: EdgeInsetsGeometry.zero,
+                        }),
+                      ),
+                      key: Key('autsch-5-addPoly'),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.arrow_back,
+                            size: (gl.polyNewPolygonButtonHeight - 4) * gl.eqPx,
+                            color: Colors.black,
+                          ),
+                        ],
+                      ),
                       onPressed: () {
                         setState(() {
                           _titleLayer = true;
@@ -1842,304 +1924,246 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                           );
                         });
                       },
-                      padding: EdgeInsets.zero,
-                    ),
-                  )
-                  : Container(width: gl.eqPx * gl.iconSizeM),
-              SizedBox(
-                width: gl.eqPx * 95,
-                height: listPartHeight > 0 ? listPartHeight - gl.eqPx * 15 : gl.eqPx * 10,
-                child: PageView(
-                  controller: _pageController,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: [
-                    ReorderableListView.builder(
-                      scrollController: _controller,
-                      buildDefaultDragHandles: false,
-                      onReorder: (int oldIndex, int newIndex) {
-                        setState(() {
-                          if (oldIndex < newIndex) {
-                            newIndex -= 1;
-                          }
-                          if (gl.geoLayers.length < newIndex + 1 || gl.geoLayers.length < oldIndex + 1) {
-                            return;
-                          }
-                          gl.refreshStack(() {
-                            final GeometricLayer item = gl.geoLayers.removeAt(oldIndex);
-                            gl.geoLayers.insert(newIndex, item);
-                          });
-                          if (oldIndex == gl.selectedGeoLayer) {
-                            gl.selectedGeoLayer = newIndex;
-                          } else if (newIndex == gl.selectedGeoLayer) {
-                            if (oldIndex > newIndex) {
-                              gl.selectedGeoLayer++;
-                            } else {
-                              gl.selectedGeoLayer--;
-                            }
-                          } else if (oldIndex < gl.selectedGeoLayer && gl.selectedGeoLayer < newIndex) {
-                            gl.selectedGeoLayer--;
-                          } else if (oldIndex > gl.selectedGeoLayer && gl.selectedGeoLayer > newIndex) {
-                            gl.selectedGeoLayer++;
-                          }
+                    )
+                    : Container(),
+              ],
+            ),
+            SizedBox(
+              width: gl.eqPx * 98,
+              height:
+                  listPartHeight > 0
+                      ? gl.dsp.orientation == Orientation.portrait
+                          ? listPartHeight - 15 * gl.eqPx
+                          : listPartHeight
+                      : gl.eqPx * 10,
+              child: PageView(
+                controller: _pageController,
+                physics: NeverScrollableScrollPhysics(),
+                children: [
+                  ReorderableListView.builder(
+                    scrollController: _controller,
+                    buildDefaultDragHandles: false,
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        if (gl.geoLayers.length < newIndex + 1 || gl.geoLayers.length < oldIndex + 1) {
+                          return;
+                        }
+                        gl.refreshStack(() {
+                          final GeometricLayer item = gl.geoLayers.removeAt(oldIndex);
+                          gl.geoLayers.insert(newIndex, item);
                         });
-                      },
-                      itemCount: gl.geoLayers.length,
-                      itemBuilder:
-                          (context, i) => TextButton(
-                            style: ButtonStyle(
-                              fixedSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                WidgetState.any: Size(gl.eqPx * gl.polyListCardWidth, gl.eqPx * gl.polyListCardHeight),
-                              }),
-                              padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                WidgetState.any: EdgeInsetsGeometry.symmetric(vertical: gl.eqPx * 2),
-                              }),
-                            ),
-                            key: Key('$i'),
-                            onPressed:
-                                i == gl.selectedGeoLayer
-                                    ? () {
-                                      setState(() {
-                                        gl.selectedGeoLayer = -1;
-                                      });
-                                    }
-                                    : () {
-                                      setState(() {
-                                        gl.selectedGeoLayer = i;
-                                      });
-                                    },
-                            child: ReorderableDragStartListener(
-                              index: i,
-                              child: SizedBox(
-                                height: gl.polyListSelectedCardHeight * gl.eqPx,
-                                width: gl.polyListSelectedCardWidth * gl.eqPx,
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadiusGeometry.circular(12.0),
-                                    side:
-                                        i == gl.selectedGeoLayer
-                                            ? BorderSide(
-                                              color: gl.geoLayers[i].defaultColor.withAlpha(255),
-                                              width: gl.eqPx * .75,
-                                            )
-                                            : BorderSide(
-                                              color: gl.geoLayers[i].defaultColor.withAlpha(120),
-                                              width: gl.eqPx * .25,
-                                            ),
-                                  ),
-                                  surfaceTintColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  color:
+                        if (oldIndex == gl.selectedGeoLayer) {
+                          gl.selectedGeoLayer = newIndex;
+                        } else if (newIndex == gl.selectedGeoLayer) {
+                          if (oldIndex > newIndex) {
+                            gl.selectedGeoLayer++;
+                          } else {
+                            gl.selectedGeoLayer--;
+                          }
+                        } else if (oldIndex < gl.selectedGeoLayer && gl.selectedGeoLayer < newIndex) {
+                          gl.selectedGeoLayer--;
+                        } else if (oldIndex > gl.selectedGeoLayer && gl.selectedGeoLayer > newIndex) {
+                          gl.selectedGeoLayer++;
+                        }
+                      });
+                    },
+                    itemCount: gl.geoLayers.length,
+                    itemBuilder:
+                        (context, i) => TextButton(
+                          style: ButtonStyle(
+                            fixedSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                              WidgetState.any: Size(gl.eqPx * gl.polyListCardWidth, gl.eqPx * gl.polyListCardHeight),
+                            }),
+                            padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                              WidgetState.any: EdgeInsetsGeometry.symmetric(vertical: gl.eqPx * 2),
+                            }),
+                          ),
+                          key: Key('$i'),
+                          onPressed:
+                              i == gl.selectedGeoLayer
+                                  ? () {
+                                    setState(() {
+                                      gl.selectedGeoLayer = -1;
+                                    });
+                                  }
+                                  : () {
+                                    setState(() {
+                                      gl.selectedGeoLayer = i;
+                                    });
+                                  },
+                          child: ReorderableDragStartListener(
+                            index: i,
+                            child: SizedBox(
+                              height: gl.polyListSelectedCardHeight * gl.eqPx,
+                              width: gl.polyListSelectedCardWidth * gl.eqPx,
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadiusGeometry.circular(12.0),
+                                  side:
                                       i == gl.selectedGeoLayer
-                                          ? gl.selLay.defaultColor.withAlpha(100)
-                                          : Colors.black.withAlpha(100),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            gl.refreshStack(() {
-                                              if (!gl.Mode.editPolygon) {
-                                                gl.geoLayers[i].visibleOnMap = !gl.geoLayers[i].visibleOnMap;
-                                                gl.geoLayers[i].visible(gl.geoLayers[i].visibleOnMap);
-                                              }
-                                            });
-                                            setState(() {});
-                                          },
-                                          icon:
-                                              gl.geoLayers[i].visibleOnMap
-                                                  ? FaIcon(
-                                                    FontAwesomeIcons.eyeSlash,
-                                                    size: gl.eqPx * gl.iconSizeS * .9,
-                                                    color: Colors.white,
-                                                  )
-                                                  : FaIcon(
-                                                    FontAwesomeIcons.eye,
-                                                    size: gl.eqPx * gl.iconSizeS * .9,
-                                                    color: Colors.white,
-                                                  ),
-                                        ),
-                                        SizedBox(
-                                          width: gl.eqPx * gl.chosenPolyBarWidth * .5,
-                                          child: Stack(
-                                            children: [
-                                              Row(
-                                                children: [
+                                          ? BorderSide(
+                                            color: gl.geoLayers[i].defaultColor.withAlpha(255),
+                                            width: gl.eqPx * .75,
+                                          )
+                                          : BorderSide(
+                                            color: gl.geoLayers[i].defaultColor.withAlpha(120),
+                                            width: gl.eqPx * .25,
+                                          ),
+                                ),
+                                surfaceTintColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                color:
+                                    i == gl.selectedGeoLayer
+                                        ? gl.selLay.defaultColor.withAlpha(100)
+                                        : Colors.black.withAlpha(100),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          gl.refreshStack(() {
+                                            if (!gl.Mode.editPolygon) {
+                                              gl.geoLayers[i].visibleOnMap = !gl.geoLayers[i].visibleOnMap;
+                                              gl.geoLayers[i].visible(gl.geoLayers[i].visibleOnMap);
+                                            }
+                                          });
+                                          setState(() {});
+                                        },
+                                        icon:
+                                            gl.geoLayers[i].visibleOnMap
+                                                ? FaIcon(
+                                                  FontAwesomeIcons.eyeSlash,
+                                                  size: gl.eqPx * gl.iconSizeS * .9,
+                                                  color: Colors.white,
+                                                )
+                                                : FaIcon(
+                                                  FontAwesomeIcons.eye,
+                                                  size: gl.eqPx * gl.iconSizeS * .9,
+                                                  color: Colors.white,
+                                                ),
+                                      ),
+                                      SizedBox(
+                                        width: gl.eqPx * gl.chosenPolyBarWidth * .5,
+                                        child: Stack(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  alignment: Alignment.topLeft,
+                                                  child:
+                                                      gl.geoLayers[i].type.contains("Point")
+                                                          ? Text(
+                                                            "POINT",
+                                                            style: TextStyle(
+                                                              color: Colors.yellow,
+                                                              fontSize: gl.eqPx * gl.fontSizeXS * .9,
+                                                            ),
+                                                          )
+                                                          : gl.geoLayers[i].type == "Polygon"
+                                                          ? Text(
+                                                            "POLY",
+                                                            style: TextStyle(
+                                                              color: Colors.green,
+                                                              fontSize: gl.eqPx * gl.fontSizeXS * .9,
+                                                            ),
+                                                          )
+                                                          : Text(
+                                                            "OHA?",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: gl.eqPx * gl.fontSizeXS * .9,
+                                                            ),
+                                                          ),
+                                                ),
+                                                SizedBox(width: gl.eqPx * 2),
+                                                if (gl.geoLayers[i].allSent())
                                                   Container(
                                                     alignment: Alignment.topLeft,
-                                                    child:
-                                                        gl.geoLayers[i].type.contains("Point")
-                                                            ? Text(
-                                                              "POINT",
-                                                              style: TextStyle(
-                                                                color: Colors.yellow,
-                                                                fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                              ),
-                                                            )
-                                                            : gl.geoLayers[i].type == "Polygon"
-                                                            ? Text(
-                                                              "POLY",
-                                                              style: TextStyle(
-                                                                color: Colors.green,
-                                                                fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                              ),
-                                                            )
-                                                            : Text(
-                                                              "OHA?",
-                                                              style: TextStyle(
-                                                                color: Colors.red,
-                                                                fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                              ),
-                                                            ),
-                                                  ),
-                                                  SizedBox(width: gl.eqPx * 2),
-                                                  if (gl.geoLayers[i].allSent())
-                                                    Container(
-                                                      alignment: Alignment.topLeft,
-                                                      child: Text(
-                                                        "ALL SENT",
-                                                        style: TextStyle(
-                                                          color: Colors.red,
-                                                          fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                        ),
+                                                    child: Text(
+                                                      "ALL SENT",
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize: gl.eqPx * gl.fontSizeXS * .9,
                                                       ),
                                                     ),
-                                                ],
-                                              ),
-                                              lt.ForestimatorScrollView(
-                                                width: gl.eqPx * gl.chosenPolyBarWidth * .5,
-                                                height: gl.eqPx * gl.iconSizeL * 1.5,
-                                                sizeArrows: gl.eqPx * gl.iconSizeXS,
-                                                arrowColor: gl.colorAgroBioTech,
-                                                horizontal: true,
-                                                child: Container(
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                    gl.geoLayers[i].name,
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: gl.eqPx * gl.fontSizeL,
-                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                            lt.ForestimatorScrollView(
+                                              width: gl.eqPx * gl.chosenPolyBarWidth * .5,
+                                              height: gl.eqPx * gl.iconSizeL * 1.5,
+                                              sizeArrows: gl.eqPx * gl.iconSizeXS,
+                                              arrowColor: gl.colorAgroBioTech,
+                                              horizontal: true,
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  gl.geoLayers[i].name,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: gl.eqPx * gl.fontSizeL,
                                                   ),
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          height: gl.eqPx * gl.iconSizeM,
-                                          width: gl.eqPx * gl.iconSizeM,
-                                          child: IconButton(
-                                            style: lt.trNoPadButtonstyle,
-                                            onPressed: () {
-                                              setState(() {
-                                                gl.selectedGeoLayer = i;
-                                                _selectedIndex = i;
-                                                _titleLayer = false;
-                                              });
-                                              _pageController.animateToPage(
-                                                1,
-                                                duration: Duration(milliseconds: 300),
-                                                curve: Curves.easeInOut,
-                                              );
-                                            },
-                                            icon: Icon(
-                                              Icons.arrow_forward,
-                                              color: Colors.white,
-                                              size: gl.eqPx * gl.iconSizeM,
                                             ),
-                                            padding: EdgeInsets.zero,
-                                          ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      Container(
+                                        alignment: Alignment.center,
+                                        height: gl.eqPx * gl.iconSizeM,
+                                        width: gl.eqPx * gl.iconSizeM,
+                                        child: IconButton(
+                                          style: lt.trNoPadButtonstyle,
+                                          onPressed: () {
+                                            setState(() {
+                                              gl.selectedGeoLayer = i;
+                                              _selectedIndex = i;
+                                              _titleLayer = false;
+                                            });
+                                            _pageController.animateToPage(
+                                              1,
+                                              duration: Duration(milliseconds: 300),
+                                              curve: Curves.easeInOut,
+                                            );
+                                          },
+                                          icon: Icon(
+                                            Icons.arrow_forward,
+                                            color: Colors.white,
+                                            size: gl.eqPx * gl.iconSizeM,
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                    ),
-                    if (_selectedIndex != null)
-                      LayerPropertiesPage(() {
-                        setState(() {
-                          _titleLayer = true;
-                          _pageController.animateToPage(
-                            0,
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        });
-                      }, widget.mapmove),
-                  ],
-                ),
-              ),
-              if (gl.dsp.orientation == Orientation.portrait && _titleLayer && !gl.dsp.showKeyboard)
-                TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
-                      WidgetState.any: Colors.white,
-                    }),
-                    shape: WidgetStateProperty<OutlinedBorder>.fromMap(<WidgetStatesConstraint, OutlinedBorder>{
-                      WidgetState.any: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
-                    }),
-                    fixedSize: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Size>{
-                      WidgetState.any: Size(
-                        gl.eqPx * gl.polyListCardWidth * .97,
-                        gl.eqPx * gl.polyNewPolygonButtonHeight * .9,
-                      ),
-                    }),
-                    padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                      WidgetState.any: EdgeInsetsGeometry.zero,
-                    }),
+                        ),
                   ),
-                  key: Key('autsch-5-addPoly'),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add, size: (gl.polyNewPolygonButtonHeight - 4) * gl.eqPx, color: Colors.black),
-                    ],
-                  ),
-                  onPressed: () {
-                    PopupNewGeometricLayer(context, (String type, String name, Color color) {
-                      if (mounted) {
-                        setState(() {
-                          switch (type) {
-                            case "Point":
-                              gl.geoLayers.add(GeometricLayer.point());
-                              break;
-                            case "Polygon":
-                              gl.geoLayers.add(GeometricLayer.polygon());
-                              break;
-                          }
-                          gl.geoLayers.last.defaultColor = color;
-                          gl.geoLayers.last.name = name;
-                        });
-                      } else {
-                        switch (type) {
-                          case "Point":
-                            gl.geoLayers.add(GeometricLayer.point());
-                            break;
-                          case "Polygon":
-                            gl.geoLayers.add(GeometricLayer.polygon());
-                            break;
-                        }
-                        gl.geoLayers.last.defaultColor = color;
-                        gl.geoLayers.last.name = name;
-                      }
-                      gl.selectedGeoLayer = gl.geoLayers.length - 1;
-                      gl.geoLayers.last.serialize();
-                      gl.refreshStack(() {
-                        gl.selectedGeoLayer = gl.geoLayers.length - 1;
+                  if (_selectedIndex != null)
+                    LayerPropertiesPage(() {
+                      setState(() {
+                        _titleLayer = true;
+                        _pageController.animateToPage(
+                          0,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
                       });
-                      _scrollDown();
-                    });
-                  },
-                ),
-            ],
-          ),
+                    }, widget.mapmove),
+                ],
+              ),
+            ),
+          ]),
         );
       },
     );
@@ -2177,24 +2201,26 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return switchRowColWithOrientation([
-      SizedBox(
-        height: (gl.dsp.eqMaxWindowHeight - 40) * gl.eqPx,
-        width: gl.onCatalogueWidth * gl.eqPx,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 0),
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              color: gl.colorAgroBioTech.withAlpha(75),
-              child: Column(children: _getPropertiesTab() + _getGeometriesList()),
-            ),
-          ],
-        ),
-      ),
-    ]);
+    return OrientationBuilder(
+      builder: (c, o) {
+        return SizedBox(
+          height: (gl.dsp.eqMaxWindowHeight - 20) * gl.eqPx,
+          width: gl.onCatalogueWidth * gl.eqPx,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+            children: [
+              Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
+                surfaceTintColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                color: gl.colorAgroBioTech.withAlpha(75),
+                child: Column(children: _getPropertiesTab() + _getGeometriesList()),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   List<Widget> _getGeometriesList() {
@@ -4863,7 +4889,7 @@ class SettingsMenu extends StatefulWidget {
   State<StatefulWidget> createState() => _SettingsMenu();
 }
 
-class _SettingsMenu extends State<SettingsMenu> {
+class _SettingsMenu extends State<SettingsMenu> with WidgetsBindingObserver {
   final Color active = Colors.black;
   final Color inactive = Colors.blueGrey;
   final List<ItemSettings> menuItems = [];
@@ -4871,35 +4897,47 @@ class _SettingsMenu extends State<SettingsMenu> {
 
   @override
   void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (openedItem.length < 20) {
       for (int i = 20; i > openedItem.length; openedItem.add(true)) {}
     }
-    super.initState();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    setState(() {
+      gl.dsp.insetBot = MediaQuery.of(context).viewInsets.bottom;
+    });
+    gl.refreshStack(() {
+      gl.dsp.insetBot = MediaQuery.of(context).viewInsets.bottom;
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
+        double cHeight = gl.eqPx * (gl.dsp.eqMaxWindowHeight - 20) - gl.dsp.insetBot;
+        if (cHeight < gl.eqPx * 20) cHeight = gl.eqPx * 20;
         return AnimatedContainer(
           duration: Duration(milliseconds: 100),
-          width:
-              gl.dsp.orientation == Orientation.portrait
-                  ? gl.eqPx * gl.popupWindowsPortraitWidth
-                  : gl.eqPx * gl.popupWindowsLandscapeWidth,
-          height:
-              gl.dsp.orientation == Orientation.portrait
-                  ? gl.eqPx * gl.popupWindowsPortraitHeight + 1
-                  : gl.eqPx * gl.popupWindowsLandscapeHeight,
+          width: gl.eqPx * gl.popupWindowsPortraitWidth,
+          height: cHeight,
           child: switchRowColWithOrientation([
             Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  height:
-                      gl.dsp.orientation == Orientation.portrait
-                          ? (gl.popupWindowsPortraitHeight - gl.searchBarHeight - gl.popupReturnButtonHeight) * gl.eqPx
-                          : (gl.popupWindowsLandscapeHeight - gl.searchBarHeight) * gl.eqPx,
-                  width: gl.popupWindowsPortraitWidth * gl.eqPx,
+                  width: gl.eqPx * gl.popupWindowsPortraitWidth,
+                  height: cHeight - gl.eqPx,
                   child: ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 0),
                     children: _injectMenuEntries((int i, ItemSettings item) {
@@ -5533,7 +5571,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
   }
 }
 
-class OnlineMapMenu extends StatefulWidget with WidgetsBindingObserver {
+class OnlineMapMenu extends StatefulWidget {
   final VoidSetter? stateOfLayerSwitcher;
   final bool offlineMode;
   final int selectionMode;
@@ -5661,6 +5699,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
     return OrientationBuilder(
       builder: (c, o) {
         double cHeight = (gl.dsp.eqMaxWindowHeight - 20) * gl.eqPx - gl.dsp.insetBot;
+        if (cHeight < gl.searchBarHeight * gl.eqPx) cHeight = 20 * gl.eqPx;
         return SizedBox(
           width:
               gl.dsp.orientation == Orientation.portrait
@@ -5744,176 +5783,176 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
                     ),
                   ],
                 ),
-
-                SizedBox(
-                  height: cHeight - gl.searchBarHeight * gl.eqPx,
-
-                  width: gl.popupWindowsPortraitWidth * gl.eqPx,
-                  child:
-                      _showCatalogue
-                          ? ListView(
-                            controller: _controller,
-                            padding: const EdgeInsets.symmetric(horizontal: 0),
-                            children: _injectGroupData(
-                              (int i, GroupeCouche groupe) => TextButton(
-                                style: ButtonStyle(
-                                  minimumSize:
-                                      i == selectedCategory
-                                          ? WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                            WidgetState.any: Size(
-                                              gl.eqPx * gl.onCatalogueWidth * .7,
-                                              gl.eqPx * gl.onCatalogueMapHeight,
-                                            ),
-                                          })
-                                          : WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                            WidgetState.any: Size(
-                                              gl.eqPx * gl.onCatalogueWidth * .7,
-                                              gl.eqPx * gl.onCatalogueCategoryHeight,
-                                            ),
-                                          }),
-                                ),
-                                key: Key('$i'),
-                                onPressed:
-                                    i == selectedCategory
-                                        ? () {}
-                                        : () {
-                                          setState(() {
-                                            selectedCategory = i;
-                                            selectedMap = -1;
-                                            selectedLayerTile = null;
-                                          });
-                                        },
-                                child: Card(
-                                  surfaceTintColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  color:
-                                      i == selectedCategory
-                                          ? gl.colorAgroBioTech.withAlpha(75)
-                                          : gl.colorAgroBioTech.withAlpha(200),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      i != selectedCategory
-                                          ? Container(
-                                            alignment: Alignment.center,
-                                            padding: EdgeInsets.all(3),
-                                            constraints: BoxConstraints(
-                                              maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                                              minHeight: gl.eqPx * gl.onCatalogueCategoryHeight,
-                                            ),
-                                            child: Text(
-                                              groupe.mLabel,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: gl.eqPx * gl.fontSizeM,
-                                              ),
-                                            ),
-                                          )
-                                          : Container(
-                                            alignment: Alignment.center,
-                                            padding: EdgeInsets.zero,
-                                            constraints: BoxConstraints(maxWidth: gl.eqPx * gl.onCatalogueWidth * .97),
-                                            child: ListBody(
-                                              children:
-                                                  <Widget>[
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          selectedCategory = -1;
-                                                          selectedMap = -1;
-                                                          selectedLayerTile = null;
-                                                        });
-                                                      },
-                                                      child: Card(
-                                                        color: gl.colorAgroBioTech.withAlpha(200),
-                                                        child: Container(
-                                                          alignment: Alignment.center,
-                                                          padding: EdgeInsets.all(3),
-                                                          constraints: BoxConstraints(
-                                                            maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                                                            minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                                                            minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
-                                                          ),
-                                                          child: Text(
-                                                            groupe.mLabel,
-                                                            textAlign: TextAlign.center,
-                                                            style: TextStyle(
-                                                              color: Colors.black,
-                                                              fontWeight: FontWeight.w400,
-                                                              fontSize: gl.eqPx * gl.fontSizeM,
-                                                            ),
-                                                          ),
+                if (!gl.Mode.keyboardExpanded || gl.dsp.orientation == Orientation.portrait)
+                  SizedBox(
+                    height: cHeight - gl.searchBarHeight * gl.eqPx,
+                    width: gl.popupWindowsPortraitWidth * gl.eqPx,
+                    child:
+                        _showCatalogue
+                            ? ListView(
+                              controller: _controller,
+                              padding: const EdgeInsets.symmetric(horizontal: 0),
+                              children: _injectGroupData(
+                                (int i, GroupeCouche groupe) =>
+                                    groupe.mExpert && !gl.Mode.expert
+                                        ? SizedBox()
+                                        : TextButton(
+                                          style: ButtonStyle(
+                                            minimumSize:
+                                                i == selectedCategory
+                                                    ? WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                                      WidgetState.any: Size(
+                                                        gl.eqPx * gl.onCatalogueWidth * .7,
+                                                        gl.eqPx * gl.onCatalogueMapHeight,
+                                                      ),
+                                                    })
+                                                    : WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                                      WidgetState.any: Size(
+                                                        gl.eqPx * gl.onCatalogueWidth * .7,
+                                                        gl.eqPx * gl.onCatalogueCategoryHeight,
+                                                      ),
+                                                    }),
+                                          ),
+                                          key: Key('$i'),
+                                          onPressed:
+                                              i == selectedCategory
+                                                  ? () {}
+                                                  : () {
+                                                    setState(() {
+                                                      selectedCategory = i;
+                                                      selectedMap = -1;
+                                                      selectedLayerTile = null;
+                                                    });
+                                                  },
+                                          child: Card(
+                                            surfaceTintColor: Colors.transparent,
+                                            shadowColor: Colors.transparent,
+                                            color:
+                                                i == selectedCategory
+                                                    ? gl.colorAgroBioTech.withAlpha(75)
+                                                    : gl.colorAgroBioTech.withAlpha(200),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                i != selectedCategory
+                                                    ? Container(
+                                                      alignment: Alignment.center,
+                                                      padding: EdgeInsets.all(3),
+                                                      constraints: BoxConstraints(
+                                                        maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                                        minHeight: gl.eqPx * gl.onCatalogueCategoryHeight,
+                                                      ),
+                                                      child: Text(
+                                                        groupe.mLabel,
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight: FontWeight.w400,
+                                                          fontSize: gl.eqPx * gl.fontSizeM,
                                                         ),
                                                       ),
+                                                    )
+                                                    : Container(
+                                                      alignment: Alignment.center,
+                                                      padding: EdgeInsets.zero,
+                                                      constraints: BoxConstraints(
+                                                        maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                                      ),
+                                                      child: ListBody(
+                                                        children:
+                                                            <Widget>[
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  setState(() {
+                                                                    selectedCategory = -1;
+                                                                    selectedMap = -1;
+                                                                    selectedLayerTile = null;
+                                                                  });
+                                                                },
+                                                                child: Card(
+                                                                  color: gl.colorAgroBioTech.withAlpha(200),
+                                                                  child: Container(
+                                                                    alignment: Alignment.center,
+                                                                    padding: EdgeInsets.all(3),
+                                                                    constraints: BoxConstraints(
+                                                                      maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                                                      minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                                                      minHeight:
+                                                                          gl.eqPx * gl.onCatalogueMapHeight * .97,
+                                                                    ),
+                                                                    child: Text(
+                                                                      groupe.mLabel,
+                                                                      textAlign: TextAlign.center,
+                                                                      style: TextStyle(
+                                                                        color: Colors.black,
+                                                                        fontWeight: FontWeight.w400,
+                                                                        fontSize: gl.eqPx * gl.fontSizeM,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ] +
+                                                            _injectLayerData(groupe.mCode, (
+                                                              int i,
+                                                              LayerTile layerTile,
+                                                            ) {
+                                                              return catalogueTileCard(
+                                                                i,
+                                                                layerTile,
+                                                                widget.offlineMode,
+                                                                widget.selectionMode,
+                                                                stateOfLayerSwitcher,
+                                                                setState,
+                                                                noLegend: gl.dsp.orientation.index == 1,
+                                                              );
+                                                            }),
+                                                      ),
                                                     ),
-                                                  ] +
-                                                  _injectLayerData(groupe.mCode, (int i, LayerTile layerTile) {
-                                                    return layerTileCard(
-                                                      i,
-                                                      layerTile,
-                                                      widget.offlineMode,
-                                                      widget.selectionMode,
-                                                      stateOfLayerSwitcher,
-                                                      setState,
-                                                      noLegend: gl.dsp.orientation.index == 1,
-                                                    );
-                                                  }),
+                                              ],
                                             ),
                                           ),
-                                    ],
-                                  ),
-                                ),
+                                        ),
                               ),
+                            )
+                            : ListView(
+                              children: List<Widget>.generate(_resultOfMapSearch.length, (int i) {
+                                LayerTile layerTile = LayerTile(
+                                  key: _resultOfMapSearch[i],
+                                  name: gl.dico.getLayerBase(_resultOfMapSearch[i]).mNom,
+                                  filter: gl.dico.getLayerBase(_resultOfMapSearch[i]).mGroupe,
+                                  downloadable: gl.dico.getLayerBase(_resultOfMapSearch[i]).mIsDownloadableRW,
+                                );
+                                return catalogueTileCard(
+                                  i,
+                                  layerTile,
+                                  widget.offlineMode,
+                                  widget.selectionMode,
+                                  stateOfLayerSwitcher,
+                                  setState,
+                                  noLegend: gl.dsp.orientation == Orientation.landscape,
+                                );
+                              }),
                             ),
-                          )
-                          : ListView(
-                            children: List<Widget>.generate(_resultOfMapSearch.length, (int i) {
-                              LayerTile layerTile = LayerTile(
-                                key: _resultOfMapSearch[i],
-                                name: gl.dico.getLayerBase(_resultOfMapSearch[i]).mNom,
-                                filter: gl.dico.getLayerBase(_resultOfMapSearch[i]).mGroupe,
-                                downloadable: gl.dico.getLayerBase(_resultOfMapSearch[i]).mIsDownloadableRW,
-                              );
-                              return layerTileCard(
-                                i,
-                                layerTile,
-                                widget.offlineMode,
-                                widget.selectionMode,
-                                stateOfLayerSwitcher,
-                                setState,
-                                noLegend: gl.dsp.orientation == Orientation.landscape,
-                              );
-                            }),
-                          ),
-                ),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                if (gl.dsp.orientation == Orientation.landscape)
-                  Container(
-                    constraints: BoxConstraints(
-                      maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth,
-                      maxHeight: gl.eqPx * (gl.popupWindowsLandscapeHeight - gl.popupReturnButtonHeight),
-                    ),
-                    child: ListView(
-                      children: [
-                        layerTileCard(
-                          selectedMap,
-                          selectedLayerTile,
-                          widget.offlineMode,
-                          widget.selectionMode,
-                          stateOfLayerSwitcher,
-                          setState,
-                        ),
-                      ],
-                    ),
                   ),
               ],
             ),
+            if (gl.dsp.orientation == Orientation.landscape && !gl.Mode.keyboardExpanded)
+              Container(
+                constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth, maxHeight: cHeight),
+                child: ListView(
+                  children: [
+                    catalogueTileCard(
+                      selectedMap,
+                      selectedLayerTile,
+                      widget.offlineMode,
+                      widget.selectionMode,
+                      stateOfLayerSwitcher,
+                      setState,
+                    ),
+                  ],
+                ),
+              ),
           ]),
         );
       },
@@ -6069,7 +6108,7 @@ class _MapStatusSymbols extends State<MapStatusSymbols> {
   }
 }
 
-Card layerTileCard(
+Card catalogueTileCard(
   int i,
   LayerTile? layerTile,
   bool offlineMode,
@@ -6273,192 +6312,206 @@ class _LayerSwitcher extends State<LayerSwitcher> {
     return OrientationBuilder(
       builder: (c, o) {
         return Card(
-          color: gl.backgroundTransparentBlackBox,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 100),
-            width:
-                gl.dsp.orientation == Orientation.portrait
-                    ? gl.eqPx * gl.layerswitcherBoxWidth
-                    : gl.eqPx * gl.layerswitcherBoxWidth * 2.2,
-            height:
-                gl.dsp.orientation == Orientation.portrait
-                    ? gl.offlineMode
-                        ? (gl.layerSwitcherBoxHeightPortraitOffline +
-                                gl.layerswitcherButtonsBoxHeight +
-                                (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
-                                    ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                    : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
-                                        ? gl.layerswitcherControlBoxHeight
-                                        : 0.0))) *
-                            gl.eqPx
-                        : (gl.layerSwitcherBoxHeightPortrait +
-                                gl.layerswitcherButtonsBoxHeight +
-                                (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
-                                    ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                    : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
-                                        ? gl.layerswitcherControlBoxHeight
-                                        : 0.0))) *
-                            gl.eqPx
-                    : gl.layerSwitcherBoxHeightLandscape * gl.eqPx,
-            child: switchRowColWithOrientation([
-              if (((gl.geoLayers.isNotEmpty) || gl.poiMarkerList.isNotEmpty) &&
-                  gl.dsp.orientation == Orientation.portrait)
-                SizedBox(
-                  width: gl.eqPx * gl.layerswitcherBoxWidth,
-                  height:
-                      (gl.poiMarkerList.isNotEmpty && gl.layerReady && gl.selLay.geometries.isNotEmpty
-                          ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                          : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
-                              ? gl.layerswitcherControlBoxHeight
-                              : 0.0)) *
-                      gl.eqPx,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                        height: gl.eqPx * gl.fontSizeL,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Couches points/polygones",
-                              textAlign: TextAlign.justify,
-                              style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
-                            ),
-                          ],
-                        ),
-                      ),
-                      UpperLayerControl(switchToLocationInSearchMenu: widget.switchToLocationInSearchMenu),
-                    ],
-                  ),
-                ),
-              SizedBox(
-                width: gl.eqPx * gl.layerswitcherBoxWidth,
-                height:
-                    gl.eqPx *
-                    (gl.offlineMode ? gl.layerSwitcherBoxHeightPortraitOffline : gl.layerSwitcherBoxHeightPortrait),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: gl.eqPx * gl.layerswitcherBoxWidth,
-                      height: gl.eqPx * gl.fontSizeXL,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Couches thématiques",
-                            textAlign: TextAlign.justify,
-                            style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+          color: gl.Mode.keyboardExpanded ? Colors.transparent : gl.backgroundTransparentBlackBox,
+          child:
+              gl.Mode.keyboardExpanded
+                  ? AnimatedContainer(
+                    duration: Duration(milliseconds: 100),
+                    width:
+                        gl.dsp.orientation == Orientation.portrait
+                            ? gl.eqPx * gl.layerswitcherBoxWidth
+                            : gl.eqPx * gl.layerswitcherBoxWidth * 2.2,
+                    height: gl.eqPx * 10,
+                  )
+                  : AnimatedContainer(
+                    duration: Duration(milliseconds: 100),
+                    width:
+                        gl.dsp.orientation == Orientation.portrait
+                            ? gl.eqPx * gl.layerswitcherBoxWidth
+                            : gl.eqPx * gl.layerswitcherBoxWidth * 2.2,
+                    height:
+                        gl.dsp.orientation == Orientation.portrait
+                            ? gl.offlineMode
+                                ? (gl.layerSwitcherBoxHeightPortraitOffline +
+                                        gl.layerswitcherButtonsBoxHeight +
+                                        (gl.poiMarkerList.isNotEmpty && gl.geoLayers.isNotEmpty
+                                            ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
+                                            : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
+                                                ? gl.layerswitcherControlBoxHeight
+                                                : 0.0))) *
+                                    gl.eqPx
+                                : (gl.layerSwitcherBoxHeightPortrait +
+                                        gl.layerswitcherButtonsBoxHeight +
+                                        (gl.poiMarkerList.isNotEmpty && gl.geoLayers.isNotEmpty
+                                            ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
+                                            : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
+                                                ? gl.layerswitcherControlBoxHeight
+                                                : 0.0))) *
+                                    gl.eqPx
+                            : gl.layerSwitcherBoxHeightLandscape * gl.eqPx,
+                    child: switchRowColWithOrientation([
+                      if (((gl.geoLayers.isNotEmpty) || gl.poiMarkerList.isNotEmpty) &&
+                          gl.dsp.orientation == Orientation.portrait)
+                        SizedBox(
+                          width: gl.eqPx * gl.layerswitcherBoxWidth,
+                          height:
+                              (gl.poiMarkerList.isNotEmpty && gl.geoLayers.isNotEmpty
+                                  ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
+                                  : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
+                                      ? gl.layerswitcherControlBoxHeight
+                                      : 0.0)) *
+                              gl.eqPx,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                                height: gl.eqPx * gl.fontSizeL,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Couches points/polygones",
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              UpperLayerControl(switchToLocationInSearchMenu: widget.switchToLocationInSearchMenu),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                      height:
-                          gl.eqPx *
-                              (gl.offlineMode
-                                  ? gl.layerSwitcherBoxHeightPortraitOffline
-                                  : gl.layerSwitcherBoxHeightPortrait) -
-                          gl.eqPx * gl.fontSizeXL,
-                      child: SwitcherBox(),
-                    ),
-                  ],
-                ),
-              ),
-              if (gl.dsp.orientation == Orientation.portrait)
-                SizedBox(
-                  width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                  height: gl.eqPx * gl.layerswitcherButtonsBoxHeight,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                        height: gl.eqPx * gl.fontSizeXL,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Catalogues des couches",
-                              textAlign: TextAlign.justify,
-                              style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
-                            ),
-                          ],
                         ),
-                      ),
-                      SizedBox(
-                        width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                        height: gl.eqPx * gl.layerswitcherButtonsBoxHeight - gl.eqPx * gl.fontSizeXL,
-                        child: ViewCatalogueControl(gl.rebuildSwitcherBox),
-                      ),
-                    ],
-                  ),
-                ),
-              if (gl.dsp.orientation == Orientation.landscape)
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (gl.geoReady || gl.poiMarkerList.isNotEmpty)
                       SizedBox(
                         width: gl.eqPx * gl.layerswitcherBoxWidth,
                         height:
-                            (gl.poiMarkerList.isNotEmpty && gl.selLay.geometries.isNotEmpty
-                                ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
-                                : (gl.poiMarkerList.isNotEmpty || gl.selLay.geometries.isNotEmpty
-                                    ? gl.layerswitcherControlBoxHeight
-                                    : 0.0)) *
-                            gl.eqPx,
+                            gl.eqPx *
+                            (gl.offlineMode
+                                ? gl.layerSwitcherBoxHeightPortraitOffline
+                                : gl.layerSwitcherBoxHeightPortrait),
                         child: Column(
                           children: [
                             SizedBox(
                               width: gl.eqPx * gl.layerswitcherBoxWidth,
-                              height: gl.eqPx * gl.fontSizeL,
+                              height: gl.eqPx * gl.fontSizeXL,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Controlez les couches visibles",
+                                    "Couches thématiques",
                                     textAlign: TextAlign.justify,
                                     style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
                                   ),
                                 ],
                               ),
                             ),
-                            UpperLayerControl(switchToLocationInSearchMenu: widget.switchToLocationInSearchMenu),
+                            SizedBox(
+                              width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                              height:
+                                  gl.eqPx *
+                                      (gl.offlineMode
+                                          ? gl.layerSwitcherBoxHeightPortraitOffline
+                                          : gl.layerSwitcherBoxHeightPortrait) -
+                                  gl.eqPx * gl.fontSizeXL,
+                              child: SwitcherBox(),
+                            ),
                           ],
                         ),
                       ),
-                    SizedBox(
-                      width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                      height: gl.eqPx * gl.layerswitcherButtonsBoxHeight,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                            height: gl.eqPx * gl.fontSizeXL,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Catalogues des couches",
-                                  textAlign: TextAlign.justify,
-                                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                      if (gl.dsp.orientation == Orientation.portrait)
+                        SizedBox(
+                          width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                          height: gl.eqPx * gl.layerswitcherButtonsBoxHeight,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                                height: gl.eqPx * gl.fontSizeXL,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Catalogues des couches",
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
+                              SizedBox(
+                                width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                                height: gl.eqPx * gl.layerswitcherButtonsBoxHeight - gl.eqPx * gl.fontSizeXL,
+                                child: ViewCatalogueControl(gl.rebuildSwitcherBox),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (gl.dsp.orientation == Orientation.landscape)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (gl.geoReady || gl.poiMarkerList.isNotEmpty)
+                              SizedBox(
+                                width: gl.eqPx * gl.layerswitcherBoxWidth,
+                                height:
+                                    (gl.poiMarkerList.isNotEmpty && gl.geoLayers.isNotEmpty
+                                        ? gl.layerSwitcherTileHeight + gl.layerswitcherControlBoxHeight
+                                        : (gl.poiMarkerList.isNotEmpty || gl.geoLayers.isNotEmpty
+                                            ? gl.layerswitcherControlBoxHeight
+                                            : 0.0)) *
+                                    gl.eqPx,
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      width: gl.eqPx * gl.layerswitcherBoxWidth,
+                                      height: gl.eqPx * gl.fontSizeL,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Controlez les couches visibles",
+                                            textAlign: TextAlign.justify,
+                                            style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    UpperLayerControl(
+                                      switchToLocationInSearchMenu: widget.switchToLocationInSearchMenu,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            SizedBox(
+                              width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                              height: gl.eqPx * gl.layerswitcherButtonsBoxHeight,
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                                    height: gl.eqPx * gl.fontSizeXL,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Catalogues des couches",
+                                          textAlign: TextAlign.justify,
+                                          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
+                                    height: gl.eqPx * gl.layerswitcherButtonsBoxHeight - gl.eqPx * gl.fontSizeXL,
+                                    child: ViewCatalogueControl(gl.rebuildSwitcherBox),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            width: gl.eqPx * gl.layerswitcherBoxWidth - 1,
-                            height: gl.eqPx * gl.layerswitcherButtonsBoxHeight - gl.eqPx * gl.fontSizeXL,
-                            child: ViewCatalogueControl(gl.rebuildSwitcherBox),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-            ]),
-          ),
+                          ],
+                        ),
+                    ]),
+                  ),
         );
       },
     );
@@ -7819,7 +7872,7 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
       builder: (context, orientation) {
         return switchRowColWithOrientation([
           SizedBox(
-            height: (gl.eqPxH - 30) * gl.eqPx,
+            height: (gl.dsp.eqMaxWindowHeight - 20) * gl.eqPx,
             width: gl.eqPx * 96,
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -7831,28 +7884,6 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
                   color: gl.backgroundTransparentBlackBox,
                   child: Column(
                     children: [
-                      Card(
-                        color: gl.colorAgroBioTech.withAlpha(200),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              height: gl.eqPx * gl.fontSizeXL * 2,
-                              width: gl.eqPx * gl.popupWindowsPortraitWidth * .8,
-                              child: Text(
-                                "Par couche",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: gl.eqPx * gl.fontSizeL,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                       Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadiusGeometry.circular(12.0),

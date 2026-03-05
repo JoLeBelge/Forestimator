@@ -16,7 +16,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO: Add state to SENT status with callback in timer.
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
-// TODO: Some Keyboard switch Bugs remaining
 
 typedef VoidSetter = void Function(void Function());
 
@@ -205,6 +204,7 @@ class Display {
     insetTop = MediaQuery.of(context).viewInsets.top;
     insetBot = MediaQuery.of(context).viewInsets.bottom;
     insetBot > 0 ? showKeyboard = true : showKeyboard = false;
+    Mode.keyboardExpanded = showKeyboard;
     //_tabletMode();
     //_squareMode();
     _enforceEquiWidthHeight();
