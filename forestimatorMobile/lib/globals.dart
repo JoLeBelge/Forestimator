@@ -169,6 +169,8 @@ class Mode {
 class Display {
   double paddingTop = -1;
   double paddingBot = -1;
+  double paddingLeft = -1;
+  double paddingRight = -1;
   double insetTop = -1;
   double insetBot = -1;
   double width = -1;
@@ -187,8 +189,11 @@ class Display {
   double alignY(double px) => (2.0 / height) * (equipixel * px);
 
   double get eqAlignTop => paddingTop / equipixel - equiheight / 2;
-  double get eqlignBottom => -paddingBot / equipixel + equiheight / 2;
+  double get eqAlignBottom => -paddingBot / equipixel + equiheight / 2;
+  double get eqAlignLeft => paddingLeft / equipixel - equiwidth / 2;
+  double get eqAlignRight => -paddingRight / equipixel + equiwidth / 2;
 
+  double get eqMaxWindowWidth => (width - 2 * math.max(paddingLeft, paddingRight)) / equipixel;
   double get eqMaxWindowHeight => (height - 2 * math.max(paddingTop, paddingBot)) / equipixel;
   double get maxWinPaddingHeight =>
       eqMaxWindowHeight * eqPx - insetBot > 0 ? eqMaxWindowHeight * eqPx - insetBot : eqPx;
@@ -196,6 +201,8 @@ class Display {
   Display(BuildContext context) {
     paddingTop = MediaQuery.of(context).padding.top;
     paddingBot = MediaQuery.of(context).padding.bottom;
+    paddingLeft = MediaQuery.of(context).padding.left;
+    paddingRight = MediaQuery.of(context).padding.right;
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     aspect = MediaQuery.of(context).size.aspectRatio;

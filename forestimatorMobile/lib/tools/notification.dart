@@ -246,7 +246,7 @@ class PopupSearchMenu {
     gl.refreshStack(() {
       popupForestimatorWindow(
         id: "SearchMenu",
-        title: "Recherche d'un lieu",
+        title: "d'un lieu",
         child: SearchMenu(moveToPoint: moveToPointOnMap),
         onDiscard: onDiscard,
       );
@@ -284,7 +284,7 @@ class PopupOnlineMapMenu {
         id: "Catalogue",
         title: "Catalogue des couches",
         onDiscard: onDiscard,
-        child: OnlineMapMenu(
+        child: CatalogueMenu(
           after: onDiscard,
           offlineMode: offlineMode,
           selectionMode: selectionMode,
@@ -651,7 +651,7 @@ class PopupForestimatorWindow extends StatelessWidget {
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (c, o) {
-        double cWidth = width ?? gl.dsp.width * gl.eqPx - 4;
+        double cWidth = width ?? gl.dsp.eqMaxWindowWidth * gl.eqPx;
         double cHeight = height ?? gl.dsp.eqMaxWindowHeight * gl.eqPx;
         cHeight -= gl.dsp.insetBot;
         return Card(
@@ -713,17 +713,20 @@ class PopupForestimatorWindow extends StatelessWidget {
                   alignment: AlignmentGeometry.xy(0, 0),
                   children: [
                     pdfChild ??
-                        SingleChildScrollView(
-                          child:
-                              child ??
-                              Text(
-                                message ?? "",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: gl.eqPx * gl.fontSizeM,
+                        SizedBox(
+                          height: cHeight - gl.eqPx * 20,
+                          child: SingleChildScrollView(
+                            child:
+                                child ??
+                                Text(
+                                  message ?? "",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: gl.eqPx * gl.fontSizeM,
+                                  ),
                                 ),
-                              ),
+                          ),
                         ),
                     if (big)
                       SizedBox(
@@ -3905,7 +3908,7 @@ class _SearchMenu extends State<SearchMenu> with WidgetsBindingObserver {
               Container(
                 alignment: Alignment.center,
                 constraints: BoxConstraints(
-                  maxHeight: (gl.popupWindowsLandscapeHeight - 5) * gl.eqPx - gl.dsp.insetBot,
+                  maxHeight: gl.eqPx * (gl.dsp.eqMaxWindowHeight - 21) - gl.dsp.insetBot,
                   maxWidth: gl.popupWindowsPortraitWidth * gl.eqPx,
                 ),
                 child: ListView(children: <Widget>[] + searchResults),
@@ -4066,7 +4069,7 @@ class _SearchMenu extends State<SearchMenu> with WidgetsBindingObserver {
             if (gl.dsp.orientation == Orientation.portrait)
               Container(
                 alignment: Alignment.center,
-                height: (gl.popupWindowsPortraitHeight - gl.searchBarHeight) * gl.eqPx - gl.dsp.insetBot,
+                height: gl.eqPx * (gl.dsp.eqMaxWindowHeight - 21 - gl.searchBarHeight) - gl.dsp.insetBot,
                 child: ListView(children: <Widget>[] + searchResults),
               ),
           ]),
@@ -4091,7 +4094,7 @@ Widget forestimatorSettingsVersion(VoidSetter state) {
                   "Forestimator Mobile",
                   overflow: TextOverflow.clip,
                   textAlign: TextAlign.left,
-                  textScaler: TextScaler.linear(2.0),
+                  style: TextStyle(fontSize: gl.fontSizeXL * gl.eqPx),
                 ),
               ],
             ),
@@ -4384,7 +4387,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
               ],
             ),
             lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-            Row(
+            Stack(
               children: [
                 IconButton(
                   onPressed: () {
@@ -4398,7 +4401,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                       );
                     });
                   },
-                  icon: Icon(Icons.info_outline, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
+                  icon: Icon(Icons.info_outline, size: gl.eqPx * gl.iconSizeXS, color: gl.colorBack),
                 ),
                 variableBooleanSlider("Observations des essences", gl.Mode.essence, (bool it) {
                   if (gl.Mode.userDataFilled) {
@@ -5571,13 +5574,13 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
   }
 }
 
-class OnlineMapMenu extends StatefulWidget {
+class CatalogueMenu extends StatefulWidget {
   final VoidSetter? stateOfLayerSwitcher;
   final bool offlineMode;
   final int selectionMode;
   final VoidCallback after;
   final String selectedMapCode;
-  const OnlineMapMenu({
+  const CatalogueMenu({
     super.key,
     required this.offlineMode,
     this.selectionMode = -1,
@@ -5587,10 +5590,10 @@ class OnlineMapMenu extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _OnlineMapMenu();
+  State<StatefulWidget> createState() => _CatalogueMenu();
 }
 
-class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
+class _CatalogueMenu extends State<CatalogueMenu> with WidgetsBindingObserver {
   static bool modified = false;
   static int selectedCategory = -1;
   static int selectedMap = -1;
@@ -5698,13 +5701,12 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
     };
     return OrientationBuilder(
       builder: (c, o) {
+        double cWidth = (gl.dsp.eqMaxWindowWidth - 2) * gl.eqPx;
+        double hWidth = gl.dsp.orientation == Orientation.landscape ? cWidth * .49 : cWidth * .98;
         double cHeight = (gl.dsp.eqMaxWindowHeight - 20) * gl.eqPx - gl.dsp.insetBot;
         if (cHeight < gl.searchBarHeight * gl.eqPx) cHeight = 20 * gl.eqPx;
         return SizedBox(
-          width:
-              gl.dsp.orientation == Orientation.portrait
-                  ? gl.eqPx * gl.popupWindowsPortraitWidth
-                  : gl.eqPx * gl.popupWindowsLandscapeWidth,
+          width: cWidth,
           height: cHeight,
           child: switchRowColWithOrientation([
             Column(
@@ -5715,7 +5717,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
                   children: [
                     SizedBox(
                       height: gl.eqPx * gl.searchBarHeight,
-                      width: gl.eqPx * gl.searchBarWidth,
+                      width: hWidth,
                       child: Card(
                         child: TextFormField(
                           decoration: InputDecoration(
@@ -5731,40 +5733,43 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
                           autocorrect: false,
                           enableSuggestions: true,
                           onChanged: (String value) {
-                            selectedMap = -1;
-                            selectedLayerTile = null;
-                            selectedCategory = -1;
-                            _resultOfMapSearch.clear();
-                            if (value.isNotEmpty) {
-                              for (String term in value.split(' ')) {
-                                if (term != '') {
-                                  for (var layer in gl.dico.mLayerBases.values) {
-                                    if ((!layer.mExpert || gl.Mode.expert) &&
-                                        (widget.offlineMode ? layer.mOffline : true) &&
-                                        (layer.mNom
-                                            .toLowerCase()
-                                            .replaceAll('è', 'e')
-                                            .replaceAll('é', 'e')
-                                            .replaceAll('ê', 'e')
-                                            .replaceAll('â', 'a')
-                                            .replaceAll('à', 'a')
-                                            .replaceAll('ç', 'c')
-                                            .contains(
-                                              term
-                                                  .toLowerCase()
-                                                  .replaceAll('è', 'e')
-                                                  .replaceAll('é', 'e')
-                                                  .replaceAll('ê', 'e')
-                                                  .replaceAll('â', 'a')
-                                                  .replaceAll('à', 'a')
-                                                  .replaceAll('ç', 'c'),
-                                            ))) {
-                                      _resultOfMapSearch.add(layer.mCode);
+                            setState(() {
+                              selectedMap = -1;
+                              selectedLayerTile = null;
+                              selectedCategory = -1;
+                              _resultOfMapSearch.clear();
+                              if (value.isNotEmpty) {
+                                for (String term in value.split(' ')) {
+                                  if (term != '') {
+                                    for (var layer in gl.dico.mLayerBases.values) {
+                                      if ((!layer.mExpert || gl.Mode.expert) &&
+                                          (widget.offlineMode ? layer.mOffline : true) &&
+                                          (layer.mNom
+                                              .toLowerCase()
+                                              .replaceAll('è', 'e')
+                                              .replaceAll('é', 'e')
+                                              .replaceAll('ê', 'e')
+                                              .replaceAll('â', 'a')
+                                              .replaceAll('à', 'a')
+                                              .replaceAll('ç', 'c')
+                                              .contains(
+                                                term
+                                                    .toLowerCase()
+                                                    .replaceAll('è', 'e')
+                                                    .replaceAll('é', 'e')
+                                                    .replaceAll('ê', 'e')
+                                                    .replaceAll('â', 'a')
+                                                    .replaceAll('à', 'a')
+                                                    .replaceAll('ç', 'c'),
+                                              ))) {
+                                        _resultOfMapSearch.add(layer.mCode);
+                                      }
                                     }
                                   }
                                 }
                               }
-                            }
+                            });
+
                             if (_resultOfMapSearch.isEmpty || value.isEmpty) {
                               setState(() {
                                 _showCatalogue = true;
@@ -5786,7 +5791,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
                 if (!gl.Mode.keyboardExpanded || gl.dsp.orientation == Orientation.portrait)
                   SizedBox(
                     height: cHeight - gl.searchBarHeight * gl.eqPx,
-                    width: gl.popupWindowsPortraitWidth * gl.eqPx,
+                    width: hWidth,
                     child:
                         _showCatalogue
                             ? ListView(
@@ -5839,7 +5844,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
                                                       alignment: Alignment.center,
                                                       padding: EdgeInsets.all(3),
                                                       constraints: BoxConstraints(
-                                                        maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                                        maxWidth: hWidth,
                                                         minHeight: gl.eqPx * gl.onCatalogueCategoryHeight,
                                                       ),
                                                       child: Text(
@@ -5855,9 +5860,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
                                                     : Container(
                                                       alignment: Alignment.center,
                                                       padding: EdgeInsets.zero,
-                                                      constraints: BoxConstraints(
-                                                        maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                                                      ),
+                                                      constraints: BoxConstraints(maxWidth: hWidth),
                                                       child: ListBody(
                                                         children:
                                                             <Widget>[
@@ -5875,8 +5878,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
                                                                     alignment: Alignment.center,
                                                                     padding: EdgeInsets.all(3),
                                                                     constraints: BoxConstraints(
-                                                                      maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
-                                                                      minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                                                                      maxWidth: hWidth,
+                                                                      minWidth: hWidth,
                                                                       minHeight:
                                                                           gl.eqPx * gl.onCatalogueMapHeight * .97,
                                                                     ),
@@ -5939,7 +5942,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> with WidgetsBindingObserver {
             ),
             if (gl.dsp.orientation == Orientation.landscape && !gl.Mode.keyboardExpanded)
               Container(
-                constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth, maxHeight: cHeight),
+                constraints: BoxConstraints(maxWidth: hWidth, maxHeight: cHeight),
                 child: ListView(
                   children: [
                     catalogueTileCard(
@@ -6122,13 +6125,13 @@ Card catalogueTileCard(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(12.0),
           side:
-              i == _OnlineMapMenu.selectedMap
+              i == _CatalogueMenu.selectedMap
                   ? BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0)
                   : BorderSide(color: Colors.transparent, width: 0.0),
         ),
-        color: i == _OnlineMapMenu.selectedMap ? Colors.white.withAlpha(255) : Colors.white.withAlpha(200),
+        color: i == _CatalogueMenu.selectedMap ? Colors.white.withAlpha(255) : Colors.white.withAlpha(200),
         child:
-            i != _OnlineMapMenu.selectedMap || noLegend
+            i != _CatalogueMenu.selectedMap || noLegend
                 ? Container(
                   constraints: BoxConstraints(minHeight: gl.eqPx * gl.onCatalogueMapHeight),
                   child: Column(
@@ -6144,16 +6147,16 @@ Card catalogueTileCard(
                             child: TextButton(
                               onPressed: () {
                                 setState(() {
-                                  _OnlineMapMenu.selectedMap == i
+                                  _CatalogueMenu.selectedMap == i
                                       ? {
-                                        _OnlineMapMenu.selectedMap = -1,
-                                        _OnlineMapMenu.selectedLayerTile = null,
-                                        _OnlineMapMenu.modified = true,
+                                        _CatalogueMenu.selectedMap = -1,
+                                        _CatalogueMenu.selectedLayerTile = null,
+                                        _CatalogueMenu.modified = true,
                                       }
                                       : {
-                                        _OnlineMapMenu.selectedMap = i,
-                                        _OnlineMapMenu.selectedLayerTile = layerTile,
-                                        _OnlineMapMenu.modified = true,
+                                        _CatalogueMenu.selectedMap = i,
+                                        _CatalogueMenu.selectedLayerTile = layerTile,
+                                        _CatalogueMenu.modified = true,
                                       };
                                 });
                               },
@@ -6197,9 +6200,9 @@ Card catalogueTileCard(
                             child: TextButton(
                               onPressed: () {
                                 setState(() {
-                                  _OnlineMapMenu.selectedMap == i
-                                      ? {_OnlineMapMenu.selectedMap = -1, _OnlineMapMenu.selectedLayerTile = null}
-                                      : {_OnlineMapMenu.selectedMap = i, _OnlineMapMenu.selectedLayerTile = layerTile};
+                                  _CatalogueMenu.selectedMap == i
+                                      ? {_CatalogueMenu.selectedMap = -1, _CatalogueMenu.selectedLayerTile = null}
+                                      : {_CatalogueMenu.selectedMap = i, _CatalogueMenu.selectedLayerTile = layerTile};
                                 });
                               },
                               child: Text(
