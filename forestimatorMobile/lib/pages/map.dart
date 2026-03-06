@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/myicons.dart';
 import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
 import 'package:fforestimator/tools/layout_tools.dart' as lt;
 import 'package:fforestimator/tools/geometry/geometry.dart' as ge;
@@ -1037,21 +1038,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       iconSize: gl.eqPx * gl.iconSizeS,
                                       color: Colors.lightGreenAccent,
                                       onPressed: () {
-                                        refreshView(() {
-                                          _stopMovingSelectedPoint();
-                                          gl.Mode.editPolygon = false;
-                                          gl.Mode.showButtonAddVertexesPolygon = true;
-                                          gl.Mode.showButtonMoveVertexesPolygon = false;
-                                          gl.Mode.showButtonRemoveVertexesPolygon = false;
-                                          gl.Mode.addVertexesPolygon = false;
-                                          gl.Mode.moveVertexesPolygon = false;
-                                          gl.Mode.removeVertexesPolygon = false;
-                                        });
-                                        if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
-                                          gl.selLay.removeGeometry(last: true);
-                                        } else if (gl.selGeo.type.contains("Polygon") && gl.selGeo.points.length < 3) {
-                                          gl.selLay.removeGeometry(last: true);
-                                        }
+                                        _closeEditingMenu();
                                       },
                                       icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                     ),
@@ -1832,12 +1819,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   style: lt.borderlessStyle,
                                   onPressed: () {
                                     setState(() {
-                                      gl.selLay.addGeometry(
-                                        name:
-                                            gl.selLay.type == "Point"
-                                                ? "Point${gl.selLay.geometries.length + 1}"
-                                                : "Polygon${gl.selLay.geometries.length + 1}",
-                                      );
+                                      if (gl.selLay.subtype != "Essence") {
+                                        gl.selLay.addGeometry(
+                                          name:
+                                              gl.selLay.type == "Point"
+                                                  ? "Point${gl.selLay.geometries.length + 1}"
+                                                  : "Polygon${gl.selLay.geometries.length + 1}",
+                                        );
+                                      }
                                       _switchModeEditVertexesOn();
                                       gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
                                     });
@@ -1856,7 +1845,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                               ? Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  if (!gl.selGeo.labelsVisibleOnMap && !gl.Mode.smallLabel)
+                                  if (!gl.selGeo.labelsVisibleOnMap && gl.Mode.debugLabel)
                                     SizedBox(
                                       height: gl.eqPx * gl.iconSizeM * .9,
                                       child: IconButton(
@@ -2085,7 +2074,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       gl.Mode.moveVertexesPolygon = false;
       gl.Mode.removeVertexesPolygon = false;
     });
-    if (gl.geoReady && gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
+    if (gl.geoReady && gl.selLay.subtype != "Essence" && gl.selGeo.type.contains("Point") && gl.selGeo.points.isEmpty) {
       gl.selLay.removeGeometry(last: true);
     } else if (gl.geoReady && gl.selGeo.type.contains("Polygon") && gl.selGeo.points.length < 3) {
       gl.selLay.removeGeometry(last: true);
@@ -2128,7 +2117,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                 : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
-        child: _forestimatorAddEssenceVertexPoint,
+        child: _forestimatorAddVertex,
       ),
       AnimatedContainer(
         alignment:
@@ -2236,7 +2225,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     ),
   );
 
-  Widget get _forestimatorAddEssenceVertexPoint => Container(
+  Widget get _forestimatorAddVertex => Container(
     alignment: Alignment.center,
     width: gl.eqPx * 12,
     height: gl.eqPx * 12,
@@ -2244,12 +2233,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       backgroundColor:
           (!(gl.geoReady && gl.selLay.type.contains("Point") && gl.selGeo.points.isNotEmpty)) ||
                   gl.Mode.essence ||
+                  (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
                   gl.geoReady && gl.selLay.type.contains("Polygon")
               ? gl.colorAgroBioTech
               : Colors.grey,
       onPressed: () {
         if ((!(gl.geoReady && gl.selLay.type.contains("Point") && gl.selGeo.points.isNotEmpty)) ||
             gl.Mode.essence ||
+            (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
             gl.geoReady && gl.selLay.type.contains("Polygon")) {
           refreshView(() {
             gl.Mode.addVertexesPolygon && gl.selLay.subtype != "Essence"
@@ -2274,7 +2265,36 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           });
         }
       },
-      child: Icon(Icons.add, color: gl.Mode.essence ? Colors.black : Colors.white, size: gl.eqPx * gl.iconSizeSettings),
+      child: SizedBox(
+        width: gl.eqPx * gl.iconSizeL,
+        height: gl.eqPx * gl.iconSizeL,
+        child: Stack(
+          alignment: AlignmentGeometry.center,
+          children: [
+            if (gl.Mode.editPolygon && gl.selLay.type == "Point" && gl.selLay.subtype == "Essence")
+              Container(
+                alignment: Alignment.bottomRight,
+                child: Icon(CustomIcons.tree, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+              )
+            else if (gl.Mode.editPolygon && gl.selLay.type == "Point")
+              Container(
+                alignment: Alignment.bottomRight,
+                child: Icon(Icons.location_pin, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+              )
+            else if (gl.Mode.editPolygon && gl.selLay.type == "Polygon")
+              Container(
+                alignment: Alignment.bottomRight,
+                child: Icon(FontAwesomeIcons.drawPolygon, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+              )
+            else if (gl.Mode.essence)
+              Container(
+                alignment: Alignment.bottomRight,
+                child: Icon(CustomIcons.tree, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+              ),
+            Icon(Icons.add, color: gl.Mode.essence ? Colors.black : Colors.white, size: gl.eqPx * gl.iconSizeS),
+          ],
+        ),
+      ),
     ),
   );
 
@@ -2311,43 +2331,54 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     ],
   );
 
-  Widget get _forestimatorDebugInfo => Container(
-    color: Colors.black,
-    width: gl.eqPx * 40,
-    height: gl.eqPx * 40,
-    child: Column(
-      children: [
-        Text(
-          "Orientation: ${gl.dsp.orientation.name}",
-          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
-        ),
-        Text(
-          "eqPxH: ${gl.dsp.equiheight.toStringAsFixed(1)}",
-          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
-        ),
-        Text(
-          "eqPxW: ${gl.dsp.equiwidth.toStringAsFixed(1)}",
-          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
-        ),
-        Text(
-          "eqPx: ${gl.dsp.equipixel.toStringAsFixed(1)}",
-          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
-        ),
-        Text(
-          "Padding Top: ${gl.dsp.paddingTop}",
-          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
-        ),
-        Text(
-          "Padding Bottom: ${gl.dsp.paddingBot}",
-          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
-        ),
-        Text(
-          "ViewInset Bottom: ${MediaQuery.of(context).viewInsets.bottom}",
-          style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
-        ),
-      ],
-    ),
-  );
+  Widget get _forestimatorDebugInfo =>
+      gl.Mode.keyboardExpanded && !gl.Mode.debugInfo
+          ? Container()
+          : Container(
+            color: Colors.black.withAlpha(100),
+            width: gl.eqPx * 40,
+            height: gl.eqPx * 40,
+            child: Column(
+              children: [
+                Text(
+                  "Orientation: ${gl.dsp.orientation.name}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+                Text(
+                  "eqPxH: ${gl.dsp.equiheight.toStringAsFixed(1)}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+                Text(
+                  "eqPxW: ${gl.dsp.equiwidth.toStringAsFixed(1)}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+                Text(
+                  "eqPx: ${gl.dsp.equipixel.toStringAsFixed(1)}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+                Text(
+                  "Padding Top: ${gl.dsp.paddingTop.toStringAsFixed(1)}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+                Text(
+                  "Padding Bottom: ${gl.dsp.paddingBot.toStringAsFixed(1)}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+                Text(
+                  "Padding Left: ${gl.dsp.paddingBot.toStringAsFixed(1)}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+                Text(
+                  "Padding Right: ${gl.dsp.paddingBot.toStringAsFixed(1)}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+                Text(
+                  "ViewInset Bottom: ${MediaQuery.of(context).viewInsets.bottom.toStringAsFixed(1)}",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
+                ),
+              ],
+            ),
+          );
 
   Widget get _forestimatorOnOffline => SizedBox(
     width: gl.eqPx * 40,
@@ -2871,7 +2902,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             },
             child: Text(
               overflow: TextOverflow.visible,
-              "$count",
+              count == gl.selGeo.numPoints - 1 ? "1" : "${count + 2}",
               maxLines: 1,
               style: TextStyle(color: Colors.black, fontSize: iconSize / 3),
             ),
@@ -2884,6 +2915,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   }
 
   void _closePolygonMenu() {
+    _closeEditingMenu();
     _stopMovingSelectedPoint();
     _polygonMode = false;
     gl.Mode.editPolygon = false;
@@ -3255,11 +3287,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           ? gl.selLay.geometries[i].type == "Polygon"
               ? Marker(
                 alignment: Alignment.center,
-                width: gl.eqPx * (gl.Mode.smallLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
+                width: gl.eqPx * (!gl.Mode.debugLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
                 height: gl.eqPx * (gl.selLay.geometries[i].getNCheckedAttributes() + 1) * gl.iconSizeS * .8 + 5,
                 point: gl.selLay.geometries[i].center,
                 child: Card(
-                  color: gl.Mode.smallLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
+                  color: !gl.Mode.debugLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children:
@@ -3306,7 +3338,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                     gl.selLay.geometries[i].name,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      color: gl.Mode.smallLabel ? Colors.black : Colors.white,
+                                      color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
                                       fontSize: gl.eqPx * gl.fontSizeXS,
                                     ),
                                   ),
@@ -3341,7 +3373,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                 ),
                             ],
                           ),
-                          if (!gl.Mode.smallLabel && gl.selLay.geometries[i].getNCheckedAttributes() > 1)
+                          if (gl.Mode.debugLabel && gl.selLay.geometries[i].getNCheckedAttributes() > 1)
                             lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                         ] +
                         List<Widget>.generate(gl.selLay.geometries[i].attributes.length, (j) {
@@ -3353,7 +3385,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    if (!gl.Mode.smallLabel)
+                                    if (gl.Mode.debugLabel)
                                       Container(
                                         alignment: Alignment.centerLeft,
                                         width: gl.eqPx * 15,
@@ -3363,13 +3395,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                             gl.selLay.geometries[i].attributes[j].name,
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                              color: gl.Mode.smallLabel ? Colors.black : Colors.white,
+                                              color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
                                               fontSize: gl.eqPx * gl.fontSizeXS,
                                             ),
                                           ),
                                         ),
                                       ),
-                                    if (!gl.Mode.smallLabel)
+                                    if (!gl.Mode.debugLabel)
                                       lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                                     Container(
                                       alignment: Alignment.centerLeft,
@@ -3380,7 +3412,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           gl.selLay.geometries[i].attributes[j].value.toString(),
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            color: gl.Mode.smallLabel ? Colors.black : Colors.white,
+                                            color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
                                             fontSize: gl.eqPx * gl.fontSizeXS,
                                           ),
                                         ),
@@ -3397,7 +3429,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
               : gl.selLay.geometries[i].type.contains("Point")
               ? Marker(
                 alignment: Alignment.bottomLeft,
-                width: gl.eqPx * (gl.Mode.smallLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
+                width: gl.eqPx * (!gl.Mode.debugLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
                 height:
                     gl.eqPx *
                         (gl.selLay.geometries[i].getNCheckedAttributes() +
@@ -3407,7 +3439,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                     5,
                 point: gl.selLay.geometries[i].center,
                 child: Card(
-                  color: gl.Mode.smallLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
+                  color: !gl.Mode.debugLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children:
@@ -3454,7 +3486,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       gl.selLay.geometries[i].name,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        color: gl.Mode.smallLabel ? Colors.black : Colors.white,
+                                        color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
                                         fontSize: gl.eqPx * gl.fontSizeXS,
                                       ),
                                     ),
@@ -3501,7 +3533,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    if (!gl.Mode.smallLabel)
+                                    if (gl.Mode.debugLabel)
                                       Container(
                                         alignment: Alignment.centerLeft,
                                         width: gl.eqPx * 15,
@@ -3514,7 +3546,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           ),
                                         ),
                                       ),
-                                    if (!gl.Mode.smallLabel)
+                                    if (gl.Mode.debugLabel)
                                       lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                                     Container(
                                       alignment: Alignment.centerLeft,
@@ -3525,7 +3557,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           gl.selLay.geometries[i].attributes[j].value.toString(),
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            color: gl.Mode.smallLabel ? Colors.black : Colors.white,
+                                            color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
                                             fontSize: gl.eqPx * gl.fontSizeXS,
                                           ),
                                         ),

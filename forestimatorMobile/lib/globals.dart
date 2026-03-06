@@ -108,7 +108,7 @@ class Mode {
   static bool userDataFilled = false;
   static bool essence = false;
   static bool labelCross = false;
-  static bool smallLabel = true;
+  static bool debugLabel = false;
   static bool essencePointsToSync = false;
 
   static bool debugScanlines = false;
@@ -155,14 +155,14 @@ class Mode {
     await shared!.setBool('Modes.essence', essence);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.labelCross', labelCross);
-    await shared!.setBool('Modes.smallLabel', smallLabel);
+    await shared!.setBool('Modes.smallLabel', debugLabel);
   }
 
   static void deserialize() {
     essence = shared!.getBool('Modes.essence') ?? false;
     userDataFilled = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
-    smallLabel = shared!.getBool('Modes.smallLabel') ?? true;
+    debugLabel = shared!.getBool('Modes.smallLabel') ?? false;
   }
 }
 

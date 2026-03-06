@@ -246,7 +246,7 @@ class PopupSearchMenu {
     gl.refreshStack(() {
       popupForestimatorWindow(
         id: "SearchMenu",
-        title: "d'un lieu",
+        title: "Recherche d'un lieu",
         child: SearchMenu(moveToPoint: moveToPointOnMap),
         onDiscard: onDiscard,
       );
@@ -717,7 +717,7 @@ class PopupForestimatorWindow extends StatelessWidget {
                   children: [
                     pdfChild ??
                         SizedBox(
-                          height: cHeight - gl.eqPx * 20,
+                          height: cHeight - (gl.Mode.keyboardExpanded ? gl.eqPx * 0 : gl.eqPx * 18),
                           child: SingleChildScrollView(
                             child:
                                 child ??
@@ -1786,6 +1786,8 @@ class GeoLayerListMenu extends StatefulWidget {
   State<StatefulWidget> createState() => _GeoLayerListMenu();
 }
 
+Function? _attributeMenuCloser;
+
 class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObserver {
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
@@ -1930,14 +1932,18 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                         ],
                       ),
                       onPressed: () {
-                        setState(() {
-                          _titleLayer = true;
-                          _pageController.animateToPage(
-                            0,
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        });
+                        Function f =
+                            _attributeMenuCloser ??
+                            () => setState(() {
+                              _titleLayer = true;
+                              _pageController.animateToPage(
+                                0,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            });
+                        f();
+                        _attributeMenuCloser = null;
                       },
                     )
                     : Container(),
@@ -2616,6 +2622,15 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                               child: IconButton(
                                 style: lt.trNoPadButtonstyle,
                                 onPressed: () {
+                                  _attributeMenuCloser =
+                                      () => setState(() {
+                                        _titleLayer = true;
+                                        _pageController.animateToPage(
+                                          0,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      });
                                   setState(() {
                                     gl.selLay.selectedGeometry = index;
                                     _selectedIndex = index;
@@ -2648,6 +2663,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                             style: lt.trNoPadButtonstyle,
                             icon: Icon(Icons.arrow_back, color: Colors.black, size: gl.eqPx * gl.iconSizeM),
                             onPressed: () {
+                              _attributeMenuCloser = null;
                               setState(() {
                                 _titleLayer = true;
                               });
@@ -3647,11 +3663,11 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 });
                                 PopupDoYouReally(
                                   () {
-                                    setState(() {
-                                      for (Geometry g in gl.selLay.geometries) {
-                                        g.selectedPointIcon = i;
-                                      }
-                                    });
+                                    mounted
+                                        ? setState(() {})
+                                        : {
+                                          for (Geometry g in gl.selLay.geometries) {g.selectedPointIcon = i},
+                                        };
                                   },
                                   "Attention",
                                   "Voulez vous changer le symbole pour tous les entités de la layer?",
@@ -4584,10 +4600,10 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           });
           gl.refreshStack(() {});
         }, true),
-        variableBooleanSlider("Petit Label", gl.Mode.smallLabel, (bool it) {
+        variableBooleanSlider("Debug Label", gl.Mode.debugLabel, (bool it) {
           setState(() {
-            gl.Mode.smallLabel = it;
-            gl.Mode.labelCross = !it;
+            gl.Mode.debugLabel = it;
+            gl.Mode.labelCross = it;
           });
           gl.refreshStack(() {});
           gl.Mode.serialize();
