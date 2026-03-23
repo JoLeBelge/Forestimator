@@ -20,6 +20,33 @@ MAP
 	  	END
   	END
   	
+  	
+  	 LAYER
+        NAME "OGFpreCarto_seuil70"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "FA.tif"
+		PROJECTION
+			"init=epsg:31370"
+	  	END
+
+		PROCESSING "BANDS=1"
+		CLASSITEM "[pixel]"
+		CLASS
+		  EXPRESSION "1"
+		  STYLE
+		    COLOR 255 255 255
+		  END
+		END
+		OFFSITE 0 0 0
+
+		METADATA
+	    	"wms_title"           "Pre carto Old Growth Forest avec seuil de 70"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+   END
   	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/OGF_layers.map"
   	
   	LAYER
