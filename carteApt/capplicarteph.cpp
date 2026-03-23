@@ -547,3 +547,102 @@ void calculProf(std::string adirBD){
     GDALClose(poDatCNSW);
 
 }
+
+std::vector<std::string> serie_spec{"J", "H", "J-H", "R"};
+double seuilPente=22;
+double seuilFE=50;// le seuil terrain est de 80 % mais la carte déconne et annonce 70 % de feuillus en cas d'affleurement rocheux, d'arbre mort sur pied, ...
+void cAppliCartepH::carteSolFortePente(std::string aOut, bool force){
+
+    if ((!exists(aOut) | force)){
+        std::cout << "creation de la carte des sols sur forte pente sur base du dico sigle pédo, de la pente en % et de la proportion de feuillus " << std::endl;
+        std::cout << "  fichier " << aOut << std::endl;
+        // input ; zbio (déjà ouvert dans constructeur, ter eco, cnsw
+        std::string aCNSWpath(dico->File("CNSW"));
+        GDALDataset  * poDatCNSW = (GDALDataset *) GDALOpen( aCNSWpath.c_str(), GA_ReadOnly );
+        if( poDatCNSW == NULL )
+        {
+            std::cout << "je n'ai pas lu le fichier " << aCNSWpath << std::endl;
+        }
+        std::string aMNTpath(dico->File("slope"));
+        GDALDataset  * poDatMNT = (GDALDataset *) GDALOpen( aMNTpath.c_str(), GA_ReadOnly );
+        if( poDatMNT == NULL )
+        {
+            std::cout << "je n'ai pas lu le fichier " << aMNTpath << std::endl;
+        }
+        std::string aFEpath(dico->File("dendro_prop_fe"));
+        GDALDataset  * poDatFE = (GDALDataset *) GDALOpen( aFEpath.c_str(), GA_ReadOnly );
+        if( poDatMNT == NULL )
+        {
+            std::cout << "je n'ai pas lu le fichier " << aFEpath << std::endl;
+        }
+
+        const char *pszFormat = "GTiff";
+        GDALDriver *poDriver;
+        poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+        if( poDriver == NULL )
+            exit( 1 );
+
+        const char * destFile=aOut.c_str();
+        char **papszOptions = NULL;
+        papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" );
+        GDALDataset* poDstDS = poDriver->CreateCopy( destFile, poDatCNSW, FALSE, papszOptions,NULL, NULL );
+        GDALRasterBand *outBand;
+        outBand = poDstDS->GetRasterBand(1);
+        std::cout << "copy of raster done" << std::endl;
+
+        x =poDatCNSW->GetRasterBand(1)->GetXSize();
+        y =poDatCNSW->GetRasterBand(1)->GetYSize();
+
+        int step= y/100;
+
+        float *scanlineCNSW = (float *) CPLMalloc( sizeof( float ) * x );
+        float *scanlineMNT = (float *) CPLMalloc( sizeof( float ) * x );
+        float *scanlineFE = (float *) CPLMalloc( sizeof( float ) * x );
+        float *scanline = (float *) CPLMalloc( sizeof( float ) * x );
+
+        // boucle sur les pixels
+        int c(0);
+        for ( int row = 0; row < y; row++ )
+        {
+            poDatCNSW->GetRasterBand(1)->RasterIO( GF_Read, 0, row, x, 1, scanlineCNSW, x,1, GDT_Float32, 0, 0 );
+            poDatMNT->GetRasterBand(1)->RasterIO( GF_Read, 0, row, x, 1, scanlineMNT, x,1, GDT_Float32, 0, 0 );
+            poDatFE->GetRasterBand(1)->RasterIO( GF_Read, 0, row, x, 1, scanlineFE, x,1, GDT_Float32, 0, 0 );
+
+            for (int col = 0; col < x; col++)
+            {
+                int aRes=0;
+                int cnsw = scanlineCNSW[ col ];
+                int slope = scanlineMNT[ col ];
+                int fe = scanlineFE[ col ];
+                if (cnsw!=0 & fe>seuilFE){
+                    //std::cout << "sigle numéro " << cnsw << std::endl;
+                    const siglePedo *s=dico->getSiglePedoPtr(cnsw);
+                    if (std::find(serie_spec.begin(), serie_spec.end(), s->getSER_SPEC()) !=serie_spec.end()){
+                        aRes=1;
+                    } else if (s->getPHASE_5()=="P" | s->getPHASE_5()=="U" & slope > seuilPente){
+                        aRes=1;
+
+                    } else if (s->getPHASE_1()=="6" & slope > seuilPente){
+                        aRes=1;
+                    }
+                }
+                scanline[ col ] = aRes;
+            }
+            // écriture du résultat dans le fichier de destination
+            outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+            if (row%step==0){std::cout << c << " pct"<< std::endl;c++;}
+        }
+        CPLFree(scanline);
+        CPLFree(scanlineCNSW);
+        CPLFree(scanlineMNT);
+        if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+        if( poDatCNSW != NULL ){ GDALClose( (GDALDatasetH) poDatCNSW );}
+        if( poDatFE != NULL ){ GDALClose( (GDALDatasetH) poDatFE );}
+        if( poDatZBIO != NULL ){ GDALClose( (GDALDatasetH) poDatZBIO );}
+        if( poDatMNT != NULL ){ GDALClose( (GDALDatasetH) poDatMNT );}
+        std::cout << " done " << std::endl;
+    } else {
+        std::cout << " la carte des sol de forte pente " << aOut << " existe, use force pour écraser " << std::endl;
+    }
+}
+

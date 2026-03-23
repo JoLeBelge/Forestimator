@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     po::options_description desc("options pour l'outil de calcul des cartes ");
     desc.add_options()
             ("help", "produce help message")
-            ("outils", po::value<int>(), "choix de l'outil à utiliser. 1 : station Descriptor (1 layer, 1 shp polygone), 2 : ajout méta , 3 : aptCS, 4 aptFEE, 5 : carteNH, 6 carteProf")
+            ("outils", po::value<int>(), "choix de l'outil à utiliser. 1 : station Descriptor (1 layer, 1 shp polygone), 2 : ajout méta , 3 : aptCS, 4 aptFEE, 5 : carteNH, 6 carteProf, 7 carteSolFortePente")
             ("test", po::value<bool>(), "debug")
             ("carteNT", po::value<bool>(), "calcul de la carte des NT")
             ("cartepH", po::value<bool>(), "calcul de la carte des pH")
@@ -228,6 +228,11 @@ int main(int argc, char *argv[])
         }
         case 6:{
             calculProf(dirBD);
+            break;
+        }
+        case 7:{
+            cAppliCartepH aAPH(dirBD,cartepH);
+            aAPH.carteSolFortePente("/home/jo/Documents/OGF/out/solFortePente.tif");
             break;
         }
 

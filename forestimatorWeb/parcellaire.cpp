@@ -541,7 +541,7 @@ void parcellaire::doComputingTask()
     std::string ressourcePath = "/results/"+ mName + ".geojson";
     Wt::Mail::Message mail = tools::createMail(
                 "JO.Lisein@uliege.be",
-                "Lisein Jonathan",
+                "forestimator-team",
                 m_app->getUser().email() == "" ? m_app->getUser().unverifiedEmail() : m_app->getUser().email(),
                 Wt::WString::tr("mail.anasMulti.title").toUTF8(),
                 Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName == "" ? mClientName : mLabelName).arg(ressourcePath).toUTF8());

@@ -30,6 +30,8 @@ public:
     void cartePTS(std::string aOut, bool force=true);
 
     void carteNT(std::string aOut, bool force=true);
+    // 2026 02 Old Growth Forest, on veux ajouter les sols de forte pente qui sont souvent ommis de la carte des forêts anciennes de Kervyn car Ferraris pas toujours top.
+    void carteSolFortePente(std::string aOut, bool force=true);
 private:
     int x,y;
 

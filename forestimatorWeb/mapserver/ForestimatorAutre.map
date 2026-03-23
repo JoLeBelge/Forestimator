@@ -20,6 +20,8 @@ MAP
 	  	END
   	END
   	
+  	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/OGF_layers.map"
+  	
   	LAYER
   	NAME "parcellaire_DNF"
   	TYPE POLYGON

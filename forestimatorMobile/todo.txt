@@ -1,6 +1,9 @@
 To do list forestimator Mobile
 ------------------------------
 
+-Forestimator Web: -> formulaire modification email pour utilisateur : il faut alors une page "mon compte"
+-> vitesse de chargement de la page d'acceuil. C'est trop lent. Voir comment accélérer.
+
 -affichage de la cnsw 16 bits? en ayant un raster au format png et un autre au format tiff-> combo gagnant pour gagner en rapidité d'affichage.
 
 ROBUSTESSE - Forestimator Web
