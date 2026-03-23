@@ -3,7 +3,7 @@
     TYPE RASTER
     STATUS ON
 
-    DATA "file:///media/Data10/Forestimator/Autre/THRESH_MIX_q70_v3_DLG.tif"
+    DATA "THRESH_MIX_q70_v3_DLG.tif"
     PROJECTION
         "init=epsg:31370"
     END
@@ -39,7 +39,7 @@ LAYER
     TYPE RASTER
     STATUS ON
 
-    DATA "file:///media/Data10/Forestimator/Autre/STATUS_MIX_q90_DLG.tif"
+    DATA "STATUS_MIX_q90_DLG.tif"
     PROJECTION
         "init=epsg:31370"
     END
@@ -75,7 +75,7 @@ LAYER
     TYPE RASTER
     STATUS ON
 
-    DATA "file:///media/Data10/Forestimator/Autre/THRESH_MIX_q70_v3_DLG.tif"
+    DATA "THRESH_MIX_q70_v3_DLG.tif"
     PROJECTION
         "init=epsg:31370"
     END
@@ -455,7 +455,7 @@ LAYER
     TYPE RASTER
     STATUS ON
 
-    DATA "file:///media/Data10/Forestimator/Autre/THRESH_MIX_q90_v3_DLG.tif"
+    DATA "THRESH_MIX_q90_v3_DLG.tif"
     PROJECTION
         "init=epsg:31370"
     END
