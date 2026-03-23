@@ -1,25 +1,854 @@
  LAYER
-        NAME "OGFpreCarto_seuil70"
-        TYPE RASTER
-        STATUS ON
-		
-		DATA "FA.tif"
-		PROJECTION
-			"init=epsg:31370"
-	  	END
+    NAME "OGF_preCarto_seuil70"
+    TYPE RASTER
+    STATUS ON
 
-		PROCESSING "BANDS=1"
-		CLASSITEM "[pixel]"
-		CLASS
-		  EXPRESSION "1"
-		  STYLE
-		    COLOR 255 255 255
-		  END
-		END
-		OFFSITE 0 0 0
+    DATA "file:///media/Data10/Forestimator/Autre/THRESH_MIX_q70_v3_DLG.tif"
+    PROJECTION
+        "init=epsg:31370"
+    END
 
-		METADATA
-	    	"wms_title"           "Pre carto Old Growth Forest avec seuil de 70"
-	    	"wms_srs"             "EPSG:31370"
-	  	END
-   END
+    PROCESSING "BANDS=1"
+    CLASSITEM "[pixel]"
+
+    CLASS
+        EXPRESSION "1"
+        STYLE
+            COLOR 0 0 0
+        END
+    END
+
+    CLASS
+        EXPRESSION "2"
+        STYLE
+            OPACITY 0
+        END
+    END
+
+    OFFSITE 0 0 0
+
+    METADATA
+        "wms_title" "Pre carto Old Growth Forest avec seuil de 70"
+        "wms_srs"   "EPSG:31370"
+    END
+END
+
+
+LAYER
+    NAME "OGF_preCarto_seuil90"
+    TYPE RASTER
+    STATUS ON
+
+    DATA "file:///media/Data10/Forestimator/Autre/STATUS_MIX_q90_DLG.tif"
+    PROJECTION
+        "init=epsg:31370"
+    END
+
+    PROCESSING "BANDS=1"
+    CLASSITEM "[pixel]"
+
+    CLASS
+        EXPRESSION "1"
+        STYLE
+            COLOR 0 0 0
+        END
+    END
+
+    CLASS
+        EXPRESSION "2"
+        STYLE
+            OPACITY 0
+        END
+    END
+
+    OFFSITE 0 0 0
+
+    METADATA
+        "wms_title" "Pre carto Old Growth Forest avec seuil de 90"
+        "wms_srs"   "EPSG:31370"
+    END
+END
+
+
+LAYER
+    NAME "OGFhauteur_q70"
+    TYPE RASTER
+    STATUS ON
+
+    DATA "file:///media/Data10/Forestimator/Autre/THRESH_MIX_q70_v3_DLG.tif"
+    PROJECTION
+        "init=epsg:31370"
+    END
+
+    PROCESSING "BANDS=1"
+    CLASSITEM "[pixel]"
+
+    CLASS
+        NAME "seuil q70 : 2460"
+        EXPRESSION "2460"
+        STYLE
+            COLOR 255 255 229
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2510"
+        EXPRESSION "2510"
+        STYLE
+            COLOR 253 254 220
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2520"
+        EXPRESSION "2520"
+        STYLE
+            COLOR 253 254 219
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2540"
+        EXPRESSION "2540"
+        STYLE
+            COLOR 253 254 215
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2580"
+        EXPRESSION "2580"
+        STYLE
+            COLOR 251 254 209
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2590"
+        EXPRESSION "2590"
+        STYLE
+            COLOR 251 253 207
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2610"
+        EXPRESSION "2610"
+        STYLE
+            COLOR 250 253 203
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2620"
+        EXPRESSION "2620"
+        STYLE
+            COLOR 250 253 202
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2630"
+        EXPRESSION "2630"
+        STYLE
+            COLOR 250 253 200
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2650"
+        EXPRESSION "2650"
+        STYLE
+            COLOR 249 253 197
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2660"
+        EXPRESSION "2660"
+        STYLE
+            COLOR 249 253 195
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2670"
+        EXPRESSION "2670"
+        STYLE
+            COLOR 248 253 193
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2680"
+        EXPRESSION "2680"
+        STYLE
+            COLOR 248 252 191
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2690"
+        EXPRESSION "2690"
+        STYLE
+            COLOR 248 252 190
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2710"
+        EXPRESSION "2710"
+        STYLE
+            COLOR 247 252 186
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2720"
+        EXPRESSION "2720"
+        STYLE
+            COLOR 247 252 185
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2730"
+        EXPRESSION "2730"
+        STYLE
+            COLOR 244 251 183
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2740"
+        EXPRESSION "2740"
+        STYLE
+            COLOR 242 250 182
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2750"
+        EXPRESSION "2750"
+        STYLE
+            COLOR 240 249 181
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2770"
+        EXPRESSION "2770"
+        STYLE
+            COLOR 235 247 178
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2780"
+        EXPRESSION "2780"
+        STYLE
+            COLOR 233 246 177
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2790"
+        EXPRESSION "2790"
+        STYLE
+            COLOR 230 245 175
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2810"
+        EXPRESSION "2810"
+        STYLE
+            COLOR 226 243 173
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2820"
+        EXPRESSION "2820"
+        STYLE
+            COLOR 224 242 171
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2830"
+        EXPRESSION "2830"
+        STYLE
+            COLOR 221 241 170
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2840"
+        EXPRESSION "2840"
+        STYLE
+            COLOR 219 240 169
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2850"
+        EXPRESSION "2850"
+        STYLE
+            COLOR 217 239 167
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2860"
+        EXPRESSION "2860"
+        STYLE
+            COLOR 214 238 166
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2880"
+        EXPRESSION "2880"
+        STYLE
+            COLOR 210 236 163
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2900"
+        EXPRESSION "2900"
+        STYLE
+            COLOR 205 235 161
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2930"
+        EXPRESSION "2930"
+        STYLE
+            COLOR 198 232 157
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2960"
+        EXPRESSION "2960"
+        STYLE
+            COLOR 191 229 153
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 2990"
+        EXPRESSION "2990"
+        STYLE
+            COLOR 185 226 149
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3010"
+        EXPRESSION "3010"
+        STYLE
+            COLOR 180 224 146
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3040"
+        EXPRESSION "3040"
+        STYLE
+            COLOR 173 221 142
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3070"
+        EXPRESSION "3070"
+        STYLE
+            COLOR 162 216 137
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3100"
+        EXPRESSION "3100"
+        STYLE
+            COLOR 150 210 131
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3110"
+        EXPRESSION "3110"
+        STYLE
+            COLOR 146 209 130
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3130"
+        EXPRESSION "3130"
+        STYLE
+            COLOR 139 205 126
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3160"
+        EXPRESSION "3160"
+        STYLE
+            COLOR 127 200 121
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3200"
+        EXPRESSION "3200"
+        STYLE
+            COLOR 112 192 113
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3220"
+        EXPRESSION "3220"
+        STYLE
+            COLOR 104 189 110
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3230"
+        EXPRESSION "3230"
+        STYLE
+            COLOR 100 187 108
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3270"
+        EXPRESSION "3270"
+        STYLE
+            COLOR 85 180 101
+        END
+    END
+
+    CLASS
+        NAME "seuil q70 : 3380"
+        EXPRESSION "3380"
+        STYLE
+            COLOR 47 159 82
+        END
+    END
+
+    METADATA
+        "wms_title" "Hauteur Old Growth Forest q70"
+        "wms_srs"   "EPSG:31370"
+    END
+END
+
+
+LAYER
+    NAME "OGFhauteur_q90"
+    TYPE RASTER
+    STATUS ON
+
+    DATA "file:///media/Data10/Forestimator/Autre/THRESH_MIX_q90_v3_DLG.tif"
+    PROJECTION
+        "init=epsg:31370"
+    END
+
+    PROCESSING "BANDS=1"
+    CLASSITEM "[pixel]"
+
+    CLASS
+        NAME "seuil q90 : 2620"
+        EXPRESSION "2620"
+        STYLE
+            COLOR 250 253 202
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2680"
+        EXPRESSION "2680"
+        STYLE
+            COLOR 248 252 191
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2700"
+        EXPRESSION "2700"
+        STYLE
+            COLOR 248 252 188
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2760"
+        EXPRESSION "2760"
+        STYLE
+            COLOR 237 248 179
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2770"
+        EXPRESSION "2770"
+        STYLE
+            COLOR 235 247 178
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2780"
+        EXPRESSION "2780"
+        STYLE
+            COLOR 233 246 177
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2790"
+        EXPRESSION "2790"
+        STYLE
+            COLOR 230 245 175
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2820"
+        EXPRESSION "2820"
+        STYLE
+            COLOR 224 242 171
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2830"
+        EXPRESSION "2830"
+        STYLE
+            COLOR 221 241 170
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2850"
+        EXPRESSION "2850"
+        STYLE
+            COLOR 217 239 167
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2870"
+        EXPRESSION "2870"
+        STYLE
+            COLOR 212 237 165
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2890"
+        EXPRESSION "2890"
+        STYLE
+            COLOR 208 235 162
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2900"
+        EXPRESSION "2900"
+        STYLE
+            COLOR 205 235 161
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2910"
+        EXPRESSION "2910"
+        STYLE
+            COLOR 203 234 159
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2920"
+        EXPRESSION "2920"
+        STYLE
+            COLOR 201 233 158
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2930"
+        EXPRESSION "2930"
+        STYLE
+            COLOR 198 232 157
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2940"
+        EXPRESSION "2940"
+        STYLE
+            COLOR 196 231 155
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2950"
+        EXPRESSION "2950"
+        STYLE
+            COLOR 194 230 154
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2960"
+        EXPRESSION "2960"
+        STYLE
+            COLOR 191 229 153
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2970"
+        EXPRESSION "2970"
+        STYLE
+            COLOR 189 228 151
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 2980"
+        EXPRESSION "2980"
+        STYLE
+            COLOR 187 227 150
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3000"
+        EXPRESSION "3000"
+        STYLE
+            COLOR 182 225 147
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3010"
+        EXPRESSION "3010"
+        STYLE
+            COLOR 180 224 146
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3020"
+        EXPRESSION "3020"
+        STYLE
+            COLOR 178 223 145
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3030"
+        EXPRESSION "3030"
+        STYLE
+            COLOR 175 222 143
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3050"
+        EXPRESSION "3050"
+        STYLE
+            COLOR 169 219 140
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3060"
+        EXPRESSION "3060"
+        STYLE
+            COLOR 166 217 138
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3070"
+        EXPRESSION "3070"
+        STYLE
+            COLOR 162 216 137
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3080"
+        EXPRESSION "3080"
+        STYLE
+            COLOR 158 214 135
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3110"
+        EXPRESSION "3110"
+        STYLE
+            COLOR 146 209 130
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3120"
+        EXPRESSION "3120"
+        STYLE
+            COLOR 142 207 128
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3130"
+        EXPRESSION "3130"
+        STYLE
+            COLOR 139 205 126
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3140"
+        EXPRESSION "3140"
+        STYLE
+            COLOR 135 203 124
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3160"
+        EXPRESSION "3160"
+        STYLE
+            COLOR 127 200 121
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3170"
+        EXPRESSION "3170"
+        STYLE
+            COLOR 123 198 119
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3250"
+        EXPRESSION "3250"
+        STYLE
+            COLOR 92 183 104
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3260"
+        EXPRESSION "3260"
+        STYLE
+            COLOR 89 182 103
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3280"
+        EXPRESSION "3280"
+        STYLE
+            COLOR 81 178 99
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3290"
+        EXPRESSION "3290"
+        STYLE
+            COLOR 77 176 97
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3323"
+        EXPRESSION "3323"
+        STYLE
+            COLOR 64 170 91
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3330"
+        EXPRESSION "3330"
+        STYLE
+            COLOR 62 169 90
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3390"
+        EXPRESSION "3390"
+        STYLE
+            COLOR 46 156 81
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3410"
+        EXPRESSION "3410"
+        STYLE
+            COLOR 43 152 79
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3490"
+        EXPRESSION "3490"
+        STYLE
+            COLOR 33 132 70
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3580"
+        EXPRESSION "3580"
+        STYLE
+            COLOR 22 110 60
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3600"
+        EXPRESSION "3600"
+        STYLE
+            COLOR 19 105 58
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3620"
+        EXPRESSION "3620"
+        STYLE
+            COLOR 16 101 55
+        END
+    END
+
+    CLASS
+        NAME "seuil q90 : 3750"
+        EXPRESSION "3750"
+        STYLE
+            COLOR 0 69 41
+        END
+    END
+
+    METADATA
+        "wms_title" "Hauteur Old Growth Forest q90"
+        "wms_srs"   "EPSG:31370"
+    END
+END
