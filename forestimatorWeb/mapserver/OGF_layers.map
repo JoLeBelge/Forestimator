@@ -48,6 +48,7 @@ LAYER
     CLASSITEM "[pixel]"
 
     CLASS
+    	NAME "OGF potentielle"
         EXPRESSION "1"
         STYLE
             COLOR 0 0 0
@@ -55,9 +56,10 @@ LAYER
     END
 
     CLASS
+    	NAME "feuillus sur forêt ancienne pas mature"
         EXPRESSION "2"
         STYLE
-            OPACITY 0
+        #    OPACITY 0
         END
     END
 
