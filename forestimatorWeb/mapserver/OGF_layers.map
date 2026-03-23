@@ -22,5 +22,4 @@
 	    	"wms_title"           "Pre carto Old Growth Forest avec seuil de 70"
 	    	"wms_srs"             "EPSG:31370"
 	  	END
-		TEMPLATE "../template.html"
    END
