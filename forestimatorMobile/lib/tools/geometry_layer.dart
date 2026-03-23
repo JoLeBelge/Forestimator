@@ -26,20 +26,20 @@ class GeometricLayer {
     type = "";
     subtype = "";
     Random rand = Random();
-    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
+    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 0.5);
   }
 
   GeometricLayer.point() {
     type = "Point";
     subtype = "";
     Random rand = Random();
-    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
+    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 0.5);
   }
 
   GeometricLayer.essence() {
     type = "Point";
     subtype = "Essence";
-    defaultColor = Colors.black;
+    defaultColor = gl.colorAgroBioTech.withAlpha(150);
     defaultPointIcon = 4;
     defaultAttributes.addAll([
       Attribute(name: "essence", type: "string", value: "Choisissez"),

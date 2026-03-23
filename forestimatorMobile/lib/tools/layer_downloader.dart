@@ -65,7 +65,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         ),
         onPressed: () async {
           PopupDoYouReally(
-            gl.notificationContext!,
             () {
               fileDelete(join(gl.dico.docDir.path, gl.dico.getLayerBase(widget.layer.key).mNomRaster)).whenComplete(() {
                 setState(() {

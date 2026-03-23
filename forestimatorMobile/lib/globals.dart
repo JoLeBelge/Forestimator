@@ -16,7 +16,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO: Add state to SENT status with callback in timer.
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
-// TODO: Some Keyboard switch Bugs remaining
 
 typedef VoidSetter = void Function(void Function());
 
@@ -109,7 +108,7 @@ class Mode {
   static bool userDataFilled = false;
   static bool essence = false;
   static bool labelCross = false;
-  static bool smallLabel = true;
+  static bool debugLabel = false;
   static bool essencePointsToSync = false;
 
   static bool debugScanlines = false;
@@ -156,20 +155,22 @@ class Mode {
     await shared!.setBool('Modes.essence', essence);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.labelCross', labelCross);
-    await shared!.setBool('Modes.smallLabel', smallLabel);
+    await shared!.setBool('Modes.smallLabel', debugLabel);
   }
 
   static void deserialize() {
     essence = shared!.getBool('Modes.essence') ?? false;
     userDataFilled = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
-    smallLabel = shared!.getBool('Modes.smallLabel') ?? true;
+    debugLabel = shared!.getBool('Modes.smallLabel') ?? false;
   }
 }
 
 class Display {
   double paddingTop = -1;
   double paddingBot = -1;
+  double paddingLeft = -1;
+  double paddingRight = -1;
   double insetTop = -1;
   double insetBot = -1;
   double width = -1;
@@ -188,13 +189,20 @@ class Display {
   double alignY(double px) => (2.0 / height) * (equipixel * px);
 
   double get eqAlignTop => paddingTop / equipixel - equiheight / 2;
-  double get eqlignBottom => -paddingBot / equipixel + equiheight / 2;
+  double get eqAlignBottom => -paddingBot / equipixel + equiheight / 2;
+  double get eqAlignLeft => paddingLeft / equipixel - equiwidth / 2;
+  double get eqAlignRight => -paddingRight / equipixel + equiwidth / 2;
 
+  double get eqMaxWindowWidth => (width - 2 * math.max(paddingLeft, paddingRight)) / equipixel;
   double get eqMaxWindowHeight => (height - 2 * math.max(paddingTop, paddingBot)) / equipixel;
+  double get maxWinPaddingHeight =>
+      eqMaxWindowHeight * eqPx - insetBot > 0 ? eqMaxWindowHeight * eqPx - insetBot : eqPx;
 
   Display(BuildContext context) {
     paddingTop = MediaQuery.of(context).padding.top;
     paddingBot = MediaQuery.of(context).padding.bottom;
+    paddingLeft = MediaQuery.of(context).padding.left;
+    paddingRight = MediaQuery.of(context).padding.right;
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     aspect = MediaQuery.of(context).size.aspectRatio;
@@ -203,6 +211,7 @@ class Display {
     insetTop = MediaQuery.of(context).viewInsets.top;
     insetBot = MediaQuery.of(context).viewInsets.bottom;
     insetBot > 0 ? showKeyboard = true : showKeyboard = false;
+    Mode.keyboardExpanded = showKeyboard;
     //_tabletMode();
     //_squareMode();
     _enforceEquiWidthHeight();
@@ -212,7 +221,9 @@ class Display {
     }
   }
 
-  void _tabletMode() {
+  set context(BuildContext context) => dsp = Display(context);
+
+  void tabletMode() {
     if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
         dpi < 1.75 && dpi * (width < height ? width : height) > 1320 ||
         dpi < 1.55 && dpi * (width < height ? width : height) > 1000 ||
@@ -235,7 +246,7 @@ class Display {
     }
   }
 
-  void _squareMode() {
+  void squareMode() {
     if ((aspect > .8 && aspect < 1 / .8) || Mode.tablet || Mode.overrideModeSquare) {
       Mode.square = true;
       orientation = Orientation.landscape;

@@ -75,8 +75,7 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Serve file with download headers
-	filename2 :=filename[8:] // j'essaie ça car j'ai des underscore _ avant et après
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=Forestimator%q", filename2))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=Forestimator%s", filename[8:]))
 	http.ServeFile(w, r, filePath)
 }
 
