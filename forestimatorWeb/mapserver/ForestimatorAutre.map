@@ -47,7 +47,7 @@ MAP
 	  	END
 		TEMPLATE "../template.html"
    END
-  	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/OGF_layers.map"
+  	#INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/OGF_layers.map"
   	
   	LAYER
   	NAME "parcellaire_DNF"
