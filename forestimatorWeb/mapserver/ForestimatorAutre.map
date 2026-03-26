@@ -105,7 +105,6 @@ MAP
     		NAME "C2-C3" # gris
     		EXPRESSION {C2,C3}
     		STYLE
-    		 	GEOMTRANSFORM (buffer([shape], 5)
       			COLOR 40 40 40
       			OUTLINECOLOR 200 200 200
       			WIDTH 2
