@@ -112,7 +112,7 @@ MAP
   	END #class
   	CLASS
     		NAME "X,dirt and path "
-    		EXPRESSION {X,dirt,path}
+    		EXPRESSION {X,DIRT,PATH}
     		STYLE
       			COLOR 100 100 100
       			OUTLINECOLOR 200 200 200
