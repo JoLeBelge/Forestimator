@@ -70,6 +70,45 @@ MAP
     	END #label
   	END #class
 	END #layer
+	
+	LAYER
+  	NAME "routes"
+  	TYPE LINE
+  	STATUS ON
+  	DATA "roadnetwork_forestimator_20260325.gpkg"  
+  	#LABELITEM    "categorie"    
+  	CLASSITEM "categorie"     
+  	CLASS
+    		NAME "C0-C1" # jaune
+    		EXPRESSION {C0,C1}
+    		STYLE
+      			COLOR 88 90 8
+      			OUTLINECOLOR 200 200 200
+      			WIDTH 4
+    		END #style
+  	END #class
+  	CLASS
+    		NAME "C2-C3" # gris
+    		EXPRESSION {C0,C1}
+    		STYLE
+    		 	GEOMTRANSFORM (buffer([shape], 5)
+      			COLOR 40 40 40
+      			OUTLINECOLOR 200 200 200
+      			WIDTH 2
+    		END #style
+  	END #class
+  	CLASS
+    		NAME "X,dirt and path "
+    		EXPRESSION {X,dirt,path}
+    		STYLE
+      			COLOR 100 100 100
+      			OUTLINECOLOR 200 200 200
+      			WIDTH 4
+      			INITIALGAP 2
+  			PATTERN 36 14 END
+    		END #style
+  	END #class
+	END #layer
 
  	LAYER
         NAME "MasqueForet"

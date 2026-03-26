@@ -15,6 +15,8 @@ ROBUSTESSE - Forestimator Web
 
 CONSOLIDATION 
 
+-analyse ponctuelle et affichage de pdf de documentation en lien avec les couches analysées ; à l'ouverture d'un pdf, le bouton en haut me propose de me rendre à la page 5 mais ça n'est pas claire ni très adéquat pour la plupart des usages
+
 -analyse ponctuelle : quand internet n'est pas disponible, afficher la boite de dialogue "vous n'avez pas accès à internet". Pour l'instant, cela fonctionne mais même quand la data est activée si jamais un autre process utilise toute la bande passante.
 
 -regrouper dans un fichier unique (dart) l'ensemble des labels affichés dans forestimator Mobile et écrit "en dur" dans le code : exemple "Appuyez ici pour ajouter une couche du catalogue" . Le fait de centraliser tout permettra une modification plus aisée (et par une tierce personne si nécessaire). Comme les messages bundle de Wt c++

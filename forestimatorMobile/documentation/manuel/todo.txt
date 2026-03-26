@@ -1,5 +1,2 @@
 
--update
--exercices ; offline mode, mode observations essence, etc
-
--Demander un deuxième feedback à quelqu'un d'extérieur: Nicolas Dassonville
+-exercices ; analyse surfacique, offline mode, mode observations essence, etc
