@@ -78,6 +78,7 @@ MAP
   	NAME "routes"
   	TYPE LINE
   	STATUS ON
+  	CONNECTIONTYPE OGR
   	CONNECTION "roadnetwork_forestimator_20260325.gpkg"
   	DATA "roadnetwork_forestimator_20260325"
   	PROJECTION
@@ -86,28 +87,21 @@ MAP
   	#LABELITEM    "categorie"    
   	CLASSITEM "categorie"
   	CLASS
-    		STYLE
-      			COLOR 40 40 40
-      			OUTLINECOLOR 200 200 200
-      			WIDTH 2
-    		END #style
-  	END #class
-  	CLASS
     		NAME "C0-C1" # jaune
     		EXPRESSION {C0,C1}
     		STYLE
-      			COLOR 88 90 8
-      			OUTLINECOLOR 200 200 200
-      			WIDTH 4
+      			#COLOR 88 90 8
+      			OUTLINECOLOR 95 97 8
+      			WIDTH 6
     		END #style
   	END #class
   	CLASS
-    		NAME "C2-C3" # gris
+    		NAME "C2-C3" 
     		EXPRESSION {C2,C3}
     		STYLE
       			COLOR 40 40 40
       			OUTLINECOLOR 200 200 200
-      			WIDTH 2
+      			WIDTH 4
     		END #style
   	END #class
   	CLASS
@@ -122,7 +116,7 @@ MAP
     		END #style
   	END #class
 	END #layer
-
+	
  	LAYER
         NAME "MasqueForet"
         TYPE RASTER
