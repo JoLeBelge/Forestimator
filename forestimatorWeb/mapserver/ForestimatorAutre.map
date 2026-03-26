@@ -6,7 +6,7 @@ MAP
 	IMAGECOLOR     255 255 255
 	IMAGETYPE      PNG
 	
-	CONFIG "MS_ERRORFILE" "/home/carto/app/Forestimator/data/tmp/mapserver_autre_error.txt"
+	#CONFIG "MS_ERRORFILE" "/home/carto/app/Forestimator/data/tmp/mapserver_autre_error.txt"
 
 	PROJECTION
 		"init=epsg:31370"
@@ -74,7 +74,7 @@ MAP
 	END #layer
 	
 	LAYER
-	DEBUG 2
+	#DEBUG 2
   	NAME "routes"
   	TYPE LINE
   	STATUS ON
