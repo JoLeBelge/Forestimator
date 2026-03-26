@@ -75,7 +75,8 @@ MAP
   	NAME "routes"
   	TYPE LINE
   	STATUS ON
-  	DATA "roadnetwork_forestimator_20260325.gpkg"  
+  	CONNECTION "roadnetwork_forestimator_20260325.gpkg"
+  	DATA "roadnetwork_forestimator_20260325"
   	#LABELITEM    "categorie"    
   	CLASSITEM "categorie"     
   	CLASS
