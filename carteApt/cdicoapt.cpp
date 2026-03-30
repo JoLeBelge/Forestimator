@@ -255,7 +255,6 @@ std::string removeAccents(std::string aStr){
 OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg, int maxSurf){
 
     OGRGeometry * pol=NULL;
-    // lecture du polygone
     OGRErr err=OGRGeometryFactory::createFromWkt(aPolyg.c_str(),NULL,&pol);
 
     // isValid() fonctionne mais par contre le destroyGeom doit être suivi d'un pol=NULL sinon bug
@@ -274,8 +273,6 @@ OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg, int maxSurf){
         if(globTest){std::cout << "createFromWkt OGR error : " << err << std::endl;}
         OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
 
-    //if (aRes==0){mResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370).";}//Wt::WText::tr("api.msg.error.polyg1").toUTF8();}}
-    //if(globTest){std::cout << "checkPolyg API done "<< std::endl;}
     return pol;
 }
 

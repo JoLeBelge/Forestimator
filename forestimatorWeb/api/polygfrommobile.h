@@ -10,6 +10,7 @@
 #include <Wt/WFileUpload.h>
 #include <iostream>
 #include <iomanip>
+#include <Wt/WLocalDateTime.h>
 using namespace Wt;
 
 class polygFromMobile : public Wt::WResource
@@ -24,7 +25,7 @@ private:
 
 class validCompoRaster{
 public:
-    std::string  essence, rmq, nom_contact,contact, geom ;
+    std::string  essence, rmq, nom_contact,contact, date, geom ;
     template<class Action>
     void persist(Action& a)
     {
@@ -32,6 +33,7 @@ public:
         dbo::field(a, rmq,   "rmq");
         dbo::field(a, nom_contact,    "nom_contact");
         dbo::field(a, contact,  "contact");
+        dbo::field(a, date,  "date");
         dbo::field(a, geom,  "geom");
     }
 };

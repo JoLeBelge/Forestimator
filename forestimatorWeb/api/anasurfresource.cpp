@@ -19,23 +19,30 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
     std::vector<std::string> aV;
     boost::split( aV,listCode,boost::is_any_of("+"),boost::token_compress_on);
 
-    OGRGeometry * pol=mDico->checkPolyg(aPolyg);
-    if (pol!=NULL){
+    OGRGeometry * pol=NULL;
+    OGRErr err=OGRGeometryFactory::createFromWkt(aPolyg.c_str(),NULL,&pol);
 
-        response.addHeader("Content-Type","application/json");
+    response.addHeader("Content-Type","application/json");
+    if (pol!=NULL && err==OGRERR_NONE){
 
-        // le double to String de response.out m'arrondi le x (et pas le y, mystère). je fait le cast moi-même
-        response.out() << "{\n\"forestimatorAnalyses\":\"surface\",\n"
-                       <<       "\"surface\":"<< OGR_G_Area(pol)/10000 <<",\n"
-                       <<       "\"RequestedLayers\":[\n";
-        int j(0);
-        for (std::string code: aV){
+        int aSurfha=OGR_G_Area(pol)/10000;
 
-            response.out() << "    { \n\"layerCode\":\"" << code <<"\",\n";
+        if (aSurfha>globMaxSurf){
+            response.out() <<"La surface du polygone est trop importante pour une analyse surfacique (" << std::to_string(aSurfha) << "ha). Maximum autorisé de "+std::to_string(globMaxSurf)+"ha";
+        } else {
 
-            if (mDico->hasLayerBase(code)){
+            // le double to String de response.out m'arrondi le x (et pas le y, mystère). je fait le cast moi-même
+            response.out() << "{\n\"forestimatorAnalyses\":\"surface\",\n"
+                           <<       "\"surface\":"<< OGR_G_Area(pol)/10000 <<",\n"
+                                 <<       "\"RequestedLayers\":[\n";
+            int j(0);
+            for (std::string code: aV){
 
-                std::shared_ptr<layerBase> l =mDico->getLayerBase(code);
+                response.out() << "    { \n\"layerCode\":\"" << code <<"\",\n";
+
+                if (mDico->hasLayerBase(code)){
+
+                    std::shared_ptr<layerBase> l =mDico->getLayerBase(code);
 
                     switch (l->getTypeVar()) {
                     case TypeVar::Continu:{
@@ -73,18 +80,20 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
                     default:
                         break;
                     }
-                // fin if dico has layer
+                    // fin if dico has layer
+                }
+                response.out()   << "    }";
+                j++;
+                if (j<aV.size()) {response.out() << ",\n";}
+                // fin boucle sur layer
             }
-            response.out()   << "    }";
-            j++;
-            if (j<aV.size()) {response.out() << ",\n";}
-            // fin boucle sur layer
-        }
-        response.out() << "\n ]\n}\n";
+            response.out() << "\n ]\n}\n";
 
-        OGRGeometryFactory::destroyGeometry(pol);
+
+        }
     } else {
-        response.out() <<"<error>La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha</error>";
+        response.out() <<"La géométrie du polygone n'est pas valide.";
     }
+    OGRGeometryFactory::destroyGeometry(pol);pol=NULL;
 
 }

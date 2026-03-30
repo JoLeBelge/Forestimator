@@ -23,12 +23,26 @@ CONSOLIDATION
 
 COMMUNICATION/ DOCUMENTATION
 
--tutoriel pdf -> Jo termine une fois que les dev actuel sont fini
-
--vidéo d'utilisation : après la rédaction du manuel et des développements "observation composition"
+-caspule video : on attend la réponse de l'étudiant influenceur
 
 NOUVELLES OPTIONS - LONG TERME
 
 -gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend (calculé depuis un polygone de préférence). puis des couches offlines sur cet extend.
+
+Debug suite à la formation SFRSB
+--------------------------------
+
+-mode points/polygones de l'utilisateur ; passage de l'interface "liste des layers" au mode compact pas très intuitif : si pas de layer sélectionnée, appuyer sur le bouton "reduire" fait quitter le mode points/polygones. Il faudrai à la place afficher l'interface "compact" avec la première layer de la liste, par exemple.
+-permission GPS ; demande la permission à chaque utilisation de l'appli, devrait demander une seule et unique fois.
+-bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli!
+-visu toujour ON pour les layers si mode edition de polygones (si jamais l'utilisateur a mis à off via le sélecteur de couche)
+-message erreur si ana Surfacique sur surface trop importante
+-check firewall si de très nombreuses personnes utilisent forestimator depuis la fac
+-ajout de la date dans l'enrengistrement des observations essences (Forestimator Web)
+-mode offline : changer le logo dans les couches du catalogue offline, logo disquette.
+-mode offline : carte numérique des sols de wallonie ; ne pas mettre de bouton "afficher" car on ne peut pas l'afficher (pour l'instant le bouton existe mais ne sert à rien)
+-mode offline : voir image qui illustre un bug
+-mapserver : optimiser, création des pyramides pour toutes les couches?? (MNH surtout?)
+
 
 
