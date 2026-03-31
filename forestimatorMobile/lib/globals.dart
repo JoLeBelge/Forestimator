@@ -106,6 +106,7 @@ class Anim {
 
 class Mode {
   static bool userDataFilled = false;
+  static bool firePath = false;
   static bool essence = false;
   static bool labelCross = false;
   static bool debugLabel = false;
@@ -152,6 +153,7 @@ class Mode {
   }
 
   static void serialize() async {
+    await shared!.setBool('Modes.firePath', firePath);
     await shared!.setBool('Modes.essence', essence);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.labelCross', labelCross);
@@ -159,6 +161,7 @@ class Mode {
   }
 
   static void deserialize() {
+    firePath = shared!.getBool('Modes.firePath') ?? false;
     essence = shared!.getBool('Modes.essence') ?? false;
     userDataFilled = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
@@ -448,14 +451,14 @@ class SelectedLayer {
   SelectedLayer({required this.mCode, this.offline = false, this.sourceImagePath = ""});
 }
 
-List<SelectedLayer> selectedLayerForMap = [
+List<SelectedLayer> switcherMaps = [
   SelectedLayer(mCode: "3", offline: false),
   SelectedLayer(mCode: "2", offline: false),
   SelectedLayer(mCode: "1", offline: false),
 ];
 
 String getFirstSelLayOffline() {
-  List<SelectedLayer> l = selectedLayerForMap.where((i) => i.offline).toList();
+  List<SelectedLayer> l = switcherMaps.where((i) => i.offline).toList();
   return l.isNotEmpty ? l.first.mCode : "_empty_";
 }
 
@@ -473,7 +476,7 @@ void initializeSelectedLayerForFlutterMap() {
 
 List<String> getInterfaceSelectedLCode() {
   List<String> aRes = [];
-  for (SelectedLayer l in selectedLayerForMap) {
+  for (SelectedLayer l in switcherMaps) {
     aRes.insert(aRes.length, l.mCode);
   }
   return aRes;
@@ -481,7 +484,7 @@ List<String> getInterfaceSelectedLCode() {
 
 List<String> getInterfaceSelectedLOffline() {
   List<String> aRes = [];
-  for (SelectedLayer l in selectedLayerForMap) {
+  for (SelectedLayer l in switcherMaps) {
     aRes.insert(aRes.length, l.offline.toString());
   }
   return aRes;
@@ -544,6 +547,7 @@ bool get positionInit => _positionInit;
 late proj4.Point pt;
 
 const Color colorAgroBioTech = Color.fromRGBO(185, 205, 118, 1.0);
+const Color colorFirePaths = Color.from(alpha: 1, red: 0.894, green: 0.298, blue: 0.063);
 const Color colorDeselected = Color.fromARGB(255, 46, 46, 46);
 const Color colorUliege = Color.fromRGBO(00, 112, 127, 1.0);
 const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
@@ -580,54 +584,54 @@ void removeLayerFromList({bool offline = false, int index = -1, String key = ""}
   }
   if (key != "") {
     SelectedLayer? sL;
-    for (var layer in selectedLayerForMap) {
+    for (var layer in switcherMaps) {
       if (layer.mCode == key && layer.offline == offline) {
         sL = layer;
       }
     }
     if (sL != null) {
-      int index = selectedLayerForMap.indexOf(sL);
-      selectedLayerForMap.removeAt(index);
-      selectedLayerForMap.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
+      int index = switcherMaps.indexOf(sL);
+      switcherMaps.removeAt(index);
+      switcherMaps.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
     }
   }
   if (index > -1) {
-    selectedLayerForMap.removeAt(index);
-    selectedLayerForMap.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
+    switcherMaps.removeAt(index);
+    switcherMaps.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
   }
 }
 
 void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
   if (key != "") {
     SelectedLayer? sL;
-    for (var layer in selectedLayerForMap) {
+    for (var layer in switcherMaps) {
       if (layer.mCode == key && layer.offline == offline) {
         sL = layer;
       }
     }
     if (sL != null) {
-      int index = selectedLayerForMap.indexOf(sL);
-      selectedLayerForMap.removeAt(index);
-      selectedLayerForMap.insert(index, SelectedLayer(mCode: replacement, offline: offline));
+      int index = switcherMaps.indexOf(sL);
+      switcherMaps.removeAt(index);
+      switcherMaps.insert(index, SelectedLayer(mCode: replacement, offline: offline));
     }
   } else if (index > -1) {
-    selectedLayerForMap.removeAt(index);
-    selectedLayerForMap.insert(index, SelectedLayer(mCode: replacement, offline: offline));
+    switcherMaps.removeAt(index);
+    switcherMaps.insert(index, SelectedLayer(mCode: replacement, offline: offline));
   } else if (getCountOfSelectedLayersForMap() == 3) {
-    selectedLayerForMap.removeAt(2);
-    selectedLayerForMap.insert(0, SelectedLayer(mCode: replacement, offline: offline));
+    switcherMaps.removeAt(2);
+    switcherMaps.insert(0, SelectedLayer(mCode: replacement, offline: offline));
   } else if (getCountOfSelectedLayersForMap() == 0) {
-    selectedLayerForMap.removeAt(0);
-    selectedLayerForMap.insert(0, SelectedLayer(mCode: replacement, offline: offline));
+    switcherMaps.removeAt(0);
+    switcherMaps.insert(0, SelectedLayer(mCode: replacement, offline: offline));
   } else {
-    selectedLayerForMap.removeAt(getIndexForEmptySlot());
-    selectedLayerForMap.insert(0, SelectedLayer(mCode: replacement, offline: offline));
+    switcherMaps.removeAt(getIndexForEmptySlot());
+    switcherMaps.insert(0, SelectedLayer(mCode: replacement, offline: offline));
   }
 }
 
 int getCountOfSelectedLayersForMap() {
   int count = 0;
-  for (SelectedLayer layer in selectedLayerForMap) {
+  for (SelectedLayer layer in switcherMaps) {
     if (layer.mCode.length > 1) {
       count++;
     }
@@ -637,7 +641,7 @@ int getCountOfSelectedLayersForMap() {
 
 int getIndexForEmptySlot() {
   int count = 0;
-  for (SelectedLayer layer in selectedLayerForMap) {
+  for (SelectedLayer layer in switcherMaps) {
     if (layer.mCode.length < 2) {
       return count;
     }
@@ -652,7 +656,7 @@ int getIndexForEmptySlot() {
 
 int getCountOfflineLayerSelected() {
   int count = 0;
-  for (SelectedLayer layer in selectedLayerForMap) {
+  for (SelectedLayer layer in switcherMaps) {
     if (layer.offline) {
       count++;
     }
@@ -662,7 +666,7 @@ int getCountOfflineLayerSelected() {
 
 int getIndexForLayer(String key, bool offline) {
   int index = 0;
-  for (SelectedLayer layer in selectedLayerForMap) {
+  for (SelectedLayer layer in switcherMaps) {
     if (layer.mCode == key && layer.offline == offline) {
       return index;
     }
@@ -673,7 +677,7 @@ int getIndexForLayer(String key, bool offline) {
 
 int getIndexForNextLayerOffline() {
   int index = 0;
-  for (SelectedLayer layer in selectedLayerForMap) {
+  for (SelectedLayer layer in switcherMaps) {
     if (layer.offline) {
       return index;
     }
@@ -684,7 +688,7 @@ int getIndexForNextLayerOffline() {
 
 int sameOnlineAsOfflineLayer(String key, bool offline) {
   int index = 0;
-  for (SelectedLayer layer in selectedLayerForMap) {
+  for (SelectedLayer layer in switcherMaps) {
     if (layer.mCode == key && layer.offline != offline) {
       return index;
     }
@@ -696,7 +700,7 @@ int sameOnlineAsOfflineLayer(String key, bool offline) {
 void savePrefSelLayOnline() async {
   interfaceSelectedLCode.clear();
   List<String> offlineLayer = [];
-  for (SelectedLayer sL in selectedLayerForMap) {
+  for (SelectedLayer sL in switcherMaps) {
     interfaceSelectedLCode.add(sL.mCode);
     offlineLayer.add(dico.getLayerBase(sL.mCode).mOffline ? "t" : "n");
   }
@@ -706,7 +710,7 @@ void savePrefSelLayOnline() async {
 
 void savePrefSelLayOffline() async {
   interfaceSelectedLCode.clear();
-  for (SelectedLayer sL in selectedLayerForMap) {
+  for (SelectedLayer sL in switcherMaps) {
     interfaceSelectedLCode.add(sL.mCode);
   }
   await shared!.setStringList('interfaceSelectedOffCode', interfaceSelectedLCode);
@@ -715,10 +719,10 @@ void savePrefSelLayOffline() async {
 void loadPrefSelLayOnline() async {
   interfaceSelectedLCode = shared!.getStringList('interfaceSelectedLCode')!;
   List<String> offlineLayer = shared!.getStringList('interfaceSelectedLCodeOfflineFlag')!;
-  selectedLayerForMap.clear();
+  switcherMaps.clear();
   int index = 0;
   for (String key in interfaceSelectedLCode) {
-    selectedLayerForMap.add(SelectedLayer(mCode: key, offline: offlineLayer[index] == "t" ? true : false));
+    switcherMaps.add(SelectedLayer(mCode: key, offline: offlineLayer[index] == "t" ? true : false));
     index++;
   }
 }
@@ -726,9 +730,9 @@ void loadPrefSelLayOnline() async {
 void loadPrefSelLayOffline() async {
   if (shared!.getStringList('interfaceSelectedOffCode') != null) {
     interfaceSelectedLCode = shared!.getStringList('interfaceSelectedOffCode')!;
-    selectedLayerForMap.clear();
+    switcherMaps.clear();
     for (String key in interfaceSelectedLCode) {
-      selectedLayerForMap.add(SelectedLayer(mCode: key, offline: true));
+      switcherMaps.add(SelectedLayer(mCode: key, offline: true));
     }
   }
 }
@@ -740,19 +744,19 @@ void changeSelectedLayerModeOffline() {
   }
   savePrefSelLayOnline();
   loadPrefSelLayOffline();
-  selectedLayerForMap.removeWhere((element) => element.offline == false);
-  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty && selectedLayerForMap.isEmpty) {
-    selectedLayerForMap.insert(
+  switcherMaps.removeWhere((element) => element.offline == false);
+  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty && switcherMaps.isEmpty) {
+    switcherMaps.insert(
       0,
       SelectedLayer(mCode: dico.getLayersOffline().where((i) => i.mBits == 8).toList().first.mCode, offline: true),
     );
   } else {
-    while (selectedLayerForMap.length > 1) {
-      selectedLayerForMap.removeLast();
+    while (switcherMaps.length > 1) {
+      switcherMaps.removeLast();
     }
   }
-  if (selectedLayerForMap.isEmpty) {
-    selectedLayerForMap.insert(0, SelectedLayer(mCode: '1', offline: true));
+  if (switcherMaps.isEmpty) {
+    switcherMaps.insert(0, SelectedLayer(mCode: '1', offline: true));
   }
 }
 
@@ -762,7 +766,7 @@ void changeSelectedLayerModeOnline() {
 }
 
 bool isSelectedLayer(String key, {offline = false}) {
-  for (var layer in selectedLayerForMap) {
+  for (var layer in switcherMaps) {
     if (layer.mCode == key && layer.offline == offline) {
       return true;
     }
@@ -771,11 +775,11 @@ bool isSelectedLayer(String key, {offline = false}) {
 }
 
 bool slotContainsLayer(int index, String key) {
-  return offlineMode ? selectedLayerForMap.first.mCode == key : selectedLayerForMap[index].mCode == key;
+  return offlineMode ? switcherMaps.first.mCode == key : switcherMaps[index].mCode == key;
 }
 
 List<SelectedLayer> getLayersForFlutterMap() {
-  return selectedLayerForMap
+  return switcherMaps
       .where(
         (val) =>
             !(val.mCode.length < 3 && (val.mCode.contains('1') || val.mCode.contains('2') || val.mCode.contains('3'))),
