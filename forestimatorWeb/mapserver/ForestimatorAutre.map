@@ -3522,7 +3522,7 @@ END
    		OFFSITE 0 0 0
    		PROCESSING "LUT=254:130"#purement visuel
 
-   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_vha.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_cdom.map"
    		METADATA
       			"wms_title"           "Modèle dendrométrique : circonférence dominante [cm]"
       			"wms_srs"             "EPSG:31370"

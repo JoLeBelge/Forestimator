@@ -41,7 +41,7 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ, double na):mean(0),ma
     stdev = std::sqrt(sq_sum / nb - mean * mean);
 }
 
-statHdomBase::statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom, bool computeStat):mLay(aLay),mGeom(poGeom)
+/*statHdomBase::statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom, bool computeStat):mLay(aLay),mGeom(poGeom)
 {
     if (computeStat){
 
@@ -84,7 +84,6 @@ statHdomBase::statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom
                         // lecture
                         int posU=i*nbPix;
                         int posV=j*nbPix;
-                        //std::cout << "i " << i << " , j " << j << " ; row  pos U " << posU << " , posV " << posV << " (width/(10.0)) " << (width/(10.0)) <<  " , (height/10.0) " << (height/10.0)<< std::endl;
 
                         // lecture du bloc en 1 coup
                         DS->GetRasterBand(1)->RasterIO( GF_Read, posU+xOffset, posV+yOffset, nbPix, nbPix, scanline, nbPix,nbPix, GDT_Float32, 0, 0 );
@@ -96,8 +95,7 @@ statHdomBase::statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom
                         {
                             if (scanlineMask[pix]==255){
                                 double aVal=scanline[ pix ];
-                                // H() c'est pour gain de 0.2
-                                aVHs.push_back(Dico()->H(aVal,mLay->Gain()));
+                                aVHs.push_back(aVa*mLay->Gain());
                             }
                         }
                         double surf=aVHs.size()*pixelWidth*pixelHeight;
@@ -182,6 +180,7 @@ std::vector<OGRPoint> hexbin(GDALDataset * mask){
     return aRes;
 }
 
+
 std::vector<OGRPolygon *> hexGeombin(GDALDataset *mask){
     std::cout << " hexGeombin sur le masque "<< std::endl;
     std::vector<OGRPoint> VCentreHexagone=hexbin(mask);
@@ -204,11 +203,11 @@ std::vector<OGRPolygon *> hexGeombin(GDALDataset *mask){
         //std::cout << " ring done "<< std::endl;
         hex->addRingDirectly(ring);
         // delete ring;
-        /* pour vérification dans Qgis
-        char *toto;
-        toto = hex.exportToJson();
-        std::cout << toto << std::endl;
-        */
+        // pour vérification dans Qgis
+        //char *toto;
+        //toto = hex.exportToJson();
+        //std::cout << toto << std::endl;
+
         aRes[c]=hex;
         c++;
     }
@@ -300,10 +299,6 @@ std::vector<std::pair<std::string,double>> statHdomBase::computeDistrH(){
             }
         }
 
-        /*for (int occ : clasOcc){
-            std::cout << " occurence classe est " << occ << std::endl;
-        }*/
-
         int nbPix=aVHauteur.size();
         // std::cout << " nombre de hauteur ;  " << nbPix<< std::endl;
         std::string aRange("<3m");
@@ -318,6 +313,7 @@ std::vector<std::pair<std::string,double>> statHdomBase::computeDistrH(){
 
     return aRes;
 }
+*/
 
 basicStat::basicStat(std::vector<double> v):mean(0),max(0),min(0),nb(0){
     bool test(0);

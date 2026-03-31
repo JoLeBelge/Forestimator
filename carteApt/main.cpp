@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     po::options_description desc("options pour l'outil de calcul des cartes ");
     desc.add_options()
             ("help", "produce help message")
-            ("outils", po::value<int>(), "choix de l'outil à utiliser. 1 : station Descriptor (1 layer, 1 shp polygone), 2 : ajout méta , 3 : aptCS, 4 aptFEE, 5 : carteNH, 6 carteProf, 7 carteSolFortePente")
+            ("outils", po::value<int>()->required(), "choix de l'outil à utiliser. 0: generation des overview pour toutes les couches carto pour optimiser le rendu par mapserver. 1 : station Descriptor (1 layer, 1 shp polygone), 2 : ajout méta , 3 : aptCS, 4 aptFEE, 5 : carteNH, 6 carteProf, 7 carteSolFortePente")
             ("test", po::value<bool>(), "debug")
             ("carteNT", po::value<bool>(), "calcul de la carte des NT")
             ("cartepH", po::value<bool>(), "calcul de la carte des pH")
@@ -77,6 +77,25 @@ int main(int argc, char *argv[])
 
         int mode(vm["outils"].as<int>());
         switch (mode) {
+        case 0:{
+            cDicoApt dico(dirBD);
+            // je boucle les layersbase
+            for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
+
+                std::shared_ptr<layerBase> l=kv.second;
+
+                if (l->mResolution!=0.0){
+                    std::string aCommand ="gdal raster overview add gdal raster overview add --external --levels=2,4,8,16 --co COMPRESS=YES "+ l->getPathTif();
+                    std::cout << aCommand << "\n";
+                    if (!globTest){
+                    system(aCommand.c_str());
+                    }
+                }
+
+            }
+
+            break;
+        }
         case 1:{
             std::cout << " station descriptor " << std::endl;
             cDicoApt dico(dirBD);

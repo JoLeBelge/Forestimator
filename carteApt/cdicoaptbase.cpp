@@ -610,10 +610,8 @@ int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique,int aTopo
     if (aCodeNT==0 && aCodeNH!=0){aRes=11; return aRes;}
     if (mAptZbio.find(aZbio)==mAptZbio.end()){aRes=11;return aRes;}// hors belgique ; Indéterminé mais pas zone batie
 
-    //int codeNTNH= mDico->NTNH()->at("h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT));
     std::string codeNTNH= "h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT);
     if (mEcoVal.find(aZbio)!=mEcoVal.end()){
-        //aRes=20;
         std::map<std::string,int> * Eco=&mEcoVal.at(aZbio);
         if (Eco->find(codeNTNH)!=Eco->end()){
             aRes=Eco->at(codeNTNH);
