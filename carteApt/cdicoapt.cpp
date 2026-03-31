@@ -306,7 +306,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                                         */
                             aResponse="calcul de hdom indisponible pour l'instant\n";
                         //}
-                    }
+                    //}
                 }else if(aTool=="aptitude"){
                     std::vector<std::string> VCApt=parseAptArg(aArgs);
                     aResponse+="code_es;type;O;T;TE;E;I\n";

@@ -422,9 +422,9 @@ int rasterFiles::getValue(double x, double y){
             scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
             // lecture du pixel
             mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
-            aRes=scanPix[0];//*mBand->GetScale(); non car c'est un integer qui est renvoyé par ma fonction getVal, donc si j'applique un gain pour avoir un float, je vais perdre les chiffres après la virgule
+            aRes=scanPix[0];
             CPLFree(scanPix);
-
+            if (mBand->GetNoDataValue()==aRes){aRes=0;}
             mBand=NULL;
         }
         GDALClose( mGDALDat );
@@ -520,11 +520,8 @@ double rasterFiles::getValueDouble(double x, double y){
             mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
             aRes=scanPix[0];
             CPLFree(scanPix);
-            //mBand=NULL;
+            if (mBand->GetNoDataValue()==aRes){aRes=0;}
         }
-        /*if (Code()=="ETP_30aire"){
-        std::cout << "rasterFiles::getValueDouble pour raster " << Code() << " et position " << x <<  " , " << y << " donne comme résultat " << aRes << " qui est en position pixel de " << col << " , " << row <<std::endl;
-        }*/
         if( mGDALDat != NULL){GDALClose(mGDALDat);}
     }
     return aRes;
@@ -534,13 +531,6 @@ std::map<std::string,int> layerBase::computeStat1(OGRGeometry *poGeom){
 
     std::map<std::string,int> aRes;
     if (mType!=TypeLayer::Externe){
-
-        /*if (mCode="MNH2019"){
-            // statistique hdom
-            statHdomBase hdomStat = statHdomBase(this,poGeom,1);
-
-        } else {*/
-
         // préparation du containeur du résultat
         for (auto &kv : mDicoVal){
             aRes.emplace(std::make_pair(kv.second,0));
