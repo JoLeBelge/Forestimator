@@ -7,8 +7,6 @@ int launchForestimator(int argc, char **argv)
     po::options_description desc("Allowed options");
     desc.add_options()("help", "produce help message")("test", po::value<bool>(), "pour le test de nouvelles options en cours de développement")("BD", po::value<std::string>(), "chemin d'accès à la BD forestimator")("colPath", po::value<std::string>(), "nom de la colonne de fichierGIS et layerApt propre à la machine (chemin d'accès couche en local)");
     po::variables_map vm;
-    // po::store(po::parse_command_line(argc, argv, desc), vm);
-    // https://stackoverflow.com/questions/15552284/boostprogram-options-how-to-ignore-unknown-parameters
     po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);
     po::notify(vm);
     if (vm.count("test"))

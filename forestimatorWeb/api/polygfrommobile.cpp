@@ -42,6 +42,8 @@ void polygFromMobile::handleRequest(const Http::Request &request,Http::Response 
     a->nom_contact = poFeature->GetFieldAsString("nom_contact");
     a->contact = poFeature->GetFieldAsString("contact");
     a->geom = poFeature->GetGeometryRef()->exportToWkt();
+    WLocalDateTime d = WLocalDateTime::currentServerDateTime();
+    a->date = d.toString().toUTF8();
     dbo::Transaction transaction(session);
     dbo::ptr<validCompoRaster> aNewPolyg = session.add(std::move(a));
     response.out() << "OK" ;
