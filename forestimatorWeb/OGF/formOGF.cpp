@@ -201,31 +201,6 @@ void formOGF::submit()
         dbo::Transaction transaction(session);
         dbo::ptr<ogf> anOGF = session.add(std::move(a));
 
-        /*
-        int rc;
-        sqlite3 *db_;
-        rc = sqlite3_open(mBDFile.c_str(), &db_);
-        if( rc )  {} else {
-
-            sqlite3_stmt * stmt;
-            SQLstring="INSERT INTO acr (date,vosRef,nom,prenom,contact,gsm,descr,surf,polygon) VALUES ('"
-                    +d.toString().toUTF8()+"',"
-                    +"'"+format4SQL(vosrefEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(nomEncoderEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(prenomEncoderEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(contactEncoderEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(contactEncoderGSMEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(descriptionEdit_->valueText().toUTF8())+"',"
-                    +std::to_string(surf)+","
-                    +"'"+polyg+"');";
-            if (globTest){ std::cout << "sql : " << SQLstring << std::endl;}
-            sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
-            // applique l'update
-            sqlite3_step( stmt );
-            sqlite3_finalize(stmt);
-        }
-        sqlite3_close(db_);*/
-
         sendSummaryMail();
 
         Wt::StandardButton answer = Wt::WMessageBox::show(WString::tr("saveACR.msg.titre"),

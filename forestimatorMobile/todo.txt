@@ -36,13 +36,20 @@ Debug suite à la formation SFRSB
 -permission GPS ; demande la permission à chaque utilisation de l'appli, devrait demander une seule et unique fois.
 -bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli!
 -visu toujour ON pour les layers si mode edition de polygones (si jamais l'utilisateur a mis à off via le sélecteur de couche)
--message erreur si ana Surfacique sur surface trop importante
+-message erreur si ana Surfacique sur surface trop importante (affichage dans une fenetre le message d'erreur renvoyé par le serveur)
 -check firewall si de très nombreuses personnes utilisent forestimator depuis la fac
--ajout de la date dans l'enrengistrement des observations essences (Forestimator Web)
+-ajout de la date dans l'enregistrement des observations essences (Forestimator Web)
 -mode offline : changer le logo dans les couches du catalogue offline, logo disquette.
 -mode offline : carte numérique des sols de wallonie ; ne pas mettre de bouton "afficher" car on ne peut pas l'afficher (pour l'instant le bouton existe mais ne sert à rien)
 -mode offline : voir image qui illustre un bug
--mapserver : optimiser, création des pyramides pour toutes les couches?? (MNH surtout?)
+
+-dans les logs de l'appli, trouver d'ou viens le message "oops no layerBase 2" et résoudre.
+-ouverture de pdf (ex fiche essences) ne se fait pas à la bonne page..
+-sélection d'une couche pour l'analyse surfacique : le choix de l'utilisateur n'est pas sauvé dans les préférences (je modifie le code mais je n'ai pas testé si ça fonctionne)
+
+-analyse surfacique : ajouter dans le rapport d'analyse , tout en haut, le nom du polygone et sa surface.
+
+-mapserver : optimiser, création des pyramides pour toutes les couches?? (MNH surtout?) --> JL
 
 
 
