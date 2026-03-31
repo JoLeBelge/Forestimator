@@ -830,7 +830,7 @@ class PopupNewGeometricLayer {
             SizedBox(
               width: gl.menuBarLength * gl.eqPx,
               child: TextFormField(
-                maxLength: 22,
+                maxLength: 255,
                 maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 onChanged: (String it) {
                   name = it;
@@ -1045,6 +1045,26 @@ class _SelectPolyType extends State<SelectPolyType> {
             ),
           ),
         ),
+        if (gl.Mode.firePath)
+          Container(
+            width: gl.eqPx * gl.iconSizeM * 1.65,
+            height: gl.eqPx * gl.iconSizeM * 1.35,
+            color: _selectedType == 2 ? gl.colorAgroBioTech : Colors.transparent,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _selectedType = 2;
+                });
+                widget.state("Path");
+              },
+              child: Column(
+                children: [
+                  FaIcon(FontAwesomeIcons.personHiking, color: Colors.white),
+                  Text("Chemin", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS)),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -1879,6 +1899,9 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                                 case "Polygon":
                                   gl.geoLayers.add(GeometricLayer.polygon());
                                   break;
+                                case "Path":
+                                  gl.geoLayers.add(GeometricLayer.path());
+                                  break;
                               }
                               gl.geoLayers.last.defaultColor = color;
                               gl.geoLayers.last.name = name;
@@ -1891,11 +1914,13 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                               case "Polygon":
                                 gl.geoLayers.add(GeometricLayer.polygon());
                                 break;
+                              case "Path":
+                                gl.geoLayers.add(GeometricLayer.path());
+                                break;
                             }
                             gl.geoLayers.last.defaultColor = color;
                             gl.geoLayers.last.name = name;
                           }
-                          gl.selectedGeoLayer = gl.geoLayers.length - 1;
                           gl.geoLayers.last.serialize();
                           gl.refreshStack(() {
                             gl.selectedGeoLayer = gl.geoLayers.length - 1;
@@ -4449,6 +4474,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   if (gl.Mode.userDataFilled) {
                     setState(() {
                       gl.Mode.essence = it;
+                      gl.Mode.firePath = false;
                     });
                   } else {
                     PopupUserData(
@@ -4457,6 +4483,50 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                       () {
                         setState(() {
                           gl.Mode.essence = it;
+                          gl.Mode.firePath = false;
+                        });
+                      },
+                      oldForename: gl.UserData.forename,
+                      oldName: gl.UserData.name,
+                      oldMail: gl.UserData.mail,
+                    );
+                  }
+                  gl.refreshStack(() {});
+                  gl.Mode.serialize();
+                }, false),
+              ],
+            ),
+            lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+            Stack(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    gl.refreshStack(() {
+                      popupForestimatorMessage(
+                        height: gl.eqPx * 90,
+                        width: gl.eqPx * 90,
+                        title: "Information",
+                        message: "",
+                      );
+                    });
+                  },
+                  icon: Icon(Icons.info_outline, size: gl.eqPx * gl.iconSizeXS, color: gl.colorBack),
+                ),
+
+                variableBooleanSlider("Classification des chemins de secours.", gl.Mode.firePath, (bool it) {
+                  if (gl.Mode.userDataFilled) {
+                    setState(() {
+                      gl.Mode.firePath = it;
+                      gl.Mode.essence = false;
+                    });
+                  } else {
+                    PopupUserData(
+                      context,
+                      () {},
+                      () {
+                        setState(() {
+                          gl.Mode.firePath = it;
+                          gl.Mode.essence = false;
                         });
                       },
                       oldForename: gl.UserData.forename,
@@ -5538,33 +5608,33 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
             }
           } else {
             if (gl.getCountOfflineLayerSelected() == 0) {
-              if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) != -1) {
+              /* if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) != -1) {
                 setState(() {
                   int index = gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true);
                   gl.removeLayerFromList(index: index, offline: false);
                   gl.replaceLayerFromList(widget.layerTile.key, index: index, offline: true);
                 });
-              } else {
-                setState(() {
-                  gl.replaceLayerFromList(widget.layerTile.key, index: interfaceSelectedMapSwitcherSlot, offline: true);
-                });
-              }
+              } else {*/
+              setState(() {
+                gl.replaceLayerFromList(widget.layerTile.key, index: interfaceSelectedMapSwitcherSlot, offline: true);
+              });
+              // }
             } else if (gl.getCountOfflineLayerSelected() == 1) {
-              if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) != -1) {
+              /*if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) != -1) {
                 setState(() {
                   int index = gl.getIndexForNextLayerOffline();
-                  gl.replaceLayerFromList(gl.selectedLayerForMap[index].mCode, index: index, offline: false);
+                  gl.replaceLayerFromList(gl.switcherMaps[index].mCode, index: index, offline: false);
                   index = gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true);
                   gl.removeLayerFromList(index: index, offline: false);
                   gl.replaceLayerFromList(widget.layerTile.key, index: index, offline: true);
                 });
-              } else {
-                setState(() {
-                  int index = gl.getIndexForNextLayerOffline();
-                  gl.removeLayerFromList(index: index, offline: true);
-                  gl.replaceLayerFromList(widget.layerTile.key, index: index, offline: true);
-                });
-              }
+              } else {*/
+              setState(() {
+                int index = gl.getIndexForNextLayerOffline();
+                gl.removeLayerFromList(index: index, offline: true);
+                gl.replaceLayerFromList(widget.layerTile.key, index: index, offline: true);
+              });
+              //}
             }
           }
           gl.refreshStack(() {});
@@ -5591,7 +5661,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
                 ? gl.removeLayerFromList(index: interfaceSelectedMapKey, offline: gl.offlineMode)
                 : {
                   gl.replaceLayerFromList(
-                    gl.selectedLayerForMap[interfaceSelectedMapKey].mCode,
+                    gl.switcherMaps[interfaceSelectedMapKey].mCode,
                     index: gl.getIndexForLayer(widget.layerTile.key, widget.offlineMode),
                     offline: gl.offlineMode,
                   ),
@@ -6893,15 +6963,15 @@ class _SwitcherBox extends State<SwitcherBox> {
             if (oldIndex < newIndex) {
               newIndex -= 1;
             }
-            if (gl.selectedLayerForMap.length < newIndex + 1 || gl.selectedLayerForMap.length < oldIndex + 1) {
+            if (gl.switcherMaps.length < newIndex + 1 || gl.switcherMaps.length < oldIndex + 1) {
               return;
             }
-            String tmpKey = gl.selectedLayerForMap[newIndex].mCode;
-            bool tmpOffline = gl.selectedLayerForMap[newIndex].offline;
+            String tmpKey = gl.switcherMaps[newIndex].mCode;
+            bool tmpOffline = gl.switcherMaps[newIndex].offline;
             gl.replaceLayerFromList(
-              gl.selectedLayerForMap[oldIndex].mCode,
+              gl.switcherMaps[oldIndex].mCode,
               index: newIndex,
-              offline: gl.selectedLayerForMap[oldIndex].offline,
+              offline: gl.switcherMaps[oldIndex].offline,
             );
             gl.replaceLayerFromList(tmpKey, index: oldIndex, offline: tmpOffline);
             gl.refreshStack(() {});
@@ -6909,8 +6979,8 @@ class _SwitcherBox extends State<SwitcherBox> {
         },
 
         children: List<Widget>.generate(3, (i) {
-          if ((!gl.offlineMode && !"123".contains(gl.selectedLayerForMap[i].mCode)) ||
-              (i == 0 && !"123".contains(gl.selectedLayerForMap[i].mCode))) {
+          if ((!gl.offlineMode && !"123".contains(gl.switcherMaps[i].mCode)) ||
+              (i == 0 && !"123".contains(gl.switcherMaps[i].mCode))) {
             return Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -6951,7 +7021,7 @@ class _SwitcherBox extends State<SwitcherBox> {
                               },
                               gl.offlineMode,
                               i,
-                              gl.selectedLayerForMap[i].mCode,
+                              gl.switcherMaps[i].mCode,
                               (void Function() x) {
                                 x();
                               },
@@ -6962,7 +7032,7 @@ class _SwitcherBox extends State<SwitcherBox> {
                             alignment: Alignment.centerLeft,
                             padding: EdgeInsets.symmetric(horizontal: 1.0),
                             child: Text(
-                              gl.dico.getLayerBase(gl.selectedLayerForMap[i].mCode).mNom,
+                              gl.dico.getLayerBase(gl.switcherMaps[i].mCode).mNom,
                               textAlign: TextAlign.left,
                               style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
                             ),
@@ -6986,11 +7056,9 @@ class _SwitcherBox extends State<SwitcherBox> {
                                   minWidth: gl.eqPx * 10,
                                 ),
                                 padding: const EdgeInsets.symmetric(),
-                                child: Image.asset(
-                                  gl.dico.getLayerBase(gl.selectedLayerForMap[i].mCode).mLogoAttributionFile,
-                                ),
+                                child: Image.asset(gl.dico.getLayerBase(gl.switcherMaps[i].mCode).mLogoAttributionFile),
                               ),
-                              gl.selectedLayerForMap[i].offline
+                              gl.switcherMaps[i].offline
                                   ? Container(
                                     constraints: BoxConstraints(
                                       maxHeight: gl.eqPx * 10,
@@ -7100,7 +7168,7 @@ class _SwitcherBox extends State<SwitcherBox> {
                               },
                               gl.offlineMode,
                               i,
-                              gl.selectedLayerForMap[i].mCode,
+                              gl.switcherMaps[i].mCode,
                               (void Function() x) {
                                 x();
                               },

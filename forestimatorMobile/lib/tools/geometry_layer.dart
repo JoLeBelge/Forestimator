@@ -52,7 +52,29 @@ class GeometricLayer {
   GeometricLayer.polygon() {
     type = "Polygon";
     Random rand = Random();
-    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
+    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), .5);
+  }
+
+  GeometricLayer.path() {
+    type = "Path";
+    subtype = "";
+    Random rand = Random();
+    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), .5);
+    defaultPointIcon = 4;
+    name = "Observations des chemins de secours";
+  }
+
+  GeometricLayer.firePath() {
+    type = "Path";
+    subtype = "FirePath";
+    defaultColor = gl.colorFirePaths.withAlpha(150);
+    defaultPointIcon = 4;
+    defaultAttributes.addAll([
+      Attribute(name: "largeur", type: "double", value: "Choisissez"),
+      Attribute(name: "revetement", type: "string", value: ""),
+    ]);
+    defaultAttributes[0].visibleOnMapLabel = true;
+    name = "Observations des chemins de secours";
   }
 
   static void deleteLayer(int index) {
@@ -296,6 +318,33 @@ class GeometricLayer {
       index++;
     }
     gl.geoLayers.add(GeometricLayer.essence());
+    gl.selectedGeoLayer = gl.geoLayers.length - 1;
+    gl.geoLayers.last.serialize();
+    return gl.geoLayers.last;
+  }
+
+  static bool firePathLayerExists() {
+    int index = 0;
+    for (GeometricLayer g in gl.geoLayers) {
+      if (g.type == "Path" && g.subtype == "FirePath") {
+        gl.selectedGeoLayer = index;
+        return true;
+      }
+      index++;
+    }
+    return false;
+  }
+
+  static GeometricLayer getFirePathLayer() {
+    int index = 0;
+    for (GeometricLayer g in gl.geoLayers) {
+      if (g.type == "Path" && g.subtype == "FirePath") {
+        gl.selectedGeoLayer = index;
+        return g;
+      }
+      index++;
+    }
+    gl.geoLayers.add(GeometricLayer.firePath());
     gl.selectedGeoLayer = gl.geoLayers.length - 1;
     gl.geoLayers.last.serialize();
     return gl.geoLayers.last;

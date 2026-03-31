@@ -3811,9 +3811,9 @@ class _AnaPtPreview extends State<AnaPtPreview> {
         );
       }
     } else {
-      int val = await gl.dico.getLayerBase(gl.selectedLayerForMap.first.mCode).getValXY(ptBL72);
+      int val = await gl.dico.getLayerBase(gl.switcherMaps.first.mCode).getValXY(ptBL72);
       setState(() {
-        gl.anaPtPreview = LayerAnaPt(mCode: gl.selectedLayerForMap.first.mCode, mRastValue: val);
+        gl.anaPtPreview = LayerAnaPt(mCode: gl.switcherMaps.first.mCode, mRastValue: val);
       });
     }
     after();
