@@ -92,10 +92,16 @@ int main(int argc, char *argv[])
                     int b1, b2;
                     pIn->GetRasterBand(1)->GetBlockSize(&b1,&b2);
                     GDALClose(pIn);
-                    std::cout << " blocksize " << b1 << " " << b2 << std::endl;
+                    //std::cout << " blocksize " << b1 << " " << b2 << std::endl;
                     std::string aCommand("");
 
                     if (b2==1){
+                    std::cout << " tiling and overview" << std::endl;
+                    aCommand= "gdaladdo -r average -minsize 16 " + l->getPathTif();
+                    std::cout << aCommand << "\n";
+                    if (!globTest){
+                    system(aCommand.c_str());
+                    }
                     std::string cogfile =l->getPathTif()+"_cog.tif";
                     std::string bu ="/media/Data10/Forestimator/BU/"+l->NomFileWithExt();
                     aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -co TILED=YES -co COPY_SRC_OVERVIEWS=YES -co COMPRESS=DEFLATE";
@@ -103,7 +109,6 @@ int main(int argc, char *argv[])
                     if (!globTest){
                     system(aCommand.c_str());
                     }
-                    // 2) move old file to bu
                     aCommand= "mv "+ l->getPathTif() +" " +bu;
                     std::cout << aCommand << "\n";
                     if (!globTest){
@@ -114,13 +119,10 @@ int main(int argc, char *argv[])
                     if (!globTest){
                     system(aCommand.c_str());
                     }
+                    } else {
+                    std::cout << " tiling and overview already done" << std::endl;
                     }
-                    // 3 compute internal overview
-                    aCommand= "gdaladdo -r average -minsize 16 " + l->getPathTif();
-                    std::cout << aCommand << "\n";
-                    if (!globTest){
-                    system(aCommand.c_str());
-                    }
+
                 }
 
             }
