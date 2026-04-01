@@ -106,7 +106,7 @@ class Anim {
 
 class Mode {
   static bool userDataFilled = false;
-  static bool firePath = false;
+  static bool recordPathAvailable = false;
   static bool essence = false;
   static bool labelCross = false;
   static bool debugLabel = false;
@@ -115,6 +115,7 @@ class Mode {
   static bool debugScanlines = false;
   static bool debugInfo = false;
   static bool recordPath = false;
+  static bool gpsTimoutException = false;
   static bool keyboardExpanded = false;
   static bool square = false;
   static bool tablet = false;
@@ -153,7 +154,7 @@ class Mode {
   }
 
   static void serialize() async {
-    await shared!.setBool('Modes.firePath', firePath);
+    await shared!.setBool('Modes.firePath', recordPathAvailable);
     await shared!.setBool('Modes.essence', essence);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.labelCross', labelCross);
@@ -161,7 +162,7 @@ class Mode {
   }
 
   static void deserialize() {
-    firePath = shared!.getBool('Modes.firePath') ?? false;
+    recordPathAvailable = shared!.getBool('Modes.firePath') ?? false;
     essence = shared!.getBool('Modes.essence') ?? false;
     userDataFilled = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
@@ -421,6 +422,11 @@ class PoiMarker {
 GeometricLayer get selLay => geoLayers[selectedGeoLayer];
 pol.Geometry get selGeo => selLay.geometries[selLay.selectedGeometry];
 
+GeometricLayer get selPathLay => geoLayers[selectedPathLayer];
+pol.Geometry get selPath => selPathLay.geometries[selectedPath];
+
+bool get pathReady => selectedPathLayer > -1 && selectedPath > -1 && geoLayers[selectedPathLayer].geometries.isNotEmpty;
+
 bool get layerReady => selectedGeoLayer > -1 && selectedGeoLayer < geoLayers.length && geoLayers.isNotEmpty;
 bool get geoReady =>
     layerReady &&
@@ -434,6 +440,9 @@ double get eqPxW => dsp.equiwidth;
 
 List<GeometricLayer> geoLayers = [];
 int selectedGeoLayer = -1;
+
+int selectedPathLayer = -1;
+int selectedPath = -1;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
 String queryApiRastDownload = "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";

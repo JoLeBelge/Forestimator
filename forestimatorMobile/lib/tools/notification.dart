@@ -1045,7 +1045,7 @@ class _SelectPolyType extends State<SelectPolyType> {
             ),
           ),
         ),
-        if (gl.Mode.firePath)
+        if (gl.Mode.recordPathAvailable)
           Container(
             width: gl.eqPx * gl.iconSizeM * 1.65,
             height: gl.eqPx * gl.iconSizeM * 1.35,
@@ -2115,6 +2115,14 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                                                             "POLY",
                                                             style: TextStyle(
                                                               color: Colors.green,
+                                                              fontSize: gl.eqPx * gl.fontSizeXS * .9,
+                                                            ),
+                                                          )
+                                                          : gl.geoLayers[i].type == "Path"
+                                                          ? Text(
+                                                            "CHEMIN",
+                                                            style: TextStyle(
+                                                              color: Colors.blue,
                                                               fontSize: gl.eqPx * gl.fontSizeXS * .9,
                                                             ),
                                                           )
@@ -4474,7 +4482,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   if (gl.Mode.userDataFilled) {
                     setState(() {
                       gl.Mode.essence = it;
-                      gl.Mode.firePath = false;
+                      gl.Mode.recordPathAvailable = false;
                     });
                   } else {
                     PopupUserData(
@@ -4483,7 +4491,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                       () {
                         setState(() {
                           gl.Mode.essence = it;
-                          gl.Mode.firePath = false;
+                          gl.Mode.recordPathAvailable = false;
                         });
                       },
                       oldForename: gl.UserData.forename,
@@ -4513,10 +4521,10 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   icon: Icon(Icons.info_outline, size: gl.eqPx * gl.iconSizeXS, color: gl.colorBack),
                 ),
 
-                variableBooleanSlider("Classification des chemins de secours.", gl.Mode.firePath, (bool it) {
+                variableBooleanSlider("Classification des chemins de secours.", gl.Mode.recordPathAvailable, (bool it) {
                   if (gl.Mode.userDataFilled) {
                     setState(() {
-                      gl.Mode.firePath = it;
+                      gl.Mode.recordPathAvailable = it;
                       gl.Mode.essence = false;
                     });
                   } else {
@@ -4525,7 +4533,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                       () {},
                       () {
                         setState(() {
-                          gl.Mode.firePath = it;
+                          gl.Mode.recordPathAvailable = it;
                           gl.Mode.essence = false;
                         });
                       },
