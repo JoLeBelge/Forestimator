@@ -84,12 +84,33 @@ int main(int argc, char *argv[])
 
                 std::shared_ptr<layerBase> l=kv.second;
 
-                if (l->mResolution!=0.0){
-                    std::string aCommand ="gdal raster overview add gdal raster overview add --external --levels=2,4,8,16 --co COMPRESS=YES "+ l->getPathTif();
+                if (l->mResolution!=0.0 && dico.lay4Visu(l->Code()) && !l->Expert()){
+                    std::cout << "work on layer " << l->Code() << std::endl;
+                    //std::string aCommand ="gdal raster overview add --external --levels=2,4,8,16 --config COMPRESS=LZW "+ l->getPathTif();
+                    // 1) create COG
+                    std::string cogfile =l->getPathTif()+"_cog.tif";
+                    std::string bu ="/media/Data10/Forestimator/bu-"+l->NomFileWithExt();
+                    std::string aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -co TILED=YES -co COPY_SRC_OVERVIEWS=YES -co COMPRESS=DEFLATE";
                     std::cout << aCommand << "\n";
                     if (!globTest){
                     system(aCommand.c_str());
                     }
+                    //if (l->mResolution<9){
+                    //aCommand ="gdal raster overview add --external --levels=2,4,8,16 --config COMPRESS=LZW "+ l->getPathTif();
+
+                    //}
+                    // 2) move old file to bu
+                    aCommand= "mv "+ l->getPathTif() +" " +bu;
+                    std::cout << aCommand << "\n";
+                    if (!globTest){
+                    system(aCommand.c_str());
+                    }
+                    aCommand= "mv "+ cogfile +" " +l->getPathTif();
+                    if (!globTest){
+                    system(aCommand.c_str());
+                    }
+                    // 3 compute internal overview
+
                 }
 
             }
