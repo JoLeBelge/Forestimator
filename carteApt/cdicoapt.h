@@ -150,22 +150,6 @@ public:
         return aRes;
     }
 
-    // hauteur en mètres de la couche MNH2019 que j'ai convertie en 8bits
-    double H(int aVal,double aGain=0.2){
-        double aRes(0.0);
-        // attention, jai des MNH en 16bit donc on peut dépasser 255
-        //if (aVal<255 && aVal>0){aRes=aVal*aGain;}
-        if (aVal>0){aRes=aVal*aGain;}
-        //std::cout << " hauteur DN " << aVal << " devient " << aRes << std::endl;
-        return aRes;
-    }
-
-    // hauteur en mètres de la couche MNT que j'ai convertie en 16bits
-    /*double mnt(int aVal){
-        double aRes(aVal/10);
-        return aRes;
-    }*/
-
     bool hasWMSinfo(std::string aCode);
 
     WMSinfo * getWMSinfo(std::string aCode);

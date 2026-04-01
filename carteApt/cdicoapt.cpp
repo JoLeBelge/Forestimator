@@ -278,8 +278,6 @@ OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg, int maxSurf){
 
 std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::string aPolyg, typeAna aType, OGRLayer * lay){
 
-    //if (globTest) {std::cout << "Forestimator API " << aTool << " aArgs " << aArgs << " polygon " << aPolyg << std::endl;}
-
     std::string aResponse;
 
     GDALAllRegister();
@@ -290,7 +288,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             OGRGeometry * pol=checkPolyg(aPolyg);
             if (pol!=NULL){
                 if (aTool=="hdom"){
-                    std::vector<std::string> VMNH=parseHdomArg(aArgs);
+                    /*std::vector<std::string> VMNH=parseHdomArg(aArgs);
                     if (VMNH.size()==0){aResponse="arguments pour traitement 'hdom' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche MNH séparées par une virgule\n";
                     }else{
                         {aResponse+="code_mnh;moy;cv;max;min;nb\n";}
@@ -299,7 +297,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                             //   statHdomBase stat(l,pol,1);
                             //   basicStat bs= stat.bshdom();
                             //   if (!xml){aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";}
-                            /*  else { aResponse="<code_mnh>"+ l->Code()+ "</code_mnh>\n"
+                              else { aResponse="<code_mnh>"+ l->Code()+ "</code_mnh>\n"
                                         +"<moy>"+ bs.getMean()+ "</moy>\n"
                                         +"<cv>"+ bs.getCV()+ "</cv>\n"
                                         +"<max>"+ bs.getMax()+ "</max>\n"
@@ -307,8 +305,8 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                                         +"<nb>"+ bs.getNb()+ "</nb>\n";}
                                         */
                             aResponse="calcul de hdom indisponible pour l'instant\n";
-                        }
-                    }
+                        //}
+                    //}
                 }else if(aTool=="aptitude"){
                     std::vector<std::string> VCApt=parseAptArg(aArgs);
                     aResponse+="code_es;type;O;T;TE;E;I\n";

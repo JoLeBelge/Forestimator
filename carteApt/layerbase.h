@@ -102,7 +102,7 @@ public:
     std::map<double,int> mValFreq;// utile quand je veux des stats basiques sur un raster de variable discontinu
 };
 
-class statHdomBase {
+/*class statHdomBase {
 public:
     statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool computeStat=1);
     ~statHdomBase(){
@@ -129,9 +129,10 @@ protected:
     std::vector<OGRPolygon *> mVaddPol;
     int mNbOccurence;
 };
-
+*/
 class rasterFiles{
 public:
+    double mResolution;
     rasterFiles(std::string aPathTif,std::string aCode);
     std::string Code() const{return mCode;}
     void checkForQml();
@@ -158,7 +159,7 @@ public:
     GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
 protected:
     std::string mPathRaster, mPathQml, mCode;
-    double mResolution;
+
 };
 
 class layerBase : public rasterFiles, public WMSinfo, public std::enable_shared_from_this<layerBase>

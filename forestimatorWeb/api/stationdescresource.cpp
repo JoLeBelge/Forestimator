@@ -11,7 +11,6 @@ void stationDescResource::handleRequest(const Http::Request &request,Http::Respo
                           "---------------------------\n\n"
                           "\nListe des traitements pour analyse surfacique (analyse spécifique sur une couche ou analyse standard sur plusieurs couches) \n"
                           "----------------------------------------------------------------------------------------------------\n"
-                          "hdom\n"
                           "aptitude\n"
                           "CNSW\n";
 
