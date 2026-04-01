@@ -78,6 +78,16 @@ class Geometry {
     );
   }
 
+  Geometry.path({String polygonName = ""}) {
+    type = "Path";
+    name = polygonName;
+    Random randomColor = Random();
+    setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
+    setColorLine(
+      Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0),
+    );
+  }
+
   Geometry.essencePoint({String polygonName = ""}) {
     type = "Point-essence";
     visibleOnMap = true;

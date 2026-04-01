@@ -61,7 +61,6 @@ class GeometricLayer {
     Random rand = Random();
     defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), .5);
     defaultPointIcon = 4;
-    name = "Observations des chemins de secours";
   }
 
   GeometricLayer.firePath() {
@@ -95,6 +94,9 @@ class GeometricLayer {
         break;
       case 'Polygon':
         geometries.add(Geometry.polygon(polygonName: name));
+        break;
+      case 'Path':
+        geometries.add(Geometry.path(polygonName: name));
         break;
       default:
         gl.print("error: unknown type $type to create new geometry on layer $name");

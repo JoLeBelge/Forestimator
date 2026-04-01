@@ -687,6 +687,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           "POLY",
                                           style: TextStyle(color: Colors.green, fontSize: gl.eqPx * gl.fontSizeXS * .9),
                                         )
+                                        : gl.selLay.type == "Path"
+                                        ? Text(
+                                          "CHEMIN",
+                                          style: TextStyle(color: Colors.blue, fontSize: gl.eqPx * gl.fontSizeXS * .9),
+                                        )
                                         : Text(
                                           "OHA?",
                                           style: TextStyle(color: Colors.red, fontSize: gl.eqPx * gl.fontSizeXS * .9),
@@ -774,6 +779,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                 "POLY",
                                                 style: TextStyle(
                                                   color: Colors.green,
+                                                  fontSize: gl.eqPx * gl.fontSizeXS * .9,
+                                                ),
+                                              )
+                                              : gl.selLay.type == "Path"
+                                              ? Text(
+                                                "CHEMIN",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
                                                   fontSize: gl.eqPx * gl.fontSizeXS * .9,
                                                 ),
                                               )
@@ -914,7 +927,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         ),
                                       ),
                                   (gl.selGeo.type == "Polygon" ||
-                                              gl.selGeo.type.contains("Point") && gl.selGeo.numPoints < 1) &&
+                                              gl.selGeo.type == "Path" ||
+                                              (gl.selGeo.type.contains("Point") && gl.selGeo.numPoints < 1)) &&
                                           gl.Mode.showButtonAddVertexesPolygon
                                       ? CircleAvatar(
                                         backgroundColor: _polygonMenuColorTools(gl.Mode.addVertexesPolygon),
@@ -928,6 +942,28 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                             onPressed: () async {
                                               refreshView(() {
                                                 gl.Mode.addVertexesPolygon = !gl.Mode.addVertexesPolygon;
+                                                if (gl.selGeo.type == "Path") {
+                                                  gl.Mode.recordPath = gl.Mode.addVertexesPolygon;
+                                                  gl.selectedPathLayer = gl.selectedGeoLayer;
+                                                  gl.selectedPath = gl.selPathLay.selectedGeometry;
+                                                  if (gl.Mode.recordPath == true) {
+                                                    gl.startTimer(
+                                                      () async {
+                                                        updateLocation();
+                                                        if (!gl.Mode.gpsTimoutException) {
+                                                          print("Added to path");
+                                                          gl.selPath.addPoint(
+                                                            LatLng(gl.position.latitude, gl.position.longitude),
+                                                          );
+                                                        }
+                                                        return false;
+                                                      },
+                                                      () => !gl.Mode.recordPath,
+                                                      1,
+                                                      1,
+                                                    );
+                                                  }
+                                                }
                                               });
                                               if (gl.Mode.addVertexesPolygon == true) {
                                                 gl.Mode.removeVertexesPolygon = false;
@@ -937,7 +973,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                 });
                                               }
                                             },
-                                            icon: const Icon(Icons.add_circle),
+                                            icon: Icon(
+                                              gl.selGeo.type == "Path" && gl.Mode.addVertexesPolygon
+                                                  ? Icons.pause_circle
+                                                  : gl.selGeo.type == "Path"
+                                                  ? Icons.play_circle
+                                                  : Icons.add_circle,
+                                            ),
                                           ),
                                         ),
                                       )
@@ -1824,7 +1866,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           name:
                                               gl.selLay.type == "Point"
                                                   ? "Point${gl.selLay.geometries.length + 1}"
-                                                  : "Polygon${gl.selLay.geometries.length + 1}",
+                                                  : gl.selLay.type == "Polygon"
+                                                  ? "Polygon${gl.selLay.geometries.length + 1}"
+                                                  : gl.selLay.type == "Path"
+                                                  ? "Path${gl.selLay.geometries.length + 1}"
+                                                  : "UUUPS${gl.selLay.geometries.length + 1}",
                                         );
                                       }
                                       _switchModeEditVertexesOn();
@@ -2109,10 +2155,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
-                ? gl.Mode.essence || gl.Mode.addVertexesPolygon
+                ? gl.Mode.essence || (gl.Mode.addVertexesPolygon && !gl.Mode.recordPath)
                     ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
                     : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
-                : gl.Mode.essence || gl.Mode.addVertexesPolygon
+                : gl.Mode.essence || (gl.Mode.addVertexesPolygon && !gl.Mode.recordPath)
                 ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
                 : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
@@ -2122,10 +2168,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
-                ? gl.Mode.addVertexesPolygon && gl.layerReady && gl.selLay.type != "Polygon"
+                ? gl.Mode.addVertexesPolygon && gl.layerReady && gl.selLay.type == "Point"
                     ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
                     : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy)
-                : gl.Mode.addVertexesPolygon && gl.layerReady && gl.selLay.type != "Polygon"
+                : gl.Mode.addVertexesPolygon && gl.layerReady && gl.selLay.type == "Point"
                 ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
                 : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
@@ -2135,10 +2181,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
-                ? gl.Mode.essence || gl.Mode.addVertexesPolygon
+                ? gl.Mode.essence || (gl.Mode.addVertexesPolygon && !gl.Mode.recordPath)
                     ? AlignmentGeometry.center
                     : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
-                : gl.Mode.essence || gl.Mode.addVertexesPolygon
+                : gl.Mode.essence || (gl.Mode.addVertexesPolygon && !gl.Mode.recordPath)
                 ? AlignmentGeometry.center
                 : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
@@ -3628,15 +3674,16 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         return;
       } else {
         _refreshLocation = true;
+        gl.Mode.gpsTimoutException = false;
       }
       Position newPosition = await Geolocator.getCurrentPosition().timeout(
         Duration(seconds: 5),
         onTimeout: () {
           gl.print("Geolocator timeout reached!");
+          gl.Mode.gpsTimoutException = true;
           return gl.position;
         },
       );
-
       refreshView(() {
         gl.position = newPosition;
       });
