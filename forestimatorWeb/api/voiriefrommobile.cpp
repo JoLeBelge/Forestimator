@@ -41,10 +41,12 @@ void voirieFromMobile::handleRequest(const Http::Request &request,Http::Response
     a->geom = poFeature->GetGeometryRef()->exportToWkt();
     //WLocalDateTime d = WLocalDateTime::currentServerDateTime();
     //a->date = d.toString().toUTF8();
-    a->date =  poFeature->GetFieldAsString("date");;
+    a->date =  poFeature->GetFieldAsString("date");
     dbo::Transaction transaction(session);
     dbo::ptr<observationVoirie> aNewPolyg = session.add(std::move(a));
     response.out() << "OK" ;
+
+    GDALClose(ds);
     }
 }
 

@@ -47,5 +47,6 @@ void polygFromMobile::handleRequest(const Http::Request &request,Http::Response 
     dbo::Transaction transaction(session);
     dbo::ptr<validCompoRaster> aNewPolyg = session.add(std::move(a));
     response.out() << "OK" ;
+    GDALClose(ds);
     }
 }

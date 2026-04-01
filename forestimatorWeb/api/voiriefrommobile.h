@@ -31,7 +31,7 @@ public:
     void persist(Action& a)
     {
         dbo::field(a, type,       "type");
-        dbo::field(a, categorie,       "type");
+        dbo::field(a, categorie,       "categorie");
         dbo::field(a, rmq,   "rmq");
         dbo::field(a, nom_contact,    "nom_contact");
         dbo::field(a, contact,  "contact");
