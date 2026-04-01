@@ -38,7 +38,6 @@ Debug suite à la formation SFRSB
 -visu toujour ON pour les layers si mode edition de polygones (si jamais l'utilisateur a mis à off via le sélecteur de couche)
 -message erreur si ana Surfacique sur surface trop importante (affichage dans une fenetre le message d'erreur renvoyé par le serveur)
 -check firewall si de très nombreuses personnes utilisent forestimator depuis la fac
--ajout de la date dans l'enregistrement des observations essences (Forestimator Web) -> DONE
 -mode offline : changer le logo dans les couches du catalogue offline, logo disquette.
 -mode offline : carte numérique des sols de wallonie ; ne pas mettre de bouton "afficher" car on ne peut pas l'afficher (pour l'instant le bouton existe mais ne sert à rien)
 -dans les logs de l'appli, trouver d'ou viens le message "oops no layerBase 2" et résoudre.
@@ -49,7 +48,6 @@ Debug suite à la formation SFRSB
 
 -mapserver : optimiser, création des pyramides pour toutes les couches?? (MNH surtout?) --> JL
 -manuel d'utilisation : le mettre en ligne sur forestimator Web --> JL
--mettre les cartes dendrométriques à jours (version janvier 2026 de NL, corrigé pour la Cdom feuillus)
 -distribution app mobile app Store : uniquement pour pays BE, GDL, FRANCE, GERMANY
 
 
