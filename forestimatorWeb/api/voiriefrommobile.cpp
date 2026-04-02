@@ -1,11 +1,10 @@
-#include "polygfrommobile.h"
+#include "voiriefrommobile.h"
 
-extern bool globTest;
-
-polygFromMobile::polygFromMobile(std::string aFileDB){
+voirieFromMobile::voirieFromMobile(std::string aFileDB)
+{
     auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
     session.setConnection(std::move(sqlite3));
-    session.mapClass<validCompoRaster>("validCompoRaster");
+    session.mapClass<observationVoirie>("observationVoirie");
     try
     {
         session.createTables();
@@ -17,36 +16,37 @@ polygFromMobile::polygFromMobile(std::string aFileDB){
     GDALAllRegister();
 }
 
-void polygFromMobile::handleRequest(const Http::Request &request,Http::Response &response){
-
+void voirieFromMobile::handleRequest(const Http::Request &request,Http::Response &response){
     auto params = request.urlParams();
     std::string features("");
-    // /api/polygFromMobile/${feature}
-    //http://localhost:8085/api/polygFromMobile/%7B'type':'FeatureCollection','features':[%7B'type':'Feature','properties':%7B'essence':'toto','rmq':'tata','nom_contact':'titi','contact':'adresse'%7D,'geometry':%7B'type':'Point','coordinates':[146.7,-41.9]%7D%7D]%7D
+    // /api/voirieFromMobile/${feature}
     for (const auto &param : params) {
         const auto &name = param.first;
         const auto &value = param.second;
         if (name=="feature") {features=value;}
     }
     boost::replace_all(features, "'", "\"");
-    if (globTest){std::cout << "feature from Mobile : "<< features << std::endl;}
     GDALDataset * ds=static_cast<GDALDataset*>(GDALOpenEx(features.c_str(), GDAL_OF_VECTOR, nullptr, nullptr, nullptr));
      if( ds == NULL ){
           response.out() << "NOK" ;
      } else{
     OGRLayer * lay = ds->GetLayer(0);
     OGRFeature *poFeature=lay->GetFeature(0);
-    std::unique_ptr<validCompoRaster> a = std::make_unique<validCompoRaster>();
-    a->essence = poFeature->GetFieldAsString("essence");
+    std::unique_ptr<observationVoirie> a = std::make_unique<observationVoirie>();
+    a->type = poFeature->GetFieldAsString("type");
+    a->categorie = poFeature->GetFieldAsString("categorie");
     a->rmq = poFeature->GetFieldAsString("rmq");
     a->nom_contact = poFeature->GetFieldAsString("nom_contact");
     a->contact = poFeature->GetFieldAsString("contact");
     a->geom = poFeature->GetGeometryRef()->exportToWkt();
-    WLocalDateTime d = WLocalDateTime::currentServerDateTime();
-    a->date = d.toString().toUTF8();
+    //WLocalDateTime d = WLocalDateTime::currentServerDateTime();
+    //a->date = d.toString().toUTF8();
+    a->date =  poFeature->GetFieldAsString("date");
     dbo::Transaction transaction(session);
-    dbo::ptr<validCompoRaster> aNewPolyg = session.add(std::move(a));
+    dbo::ptr<observationVoirie> aNewPolyg = session.add(std::move(a));
     response.out() << "OK" ;
+
     GDALClose(ds);
     }
 }
+

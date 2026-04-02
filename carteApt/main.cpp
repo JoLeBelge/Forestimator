@@ -84,12 +84,50 @@ int main(int argc, char *argv[])
 
                 std::shared_ptr<layerBase> l=kv.second;
 
-                if (l->mResolution!=0.0){
-                    std::string aCommand ="gdal raster overview add gdal raster overview add --external --levels=2,4,8,16 --co COMPRESS=YES "+ l->getPathTif();
+                if (l->mResolution!=0.0 && dico.lay4Visu(l->Code()) && !l->Expert() && l->rasterExist()){
+                    std::cout << "work on layer " << l->Code() << std::endl;
+                    //std::string aCommand ="gdal raster overview add --external --levels=2,4,8,16 --config COMPRESS=LZW "+ l->getPathTif();
+                    // 1) create COG if not already tiled
+                    GDALDataset *pIn= (GDALDataset*) GDALOpen(l->getPathTif().c_str(), GA_ReadOnly);
+                    int b1, b2;
+                    pIn->GetRasterBand(1)->GetBlockSize(&b1,&b2);
+                    //std::string layout;
+                    //layout = *pIn->GetMetadata("IMAGE_STRUCTURE");
+                    //std::cout << " layout " << layout << std::endl;
+                    GDALClose(pIn);
+                    //std::cout << " blocksize " << b1 << " " << b2 << std::endl;
+                    std::string aCommand("");
+
+                    if (b2!=512){
+                    //if (1) {
+                   /* std::cout << " tiling and overview" << std::endl;
+                    aCommand= "gdaladdo -r average -minsize 16 " + l->getPathTif();
+                    std::cout << aCommand << "\n";
+                    if (!globTest){
+                    system(aCommand.c_str());
+                    }*/
+                    std::string cogfile =l->getPathTif()+"_cog.tif";
+                    std::string bu ="/media/Data10/Forestimator/BU/"+l->NomFileWithExt();
+                    //aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -co TILED=YES -co COPY_SRC_OVERVIEWS=YES -co COMPRESS=DEFLATE";
+                    aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -of COG -co COMPRESS=LZW -co BIGTIFF=YES";
                     std::cout << aCommand << "\n";
                     if (!globTest){
                     system(aCommand.c_str());
                     }
+                    aCommand= "mv "+ l->getPathTif() +" " +bu;
+                    std::cout << aCommand << "\n";
+                    if (!globTest){
+                    system(aCommand.c_str());
+                    }
+                    aCommand= "mv "+ cogfile +" " +l->getPathTif();
+                    std::cout << aCommand << "\n";
+                    if (!globTest){
+                    system(aCommand.c_str());
+                    }
+                    } else {
+                    std::cout << " tiling and overview already done" << std::endl;
+                    }
+
                 }
 
             }

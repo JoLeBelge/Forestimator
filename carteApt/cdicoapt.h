@@ -94,7 +94,7 @@ public:
         return aRes;
     }
     double RasterResolution(std::string aCode){
-        double aRes(10.0);
+        double aRes(0.0);
         if (Dico_RasterResolution.find(aCode)!=Dico_RasterResolution.end()){aRes=Dico_RasterResolution.at(aCode);
         }
         return aRes;

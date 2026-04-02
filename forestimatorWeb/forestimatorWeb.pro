@@ -35,6 +35,7 @@ SOURCES += main.cpp \
     api/polygfrommobile.cpp \
     api/rasterclipresource.cpp \
     api/staticmapresource.cpp \
+    api/voiriefrommobile.cpp \
     auth/Session.cpp \
     auth/User.cpp \
     cadastre.cpp \
@@ -76,6 +77,7 @@ HEADERS += \
     api/polygfrommobile.h \
     api/rasterclipresource.h \
     api/staticmapresource.h \
+    api/voiriefrommobile.h \
     auth/Session.h \
     auth/User.h \
     cadastre.h \

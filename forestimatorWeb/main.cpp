@@ -35,6 +35,7 @@ int launchForestimator(int argc, char **argv)
     staticMapResource smResource(dico);
 
     polygFromMobile fromMobile(dico->File("docroot") + "validCarteEss.db");
+    voirieFromMobile route(dico->File("docroot") + "observationVoirie.db");
 
     try
     {
@@ -69,6 +70,7 @@ int launchForestimator(int argc, char **argv)
         server.addResource(&anaSurfResource, "/api/anaSurf/layers/${listLayerCode}/polygon/${pol}");
 
         server.addResource(&fromMobile, "/api/polygFromMobile/${feature}");
+        server.addResource(&route, "/api/voirieFromMobile/${feature}");
 
         // fileResource pour les cartes à l'échelle de toute la RW
         for (auto kv : dico->VlayerBase())
@@ -100,13 +102,13 @@ int launchForestimator(int argc, char **argv)
             server.addResource(fileResource3, "/telechargement/" + aName);
         }
 
-        Wt::WFileResource *fileResource3 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/methodoInventaireTerrainJeunePeup.pdf");
+        /*Wt::WFileResource *fileResource3 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/methodoInventaireTerrainJeunePeup.pdf");
         fileResource3->suggestFileName("methodoInventaireAncienneCoupeRase.pdf");
-        server.addResource(fileResource3, "/telechargement/methodoInventaireACR");
+        server.addResource(fileResource3, "/telechargement/methodoInventaireACR");*/
 
-        Wt::WFileResource *fileResource = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "ACR.db");
-        fileResource->suggestFileName("ACR.db");
-        server.addResource(fileResource, "/telechargement/ACR");
+        Wt::WFileResource *fileResource = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "observationVoirie.db");
+        fileResource->suggestFileName("observationVoirie.db");
+        server.addResource(fileResource, "/telechargement/voirie");
 
         /*Wt::WFileResource *fileResource4 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/invitationCarrefourForestier2025.pdf");
         fileResource4->suggestFileName("invitationCarrefourForestier2025.pdf");

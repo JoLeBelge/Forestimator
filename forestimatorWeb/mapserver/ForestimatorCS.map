@@ -18,6 +18,22 @@ MAP
 			"wms_enable_request"  "*"
 	  	END
   	END
+  	
+LAYER
+  NAME "Aptitude_CS_AB"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "recommandation_AB.tif" 
+   INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
+ METADATA
+      "wms_title"           "recommandation pour l'Alisier Blanc"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
 LAYER
   NAME "Aptitude_CS_AG"
    TYPE RASTER
@@ -718,7 +734,7 @@ LAYER
    DATA "recommandation_RY.tif" 
 INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
-      "wms_title"           "Aptitude desCaryers"
+      "wms_title"           "recommandation pour les Caryers"
       "wms_srs"             "EPSG:31370"
    END
    TEMPLATE "../template.html"
