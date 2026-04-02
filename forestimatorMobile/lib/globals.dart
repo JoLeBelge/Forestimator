@@ -111,6 +111,7 @@ class Mode {
   static bool labelCross = false;
   static bool debugLabel = false;
   static bool essencePointsToSync = false;
+  static bool pathsToSync = false;
 
   static bool debugScanlines = false;
   static bool debugInfo = false;
@@ -528,7 +529,7 @@ bool get positionInit => _positionInit;
 late proj4.Point pt;
 
 const Color colorAgroBioTech = Color.fromRGBO(185, 205, 118, 1.0);
-const Color colorFirePaths = Color.from(alpha: 1, red: 0.894, green: 0.298, blue: 0.063);
+const Color colorPathPoints = Color.from(alpha: 1, red: 0.894, green: 0.298, blue: 0.063);
 const Color colorDeselected = Color.fromARGB(255, 46, 46, 46);
 const Color colorUliege = Color.fromRGBO(00, 112, 127, 1.0);
 const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
