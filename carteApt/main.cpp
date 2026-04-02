@@ -91,12 +91,15 @@ int main(int argc, char *argv[])
                     GDALDataset *pIn= (GDALDataset*) GDALOpen(l->getPathTif().c_str(), GA_ReadOnly);
                     int b1, b2;
                     pIn->GetRasterBand(1)->GetBlockSize(&b1,&b2);
+                    //std::string layout;
+                    //layout = *pIn->GetMetadata("IMAGE_STRUCTURE");
+                    //std::cout << " layout " << layout << std::endl;
                     GDALClose(pIn);
                     //std::cout << " blocksize " << b1 << " " << b2 << std::endl;
                     std::string aCommand("");
 
-                    //if (b2==1){
-                    if (1) {
+                    if (b2!=512){
+                    //if (1) {
                    /* std::cout << " tiling and overview" << std::endl;
                     aCommand= "gdaladdo -r average -minsize 16 " + l->getPathTif();
                     std::cout << aCommand << "\n";
@@ -106,7 +109,7 @@ int main(int argc, char *argv[])
                     std::string cogfile =l->getPathTif()+"_cog.tif";
                     std::string bu ="/media/Data10/Forestimator/BU/"+l->NomFileWithExt();
                     //aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -co TILED=YES -co COPY_SRC_OVERVIEWS=YES -co COMPRESS=DEFLATE";
-                    aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -of COG -co COMPRESS=LZW";
+                    aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -of COG -co COMPRESS=LZW -co BIGTIFF=YES";
                     std::cout << aCommand << "\n";
                     if (!globTest){
                     system(aCommand.c_str());
