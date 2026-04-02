@@ -460,6 +460,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                     ),
                                   MarkerLayer(markers: _getPointsToDraw()),
                                   PolygonLayer(polygons: _getPolygonesToDraw()),
+                                  PolygonLayer(polygons: _getPathsToDraw()),
                                 ]
                                 : (gl.Mode.polygon)
                                 ? <Widget>[
@@ -486,10 +487,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                     ),
                                   ),
                                   MarkerLayer(markers: _getPointsToDraw(hitButton: true)),
+                                  PolygonLayer<String>(polygons: _getPathsToDraw()),
                                 ]
                                 : gl.modeMapShowPolygons
                                 ? <Widget>[
                                   PolygonLayer<String>(polygons: _getPolygonesToDraw()),
+                                  PolygonLayer<String>(polygons: _getPathsToDraw()),
                                   MarkerLayer(markers: _getPointsToDraw(hitButton: false)),
                                 ]
                                 : <Widget>[]) +
@@ -1175,40 +1178,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                                     ),
                                                                   ),
                                                                   onPressed: () {},
-                                                                  /*onLongPress: () {
-                                                                        PopupValueChange(
-                                                                          "prop",
-                                                                          gl.selGeo.attributes[i].name,
-                                                                          (value) {
-                                                                            gl
-                                                                                .selLay
-                                                                                .geometries[gl.selLay.selectedGeometry]
-                                                                                .attributes[i]
-                                                                                .name = cleanAttributeName(
-                                                                              value.toString(),
-                                                                            );
-                                                                          },
-                                                                          () {},
-                                                                          () {
-                                                                            String nom = gl.selGeo.attributes[i].name;
-                                                                            if (controlDuplicateAttributeName(
-                                                                              gl.selGeo.attributes[i].name,
-                                                                              gl.selGeo.attributes,
-                                                                            )) {
-                                                                              gl.refreshStack(() {
-                                                                                popupForestimatorMessage(
-                                                                                  id: "MSGduplicateName",
-                                                                                  title: "Erreur",
-                                                                                  message: "Le nom $nom existe déja!",
-                                                                                );
-                                                                              });
-                                                                              return;
-                                                                            } else {
-                                                                              gl.selGeo.serialize();
-                                                                            }
-                                                                          },
-                                                                        );
-                                                                      },*/
                                                                   child: Container(
                                                                     alignment: Alignment.centerLeft,
                                                                     child: SingleChildScrollView(
@@ -2188,7 +2157,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   List<Polygon<String>> _getPathsToDraw() {
     List<Polygon<String>> that = [];
     for (GeometricLayer layer in gl.geoLayers) {
-      if (layer.visibleOnMap && layer.type == "Polygon") {
+      if (layer.visibleOnMap && layer.type == "Path") {
         for (var g in layer.geometries) {
           if (g.numPoints > 2 && g.visibleOnMap) {
             that.add(Polygon<String>(points: g.points, color: g.colorInside, hitValue: g.identifier));

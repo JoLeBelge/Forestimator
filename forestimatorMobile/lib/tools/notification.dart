@@ -1389,15 +1389,19 @@ class PopupRoadChanged {
           height: 120 * gl.eqPx,
           messageAccept: "Placer",
           messageDecline: "Annuler",
-          onAccept: (String ess, Color col) {
+          onAccept: (String ess, Color col, String type, String rmq) {
             gl.refreshStack(() {
-              GeometricLayer.getfirePointsLayer().addGeometry(name: "Observation - ${GeometricLayer.getfirePointsLayer().geometries.length + 1}");
-              GeometricLayer.getfirePointsLayer().geometries.last.addPoint(coordinates);
-              GeometricLayer.getfirePointsLayer().geometries.last.attributes[0].value = ess;
-              GeometricLayer.getfirePointsLayer().geometries.last.colorLine = col;
+              GeometricLayer.getPathPointsLayer().addGeometry(name: "Observation - ${GeometricLayer.getPathPointsLayer().geometries.length + 1}");
+              GeometricLayer.getPathPointsLayer().geometries.last.addPoint(coordinates);
+              GeometricLayer.getPathPointsLayer().geometries.last.attributes[0].value = ess;
+              GeometricLayer.getPathPointsLayer().geometries.last.attributes[1].value = type;
+              GeometricLayer.getPathPointsLayer().geometries.last.attributes[2].value = rmq;
+              GeometricLayer.getPathPointsLayer().geometries.last.attributes[3].value = DateTime.now().toString();
+              GeometricLayer.getPathPointsLayer().geometries.last.colorLine = col;
               gl.lastUsedCategory = col;
-              GeometricLayer.getfirePointsLayer().geometries.last.serialize();
+              GeometricLayer.getPathPointsLayer().geometries.last.serialize();
               gl.Mode.serialize();
+              GeometricLayer.getPathPointsLayer().geometries.last.sendPathpointToServer();
               gl.stack.pop("observeRoad");
             });
           },
@@ -1414,7 +1418,7 @@ class PopupRoadChanged {
 
 class AddRoadPoint extends StatefulWidget {
   final VoidCallback? callbackOnStartTyping;
-  final Function(String, Color) onAccept;
+  final Function(String, Color, String, String) onAccept;
   final VoidCallback onDecline;
   final String messageAccept;
   final String messageDecline;
@@ -1523,10 +1527,7 @@ class _AddRoadPoint extends State<AddRoadPoint> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(gl.roadCategoryChoice.keys.toList()[index], style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx)),
-                          CircleAvatar(
-                            backgroundColor:  gl.roadCategoryChoice.values.toList()[index],
-                            radius: gl.iconSizeXS * gl.eqPx * .75,
-                          ),
+                          CircleAvatar(backgroundColor: gl.roadCategoryChoice.values.toList()[index], radius: gl.iconSizeXS * gl.eqPx * .75),
                         ],
                       ),
                     ),
@@ -1558,7 +1559,7 @@ class _AddRoadPoint extends State<AddRoadPoint> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(gl.roadObstacleChoice.keys.toList()[index], style: TextStyle(color:Colors.white, fontSize: gl.fontSizeM * gl.eqPx)),
+                          Text(gl.roadObstacleChoice.keys.toList()[index], style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx)),
                           Icon(gl.roadObstacleChoice.values.toList()[index], color: gl.lastUsedCategory, size: gl.iconSizeS * gl.eqPx),
                         ],
                       ),
@@ -1605,7 +1606,12 @@ class _AddRoadPoint extends State<AddRoadPoint> {
                         child: TextButton(
                           style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
                           onPressed: () {
-                            widget.onAccept(_custom, _color);
+                            widget.onAccept(
+                              _custom,
+                              _color,
+                              _type == 1 ? "Categorie" : "Obstacle",
+                              _type == 1 ? gl.roadCategoryChoice[_custom]!.toString() : gl.roadObstacleChoice[_custom]!.toString(),
+                            );
                           },
                           child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
                         ),
