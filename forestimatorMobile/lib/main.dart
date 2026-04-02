@@ -96,17 +96,13 @@ class _MyApp extends State<MyApp> {
       gl.Mode.expertTools = modeExpertTools;
     }
 
-    final List<String>? aAnaPtSelectedLayerKeys = gl.shared!.getStringList(
-      'anaPtSelectedLayerKeys',
-    );
+    final List<String>? aAnaPtSelectedLayerKeys = gl.shared!.getStringList('anaPtSelectedLayerKeys');
 
     if (aAnaPtSelectedLayerKeys != null) {
       gl.anaPtSelectedLayerKeys = aAnaPtSelectedLayerKeys;
     }
 
-    final List<String>? anaSurfSelectedLayerKeys = gl.shared!.getStringList(
-      'anaSurfSelectedLayerKeys',
-    );
+    final List<String>? anaSurfSelectedLayerKeys = gl.shared!.getStringList('anaSurfSelectedLayerKeys');
 
     if (anaSurfSelectedLayerKeys != null) {
       gl.anaSurfSelectedLayerKeys = anaSurfSelectedLayerKeys;
@@ -117,15 +113,11 @@ class _MyApp extends State<MyApp> {
       gl.firstTimeUse = firstTimeUse;
     }
 
-    final List<String>? ainterfaceSelectedLCode = gl.shared!.getStringList(
-      'interfaceSelectedLCode',
-    );
+    final List<String>? ainterfaceSelectedLCode = gl.shared!.getStringList('interfaceSelectedLCode');
     if (ainterfaceSelectedLCode != null) {
       gl.interfaceSelectedLCode = ainterfaceSelectedLCode;
     }
-    final List<String>? ainterfaceSelectedLOffline = gl.shared!.getStringList(
-      'interfaceSelectedLOffline',
-    );
+    final List<String>? ainterfaceSelectedLOffline = gl.shared!.getStringList('interfaceSelectedLOffline');
     if (ainterfaceSelectedLOffline != null) {
       gl.interfaceSelectedLOffline =
           ainterfaceSelectedLOffline.map<bool>((e) {
@@ -178,8 +170,7 @@ class _MyApp extends State<MyApp> {
     try {
       final manifestcontent = await rootBundle.loadString('AssetManifest.json');
       final Map<String, dynamic> manifestmap = json.decode(manifestcontent);
-      final List<String> list =
-          manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
+      final List<String> list = manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
       for (String f in list) {
         await fromAsset(f, path.basename(f));
       }
@@ -218,8 +209,9 @@ class _MyApp extends State<MyApp> {
       _navigatorKey = GlobalKey<NavigatorState>();
       gl.notificationContext = _navigatorKey!.currentContext;
     });
-    if (GeometricLayer.essenceLayerExists())
+    if (GeometricLayer.essenceLayerExists()) {
       Geometry.sendEssencePointsInBackground();
+    }
   }
 
   @override
@@ -231,11 +223,7 @@ class _MyApp extends State<MyApp> {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       title: 'Forestimator Mobile',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: gl.colorAgroBioTech),
-        fontFamily: "Calibri",
-        useMaterial3: true,
-      ),
+      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: gl.colorAgroBioTech), fontFamily: "Calibri", useMaterial3: true),
       home: ForestimatorMap(),
     );
   }

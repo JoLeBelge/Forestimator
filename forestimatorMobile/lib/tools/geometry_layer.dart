@@ -41,10 +41,7 @@ class GeometricLayer {
     subtype = "Essence";
     defaultColor = gl.colorAgroBioTech.withAlpha(150);
     defaultPointIcon = 4;
-    defaultAttributes.addAll([
-      Attribute(name: "essence", type: "string", value: "Choisissez"),
-      Attribute(name: "rmq", type: "string", value: ""),
-    ]);
+    defaultAttributes.addAll([Attribute(name: "essence", type: "string", value: "Choisissez"), Attribute(name: "rmq", type: "string", value: "")]);
     defaultAttributes[0].visibleOnMapLabel = true;
     name = "Observations Essences";
   }
@@ -64,13 +61,15 @@ class GeometricLayer {
   }
 
   GeometricLayer.firePath() {
-    type = "Path";
+    type = "Point";
     subtype = "FirePath";
     defaultColor = gl.colorFirePaths.withAlpha(150);
     defaultPointIcon = 4;
     defaultAttributes.addAll([
-      Attribute(name: "largeur", type: "double", value: "Choisissez"),
-      Attribute(name: "revetement", type: "string", value: ""),
+      Attribute(name: "categorie", type: "int", value: "Choisissez"),
+      Attribute(name: "obstacle", type: "string", value: ""),
+      Attribute(name: "obstacle", type: "string", value: ""),
+      Attribute(name: "obstacle", type: "string", value: ""),
     ]);
     defaultAttributes[0].visibleOnMapLabel = true;
     name = "Observations des chemins de secours";
@@ -88,9 +87,7 @@ class GeometricLayer {
   void addGeometry({String name = ""}) {
     switch (type) {
       case 'Point':
-        subtype == 'Essence'
-            ? geometries.add(Geometry.essencePoint(polygonName: name))
-            : geometries.add(Geometry.point(polygonName: name));
+        subtype == 'Essence' ? geometries.add(Geometry.essencePoint(polygonName: name)) : geometries.add(Geometry.point(polygonName: name));
         break;
       case 'Polygon':
         geometries.add(Geometry.polygon(polygonName: name));
@@ -325,10 +322,10 @@ class GeometricLayer {
     return gl.geoLayers.last;
   }
 
-  static bool firePathLayerExists() {
+  static bool firePointsLayerExists() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
-      if (g.type == "Path" && g.subtype == "FirePath") {
+      if (g.type == "Point" && g.subtype == "FirePath") {
         gl.selectedGeoLayer = index;
         return true;
       }
@@ -337,10 +334,10 @@ class GeometricLayer {
     return false;
   }
 
-  static GeometricLayer getFirePathLayer() {
+  static GeometricLayer getfirePointsLayer() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
-      if (g.type == "Path" && g.subtype == "FirePath") {
+      if (g.type == "Point" && g.subtype == "FirePath") {
         gl.selectedGeoLayer = index;
         return g;
       }

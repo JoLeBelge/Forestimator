@@ -199,8 +199,7 @@ class Display {
 
   double get eqMaxWindowWidth => (width - 2 * math.max(paddingLeft, paddingRight)) / equipixel;
   double get eqMaxWindowHeight => (height - 2 * math.max(paddingTop, paddingBot)) / equipixel;
-  double get maxWinPaddingHeight =>
-      eqMaxWindowHeight * eqPx - insetBot > 0 ? eqMaxWindowHeight * eqPx - insetBot : eqPx;
+  double get maxWinPaddingHeight => eqMaxWindowHeight * eqPx - insetBot > 0 ? eqMaxWindowHeight * eqPx - insetBot : eqPx;
 
   Display(BuildContext context) {
     paddingTop = MediaQuery.of(context).padding.top;
@@ -409,14 +408,7 @@ class PoiMarker {
   final String address;
   final String city;
   final String postcode;
-  PoiMarker({
-    required this.index,
-    required this.position,
-    required this.name,
-    required this.address,
-    required this.city,
-    required this.postcode,
-  });
+  PoiMarker({required this.index, required this.position, required this.name, required this.address, required this.city, required this.postcode});
 }
 
 GeometricLayer get selLay => geoLayers[selectedGeoLayer];
@@ -502,29 +494,9 @@ List<String> getInterfaceSelectedLOffline() {
 LayerAnaPt? anaPtPreview;
 List<LayerAnaPt> requestedLayers = [];
 
-List<String> anaPtSelectedLayerKeys = [
-  "ZBIO",
-  "CNSWrast",
-  "CS_A",
-  "MNT",
-  "slope",
-  "NT",
-  "NH",
-  "Topo",
-  "AE",
-  "COMPOALL",
-  "MNH2021",
-];
+List<String> anaPtSelectedLayerKeys = ["ZBIO", "CNSWrast", "CS_A", "MNT", "slope", "NT", "NH", "Topo", "AE", "COMPOALL", "MNH2021"];
 
-List<String> anaSurfSelectedLayerKeys = [
-  "dendro_nha",
-  "dendro_gha",
-  "dendro_cdom",
-  "dendro_hdom",
-  "dendro_vha",
-  "HE_FEE",
-  "COMPOALL",
-];
+List<String> anaSurfSelectedLayerKeys = ["dendro_nha", "dendro_gha", "dendro_cdom", "dendro_hdom", "dendro_vha", "HE_FEE", "COMPOALL"];
 
 List<String> downloadableLayerKeys = ["ZBIO", "NT", "NH", "Topo", "CS_A", "CNSWrast"];
 
@@ -755,10 +727,7 @@ void changeSelectedLayerModeOffline() {
   loadPrefSelLayOffline();
   switcherMaps.removeWhere((element) => element.offline == false);
   if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty && switcherMaps.isEmpty) {
-    switcherMaps.insert(
-      0,
-      SelectedLayer(mCode: dico.getLayersOffline().where((i) => i.mBits == 8).toList().first.mCode, offline: true),
-    );
+    switcherMaps.insert(0, SelectedLayer(mCode: dico.getLayersOffline().where((i) => i.mBits == 8).toList().first.mCode, offline: true));
   } else {
     while (switcherMaps.length > 1) {
       switcherMaps.removeLast();
@@ -789,31 +758,13 @@ bool slotContainsLayer(int index, String key) {
 
 List<SelectedLayer> getLayersForFlutterMap() {
   return switcherMaps
-      .where(
-        (val) =>
-            !(val.mCode.length < 3 && (val.mCode.contains('1') || val.mCode.contains('2') || val.mCode.contains('3'))),
-      )
+      .where((val) => !(val.mCode.length < 3 && (val.mCode.contains('1') || val.mCode.contains('2') || val.mCode.contains('3'))))
       .toList()
       .reversed
       .toList();
 }
 
-Map<int, int> lutVulnerabiliteCS = {
-  0: 0,
-  1: 1,
-  2: 1,
-  3: 3,
-  4: 5,
-  5: 2,
-  6: 2,
-  7: 3,
-  8: 6,
-  9: 2,
-  10: 4,
-  11: 4,
-  12: 4,
-  13: 7,
-};
+Map<int, int> lutVulnerabiliteCS = {0: 0, 1: 1, 2: 1, 3: 3, 4: 5, 5: 2, 6: 2, 7: 3, 8: 6, 9: 2, 10: 4, 11: 4, 12: 4, 13: 7};
 
 ForestimatorStack stack = ForestimatorStack();
 
@@ -881,6 +832,22 @@ Map<String, String> essenceChoice = {
   "Autres conifères": "AUc - Others coniferous",
   "Entrer du texte": "",
 };
+
+Map<String, IconData> roadObstacleChoice = {
+  "Grand trou": Icons.warning,
+  "Route obstruée": Icons.block,
+  "Autres conifères": Icons.park,
+  "Entrer du texte": Icons.text_fields,
+};
+
+Map<String, Color> roadCategoryChoice = {
+  "Categorie 1": Colors.red,
+  "Categorie 2": Colors.orange,
+  "Categorie 3": Colors.yellow,
+  "Categorie 4": Colors.green,
+};
+
+Color lastUsedCategory = Colors.red;
 
 const String labelSendCompoFeature =
     "Vous pouvez nous communiquer des observations relatives à la composition dans le but d'améliorer la carte de composition. Veillez à complêter l'attribut 'essence' avec l'espèce observée. Nous attirons votre attention qu'une entitée (polygone ou point) ne peux être envoyée qu'une seule fois. Merci pour votre contribution !";
