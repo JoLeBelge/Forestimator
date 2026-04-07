@@ -34,7 +34,9 @@ class TifFileTileProvider extends TileProvider {
   }
 
   Future _loadAndDecodeImage() async {
-    gl.print("init TifFileTileProvider by loading source image in memory");
+    gl.print(
+      "init TifFileTileProvider by loading source image $sourceImPath in memory",
+    );
     final File fileIm = File(sourceImPath);
     bool e = await fileIm.exists();
     if (e) {
@@ -43,7 +45,7 @@ class TifFileTileProvider extends TileProvider {
       img.TiffInfo tiffInfo = img.TiffDecoder().startDecode(bytes)!;
       img.TiffImage tifIm = tiffInfo.images[0];
       int bps = tifIm.bitsPerSample;
-      gl.print("file with $bps loaded in memory $e");
+      gl.print("file with $bps bps loaded in memory $e");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {
@@ -59,7 +61,10 @@ class TifFileTileProvider extends TileProvider {
   @override
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) {
     int tileSize = 256;
-    final Offset nwPoint = Offset(coordinates.x.toDouble() * tileSize, coordinates.y.toDouble() * tileSize);
+    final Offset nwPoint = Offset(
+      coordinates.x.toDouble() * tileSize,
+      coordinates.y.toDouble() * tileSize,
+    );
     final nwCoords = mycrs.offsetToLatLng(nwPoint, coordinates.z.toDouble());
     final nw = mycrs.projection.project(nwCoords);
     Rect b = mycrs.projection.bounds!;
@@ -76,11 +81,23 @@ class TifFileTileProvider extends TileProvider {
     int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).round();
 
     if (_sourceImage != null) {
-      img.Image cropped = img.copyCrop(_sourceImage!, x: xOffset, y: yOffset, width: initImSize, height: initImSize);
-      img.Image resized = img.copyResize(cropped, width: tileSize, interpolation: img.Interpolation.linear);
+      img.Image cropped = img.copyCrop(
+        _sourceImage!,
+        x: xOffset,
+        y: yOffset,
+        width: initImSize,
+        height: initImSize,
+      );
+      img.Image resized = img.copyResize(
+        cropped,
+        width: tileSize,
+        interpolation: img.Interpolation.linear,
+      );
       return MemoryImage(img.encodePng(resized, singleFrame: true));
     } else {
-      Uint8List blankBytes = Base64Codec().decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+      Uint8List blankBytes = Base64Codec().decode(
+        "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+      );
       return MemoryImage(blankBytes);
     }
   }

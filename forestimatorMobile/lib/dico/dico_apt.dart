@@ -339,11 +339,14 @@ class DicoAptProvider {
   List<Station> mStations = [];
   Map<int, String> dicoCode2NTNH = {};
   late Directory docDir;
+  late Directory ? downloadDir;
 
   Future<String> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
 
     docDir = await getApplicationDocumentsDirectory();
+    downloadDir = await getDownloadsDirectory();// c'est là qu'on devrait sauver nos rasters téléchargés
+
     final path = join(docDir.path, "db/fforestimator.db");
     var exists = await databaseExists(path);
 
