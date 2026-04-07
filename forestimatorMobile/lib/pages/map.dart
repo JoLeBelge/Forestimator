@@ -2558,7 +2558,9 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                         ),
                       )
                       : Icon(
-                        gl.selectableIcons[geometry.selectedPointIcon],
+                        layer.subtype == "PathPoint" && geometry.attributes[1].value == "Obstacle"
+                            ? gl.roadObstacleChoice[geometry.attributes[0].value] ?? FontAwesomeIcons.bug
+                            : gl.selectableIcons[geometry.selectedPointIcon],
                         size: geometry.iconSize * gl.eqPx,
                         color: geometry.colorLine,
                       ),

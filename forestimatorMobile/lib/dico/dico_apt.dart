@@ -1,6 +1,5 @@
 import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:fforestimator/dico/ess.dart';
@@ -44,9 +43,7 @@ class Risque {
 class Vulnerabilite {
   late int mCode;
   String? mVulnerabilite;
-  Vulnerabilite.fromMap(final Map<String, dynamic> map)
-    : mCode = map['raster_val'],
-      mVulnerabilite = map['label'];
+  Vulnerabilite.fromMap(final Map<String, dynamic> map) : mCode = map['raster_val'], mVulnerabilite = map['label'];
   //mCategorie = map['categorie'];
 }
 
@@ -180,9 +177,7 @@ class LayerBase {
         break;
       default:
         aRes = "assets/images/LogoForestimatorWhiteAlpha.png";
-        gl.print(
-          "Error: can't find assets path for image logo: $mWMSattribution",
-        );
+        gl.print("Error: can't find assets path for image logo: $mWMSattribution");
     }
     return aRes;
   }
@@ -270,8 +265,7 @@ class LayerBase {
 
   Future<void> fillLayerDico(DicoAptProvider dico) async {
     if (mCategorie != 'Externe' && nomDico != null) {
-      String myquery =
-          'SELECT $nomFieldRaster as rast, $nomFieldValue as val, "col" FROM $nomDico';
+      String myquery = 'SELECT $nomFieldRaster as rast, $nomFieldValue as val, "col" FROM $nomDico';
       if (condition != null) {
         myquery += ' WHERE $condition';
       }
@@ -284,11 +278,7 @@ class LayerBase {
         int i = 0;
         while (i < 255) {
           i++;
-          adicoval.add(<String, dynamic>{
-            "rast": i,
-            "val": i * mGain,
-            "col": null,
-          });
+          adicoval.add(<String, dynamic>{"rast": i, "val": i * mGain, "col": null});
         }
       }
       for (var r in adicoval) {
@@ -305,8 +295,7 @@ class LayerBase {
             if (colcode.substring(0, 1) == '#') {
               mDicoCol[r['rast']] = HexColor(colcode);
             } else if (dico.colors.containsKey(colcode)) {
-              mDicoCol[r['rast']] =
-                  dico.colors[colcode] ?? Color.fromRGBO(255, 255, 255, 1.0);
+              mDicoCol[r['rast']] = dico.colors[colcode] ?? Color.fromRGBO(255, 255, 255, 1.0);
               // } else {
               //print("couleur ${colcode} n'est pas définie dans le dico.colors");
             }
@@ -318,8 +307,7 @@ class LayerBase {
 
   @override
   String toString() {
-    String res =
-        "layerbase code $mCode, name $mNom, dicoVal size ${mDicoVal.length} dicoCol size ${mDicoCol.length}";
+    String res = "layerbase code $mCode, name $mNom, dicoVal size ${mDicoVal.length} dicoCol size ${mDicoCol.length}";
     return res;
   }
 
@@ -343,10 +331,8 @@ class DicoAptProvider {
   Map<String, LayerBase> mLayerBases = {};
   Map<String, Ess> mEssences = {};
   List<Aptitude> mAptitudes = [];
-  List<Vulnerabilite> mVulnerabilite =
-      []; // carte recommandation CS = carte de vulnerabilite
-  List<Risque> mRisques =
-      []; // attention, risque Topo FEE, pas risque Climatique CS
+  List<Vulnerabilite> mVulnerabilite = []; // carte recommandation CS = carte de vulnerabilite
+  List<Risque> mRisques = []; // attention, risque Topo FEE, pas risque Climatique CS
   List<Zbio> mZbio = [];
   List<GroupeCouche> mGrCouches = [];
   List<Station> mStations = [];
@@ -374,13 +360,8 @@ class DicoAptProvider {
 
       // Create the writable database file from the bundled  (asset bulk) fforestimator.db database file:
       // the bundled resource itself can't be directly opened as a file on Android -> c'est bien dommage
-      ByteData data = await rootBundle.load(
-        url.join("assets", "db/fforestimator.db"),
-      );
-      List<int> bytes = data.buffer.asUint8List(
-        data.offsetInBytes,
-        data.lengthInBytes,
-      );
+      ByteData data = await rootBundle.load(url.join("assets", "db/fforestimator.db"));
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       await File(path).writeAsBytes(bytes, flush: true);
     }
 
@@ -622,10 +603,8 @@ class DicoAptProvider {
 
   List<String> getAllStationFiches() {
     // en l'état, uniquement fonctionnel pour l'Ardenne
-    List<Station> that =
-        mStations.where((i) => i.mVarMaj & (i.mZbio == 1)).toList();
-    List<String> aRes =
-        that.map((item) => getStationPdf(item.mStationId)).toList();
+    List<Station> that = mStations.where((i) => i.mVarMaj & (i.mZbio == 1)).toList();
+    List<String> aRes = that.map((item) => getStationPdf(item.mStationId)).toList();
     return aRes;
   }
 
@@ -648,9 +627,7 @@ class DicoAptProvider {
   void checkLayerBaseForAnalysis() async {
     for (LayerBase l in mLayerBases.values) {
       //File file = File(getRastPath(l.mCode));
-      if (l.mGroupe != "APT_CS" &&
-          l.mGroupe != "APT_FEE" &&
-          l.mCategorie != "Externe") {
+      if (l.mGroupe != "APT_CS" && l.mGroupe != "APT_FEE" && l.mCategorie != "Externe") {
         l.mUsedForAnalysis = true;
       }
     }
