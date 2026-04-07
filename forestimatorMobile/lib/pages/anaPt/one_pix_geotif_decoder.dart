@@ -31,7 +31,37 @@ class OnePixGeotifDecoder extends Decoder {
     ); // determiner la position du pixel qui nous intéresse
 
     // determiner l'offset et le byteCount de la tile qui contient la valeur du pixel que l'on souhaite - fonctionne QUE avec mes tif qui on un Tile par ligne
-    final tileIndex = uv.y.toInt() * im.tilesX;
+    // A modifier!!, maintenant j'utlise des rasters tuilés depuis début avril 2026
+    gl.print(
+      "world to Pixel : tile width " +
+          im.tileWidth.toString() +
+          " tile height " +
+          im.tileHeight.toString() +
+          " tile X :" +
+          im.tilesX.toString() +
+          " tile Y :" +
+          im.tilesY.toString(),
+    );
+
+    int tilesPerRow = im.width ~/ im.tileWidth;
+    int nTilerow = (uv.y.toInt() ~/ im.tileHeight) + 1;
+    int nTilecol = (uv.x.toInt() ~/ im.tileWidth) + 1;
+
+    gl.print(
+      "tile row " + nTilerow.toString() + " tile col " + nTilecol.toString(),
+    );
+
+    Coordinate tileCoord = Coordinate(
+      uv.x - (nTilecol - 1) * im.tileWidth,
+      uv.y - (nTilerow - 1) * im.tileHeight,
+    ); // coord du pixel dans la tile
+    int tilePixNum =
+        tileCoord.y.toInt() * im.tileWidth +
+        tileCoord.x.toInt(); // numéro du pixel dans la tile
+
+    final tileIndex = nTilerow * tilesPerRow + nTilecol;
+
+    //final tileIndex = uv.y.toInt() * im.tilesX;
     _input.offset = im.tileOffsets![tileIndex];
     final byteCount = im.tileByteCounts![tileIndex];
 
@@ -39,9 +69,9 @@ class OnePixGeotifDecoder extends Decoder {
     List<int> outData = const ZLibDecoder().decodeBytes(data);
 
     if (im.bitsPerSample == 16) {
-      aRes = (outData[(uv.x.toInt() * 2) - 1] << 8) + outData[uv.x.toInt() * 2];
+      aRes = (outData[(tilePixNum * 2) - 1] << 8) + outData[tilePixNum * 2];
     } else {
-      aRes = outData[uv.x.toInt()];
+      aRes = outData[tilePixNum];
     }
 
     return aRes;
