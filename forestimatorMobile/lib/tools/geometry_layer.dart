@@ -41,7 +41,10 @@ class GeometricLayer {
     subtype = "Essence";
     defaultColor = gl.colorAgroBioTech.withAlpha(150);
     defaultPointIcon = 4;
-    defaultAttributes.addAll([Attribute(name: "essence", type: "string", value: "Choisissez"), Attribute(name: "rmq", type: "string", value: "")]);
+    defaultAttributes.addAll([
+      Attribute(name: "essence", type: "string", value: "Choisissez"),
+      Attribute(name: "rmq", type: "string", value: ""),
+    ]);
     defaultAttributes[0].visibleOnMapLabel = true;
     name = "Observations Essences";
   }
@@ -60,18 +63,21 @@ class GeometricLayer {
     defaultPointIcon = 4;
   }
 
-  GeometricLayer.firePath() {
+  GeometricLayer.pathPoint() {
     type = "Point";
-    subtype = "FirePath";
-    defaultColor = gl.colorFirePaths.withAlpha(150);
-    defaultPointIcon = 4;
+    subtype = "PathPoint";
+    defaultColor = gl.colorPathPoints.withAlpha(150);
+    defaultPointIcon = 25;
+    defaultIconSize = 7.5;
     defaultAttributes.addAll([
-      Attribute(name: "categorie", type: "int", value: "Choisissez"),
-      Attribute(name: "obstacle", type: "string", value: ""),
-      Attribute(name: "obstacle", type: "string", value: ""),
-      Attribute(name: "obstacle", type: "string", value: ""),
+      Attribute(name: "categorie", type: "string", value: "Choisissez"),
+      Attribute(name: "type", type: "string", value: ""),
+      Attribute(name: "rmq", type: "string", value: ""),
+      Attribute(name: "date", type: "string", value: ""),
     ]);
-    defaultAttributes[0].visibleOnMapLabel = true;
+    for (int i = 0; i < 2; i++) {
+      defaultAttributes[i].visibleOnMapLabel = true;
+    }
     name = "Observations des chemins de secours";
   }
 
@@ -87,7 +93,9 @@ class GeometricLayer {
   void addGeometry({String name = ""}) {
     switch (type) {
       case 'Point':
-        subtype == 'Essence' ? geometries.add(Geometry.essencePoint(polygonName: name)) : geometries.add(Geometry.point(polygonName: name));
+        subtype == 'Essence'
+            ? geometries.add(Geometry.essencePoint(polygonName: name))
+            : geometries.add(Geometry.point(polygonName: name));
         break;
       case 'Polygon':
         geometries.add(Geometry.polygon(polygonName: name));
@@ -322,10 +330,10 @@ class GeometricLayer {
     return gl.geoLayers.last;
   }
 
-  static bool firePointsLayerExists() {
+  static bool pathpointsLayerExists() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
-      if (g.type == "Point" && g.subtype == "FirePath") {
+      if (g.type == "Point" && g.subtype == "PathPoint") {
         gl.selectedGeoLayer = index;
         return true;
       }
@@ -334,16 +342,16 @@ class GeometricLayer {
     return false;
   }
 
-  static GeometricLayer getfirePointsLayer() {
+  static GeometricLayer getPathPointsLayer() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
-      if (g.type == "Point" && g.subtype == "FirePath") {
+      if (g.type == "Point" && g.subtype == "PathPoint") {
         gl.selectedGeoLayer = index;
         return g;
       }
       index++;
     }
-    gl.geoLayers.add(GeometricLayer.firePath());
+    gl.geoLayers.add(GeometricLayer.pathPoint());
     gl.selectedGeoLayer = gl.geoLayers.length - 1;
     gl.geoLayers.last.serialize();
     return gl.geoLayers.last;
