@@ -1496,8 +1496,7 @@ class PopupRoadChanged {
   PopupRoadChanged(BuildContext context, LatLng coordinates, {this.onTapOutside, this.callbackOnStartTyping}) {
     gl.refreshStack(() {
       _AddRoadPoint.reset();
-      popupForestimatorMessage(
-        height: 130 * gl.eqPx,
+      popupForestimatorWindow(
         id: "observeRoad",
         title: "Observation de la voirie",
         onDiscard: () {
@@ -1561,7 +1560,7 @@ class AddRoadPoint extends StatefulWidget {
 }
 
 class _AddRoadPoint extends State<AddRoadPoint> {
-  static int _type = -1;
+  static int _type = 1;
   static int _selected = -1;
   static String _custom = "";
   static Color _color = Colors.transparent;
@@ -1569,210 +1568,218 @@ class _AddRoadPoint extends State<AddRoadPoint> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        AnimatedContainer(
-          duration: Duration(milliseconds: 200),
-          height: 24 * gl.eqPx,
-          child: lt.ForestimatorScrollView(
-            height: 24 * gl.eqPx,
-            child: Column(
-              children: [
-                AnimatedContainer(
-                  color: _type == 1 ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
-                  duration: Duration(milliseconds: 500),
-                  child: TextButton(
-                    style: lt.borderlessStyle,
-                    onPressed: () {
-                      setState(() {
-                        _type = 1;
-                        _selected = -1;
-                        _custom = "";
-                      });
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Categorie", style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx)),
-                        CircleAvatar(backgroundColor: Colors.white, radius: gl.iconSizeXS * gl.eqPx * .75),
-                      ],
-                    ),
-                  ),
-                ),
-                AnimatedContainer(
-                  color: _type == 2 ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
-                  duration: Duration(milliseconds: 500),
-                  child: TextButton(
-                    style: lt.borderlessStyle,
-                    onPressed: () {
-                      setState(() {
-                        _type = 2;
-                        _selected = -1;
-                        _custom = "";
-                      });
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Obstacle", style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx)),
-                        CircleAvatar(backgroundColor: Colors.white, radius: gl.iconSizeXS * gl.eqPx * .75),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-        if (_type == 1)
-          AnimatedContainer(
-            duration: Duration(milliseconds: 200),
-            height: widget.height - 70 * gl.eqPx,
-            child: lt.ForestimatorScrollView(
-              height: widget.height - 70 * gl.eqPx,
-              child: Column(
-                children: List<Widget>.generate(gl.roadCategoryChoice.length, (index) {
-                  return AnimatedContainer(
-                    color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
-                    duration: Duration(milliseconds: 500),
-                    child: TextButton(
-                      style: lt.borderlessStyle,
-                      onPressed: () {
-                        _selected = index;
-                        setState(() {
-                          _custom = gl.roadCategoryChoice.keys.toList()[index];
-                          _color = gl.roadCategoryChoice.values.toList()[index];
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            gl.roadCategoryChoice.keys.toList()[index],
-                            style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
-                          ),
-                          CircleAvatar(
-                            backgroundColor: gl.roadCategoryChoice.values.toList()[index],
-                            radius: gl.iconSizeXS * gl.eqPx * .75,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          ),
-        if (_type == 2)
-          AnimatedContainer(
-            duration: Duration(milliseconds: 200),
-            height:
-                _selected == gl.roadObstacleChoice.length - 1
-                    ? widget.height - 85 * gl.eqPx
-                    : widget.height - 70 * gl.eqPx,
-            child: lt.ForestimatorScrollView(
-              height:
-                  _selected == gl.roadObstacleChoice.length - 1
-                      ? widget.height - 85 * gl.eqPx
-                      : widget.height - 70 * gl.eqPx,
-              child: Column(
-                children: List<Widget>.generate(gl.roadObstacleChoice.length, (index) {
-                  return AnimatedContainer(
-                    color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
-                    duration: Duration(milliseconds: 500),
-                    child: TextButton(
-                      style: lt.borderlessStyle,
-                      onPressed: () {
-                        _selected = index;
-                        setState(() {
-                          _custom = gl.roadObstacleChoice.keys.toList()[index];
-                          _color = gl.lastUsedCategory;
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            gl.roadObstacleChoice.keys.toList()[index],
-                            style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
-                          ),
-                          Icon(
-                            gl.roadObstacleChoice.values.toList()[index],
-                            color: gl.lastUsedCategory,
-                            size: gl.iconSizeS * gl.eqPx,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-          ),
-        if (_type > 0)
-          AnimatedContainer(
-            duration: Duration(milliseconds: 200),
-            height: _type == 2 && _selected == gl.roadObstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
-            width: gl.menuBarLength * gl.eqPx,
-            child: Column(
-              children: [
-                if (_type == 2 && _selected == gl.roadObstacleChoice.length - 1)
-                  lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                if (_type == 2 && _selected == gl.roadObstacleChoice.length - 1)
-                  AnimatedOpacity(
-                    opacity: _type == 2 && _selected == gl.roadObstacleChoice.length - 1 ? 1 : 0,
-                    duration: Duration(milliseconds: 200),
-                    child: TextFormField(
-                      cursorColor: Colors.white,
-                      maxLength: 256,
-                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                      onChanged: (value) {
-                        setState(() {
-                          _custom = "Autre";
-                          _rmq = value;
-                        });
-                      },
-                      onTap: () => widget.callbackOnStartTyping ?? () {},
-                      onTapOutside: (pointer) {},
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    if (_selected > -1 && _selected < gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty ||
-                        _selected == gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty)
-                      SizedBox(
-                        width: gl.menuBarLength * .5 * gl.eqPx,
+    return OrientationBuilder(
+      builder: (c, o) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
+              AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                height: 24 * gl.eqPx,
+                child: lt.ForestimatorScrollView(
+                  height: 24 * gl.eqPx,
+                  child: Column(
+                    children: [
+                      AnimatedContainer(
+                        color: _type == 1 ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                        duration: Duration(milliseconds: 500),
                         child: TextButton(
-                          style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
+                          style: lt.borderlessStyle,
                           onPressed: () {
-                            widget.onAccept(_custom, _color, _type == 1 ? "Categorie" : "Obstacle", _rmq);
+                            setState(() {
+                              _type = 1;
+                              _selected = -1;
+                              _custom = "";
+                            });
                           },
-                          child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Categorie",
+                                style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                              ),
+                              CircleAvatar(backgroundColor: Colors.white, radius: gl.iconSizeXS * gl.eqPx * .75),
+                            ],
+                          ),
                         ),
                       ),
-                    SizedBox(
-                      width: gl.menuBarLength * .5 * gl.eqPx,
-                      child: TextButton(
-                        style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Retour".length),
-                        onPressed: widget.onDecline,
-                        child: Text(widget.messageDecline, style: dialogTextButtonStyle()),
+                      AnimatedContainer(
+                        color: _type == 2 ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                        duration: Duration(milliseconds: 500),
+                        child: TextButton(
+                          style: lt.borderlessStyle,
+                          onPressed: () {
+                            setState(() {
+                              _type = 2;
+                              _selected = -1;
+                              _custom = "";
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Obstacle", style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx)),
+                              CircleAvatar(backgroundColor: Colors.white, radius: gl.iconSizeXS * gl.eqPx * .75),
+                            ],
+                          ),
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+              ),
+              lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+              if (_type == 1)
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  height: widget.height - 70 * gl.eqPx,
+                  child: lt.ForestimatorScrollView(
+                    height: widget.height - 70 * gl.eqPx,
+                    child: Column(
+                      children: List<Widget>.generate(gl.roadCategoryChoice.length, (index) {
+                        return AnimatedContainer(
+                          color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                          duration: Duration(milliseconds: 500),
+                          child: TextButton(
+                            style: lt.borderlessStyle,
+                            onPressed: () {
+                              _selected = index;
+                              setState(() {
+                                _custom = gl.roadCategoryChoice.keys.toList()[index];
+                                _color = gl.roadCategoryChoice.values.toList()[index];
+                              });
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  gl.roadCategoryChoice.keys.toList()[index],
+                                  style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                ),
+                                CircleAvatar(
+                                  backgroundColor: gl.roadCategoryChoice.values.toList()[index],
+                                  radius: gl.iconSizeXS * gl.eqPx * .75,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+              if (_type == 2)
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  height:
+                      _selected == gl.roadObstacleChoice.length - 1
+                          ? widget.height - 85 * gl.eqPx
+                          : widget.height - 70 * gl.eqPx,
+                  child: lt.ForestimatorScrollView(
+                    height:
+                        _selected == gl.roadObstacleChoice.length - 1
+                            ? widget.height - 85 * gl.eqPx
+                            : widget.height - 70 * gl.eqPx,
+                    child: Column(
+                      children: List<Widget>.generate(gl.roadObstacleChoice.length, (index) {
+                        return AnimatedContainer(
+                          color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                          duration: Duration(milliseconds: 500),
+                          child: TextButton(
+                            style: lt.borderlessStyle,
+                            onPressed: () {
+                              _selected = index;
+                              setState(() {
+                                _custom = gl.roadObstacleChoice.keys.toList()[index];
+                                _color = gl.lastUsedCategory;
+                              });
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  gl.roadObstacleChoice.keys.toList()[index],
+                                  style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                ),
+                                Icon(
+                                  gl.roadObstacleChoice.values.toList()[index],
+                                  color: gl.lastUsedCategory,
+                                  size: gl.iconSizeS * gl.eqPx,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+            ]),
+            if (_type > 0)
+              AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                height: _type == 2 && _selected == gl.roadObstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
+                child: Column(
+                  children: [
+                    if (_type == 2 && _selected == gl.roadObstacleChoice.length - 1)
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                    if (_type == 2 && _selected == gl.roadObstacleChoice.length - 1)
+                      AnimatedOpacity(
+                        opacity: _type == 2 && _selected == gl.roadObstacleChoice.length - 1 ? 1 : 0,
+                        duration: Duration(milliseconds: 200),
+                        child: TextFormField(
+                          cursorColor: Colors.white,
+                          maxLength: 256,
+                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          onChanged: (value) {
+                            setState(() {
+                              _custom = "Autre";
+                              _rmq = value;
+                            });
+                          },
+                          onTap: () => widget.callbackOnStartTyping ?? () {},
+                          onTapOutside: (pointer) {},
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        if (_selected > -1 && _selected < gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty ||
+                            _selected == gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty)
+                          SizedBox(
+                            width: gl.menuBarLength * .5 * gl.eqPx,
+                            child: TextButton(
+                              style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
+                              onPressed: () {
+                                widget.onAccept(_custom, _color, _type == 1 ? "Categorie" : "Obstacle", _rmq);
+                              },
+                              child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
+                            ),
+                          ),
+                        SizedBox(
+                          width: gl.menuBarLength * .5 * gl.eqPx,
+                          child: TextButton(
+                            style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Retour".length),
+                            onPressed: widget.onDecline,
+                            child: Text(widget.messageDecline, style: dialogTextButtonStyle()),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-      ],
+              ),
+          ],
+        );
+      },
     );
   }
 
-  static void reset() => {_custom = "", _selected = -1, _type = -1};
+  static void reset() => {_custom = "", _selected = -1, _type = 1};
 }
 
 class PopupValueChange {
