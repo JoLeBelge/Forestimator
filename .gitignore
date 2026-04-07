@@ -17,6 +17,7 @@ data/cadastre.db*
 data/VCR.db*
 data/ACR*.db*
 data/validCarteEss*.db*
+data/observationVoirie*.db*
 stationDescriptor/stationDescriptor.pro.*
 carteApt/*.autosave
 stationDescriptor/*.autosave
@@ -35,3 +36,4 @@ forestimatorWeb/log.txt
 *forestimator.cfg
 VideosTuto/*
 forestimatorMobile/documentation/manuel/Images/*
+forestimatorMobile/pubspec.lock

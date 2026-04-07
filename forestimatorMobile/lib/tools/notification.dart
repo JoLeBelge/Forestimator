@@ -5835,7 +5835,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
             ),
             onPressed: () {
               String path =
-                  "${gl.pathExternalStorage}/FEE-${gl.dico.getEss(gl.dico.getLayerBase(widget.layerTile.key).getEssCode()).mCode}.pdf";
+                  "${gl.docDir}/FEE-${gl.dico.getEss(gl.dico.getLayerBase(widget.layerTile.key).getEssCode()).mCode}.pdf";
               PopupPdfMenu(widget.layerTile.key, path: path);
             },
           ),
@@ -6687,7 +6687,7 @@ class PopupPdfMenu {
   PopupPdfMenu(String layerKey, {String path = "", String titre = "", int currentPage = -1}) {
     gl.refreshStack(() {
       if (path == "") {
-        path = "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerKey).mPdfName}";
+        path = "${gl.docDir}/${gl.dico.getLayerBase(layerKey).mPdfName}";
       }
       if (currentPage == -1) {
         currentPage = int.parse(gl.dico.getLayerBase(layerKey).mPdfPage.toString());
@@ -7863,8 +7863,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
               if (gl.dico.getLayerBase(layer.mCode).hasDoc() && layer.mCode == "CS_A" && layer.mRastValue < 99) {
                 PopupPdfMenu(
                   "",
-                  path:
-                      '${gl.pathExternalStorage}/${gl.dico.getLayerBase(layer.mCode).getFicheRoute(us: layer.mRastValue)}',
+                  path: '${gl.docDir}/${gl.dico.getLayerBase(layer.mCode).getFicheRoute(us: layer.mRastValue)}',
                 );
               }
             },
@@ -8168,7 +8167,7 @@ class EssencesListViewGS extends StatelessWidget {
                       : null,
               trailing: SizedBox(width: gl.eqPx * gl.iconSizeXS),
               onTap: () {
-                String path = "/${gl.pathExternalStorage}/FEE-${gl.dico.getEss(code.elementAt(index)).mCode}.pdf";
+                String path = "/${gl.docDir}/FEE-${gl.dico.getEss(code.elementAt(index)).mCode}.pdf";
                 PopupPdfMenu("", path: path, currentPage: 0);
               },
             ),
@@ -8247,7 +8246,7 @@ class EssencesListView extends StatelessWidget {
                       )
                       : SizedBox(width: gl.eqPx * gl.iconSizeXS),
               onTap: () {
-                String path = "/${gl.pathExternalStorage}/FEE-${gl.dico.getEss(code.elementAt(index)).mCode}.pdf";
+                String path = "/${gl.docDir}/FEE-${gl.dico.getEss(code.elementAt(index)).mCode}.pdf";
                 PopupPdfMenu("", path: path, currentPage: 0);
               },
             ),
@@ -8318,8 +8317,7 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
                                 if (gl.dico.getLayerBase(mCode).hasDoc() && mCode == "CS_A" && mRastValue < 99) {
                                   PopupPdfMenu(
                                     "",
-                                    path:
-                                        '${gl.pathExternalStorage}/${gl.dico.getLayerBase(mCode).getFicheRoute(us: mRastValue)}',
+                                    path: '${gl.docDir}/${gl.dico.getLayerBase(mCode).getFicheRoute(us: mRastValue)}',
                                   );
                                 }
                               },

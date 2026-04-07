@@ -44,6 +44,8 @@ Debug suite à la formation SFRSB
 -ouverture de pdf (ex fiche essences) ne se fait pas à la bonne page..
 -sélection d'une couche pour l'analyse surfacique : le choix de l'utilisateur n'est pas sauvé dans les préférences (je modifie le code mais je n'ai pas testé si ça fonctionne)
 
+-si une couche en mode offline dans le sélecteur et que je clique dessus : ouvre le catalogue online!
+
 -analyse surfacique : ajouter dans le rapport d'analyse , tout en haut, le nom du polygone et sa surface.
 
 -mapserver : optimiser, création des pyramides pour toutes les couches?? (MNH surtout?) --> JL

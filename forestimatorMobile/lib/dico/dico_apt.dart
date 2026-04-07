@@ -1,6 +1,5 @@
 import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:fforestimator/dico/ess.dart';
@@ -318,7 +317,7 @@ class LayerBase {
   }
 
   Future<int> getValXY(proj4.Point pt) async {
-    final File fileIm = File("${gl.dico.docDir.path}/$mNomRaster");
+    final File fileIm = File("${gl.pathExternalStorage}/$mNomRaster");
     OnePixGeotifDecoder myDecoder = OnePixGeotifDecoder(x: pt.x, y: pt.y);
     Uint8List bytes = await fileIm.readAsBytes();
     return myDecoder.getVal(bytes);
@@ -338,13 +337,15 @@ class DicoAptProvider {
   List<GroupeCouche> mGrCouches = [];
   List<Station> mStations = [];
   Map<int, String> dicoCode2NTNH = {};
-  late Directory docDir;
+  //late Directory docDir;
 
   Future<String> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
 
-    docDir = await getApplicationDocumentsDirectory();
-    final path = join(docDir.path, "db/fforestimator.db");
+    //docDir = await getApplicationDocumentsDirectory();
+
+    final path = join(gl.docDir, "db/fforestimator.db");
+    gl.print("db path: $path");
     var exists = await databaseExists(path);
 
     if (!exists) {
@@ -635,7 +636,7 @@ class DicoAptProvider {
 
   String getRastPath(String aLayerCode) {
     LayerBase l = getLayerBase(aLayerCode);
-    return "${docDir.path}/${l.mNomRaster}";
+    return "${gl.pathExternalStorage}/${l.mNomRaster}";
   }
 }
 
