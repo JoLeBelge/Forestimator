@@ -41,7 +41,10 @@ class GeometricLayer {
     subtype = "Essence";
     defaultColor = gl.colorAgroBioTech.withAlpha(150);
     defaultPointIcon = 4;
-    defaultAttributes.addAll([Attribute(name: "essence", type: "string", value: "Choisissez"), Attribute(name: "rmq", type: "string", value: "")]);
+    defaultAttributes.addAll([
+      Attribute(name: "essence", type: "string", value: "Choisissez"),
+      Attribute(name: "rmq", type: "string", value: ""),
+    ]);
     defaultAttributes[0].visibleOnMapLabel = true;
     name = "Observations Essences";
   }
@@ -64,14 +67,17 @@ class GeometricLayer {
     type = "Point";
     subtype = "PathPoint";
     defaultColor = gl.colorPathPoints.withAlpha(150);
-    defaultPointIcon = 4;
+    defaultPointIcon = 25;
+    defaultIconSize = 7.5;
     defaultAttributes.addAll([
       Attribute(name: "categorie", type: "string", value: "Choisissez"),
       Attribute(name: "type", type: "string", value: ""),
       Attribute(name: "rmq", type: "string", value: ""),
       Attribute(name: "date", type: "string", value: ""),
     ]);
-    defaultAttributes[0].visibleOnMapLabel = true;
+    for (int i = 0; i < 2; i++) {
+      defaultAttributes[i].visibleOnMapLabel = true;
+    }
     name = "Observations des chemins de secours";
   }
 
@@ -87,7 +93,9 @@ class GeometricLayer {
   void addGeometry({String name = ""}) {
     switch (type) {
       case 'Point':
-        subtype == 'Essence' ? geometries.add(Geometry.essencePoint(polygonName: name)) : geometries.add(Geometry.point(polygonName: name));
+        subtype == 'Essence'
+            ? geometries.add(Geometry.essencePoint(polygonName: name))
+            : geometries.add(Geometry.point(polygonName: name));
         break;
       case 'Polygon':
         geometries.add(Geometry.polygon(polygonName: name));
