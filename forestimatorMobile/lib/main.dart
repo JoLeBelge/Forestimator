@@ -14,7 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:memory_info/memory_info.dart';
+//import 'package:memory_info/memory_info.dart';
 
 void main() async {
   // Ensure Flutter binding initialized before running app or any plugins
@@ -26,6 +26,8 @@ void main() async {
   } else {
     initDownloader();
   }
+
+  await _getExternalDir();
 
   gl.dico = DicoAptProvider();
   // Start app immediately so integration tests can locate MaterialApp and
@@ -42,6 +44,20 @@ void main() async {
   gl.dico.init().then((_) {});
 }
 
+Future<void> _getExternalDir() async {
+  Directory _docDir = await getApplicationDocumentsDirectory();
+  gl.docDir = _docDir.path;
+
+  Directory? externalStorage = await getDownloadsDirectory();
+  if (externalStorage != null && await externalStorage.exists()) {
+    gl.pathExternalStorage = externalStorage.path;
+    gl.print("external directory : ${gl.pathExternalStorage}");
+  } else {
+    gl.pathExternalStorage = gl.docDir;
+    gl.print("get app document dir instead of download directory");
+  }
+}
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -54,7 +70,7 @@ class _MyApp extends State<MyApp> {
   GlobalKey<NavigatorState>? _navigatorKey;
 
   _MyApp();
-
+  /* pas utilisé on dirait
   Future<void> getMemoryInfo() async {
     Memory? memory;
     try {
@@ -68,7 +84,7 @@ class _MyApp extends State<MyApp> {
         gl.memory = memory;
       });
     }
-  }
+  }*/
 
   Future _readPreference() async {
     gl.shared = await SharedPreferences.getInstance();
@@ -96,13 +112,17 @@ class _MyApp extends State<MyApp> {
       gl.Mode.expertTools = modeExpertTools;
     }
 
-    final List<String>? aAnaPtSelectedLayerKeys = gl.shared!.getStringList('anaPtSelectedLayerKeys');
+    final List<String>? aAnaPtSelectedLayerKeys = gl.shared!.getStringList(
+      'anaPtSelectedLayerKeys',
+    );
 
     if (aAnaPtSelectedLayerKeys != null) {
       gl.anaPtSelectedLayerKeys = aAnaPtSelectedLayerKeys;
     }
 
-    final List<String>? anaSurfSelectedLayerKeys = gl.shared!.getStringList('anaSurfSelectedLayerKeys');
+    final List<String>? anaSurfSelectedLayerKeys = gl.shared!.getStringList(
+      'anaSurfSelectedLayerKeys',
+    );
 
     if (anaSurfSelectedLayerKeys != null) {
       gl.anaSurfSelectedLayerKeys = anaSurfSelectedLayerKeys;
@@ -113,11 +133,15 @@ class _MyApp extends State<MyApp> {
       gl.firstTimeUse = firstTimeUse;
     }
 
-    final List<String>? ainterfaceSelectedLCode = gl.shared!.getStringList('interfaceSelectedLCode');
+    final List<String>? ainterfaceSelectedLCode = gl.shared!.getStringList(
+      'interfaceSelectedLCode',
+    );
     if (ainterfaceSelectedLCode != null) {
       gl.interfaceSelectedLCode = ainterfaceSelectedLCode;
     }
-    final List<String>? ainterfaceSelectedLOffline = gl.shared!.getStringList('interfaceSelectedLOffline');
+    final List<String>? ainterfaceSelectedLOffline = gl.shared!.getStringList(
+      'interfaceSelectedLOffline',
+    );
     if (ainterfaceSelectedLOffline != null) {
       gl.interfaceSelectedLOffline =
           ainterfaceSelectedLOffline.map<bool>((e) {
@@ -149,8 +173,6 @@ class _MyApp extends State<MyApp> {
     Completer<File> completer = Completer();
     try {
       var dir = await getApplicationDocumentsDirectory();
-      //var dir = await getExternalStorageDirectory();
-      gl.pathExternalStorage = dir.path;
       File file = File("${dir.path}/$filename");
       if (await file.exists() == false) {
         var data = await rootBundle.load(asset);
@@ -170,7 +192,8 @@ class _MyApp extends State<MyApp> {
     try {
       final manifestcontent = await rootBundle.loadString('AssetManifest.json');
       final Map<String, dynamic> manifestmap = json.decode(manifestcontent);
-      final List<String> list = manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
+      final List<String> list =
+          manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
       for (String f in list) {
         await fromAsset(f, path.basename(f));
       }
@@ -205,15 +228,13 @@ class _MyApp extends State<MyApp> {
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
     _readPreference();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _navigatorKey = GlobalKey<NavigatorState>();
       gl.notificationContext = _navigatorKey!.currentContext;
     });
     if (GeometricLayer.essenceLayerExists()) {
       Geometry.sendEssencePointsInBackground();
-    }
-    if(GeometricLayer.pathpointsLayerExists()) {
-      Geometry.sendPathPointsInBackground();
     }
   }
 
@@ -226,7 +247,11 @@ class _MyApp extends State<MyApp> {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       title: 'Forestimator Mobile',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: gl.colorAgroBioTech), fontFamily: "Calibri", useMaterial3: true),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: gl.colorAgroBioTech),
+        fontFamily: "Calibri",
+        useMaterial3: true,
+      ),
       home: ForestimatorMap(),
     );
   }
