@@ -50,9 +50,5 @@ Debug suite à la formation SFRSB
 
 -analyse surfacique : ajouter dans le rapport d'analyse , tout en haut, le nom du polygone et sa surface.
 
--mapserver : optimiser, création des pyramides pour toutes les couches?? (MNH surtout?) --> JL
 -manuel d'utilisation : le mettre en ligne sur forestimator Web --> JL
--distribution app mobile app Store : uniquement pour pays BE, GDL, FRANCE, GERMANY
-
-
 

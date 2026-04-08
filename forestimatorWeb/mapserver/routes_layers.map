@@ -58,9 +58,9 @@ LAYER
     		EXPRESSION "1C"
     		  STYLE
     		  	COLOR 255 0 0
-    			SYMBOL "linie-gestr4"
-    			SIZE 2
-    			COLOR 0 0 0
+    		  	OUTLINECOLOR 255 0 0
+    			#SYMBOL "linie-gestr4"
+    			WIDTH 4
   		END
   	END #class
   	CLASS
@@ -69,7 +69,7 @@ LAYER
     		STYLE
     			COLOR 255 0 0
       			OUTLINECOLOR 255 0 0
-      			WIDTH 2
+      			WIDTH 3
     		END #style
   	END #class
   	CLASS
