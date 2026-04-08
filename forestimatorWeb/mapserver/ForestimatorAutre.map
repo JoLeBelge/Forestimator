@@ -23,7 +23,6 @@ MAP
 	  	END
   	END
   	
-  
   	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/OGF_layers.map"
   	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/routes_layers.map"
   	

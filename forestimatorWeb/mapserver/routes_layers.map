@@ -55,8 +55,9 @@ LAYER
   	CLASSITEM "categorie"
   	CLASS
     		NAME "1C" 
-    		EXPRESSION {1C}
+    		EXPRESSION "1C"
     		  STYLE
+    		  	COLOR 255 0 0
     			SYMBOL "linie-gestr4"
     			SIZE 2
     			COLOR 0 0 0
@@ -64,20 +65,22 @@ LAYER
   	END #class
   	CLASS
     		NAME "2C" 
-    		EXPRESSION {2C}
+    		EXPRESSION "2C"
     		STYLE
+    			COLOR 255 0 0
       			OUTLINECOLOR 255 0 0
       			WIDTH 2
     		END #style
   	END #class
   	CLASS
     		NAME "3C"
-    		EXPRESSION {3C}
+    		EXPRESSION "3C"
     		STYLE
+    			COLOR 255 0 0
       			OUTLINECOLOR 255 0 0
       			WIDTH 2
       			INITIALGAP 2
-  			PATTERN 36 14 END
+  			PATTERN 18 7 END
     		END #style
   	END #class
 	END #layer
