@@ -5,6 +5,7 @@ MAP
 	SHAPEPATH      "/media/Data10/Forestimator/Autre/"
 	IMAGECOLOR     255 255 255
 	IMAGETYPE      PNG
+	SYMBOLSET "symbols/symbols.sym"
 	
 	#CONFIG "MS_ERRORFILE" "/home/carto/app/Forestimator/data/tmp/mapserver_autre_error.txt"
 
@@ -75,7 +76,7 @@ MAP
 	
 	LAYER
 	#DEBUG 2
-  	NAME "routes"
+  	NAME "routes_ign"
   	TYPE LINE
   	STATUS ON
   	CONNECTIONTYPE OGR
@@ -111,6 +112,46 @@ MAP
       			COLOR 100 100 100
       			OUTLINECOLOR 200 200 200
       			WIDTH 4
+      			INITIALGAP 2
+  			PATTERN 36 14 END
+    		END #style
+  	END #class
+	END #layer
+	
+	LAYER
+  	NAME "routes"
+  	TYPE LINE
+  	STATUS ON
+  	CONNECTIONTYPE OGR
+  	CONNECTION "pistes_dnf.gpkg"
+  	DATA "pistes_dnf"
+  	PROJECTION
+            "init=epsg:31370"
+        END 
+  	CLASSITEM "categorie"
+  	CLASS
+    		NAME "1C" 
+    		EXPRESSION {1C}
+    		  STYLE
+    			SYMBOL "linie-gestr4"
+    			SIZE 2
+    			COLOR 0 0 0
+  		END
+  	END #class
+  	CLASS
+    		NAME "2C" 
+    		EXPRESSION {2C}
+    		STYLE
+      			OUTLINECOLOR 255 0 0
+      			WIDTH 2
+    		END #style
+  	END #class
+  	CLASS
+    		NAME "3C"
+    		EXPRESSION {3C}
+    		STYLE
+      			OUTLINECOLOR 255 0 0
+      			WIDTH 2
       			INITIALGAP 2
   			PATTERN 36 14 END
     		END #style
