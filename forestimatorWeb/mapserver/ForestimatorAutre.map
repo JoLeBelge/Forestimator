@@ -5,7 +5,7 @@ MAP
 	SHAPEPATH      "/media/Data10/Forestimator/Autre/"
 	IMAGECOLOR     255 255 255
 	IMAGETYPE      PNG
-	SYMBOLSET "symbols/symbols.sym"
+	SYMBOLSET "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbols/symbols.sym"
 	
 	#CONFIG "MS_ERRORFILE" "/home/carto/app/Forestimator/data/tmp/mapserver_autre_error.txt"
 
