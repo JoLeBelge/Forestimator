@@ -1,6 +1,7 @@
 #Achtung: diese Datei enthält mehr als die normalerweise zulässigen 64 Symbol-Definitionen. Daher sind einige Symbole auskommentiert. Um mehr als 64 Symbole benutzen zu können, müssen Sie einen mapserver mit MS_MAXSYMBOLS (mapsybols.h) > 64 bauen. 
 ### Zeichen für Flächenschraffuren ###
 #1
+SYMBOLSET
 SYMBOL
   NAME "linie-horizontal"
   TYPE vector
@@ -827,4 +828,6 @@ SYMBOL #
   STYLE
     20 30 20 30
   END
+END
+
 END
