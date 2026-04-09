@@ -46,11 +46,9 @@ Debug suite à la formation SFRSB
 
 -si une couche en mode offline dans le sélecteur et que je clique dessus : ouvre le catalogue online!
 
+-si une couche ne mode offline numéro 1 dans sélecteur et que je fait un appui court sur la carte ; envoie la demande de légende au serveur (devrais faire l'analyse en offline pour cette couche)
+
 -analyse surfacique : ajouter dans le rapport d'analyse , tout en haut, le nom du polygone et sa surface.
 
--mapserver : optimiser, création des pyramides pour toutes les couches?? (MNH surtout?) --> JL
 -manuel d'utilisation : le mettre en ligne sur forestimator Web --> JL
--distribution app mobile app Store : uniquement pour pays BE, GDL, FRANCE, GERMANY
-
-
 

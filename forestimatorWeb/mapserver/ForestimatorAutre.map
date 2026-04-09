@@ -5,6 +5,7 @@ MAP
 	SHAPEPATH      "/media/Data10/Forestimator/Autre/"
 	IMAGECOLOR     255 255 255
 	IMAGETYPE      PNG
+	#SYMBOLSET "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbols/symbols.sym"
 	
 	#CONFIG "MS_ERRORFILE" "/home/carto/app/Forestimator/data/tmp/mapserver_autre_error.txt"
 
@@ -22,8 +23,8 @@ MAP
 	  	END
   	END
   	
-  
   	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/OGF_layers.map"
+  	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/routes_layers.map"
   	
   	LAYER
   	NAME "parcellaire_DNF"
@@ -73,49 +74,6 @@ MAP
   	END #class
 	END #layer
 	
-	LAYER
-	#DEBUG 2
-  	NAME "routes"
-  	TYPE LINE
-  	STATUS ON
-  	CONNECTIONTYPE OGR
-  	CONNECTION "roadnetwork_forestimator_20260325.gpkg"
-  	DATA "roadnetwork_forestimator_20260325"
-  	PROJECTION
-            "init=epsg:3812"
-        END
-  	#LABELITEM    "categorie"    
-  	CLASSITEM "categorie"
-  	CLASS
-    		NAME "C0-C1" # jaune
-    		EXPRESSION {C0,C1}
-    		STYLE
-      			#COLOR 88 90 8
-      			OUTLINECOLOR 95 97 8
-      			WIDTH 6
-    		END #style
-  	END #class
-  	CLASS
-    		NAME "C2-C3" 
-    		EXPRESSION {C2,C3}
-    		STYLE
-      			COLOR 40 40 40
-      			OUTLINECOLOR 200 200 200
-      			WIDTH 4
-    		END #style
-  	END #class
-  	CLASS
-    		NAME "X,dirt and path "
-    		EXPRESSION {X,DIRT,PATH}
-    		STYLE
-      			COLOR 100 100 100
-      			OUTLINECOLOR 200 200 200
-      			WIDTH 4
-      			INITIALGAP 2
-  			PATTERN 36 14 END
-    		END #style
-  	END #class
-	END #layer
 	
  	LAYER
         NAME "MasqueForet"

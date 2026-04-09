@@ -91,7 +91,9 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
     double tr1[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     pInputRaster->GetGeoTransform(transform);
 
-    papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "LZW");
+    // ne pas oublier que le decoder de tiff pour la lecture d'un pixel unique dans FM est inféodé à la compressiond deflate.
+    papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "DEFLATE");
+    //papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "LZW");
     papszOptions = CSLSetNameValue(papszOptions, "TILED", "YES");
 
     if (coordCount == 4)

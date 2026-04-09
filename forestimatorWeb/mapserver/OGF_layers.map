@@ -9,6 +9,7 @@
     END
 
     PROCESSING "BANDS=1"
+    OFFSITE 0 0 0
     CLASSITEM "[pixel]"
 
     CLASS
@@ -46,6 +47,7 @@ LAYER
     END
 
     PROCESSING "BANDS=1"
+    OFFSITE 0 0 0
     CLASSITEM "[pixel]"
 
     CLASS
@@ -83,6 +85,7 @@ LAYER
     END
 
     PROCESSING "BANDS=1"
+    OFFSITE 0 0 0
     CLASSITEM "[pixel]"
 
     CLASS
@@ -719,6 +722,7 @@ LAYER
     END
 
     PROCESSING "BANDS=1"
+    OFFSITE 0 0 0
     CLASSITEM "[pixel]"
 
     CLASS

@@ -1,0 +1,23 @@
+SYMBOLSET
+
+SYMBOL
+  NAME "linie-gestr4"
+  TYPE ELLIPSE
+  POINTS
+    1 1
+  END
+  STYLE
+    10 10 10 10
+  END
+END
+
+SYMBOL
+  NAME "punkt"
+  TYPE ELLIPSE
+  POINTS
+    1 1
+  END
+  FILLED TRUE
+END
+
+END
