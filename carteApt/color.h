@@ -17,7 +17,7 @@ public:
         if(aHex.at(0)=='#'){
             c=aHex.substr(1,aHex.size()).c_str();
         }
-        sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
+        sscanf(c, "%02i%02i%02i", &mR, &mG, &mB);
         // fonctionne pas si #000000
         if ((mR < 0) | (mG < 0) | (mB < 0)){
             mR=0;

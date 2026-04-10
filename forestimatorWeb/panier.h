@@ -16,7 +16,7 @@ public:
     cDicoApt * mDico;
     cWebAptitude * m_app;
     WOpenLayers * mMap;
-    groupLayers * mGroupL;
+    std::shared_ptr<groupLayers> mGroupL;
 
     // var de classe
     std::vector<std::shared_ptr<Layer>> mVLs;

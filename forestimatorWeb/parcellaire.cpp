@@ -6,7 +6,7 @@ int globVolMaxShp(10000);    // en ko // n'as pas l'air de fonctionner comme je 
 
 extern bool globTest;
 
-parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW) : mGL(aGL), centerX(0.0), centerY(0.0), mClientName(""), mName(""), mFullPath(""), m_app(app), fu(NULL), msg(NULL), hasValidShp(0), downloadRasterBt(NULL), mStatW(statW), mLabelName("")
+parcellaire::parcellaire(std::shared_ptr<groupLayers> aGL, cWebAptitude *app, statWindow *statW) : mGL(aGL), centerX(0.0), centerY(0.0), mClientName(""), mName(""), mFullPath(""), m_app(app), fu(NULL), msg(NULL), hasValidShp(0), downloadRasterBt(NULL), mStatW(statW), mLabelName("")
 {
     // std::cout << "creation parcellaire " << std::endl;
     mDico = aGL->Dico();

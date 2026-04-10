@@ -45,7 +45,7 @@ extern Wt::WServer *globServer;
 class parcellaire : public WContainerWidget
 {
 public:
-    parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW);
+    parcellaire(std::shared_ptr<groupLayers> aGL, cWebAptitude *app, statWindow *statW);
     ~parcellaire();
     void cleanShpFile();
     bool to31370AndGeoJson(); // boite de dialogue pour choisir src si jamais la couche n'en a pas de défini
@@ -86,14 +86,14 @@ public:
     class TaskComputing : public Task
     {
         std::string geoJsonName;
-        groupLayers *mGL;
+        std::shared_ptr<groupLayers> mGL;
         cDicoApt * mDico;
         //std::string path;
         cWebAptitude **app;
         void run() override;
 
     public:
-        TaskComputing(std::string geoJsonName, groupLayers *mGL, cDicoApt * aDico,cWebAptitude **app) : geoJsonName(geoJsonName), mGL(mGL),mDico(aDico), app(app)
+        TaskComputing(std::string geoJsonName, std::shared_ptr<groupLayers> mGL, cDicoApt * aDico,cWebAptitude **app) : geoJsonName(geoJsonName), mGL(mGL),mDico(aDico), app(app)
         {}
     };
 
@@ -109,7 +109,7 @@ private:
     // Wt::WPushButton  *anaOnAllPolygBt;
     cWebAptitude *m_app;
     Wt::WText *msg;
-    groupLayers *mGL;
+    std::shared_ptr<groupLayers> mGL;
     cDicoApt *mDico;
     double centerX, centerY;
     OGREnvelope mParcellaireExtent;

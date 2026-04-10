@@ -363,7 +363,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     if (globTest){ printf("create GL\n");}
-    mGroupL = new groupLayers(this);
+    mGroupL = std::shared_ptr<groupLayers>(new groupLayers(this));
     if (globTest){ printf("done\n");}
 
     mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(this));

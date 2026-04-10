@@ -105,7 +105,8 @@ public:
     Wt::WStackedWidget * top_stack;// celui qui navige entre la page de garde (home), la page de présentation et les volets analyse/carto
     Wt::Auth::AuthWidget* authWidget;
     Wt::WPushButton *b_login;
-    groupLayers * mGroupL;
+    std::shared_ptr<groupLayers> mGroupL;
+
 
     //WStackedWidget * stack_info; // cause que je dois changer de current index après avoir mis à jour la légende que je clique sur une station
     WContainerWidget *mSimplepointW, *mGroupLayerW, *mLegendW;

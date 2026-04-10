@@ -1,7 +1,7 @@
 #include "statwindow.h"
 extern bool globTest;
 
-statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), m_app(aGL->m_app),mGL(aGL)//, sigImgPDF(this,"pdf"), slotImgPDF(this)
+statWindow::statWindow(std::shared_ptr<groupLayers> aGL):mDico(aGL->Dico()), m_app(aGL->m_app),mGL(aGL)//, sigImgPDF(this,"pdf"), slotImgPDF(this)
 {
     if (globTest){std::cout << "statWindow::statWindow" << std::endl;}
     setId("statWindow");

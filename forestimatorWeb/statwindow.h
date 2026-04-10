@@ -18,7 +18,7 @@ class statWindow : public Wt::WContainerWidget
 {
 public:
     // a besoin du dictionnaire pour créer le layer qui contient la carte IGN pour faire la carte de situation globale
-    statWindow(groupLayers * aGL);
+    statWindow(std::shared_ptr<groupLayers> aGL);
 
     void vider();
     void titre(std::string aTitre){mTitre->setText(aTitre);}
@@ -36,7 +36,7 @@ public:
 
 
     cDicoApt * mDico;
-     groupLayers*mGL;
+    std::shared_ptr<groupLayers> mGL;
 private:
 
     cWebAptitude * m_app;

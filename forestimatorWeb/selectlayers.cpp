@@ -24,7 +24,7 @@ selectLayers::selectLayers(groupLayers * aGL){
         n->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(checkB));
         treeTable->treeRoot()->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
         // pour les noeuds qu'on veux cacher lorsqu'on est pas en mode expert
-        if (kv.first == TypeLayer::KK | kv.first == TypeLayer::CS ){
+        if ((kv.first == TypeLayer::KK) | (kv.first == TypeLayer::CS)){
             mGL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
         }
     }
