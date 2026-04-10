@@ -28,14 +28,13 @@ int launchForestimator(int argc, char **argv)
     }
     cDicoApt *dico = new cDicoApt(aBD);
 
-    stationDescResource resource(dico);
-    rasterClipResource rClipRaster(dico);
-    anaPonctuelleResource anaPonctResource(dico);
-    anaSurfResource anaSurfResource(dico);
-    staticMapResource smResource(dico);
-
-    polygFromMobile fromMobile(dico->File("docroot") + "validCarteEss.db");
-    voirieFromMobile route(dico->File("docroot") + "observationVoirie.db");
+    std::shared_ptr<stationDescResource> resource = std::shared_ptr<stationDescResource>(new stationDescResource(dico));
+    std::shared_ptr<rasterClipResource> rClipRaster = std::shared_ptr<rasterClipResource>(new rasterClipResource(dico));
+    std::shared_ptr<anaPonctuelleResource> anaPonctResource = std::shared_ptr<anaPonctuelleResource>(new anaPonctuelleResource(dico));
+    std::shared_ptr<anaSurfResource> anaSurfRes = std::shared_ptr<anaSurfResource>(new anaSurfResource(dico));
+    std::shared_ptr<staticMapResource> smResource = std::shared_ptr<staticMapResource>(new staticMapResource(dico));
+    std::shared_ptr<polygFromMobile> fromMobile = std::shared_ptr<polygFromMobile>(new polygFromMobile(dico->File("docroot") + "validCarteEss.db"));
+    std::shared_ptr<voirieFromMobile> route = std::shared_ptr<voirieFromMobile>(new voirieFromMobile(dico->File("docroot") + "observationVoirie.db"));
 
     try
     {
@@ -43,34 +42,34 @@ int launchForestimator(int argc, char **argv)
 
         // set first ressources with sub-folder /api/
         // then add entry point for the web site
-        server.addResource(&resource, "/api/${tool}/args/${toolarg}/polygon/${pol}");
-        server.addResource(&resource, "/api/${tool}/polygon/${pol}");
-        server.addResource(&resource, "/api/${tool}/point/${pt}");
-        server.addResource(&resource, "/api/${tool}/${pts}");
-        server.addResource(&resource, "/api/${tool}/args/${toolarg}/point/${pt}");
+        server.addResource(resource, "/api/${tool}/args/${toolarg}/polygon/${pol}");
+        server.addResource(resource, "/api/${tool}/polygon/${pol}");
+        server.addResource(resource, "/api/${tool}/point/${pt}");
+        server.addResource(resource, "/api/${tool}/${pts}");
+        server.addResource(resource, "/api/${tool}/args/${toolarg}/point/${pt}");
         // seule url de la ressource ou tout les arguments sont vide
-        server.addResource(&resource, "/api/help");
+        server.addResource(resource, "/api/help");
 
         // pour avoir la table dictionnaire
-        server.addResource(&resource, "/api/${tool}");
+        server.addResource(resource, "/api/${tool}");
 
         // exemple http://localhost:8085/api/clipRast/layerCode/EP_FEE/xmin/200000.0/ymin/80000.0/xmax/250000.0/ymax/100000.0/toto.tif
-        server.addResource(&rClipRaster, "/api/clipRast/layerCode/${layerCode}/xmin/${xmin}/ymin/${ymin}/xmax/${xmax}/ymax/${ymax}");
-        server.addResource(&rClipRaster, "/api/rastPColor/layerCode/${layerCode}");
+        server.addResource(rClipRaster, "/api/clipRast/layerCode/${layerCode}/xmin/${xmin}/ymin/${ymin}/xmax/${xmax}/ymax/${ymax}");
+        server.addResource(rClipRaster, "/api/rastPColor/layerCode/${layerCode}");
         // pour créer le raster avec palette de couleur (forestimator Mobile)
 
-        server.addResource(&smResource, "/api/staticMap/layerCode/${layerCode}/polygon/${pol}");
-        server.addResource(&smResource, "/api/staticMap/layerCode/${layerCode}/sz/${sz}/polygon/${pol}");
-        server.addResource(&smResource, "/api/staticMap/layerCode/${layerCode}/env/${env}/polygon/${pol}");
-        server.addResource(&smResource, "/api/staticMap/layerCode/${layerCode}/env/${env}/sz/${sz}/polygon/${pol}");
+        server.addResource(smResource, "/api/staticMap/layerCode/${layerCode}/polygon/${pol}");
+        server.addResource(smResource, "/api/staticMap/layerCode/${layerCode}/sz/${sz}/polygon/${pol}");
+        server.addResource(smResource, "/api/staticMap/layerCode/${layerCode}/env/${env}/polygon/${pol}");
+        server.addResource(smResource, "/api/staticMap/layerCode/${layerCode}/env/${env}/sz/${sz}/polygon/${pol}");
 
         // http://localhost:8085/api/anaPt/layers/EP_FEE+EP_CS+MNH2019+CNSW/x/200000.3/y/80000.1
-        server.addResource(&anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");
+        server.addResource(anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");
 
-        server.addResource(&anaSurfResource, "/api/anaSurf/layers/${listLayerCode}/polygon/${pol}");
+        server.addResource(anaSurfRes, "/api/anaSurf/layers/${listLayerCode}/polygon/${pol}");
 
-        server.addResource(&fromMobile, "/api/polygFromMobile/${feature}");
-        server.addResource(&route, "/api/voirieFromMobile/${feature}");
+        server.addResource(fromMobile, "/api/polygFromMobile/${feature}");
+        server.addResource(route, "/api/voirieFromMobile/${feature}");
 
         // fileResource pour les cartes à l'échelle de toute la RW
         for (auto kv : dico->VlayerBase())
@@ -79,16 +78,16 @@ int launchForestimator(int argc, char **argv)
             std::string aCode = kv.first;
             if (l->rasterExist())
             {
-                layerResource *fileResource = new layerResource(l,dico);
+                std::shared_ptr<layerResource> fileResource = std::shared_ptr<layerResource>(new layerResource(l,dico));
                 fileResource->suggestFileName(l->NomFileWithExt());
                 // if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
                 server.addResource(fileResource, "/telechargement/" + aCode);
                 // fichier de symbologie
-                layerResource *fileResource2 = new layerResource(l, dico,1);
+                std::shared_ptr<layerResource> fileResource2 = std::shared_ptr<layerResource>(new layerResource(l, dico,1));
                 fileResource2->suggestFileName(l->NomFile() + ".qml");
                 server.addResource(fileResource2, "/telechargement/" + aCode + "qml");
                 // table dictionnaire
-                layerResource *fileResource3 = new layerResource(l,dico, 2);
+                std::shared_ptr<layerResource> fileResource3 = std::shared_ptr<layerResource>(new layerResource(l,dico, 2));
                 fileResource3->suggestFileName(l->NomFile() + "_dico.csv");
                 server.addResource(fileResource3, "/telechargement/" + aCode + "dico");
             }
@@ -97,28 +96,20 @@ int launchForestimator(int argc, char **argv)
         for (int i(1); i < 18; i++)
         {
             std::string aName("US-A" + std::to_string(i) + ".pdf");
-            Wt::WFileResource *fileResource3 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/" + aName);
+            std::shared_ptr<Wt::WFileResource> fileResource3 = std::shared_ptr<Wt::WFileResource>(new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/" + aName));
             fileResource3->suggestFileName(aName);
             server.addResource(fileResource3, "/telechargement/" + aName);
         }
 
-        /*Wt::WFileResource *fileResource3 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/methodoInventaireTerrainJeunePeup.pdf");
-        fileResource3->suggestFileName("methodoInventaireAncienneCoupeRase.pdf");
-        server.addResource(fileResource3, "/telechargement/methodoInventaireACR");*/
-
-        Wt::WFileResource *fileResource = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "observationVoirie.db");
+        std::shared_ptr<Wt::WFileResource> fileResource = std::shared_ptr<Wt::WFileResource>(new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "observationVoirie.db"));
         fileResource->suggestFileName("observationVoirie.db");
         server.addResource(fileResource, "/telechargement/voirie");
 
-        /*Wt::WFileResource *fileResource4 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/invitationCarrefourForestier2025.pdf");
-        fileResource4->suggestFileName("invitationCarrefourForestier2025.pdf");
-        server.addResource(fileResource4, "/CF");*/
-
-        Wt::WFileResource *fileResource5 = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "OGF.db");
+        std::shared_ptr<Wt::WFileResource> fileResource5 = std::shared_ptr<Wt::WFileResource>(new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "OGF.db"));
         fileResource5->suggestFileName("OGF.db");
         server.addResource(fileResource5, "/telechargement/OGF");
 
-        Wt::WFileResource *fileResource6 = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "validCarteEss.db");
+        std::shared_ptr<Wt::WFileResource> fileResource6 = std::shared_ptr<Wt::WFileResource>(new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "validCarteEss.db"));
         fileResource6->suggestFileName("validCarteEss.db");
         server.addResource(fileResource6, "/telechargement/validCarteEss");
 
@@ -138,6 +129,7 @@ int launchForestimator(int argc, char **argv)
     {
         std::cerr << "exception: " << e.what() << std::endl;
     }
+    return 0;
 }
 
 std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt *dico)
@@ -197,7 +189,7 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
         app404->root()->addWidget(std::make_unique<Wt::WText>("ERREUR: Page introuvable..."));
         return app404;
     }
-    return Wt::cpp14::make_unique<cWebAptitude>(env, dico);
+    return std::make_unique<cWebAptitude>(env, dico);
 }
 
 void layerResource::handleRequest(const Http::Request &request, Http::Response &response)
