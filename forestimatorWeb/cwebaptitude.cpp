@@ -251,7 +251,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     top_stack->setOverflow(Overflow::Auto);
     top_stack->addStyleClass("stackfit");
     // load DOC page
-    presentationP= top_stack->addNew<presentationPage>(mDico,this);
+    top_stack->addWidget(std::make_unique<presentationPage>(mDico,this));
     // load MAP page
     std::unique_ptr<WContainerWidget> content_app = std::make_unique<WContainerWidget>();
     content_app->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
@@ -368,7 +368,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(this));
 
-    statWindow * page_camembert = top_stack->addNew<statWindow>(mGroupL);
+    statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(mGroupL));
 
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
