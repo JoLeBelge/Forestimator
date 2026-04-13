@@ -83,15 +83,9 @@ function polygonStyleFunction(feature, resolution) {
 		color: 'rgba(0, 0, 255, 1.0)',
 		width: 2
 	  }),
-	  /*fill: new Fill({
-		color: 'rgba(0, 0, 255, 0.1)'
-	  }),*/
 	  text: createTextStyle(feature, resolution, myDom)
 	});
 }
-
-/*_____fin label polygon______*/
-
 
 proj4.defs('EPSG:31370',
 '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs');
@@ -104,11 +98,7 @@ projection = new ol.proj.Projection({
 
 extent = [42247, 21148, 295176, 167719];// full RW
 ol.proj.get('EPSG:31370').setExtent(extent);
-// ol 6 va pas. Si si ol 6.4.3 ça roule sans problème, et l'échelle est bonne avec ol.proj.proj4.register(proj4)+ ol.proj.get('EPSG:31370').setExtent(extent);
 
-/*
-le tileGrid est une astuce assez lourde à mettre en place pour le chargement de tuile png ou raster stockées sur le server (carte des scolyte) --> nous on a plus besoin de cette approche - quoi que si pour pouvoir changer la taille des tuiles (512 au lieu de 256) afin de diminuer par 4 le nombres de requêtes au serveur
-*/
 var resolutions = new Array(22);
 var startResolution = (extent[2]-extent[0]) / 512;
 for (var i = 0, ii = resolutions.length; i < ii; ++i) {
@@ -122,12 +112,6 @@ tileGrid = new ol.tilegrid.TileGrid({
 
 console.log(resolutions);
 
-//var res_ndvi=[384.02176,192.01088,96.00544,48.00272,24.00136,12.00068,6.00034,3.00017];
-var res_ndvi=[384.0576,192.0288,96.0144,48.0072,24.0036,12.0018,6.0009,3.00045];
-//var extend_ndvi=[110345, 15392, 302118, 171369];
-var extend_previous=[110345.3375329999980750,-25250.0562959999988379, 301972.3004199999850243, 171369.1921980000042822];
-//var extend_ndvi=[38824.4511019999990822,19513.5278680000010354, 296527.3037289999774657,171984.5151900000055321];
-var extend_ndvi=[39166.5026720000023488,19513.5278680000010354, 296527.3037289999774657,171984.5151900000055321];
 
 activeLayer=1;
 activeLayers={};
@@ -155,27 +139,6 @@ station = new ol.layer.Vector({
     })
 });
 
-//var selectElement = document.getElementById('type');
-
-/*parcelles = new ol.layer.Tile({
-	title: 'Cadastre',
-	extent: extent,
-	opacity: 0.5,
-	source: new ol.source.TileWMS({
-		url: 'http://ccff02.minfin.fgov.be/geoservices/arcgis/services/WMS/Cadastral_Layers/MapServer/WMSServer',
-		crossOrigin: 'null',
-		attributions: 'Â© CartoWeb.be & Geoportail.wallonie.be',
-		params: {
-			'LAYERS': 'Cadastral Parcel',
-			'TILED': true,
-			'FORMAT': 'image/jpeg'},
-		serverType: 'mapserver',
-		//tileGrid: tileGrid
-		projection: 'EPSG:31370',
-	})
-});*/
-
-
 var commune_src = new ol.source.Vector({
 	format: new ol.format.GeoJSON(),
 	url: function(extent) {
@@ -187,12 +150,6 @@ var commune_src = new ol.source.Vector({
 	strategy: ol.loadingstrategy.bbox
 });
 
- /*
- var commune_src = new ol.source.Vector({
-	format: new ol.format.GeoJSON(),
-	url: 'tmp/wt2Kjmcd-epioux_parcellaire.geojson'
-});
-*  */
 
 style = new ol.style.Style({
 	text: new Text({
@@ -206,7 +163,6 @@ style = new ol.style.Style({
 	  })
 });
 
-
 communes = new ol.layer.Vector({
 	crossOrigin: 'null',
 	title: 'Communes',
@@ -214,7 +170,6 @@ communes = new ol.layer.Vector({
 	source: commune_src,
 	style: polygonStyleFunction
 });
-
 
 layers = [
 	new ol.layer.Group({
@@ -259,7 +214,6 @@ map = new ol.Map({
 	]),
  	interactions : ol.interaction.defaults.defaults({doubleClickZoom :false, shiftDragZoom: false}),
 	renderer: 'canvas',
-	//renderer: 'webgl',
 	layers: layers,
 	target: 'map',
 	overlays: [overlay],
@@ -286,14 +240,6 @@ closer.ontouch = function() {
   closer.blur();
   return false;
 };
-
-
-refreshLayers = function (){
-
-	//IGNLayer.getSource().changed();
-	
-	//activeLayer.getSource().changed();
-}
 
 /***
  *	Redéfini les couches à afficher

@@ -41,9 +41,9 @@ class WOpenLayers: public WContainerWidget
 public:
     WOpenLayers( cDicoApt * aDico);
 
-    void updateView(){
+   /*void updateView(){
         doJavaScript("refreshLayers();");
-    }
+    }*/
 
     // signaux; voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807
 
@@ -77,6 +77,7 @@ public:
         // Force a recalculation of the map viewport size. This should be called when third-party code changes the size of the map viewport
         doJavaScript("map.updateSize();");
     }
+
     cDicoApt * mDico;
     JSignal<double,double>& xy() { return xy_; }
     JSlot slot;

@@ -16,12 +16,12 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
     }
     else
     {
-        std::ifstream t(mDico->File("initOL"));
+        /*std::ifstream t(mDico->File("initOL"));
         std::stringstream ss;
         ss << t.rdbuf();
         t.close();
         doJavaScript(ss.str());
-        if (globTest) { std::cout << "initOL done" << std::endl;}
+        if (globTest) { std::cout << "initOL done" << std::endl;}*/
 
         setToolTip(tr("tooltipMap1"));
 
@@ -79,7 +79,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
         touchMoved().preventDefaultAction(true);
         touchEnded().preventDefaultAction(true);
         // openfileBug
-        t.close();
+        //t.close();
     }
 
     // le popup pour afficher la valeur de la couche en cours d'affichage

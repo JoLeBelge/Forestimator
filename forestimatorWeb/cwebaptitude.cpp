@@ -205,13 +205,12 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     /*	MAP	*/
     if (globTest){std::cout << "create map" << std::endl;}
-    std::unique_ptr<WOpenLayers> map = std::make_unique<WOpenLayers>(mDico);
+    auto map = std::make_unique<WOpenLayers>(mDico);
     mMap = map.get();
 
 
-    layout_app->addWidget(std::move(map), 0);
 
-    top_stack->setCurrentIndex(1);
+    layout_app->addWidget(std::move(map), 0);
 
     /*  Panel droit avec boutons et couches selectionnees */
     auto content_couches = layout_app->addWidget(std::make_unique<WContainerWidget>());
@@ -321,8 +320,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     // dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
     mMap->xySelect().connect(std::bind(&parcellaire::selectPolygon,mPA, std::placeholders::_1,std::placeholders::_2));
-    //mMap->polygId().connect(std::bind(&parcellaire::computeStatAndVisuSelectedPol,mPA, std::placeholders::_1));
-    //mMap->getMapExtendSignal().connect(std::bind(&WOpenLayers::updateMapExtend,mMap,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
     //cadastre
     content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1,std::placeholders::_2));
@@ -334,28 +331,16 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     root()->addStyleClass("layout_main");
     loaded_=true;
+    top_stack->setCurrentIndex(1);
 
-    /*
-    std::string coName="invitationCF";
-    if (!env.getCookie(coName)){
-    Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-                                                      "9ieme Carrefour forestier",
-                                                      WString::tr("insertCF"),
-                                                      Wt::Icon::None,
-                                                      Wt::StandardButton::Ok));
-    messageBox->setHeight("100%");
-    messageBox->setWidth("50%");
-    messageBox->contents()->setOverflow(Overflow::Scroll);
-    messageBox->setModal(true);
-    messageBox->buttonClicked().connect([=] {
-        this->removeChild(messageBox);
-        // une semaine
-        Http::Cookie coCF(coName, "1", std::chrono::seconds(604800));
-        this->setCookie(coCF);
-    });
-    messageBox->show();
-    }*/
     clientIDcookies();
+
+    // avant c'était dans wopenwidget
+    std::ifstream t(mDico->File("initOL"));
+    std::stringstream ss;
+    ss << t.rdbuf();
+    t.close();
+    doJavaScript(ss.str(),false);
 }
 
 void cWebAptitude::loadStyles(){
@@ -390,7 +375,7 @@ void cWebAptitude::loadStyles(){
     EssStyle.font().setWeight(FontWeight::Bold);
     styleSheet().addRule(".currentEss", EssStyle);
 
-    // init the OpenLayers javascript api
+
     require("jslib/v10.8.0-package/dist/ol.js");
     useStyleSheet("jslib/v10.8.0-package/ol.css");
     require("jslib/proj4js-2.20.3-dist/proj4.js");

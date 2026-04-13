@@ -336,7 +336,7 @@ void groupLayers::extractInfo(double x, double y)
         }
         // tableau des aptitudes pour toutes les essences
         mAnaPoint->afficheAptAllEss();
-        mMap->updateView();
+        //mMap->updateView();
     }
     else
     {
