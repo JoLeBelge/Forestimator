@@ -49,9 +49,22 @@ class TifFileTileProvider extends TileProvider {
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {
-        _sourceImage = await Isolate.run<img.Image?>(() {
-          return img.TiffDecoder().decode(bytes);
-        });
+        File jpgFile = File("$sourceImPath.jpg");
+        if (jpgFile.existsSync()) {
+          gl.print("jpg file already exists, loading it in memory");
+          _sourceImage = await Isolate.run<img.Image?>(() {
+            return img.JpegDecoder().decode(jpgFile.readAsBytesSync());
+          });
+        } else {
+          _sourceImage = await Isolate.run<img.Image?>(() {
+            return img.TiffDecoder().decode(bytes);
+          });
+        }
+        // test si sauver l'image décodée permet un gain de temps
+        if (!jpgFile.existsSync()) {
+          jpgFile.writeAsBytesSync(img.encodeJpg(_sourceImage!));
+        }
+
         _loaded = true;
         gl.print("file decoded in memory $e");
       }

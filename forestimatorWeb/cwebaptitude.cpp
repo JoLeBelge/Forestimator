@@ -29,8 +29,6 @@ void cWebAptitude::handlePathChange()
                 sectionDoc.erase(sectionDoc.size()-1);
             }
 
-            //sectionDoc.erase(std::remove(sectionDoc.begin(), sectionDoc.end(), '/'), sectionDoc.end());
-            if (globTest){std::cout << "section doc : "<< sectionDoc << std::endl;}
             changeHeader(sectionDoc);
         } else {
             changeHeader("documentation");
@@ -110,72 +108,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     messageResourceBundle().use(docRoot() + "/forestimator-documentation");
     messageResourceBundle().use(docRoot() + "/forestimator-CS");
 
-    // export de tout les messages html vers un fichier csv qui sera traduit en text avec ./html2text -from_encoding UTF8 -nobs -o /home/jo/app/Forestimator/data/tmp/Forestimator.txt /home/jo/app/Forestimator/data/tmp/texteForestimator.csv pour correction orthographique
-    /*bool forestimator(0);
-    if (globTest & 0){
-        std::cout << " export des messages xml \n\n\n" << std::endl;
-        std::ifstream theFile;
-        std::string aFile(mDico->File("TMPDIR")+"texteForestimator.csv");
-        if (forestimator){
-
-            theFile.open(docRoot() + "/forestimator.xml");} else {
-            aFile=mDico->File("TMPDIR")+"textePhytospy.csv";
-            theFile.open("/home/jo/app/phytospy/data/phytoTool.xml");
-            messageResourceBundle().use("/home/jo/app/phytospy/data/phytoTool");
-        }
-
-        std::ofstream aOut;
-        aFile=mDico->File("TMPDIR")+"traductionPhytospy.xml";
-        aOut.open(aFile,ios::out);
-        xml_document<> doc;
-        xml_node<> * root_node;
-        std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
-        buffer.push_back('\0');
-        // Parse the buffer using the xml file parsing library into doc
-        doc.parse<0>(&buffer[0]);
-        // Find our root node
-        root_node = doc.first_node("messages");
-        for (xml_node<> * node = root_node->first_node("message"); node; node = node->next_sibling())
-        {
-            // il faudrait tester si l'attribut id existe, sinon plante. pour le moment c'est pas fonctionnel
-            if (node->first_attribute("id")->value()){
-                std::string aId(node->first_attribute("id")->value());
-                if (0 & aId.find("Wt.Auth")==std::string::npos){
-                    aOut << WText::tr(aId).toUTF8() ;
-                    aOut <<"\n\n<br> <br/>" ;
-                }
-            } else {
-                std::cout << "incorrect node " << std::endl;
-            }
-            //break;
-        }
-        std::cout << " premier fichier fait " << std::endl;
-        doc.clear();
-        theFile.close();
-        if (forestimator){
-            theFile.open(docRoot() + "/forestimator-documentation.xml");
-            std::vector<char> buffer2((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
-            buffer2.push_back('\0');
-            // Parse the buffer using the xml file parsing library into doc
-            doc.parse<0>(&buffer2[0]);
-            // Find our root node
-            root_node = doc.first_node("messages");
-            for (xml_node<> * node = root_node->first_node("message"); node; node = node->next_sibling())
-            {
-                //std::cout << WText::tr(node->first_attribute("id")->value()).toUTF8() << "\n\n" << std::endl;
-                std::string aId(node->first_attribute("id")->value());
-                if (aId.find("Wt.Auth")==std::string::npos){
-                    aOut << WText::tr(aId).toUTF8() ;
-                    aOut <<"\n\n<br> <br/>" ;
-                }
-            }
-            // bug too many open files
-            theFile.close();
-        }
-        std::cout << " ---------------- export done\n" << std::endl;
-        aOut.close();
-    }*/
-
     setTitle("Forestimator");
     loadStyles();
 
@@ -216,7 +148,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     navigation = contPrincipal->addWidget(std::make_unique<WNavigationBar>());
     navigation->setResponsive(true);
     navigation->addStyleClass("carto_menu");
-    navigation->setTitle("<strong>Forestimator</strong>"); // PL request !
+    navigation->setTitle("<strong>Forestimator</strong>");
 
     std::unique_ptr<WMenu> menu_ = std::make_unique<WMenu>();
     WMenu * navbar_menu = navigation->addMenu(std::move(menu_), Wt::AlignmentFlag::Right);
@@ -227,8 +159,13 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     menuitem_app->setToolTip(Wt::WString::tr("menu.button.tooltip.carto"));
     // menu doc
     menuitem_documentation = navbar_menu->addItem("resources/problem_analysis_icon_149897.png","");
-    menuitem_documentation->setLink(WLink(LinkType::InternalPath, "/documentation"));
+    //menuitem_documentation->setLink(WLink(LinkType::Url, "https://forestimator.gembloux.ulg.ac.be/documentation"));
+    WLink l= WLink(LinkType::Url, "https://forestimator.gembloux.ulg.ac.be/documentation");
+    //l.setTarget(LinkTarget::NewWindow);
+    menuitem_documentation->setLink(l);
     menuitem_documentation->setToolTip(Wt::WString::tr("menu.button.tooltip.doc"));
+
+
     // menu login
     menuitem_login = navbar_menu->addItem(isLoggedIn()?"resources/user_icon_logout.png":"resources/user_icon_149851.png","");
     menuitem_login->setToolTip(WString::tr("menu.button.tooltip.login"));
