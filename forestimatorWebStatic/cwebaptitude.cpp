@@ -132,11 +132,11 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment &env, cDicoApt *dico)
     setTitle("Forestimator");
     loadStyles();
 
-    auto layout = root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    auto layout = root()->setLayout(std::make_unique<Wt::WVBoxLayout>());
     root()->setMargin(0);
     root()->setPadding(0);
 
-    dialog_auth = layout->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Connexion"));
+    dialog_auth = layout->addChild(std::make_unique<Wt::WDialog>("Connexion"));
     dialog_auth->setResizable(true);
     dialog_auth->setModal(true);
     dialog_auth->setMaximumSize(700, 600);
@@ -146,7 +146,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment &env, cDicoApt *dico)
     dialog_auth->setClosable(true);
     dialog_auth->contents()->addWidget(std::move(loadAuthWidget()));
 
-    Wt::WContainerWidget *contPrincipal = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    Wt::WContainerWidget *contPrincipal = layout->addWidget(std::make_unique<Wt::WContainerWidget>());
     contPrincipal->setContentAlignment(Wt::AlignmentFlag::Top); // j'ai mis ça sur deux ou trois conteneur car sinon j'ai un bug avec la taille de la page "catalogue station" qui augmente sa taille à l'infini (voir post sur e layout manager for a container which does not have a height that is constrained somehow, you need to specify AlignTop in the alignment flags of WContainerWidget::setLayout().
     GDALAllRegister();
 
@@ -202,7 +202,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment &env, cDicoApt *dico)
         } });
 
     // main stack : DOC and MAP and RESULTS divs
-    top_stack = contPrincipal->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
+    top_stack = contPrincipal->addWidget(std::make_unique<Wt::WStackedWidget>());
     top_stack->setMargin(0);
     // top_stack->setHeight("100%");
     top_stack->setOverflow(Overflow::Auto);

@@ -203,7 +203,7 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
         app404->root()->addWidget(std::make_unique<Wt::WText>("ERREUR: Page introuvable..."));
         return app404;
     }
-    return Wt::cpp14::make_unique<cWebAptitude>(env, dico);
+    return std::make_unique<cWebAptitude>(env, dico);
 }
 
 void layerResource::handleRequest(const Http::Request &request, Http::Response &response)
