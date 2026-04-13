@@ -195,22 +195,23 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     content_app->addStyleClass("carto_div");
     WHBoxLayout * layout_app = content_app->setLayout(std::make_unique<WHBoxLayout>());
     layout_app->setContentsMargins(0,0,0,0);
-    content_app->setHeight("100%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
-    content_app->setOverflow(Overflow::Visible); // non pas d'overflow pour la carte, qui est dans page_carto
+    content_app->setHeight("100%");
+    content_app->setOverflow(Overflow::Visible);
     top_stack->addWidget(std::move(content_app));
-    top_stack->setCurrentIndex(1);
+
     // load RESULT page TODO
 
     /*** page principale application map ***/
 
     /*	MAP	*/
     if (globTest){std::cout << "create map" << std::endl;}
-    auto map = std::make_unique<WOpenLayers>(mDico);
+    std::unique_ptr<WOpenLayers> map = std::make_unique<WOpenLayers>(mDico);
     mMap = map.get();
-    mMap->setWidth("100%");
-    mMap->setMinimumSize(400,0);
-    mMap->setOverflow(Overflow::Visible);
+
+
     layout_app->addWidget(std::move(map), 0);
+
+    top_stack->setCurrentIndex(1);
 
     /*  Panel droit avec boutons et couches selectionnees */
     auto content_couches = layout_app->addWidget(std::make_unique<WContainerWidget>());

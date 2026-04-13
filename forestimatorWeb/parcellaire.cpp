@@ -704,7 +704,8 @@ bool parcellaire::to31370AndGeoJson()
                     out.close();
                 }
                 to31370AndGeoJsonGDAL();
-                return aRes; });
+                //return aRes;
+            });
             dialogBox->show();
             return aRes;
         }
