@@ -61,11 +61,11 @@ matApt::matApt(std::shared_ptr<cDicoApt> aDicoApt):mDicoApt(aDicoApt),zbio_(1),n
         }
     }
     // partie droite
-    WContainerWidget * contD = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
-    WVBoxLayout * layoutDroite = contD->setLayout(cpp14::make_unique<WVBoxLayout>());
-    WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
-    WHBoxLayout * layoutzbio = contZbio->setLayout(cpp14::make_unique<WHBoxLayout>());
-    WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * contD = layoutGlobal->addWidget(std::make_unique<WContainerWidget>());
+    WVBoxLayout * layoutDroite = contD->setLayout(std::make_unique<WVBoxLayout>());
+    WContainerWidget * contZbio = layoutDroite->addWidget(std::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutzbio = contZbio->setLayout(std::make_unique<WHBoxLayout>());
+    WContainerWidget * contZbioGauche = layoutzbio->addWidget(std::make_unique<WContainerWidget>());
     contZbioGauche->addWidget(std::make_unique<Wt::WText>(tr("zbio.titre")));
     //contZbio->setMinimumSize("50%","100px");
     //contZbio->setMaximumSize("50%","300px");
@@ -315,7 +315,7 @@ void matApt::compareMatApt(){
             for (int aptHT : {1,2,3}){
                 std::vector<std::shared_ptr<cEss>> aV1=allVEss.at(0).at(aptHT+(3*(aptZbio-1))-1);
                 std::vector<std::shared_ptr<cEss>> aVEssCom;
-                for (int c(0);c<allVEss.size();c++){
+                for (size_t c(0);c<allVEss.size();c++){
                     std::vector<std::shared_ptr<cEss>> aV2=allVEss.at(c).at(aptHT+(3*(aptZbio-1))-1);
                     getVEssCommun(aV1, aV2,aVEssCom, aVEssDiff);
                 }
@@ -358,7 +358,7 @@ void matApt::compareMatApt(){
                 int r(0),col(0);
 
                 // les essences qui partagent la mm aptitude
-                for (int n(0);n<aV1.size();n++){
+                for (size_t n(0);n<aV1.size();n++){
                     WContainerWidget * c = t1->elementAt(r,col)->addNew<WContainerWidget>();
                     std::string essCode(aV1.at(n)->Code());
                     c->addStyleClass("circle_eco");
@@ -407,7 +407,7 @@ void matApt::compareMatApt(){
                     col++;
                     if (col+1>ncells){col=0;r++;}
                 }
-                for (int n(0);n<aV2.size();n++){
+                for (size_t n(0);n<aV2.size();n++){
                     WContainerWidget * c = t1->elementAt(r,col)->addNew<WContainerWidget>();
                     std::string essCode(aV2.at(n)->Code());
                     c->addStyleClass("circle_eco");
@@ -514,11 +514,14 @@ zbioPainted::zbioPainted(cDicoApt *aDico)
 
     if( mDico->mDS_zbio != NULL ){
         mlay = mDico->mDS_zbio->GetLayer(0);
-        ext= new OGREnvelope;
-        mlay->GetExtent(ext);
+        std::shared_ptr<OGREnvelope> ext = std::shared_ptr<OGREnvelope>(new OGREnvelope());
+        OGRErr e = mlay->GetExtent(ext.get());
+        if (e != OGRERR_NONE){
+            std::cout << " error getting extent for zbio layer " << std::endl;
+        }
         // taille de l'emprise de l'image
-        mWx=ext->MaxX-ext->MinX;
-        mWy=ext->MaxY-ext->MinY;
+        mWx = ext->MaxX-ext->MinX;
+        mWy = ext->MaxY-ext->MinY;
     }
 }
 
@@ -650,7 +653,7 @@ void matApt::selectLevel4comparison(std::tuple<int,int> ntnh){
         if (ntnh2==ntnh) { mVNtnh4Comparison.erase(mVNtnh4Comparison.begin()+c); remove=1; break;}
         c++;
     }
-    if (!remove | mVNtnh4Comparison.size()==0){
+    if (!remove || mVNtnh4Comparison.size()==0){
         mVNtnh4Comparison.push_back(ntnh);
     }
     compareMatApt();

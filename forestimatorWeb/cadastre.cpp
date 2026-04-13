@@ -280,7 +280,10 @@ dbo::ptr<capa> cadastre::getCaPaPtr(std::string aCaPaKey, dbo::Session *session)
 {
     dbo::Transaction transaction{*session};
     dbo::ptr<capa> aRes = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
-    boost::replace_all(aCaPaKey, "/", "\/"); // ben oui sinon ça marche pas le sql select de dbo wt si on échappe pas le slash...
+    // boost::replace_all(aCaPaKey, "/", "\/"); 
+    // ben oui sinon ça marche pas le sql select de dbo wt si on échappe pas le slash...
+    // cout << "\/" == cout << "/"  est une erreur?
+
     // aRes = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
     // collectionCapa Capas = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
     // std::cout << Capas.size() <<" est le nombre de capa retourné par la méthode" << std::endl;
@@ -516,7 +519,7 @@ void cadastre::getCaPa4pt(double x, double y, ptCadastre *aPt)
     }
 }
 
-ptCadastre::ptCadastre(std::shared_ptr<cadastre> aCadastre, double x, double y) : mCad(aCadastre), mCommune(""), mFID(0), mCaPaKey("")
+ptCadastre::ptCadastre(std::shared_ptr<cadastre> aCadastre, double x, double y) : mCad(aCadastre), mCommune("")
 {
     if (!boost::filesystem::exists(mCad->mDirBDCadastre))
     {

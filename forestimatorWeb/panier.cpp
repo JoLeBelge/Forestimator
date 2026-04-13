@@ -158,8 +158,8 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
     bvis->setToolTip(tr("panier.moveup"));
     bvis->clicked().connect([=] {
         if (mVLs.size()==1) return; // skipt 1 element
-        int i=0;
-        for (i; i<mVLs.size(); i++){
+        size_t i;
+        for (i=0; i<mVLs.size(); i++){
             //std::cout << "i" << i << ", lay = " << l << std::endl;
             if(mVLs.at(i)==l){break;}
         }

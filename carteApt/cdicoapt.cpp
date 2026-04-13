@@ -87,7 +87,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         if (globTest){   std::cout << "crée toute les layerbase " << std::endl;}
         for (auto & pair : Dico_RasterNomCourt){
             std::shared_ptr<layerBase> l=std::make_shared<layerBase>(pair.first,this);
-            if (l->getCatLayer()!=TypeLayer::Externe & !l->rasterExist()){
+            if (l->getCatLayer() != TypeLayer::Externe && !l->rasterExist()){
                 std::cout << "Attention layerBase " << l->Code() << ", fichier " << l->getPathTif() << " inexistant" << std::endl;
             }
 
@@ -382,7 +382,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             if (globTest){std::cout << "api analyse ponctuelle" << std::endl;}
             OGRPoint * pt=checkPoint(aPolyg);
             if (pt!=NULL){
-                if (aTool=="hdom"   | aTool=="aptitude" ){
+                if (aTool=="hdom"   || aTool=="aptitude" ){
                     aResponse="pas de traitement ponctuel pour cet outil";
                 } else if(aTool=="CNSW"){
                     ptPedo ptPed=ptPedo(mPedo,pt->getX(),pt->getY());
@@ -492,7 +492,7 @@ bool cDicoApt::checkTool(std::string aTool){
     bool aRes(0);
     if (hasLayerBase(aTool)){ aRes=1;}
     // traitements qui ne sont pas des cartes
-    if (aTool=="hdom"   | aTool=="aptitude" | aTool=="CNSW"){ aRes=1;}
+    if (aTool=="hdom"   || aTool=="aptitude" || aTool=="CNSW"){ aRes=1;}
     return aRes;
 }
 
@@ -514,7 +514,7 @@ std::vector<std::string> cDicoApt::parseAptArg(std::string aArgs){
         boost::split( aVAptCarte,aArgs,boost::is_any_of(","),boost::token_compress_on);
         for (std::string code: aVAptCarte){
             if (accroEss2Nom(code)!=""){ code=code+"_FEE";}
-            if (hasLayerBase(code) & (getLayerBase(code)->getCatLayer()==TypeLayer::FEE | getLayerBase(code)->getCatLayer()==TypeLayer::CS)){
+            if (hasLayerBase(code) & (getLayerBase(code)->getCatLayer()==TypeLayer::FEE || getLayerBase(code)->getCatLayer()==TypeLayer::CS)){
                 aRes.push_back(code);
             }
         }

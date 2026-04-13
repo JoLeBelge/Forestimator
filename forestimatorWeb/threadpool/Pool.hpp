@@ -20,7 +20,7 @@ private:
 public:
     cpu_set_t cpuset;
     static int ID;
-    Pool(Task* mainTask, int nThreads) : mainTask(mainTask), nThreads(nThreads + MIN_THREADS){
+    Pool(Task* mainTask, int nThreads) : nThreads(nThreads + MIN_THREADS), mainTask(mainTask){
         for (size_t j = 0; j < size_t(nThreads); j++)
             CPU_SET(j, &cpuset);
     }
@@ -58,7 +58,7 @@ public:
         void run();
         void pushTask(Task* task);
         int empty();
-        CoreThread(std::vector<CoreThread*>* cThreads, int* nThreads, int* valid) : threadID(ID++), myTasks(new ThreadQueue()), cThreads(cThreads), nThreads(nThreads), valid(valid){}
+        CoreThread(std::vector<CoreThread*>* cThreads, int* nThreads, int* valid) : threadID(ID++), cThreads(cThreads), nThreads(nThreads), valid(valid), myTasks(new ThreadQueue()){}
         int getUnfinishdTasks();
         void startWork();
         void suspendWork();

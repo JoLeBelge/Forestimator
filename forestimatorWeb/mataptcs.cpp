@@ -22,7 +22,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     addNew<Wt::WBreak>();
     addNew<Wt::WBreak>();
 
-    Wt::WTemplate * tpl = addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS")));
+    Wt::WTemplate * tpl = addWidget(std::make_unique<Wt::WTemplate>(tr("template.CS")));
     graphZbio = tpl->bindWidget("graphZbio", std::make_unique<zbioPainted>(mDicoApt));
     contListeUS = tpl->bindWidget("listeUS", std::make_unique<WContainerWidget>());
     WContainerWidget * contlisteEss = tpl->bindWidget("listeEssence", std::make_unique<WContainerWidget>());
@@ -82,7 +82,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     }
 
      /* 4 Description de unités stationnelles ---------------------------*/
-    contFicheUS = addWidget(cpp14::make_unique<WContainerWidget>());
+    contFicheUS = addWidget(std::make_unique<WContainerWidget>());
     contFicheUS->setId("ficheUS");
 
     updateListeUS();
@@ -139,7 +139,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     mVEss.clear();
     contFicheUS->clear();
 
-    Wt::WTemplate * tpl = contFicheUS->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS.fiche")));
+    Wt::WTemplate * tpl = contFicheUS->addWidget(std::make_unique<Wt::WTemplate>(tr("template.CS.fiche")));
 
     Wt::WContainerWidget * cont = tpl->bindWidget("teaser", std::make_unique<Wt::WContainerWidget>());
 
@@ -168,11 +168,11 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     //contFicheUS->addWidget(Wt::WText::tr("t"));
 
     cont = tpl->bindWidget("listeEssence", std::make_unique<Wt::WContainerWidget>());
-    mAptTable = cont->addWidget(cpp14::make_unique<WTable>());
+    mAptTable = cont->addWidget(std::make_unique<WTable>());
     int r(0);
     mAptTable->setStyleClass("table-recommand");
     for (std::vector<cEss*> aV : mVEss){
-        for (int n(0);n<aV.size();n++){
+        for (size_t n(0);n<aV.size();n++){
             WContainerWidget * c = mAptTable->elementAt(r,0)->addNew<WContainerWidget>();
             std::string essCode(aV.at(n)->Code());
             c->addStyleClass("circle_eco");
@@ -211,7 +211,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
                 });
                 messageBox->show();
             });
-            WText * t = mAptTable->elementAt(r,1)->addNew<WText>(aV.at(n)->Nom());
+            mAptTable->elementAt(r,1)->addWidget(std::make_unique<Wt::WText>(aV.at(n)->Nom()));
             r++;
         }
     }
@@ -266,7 +266,7 @@ void matAptCS::changeZbio(){
     for (auto & kv : *mDicoApt->ZBIO()){
         if (kv.second==zbioSelection_->currentText()){zbio_=kv.first;}
     }
-    if (zbio_==1 | zbio_==2 | zbio_==10){prefixZbio_="A";}
+    if (zbio_==1 || zbio_==2 || zbio_==10){prefixZbio_="A";}
     if (zbio_==4){prefixZbio_="F";}
 
     graphZbio->selectZbio(zbio_);

@@ -96,7 +96,7 @@ void simplepoint::detailCalculAptFEE(ST *aST)
         mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("Situation Topographique"));
         mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(aST->TOPO()));
         row++;
-        Wt::WText *r = mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("rique pour l'essence :"));
+        mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("rique pour l'essence :"));
         mDetAptFEE->elementAt(row, 0)->setToolTip(tr("tooltip.compensationTopo"));
         ;
         int risque = Ess->getRisque(aST->mZBIO, aST->mTOPO);
