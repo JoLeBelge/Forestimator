@@ -4,7 +4,7 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
 
     auto params = request.urlParams();
     std::string listCode("");
-    double x,y;
+    double x = 0.0,y = 0.0;
 
     // "/api/anaPt/${listLayerCode}/x/${x}/y/${y}"
     for (const auto &param : params) {
@@ -34,11 +34,11 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
     std::vector<std::string> aV;
     boost::split( aV,listCode,boost::is_any_of("+"),boost::token_compress_on);
     response.addHeader("Content-Type","application/json");
-    int c(0);
+    size_t c(0);
     for (std::string code: aV){
         if (mDico->hasLayerBase(code)){
              std::shared_ptr<layerBase> l =mDico->getLayerBase(code);
-             int v=l->getValue(x,y);
+             int v = l->getValue(x,y);
              std::string foundR=l->rasterExist() ? "true" : "false";
              response.out() << "    { \n\"layerCode\":\"" << code <<"\",\n"
                             << "    \"foundLayer\":true,\n"
@@ -55,7 +55,7 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
                            << "    }";
         }
         c++;
-        if (c<aV.size()) { response.out() << ",\n";}
+        if (c <aV.size()) { response.out() << ",\n";}
     }
     response.out() << "\n ]\n}\n";
 }

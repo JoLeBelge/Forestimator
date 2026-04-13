@@ -213,14 +213,14 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table4->elementAt(0, 1)->addNew<Wt::WText>("Nombre d'utilisateur");
 
     row=1;
-    for (int y(2025);y <2027;y++){
+    for (int y(2025);y < 2027;y++){
         for (int m(1);m <13;m++){
             std::string month = std::to_string(m);
             if (month.size()==1){month="0"+ month;}
             int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%"+std::to_string(y)+"-"+month+"%' GROUP BY client_id)");
-            table4->elementAt(row,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month+"-"+std::to_string(y)));
+            table4->elementAt(row,0)->addWidget(std::make_unique<Wt::WText>(month+"-" + std::to_string(y)));
             table4->elementAt(row,0)->setContentAlignment(AlignmentFlag::Right);
-            table4->elementAt(row,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
+            table4->elementAt(row,1)->addWidget(std::make_unique<Wt::WText>(std::to_string(nb)));
             table4->elementAt(row,1)->setContentAlignment(AlignmentFlag::Center);
             row++;
         }
