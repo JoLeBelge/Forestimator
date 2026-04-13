@@ -152,7 +152,7 @@ std::unique_ptr<WMenuItem> presentationPage::downloadPage()
     bool test(0);
     for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr))
     {
-      if (l->getCatLayer() != TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code()))
+      if (l->getCatLayer() != TypeLayer::Externe && !l->Expert() & mDico->lay4Visu(l->Code()))
       {
         test = 1;
         break;

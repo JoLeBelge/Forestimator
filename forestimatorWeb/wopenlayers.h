@@ -41,17 +41,11 @@ class WOpenLayers: public WContainerWidget
 public:
     WOpenLayers( cDicoApt * aDico);
 
-    /*WOpenLayers(){
-        printf("destructor wopenlayer\n");
-        //mDico=NULL;
-    }*/
-
     void updateView(){
-        //doJavaScript("activeLayer.getSource().changed();");
         doJavaScript("refreshLayers();");
     }
 
-    // pas simple d'impletemter ses signaux, voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807
+    // signaux; voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807
 
     void filterMouseEvent(WMouseEvent event){
         if (event.modifiers().test(Wt::KeyboardModifier::Shift)){
@@ -69,12 +63,9 @@ public:
 
     void TouchEnd(WTouchEvent t){
         milliseconds touchLength = duration_cast< milliseconds >(system_clock::now().time_since_epoch()) - timer;
-        //std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
         if (touchLength.count()>100){
-            //std::cout << "number of changedTouches " << t.changedTouches().size() << std::endl;
             if (t.changedTouches().size()>0){
             Wt::Touch touch = t.changedTouches()[0];
-            //std::cout << " touch est de " << touch.screen().x << std::endl;
             slot3.exec(std::to_string(touch.widget().x),std::to_string(touch.widget().y));
             }
         }
@@ -85,7 +76,6 @@ public:
         WContainerWidget::layoutSizeChanged(width, height);
         // Force a recalculation of the map viewport size. This should be called when third-party code changes the size of the map viewport
         doJavaScript("map.updateSize();");
-       // std::cout << "layoutSizeChanged de wopenlayers \n\n\n" << std::endl;
     }
     cDicoApt * mDico;
     JSignal<double,double>& xy() { return xy_; }

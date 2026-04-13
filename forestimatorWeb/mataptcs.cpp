@@ -239,7 +239,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
 
     val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).SCC;
     tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("SCC")));
-    cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont = tpl->bindWidget("progress", std::make_unique<Wt::WContainerWidget>());
 
     cont->setStyleClass("syntheseCS"+std::to_string(val));
 

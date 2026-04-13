@@ -11,7 +11,7 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
 
     messageResourceBundle().use(docRoot() + "/encodageVCR");
     setTitle(WString("Suivi Coupe Rase"));
-    Wt::WTemplate *tpl = root()->addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("template")));
+    Wt::WTemplate *tpl = root()->addWidget(std::make_unique<Wt::WTemplate>(WString::tr("template")));
     WContainerWidget *cont = tpl->bindWidget("contTitre", std::make_unique<WContainerWidget>());
     cont->addNew<Wt::WText>(WString::tr("titre"));
 
@@ -172,11 +172,11 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     cont = tpl->bindWidget("contLoca", std::make_unique<WContainerWidget>());
     cont->addStyleClass("encodage");
 
-    WVBoxLayout *la = cont->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    WVBoxLayout *la = cont->setLayout(std::make_unique<Wt::WVBoxLayout>());
     cont = la->addWidget(std::make_unique<WContainerWidget>());
     cont->addWidget(std::make_unique<Wt::WText>(WString::tr("titreLocalisation")));
     cont = la->addWidget(std::make_unique<WContainerWidget>());
-    WHBoxLayout *layoutH = cont->setLayout(Wt::cpp14::make_unique<Wt::WHBoxLayout>());
+    WHBoxLayout *layoutH = cont->setLayout(std::make_unique<Wt::WHBoxLayout>());
     auto smart_map = std::make_unique<Wol>();
     map = smart_map.get();
 
