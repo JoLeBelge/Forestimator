@@ -7,8 +7,8 @@ const std::string closeMenuText = "<i class='fa fa-bars' aria-hidden='true'></i>
 
 presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(aDico), m_app(app), openMenuButton_(nullptr), menuOpen_(false)
 {
-  Wt::WTemplate *tpl = addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("tpl:widget-gallery")));
-  contentsStack_ = contentsStack_ = tpl->bindWidget("contents", std::make_unique<WStackedWidget>());
+  Wt::WTemplate *tpl = addWidget(std::make_unique<Wt::WTemplate>(WString::tr("tpl:widget-gallery")));
+  contentsStack_ = tpl->bindWidget("contents", std::make_unique<WStackedWidget>());
 
   Wt::WAnimation animation(Wt::AnimationEffect::Fade,
                            Wt::TimingFunction::Linear,
@@ -63,7 +63,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
         label = "";
         if (globTest){cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;}
     }
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, std::make_unique<Wt::WText>(getHtml(c)));
     if (i == 0)
     {
       item2->setPathComponent("");
@@ -88,7 +88,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
         label = "";
         if (globTest){cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;}
     }
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, std::make_unique<Wt::WText>(getHtml(c)));
     if (i == 0)
     {
       item2->setPathComponent("");
@@ -152,7 +152,7 @@ std::unique_ptr<WMenuItem> presentationPage::downloadPage()
     bool test(0);
     for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr))
     {
-      if (l->getCatLayer() != TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code()))
+      if (l->getCatLayer() != TypeLayer::Externe && !l->Expert() & mDico->lay4Visu(l->Code()))
       {
         test = 1;
         break;

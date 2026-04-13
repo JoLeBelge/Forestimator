@@ -655,7 +655,11 @@ bool parcellaire::to31370AndGeoJson()
             if (poGeom->IsValid() != 1)
             {
                 std::cout << "géométrie feature " << poFeature->GetFID() << " is invalid" << std::endl;
-                lay->DeleteFeature(poFeature->GetFID()); // on est en lecture seule, donc ça ne devrai rien faire je crois. inutile?  GDAL_OF_READONLY
+                OGRErr err = lay->DeleteFeature(poFeature->GetFID()); // on est en lecture seule, donc ça ne devrai rien faire je crois. inutile?  GDAL_OF_READONLY
+                if (err != OGRERR_NONE)
+                {
+                    std::cout << "problem with deletion of feature " << poFeature->GetFID() << ", error : " << err << std::endl;
+                }
             }
         }
 
