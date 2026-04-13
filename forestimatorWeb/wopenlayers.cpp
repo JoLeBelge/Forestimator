@@ -21,6 +21,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
         ss << t.rdbuf();
         t.close();
         doJavaScript(ss.str());
+        if (globTest) { std::cout << "initOL done" << std::endl;}
         setToolTip(tr("tooltipMap1"));
 
         // slots

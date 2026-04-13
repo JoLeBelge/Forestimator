@@ -1,14 +1,18 @@
 import 'dart:typed_data';
-import 'package:archive/archive.dart';
+import 'package:archive/archive.dart'; //for ZLibdecoder. But no LzwDecoder in this package
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:geoimage/geoimage.dart';
 import 'package:image/image.dart';
+import 'package:image/src/formats/tiff/tiff_lzw_decoder.dart';
 import 'package:dart_jts/dart_jts.dart';
+
+// pour debugger
+import 'dart:io';
 
 class OnePixGeotifDecoder extends Decoder {
   TiffInfo? info;
   ExifData? exif;
-  late InputBuffer _input;
+  late InputBuffer p;
   double x;
   double y;
 
@@ -32,48 +36,129 @@ class OnePixGeotifDecoder extends Decoder {
 
     // determiner l'offset et le byteCount de la tile qui contient la valeur du pixel que l'on souhaite - fonctionne QUE avec mes tif qui on un Tile par ligne
     // A modifier!!, maintenant j'utlise des rasters tuilés depuis début avril 2026
-    gl.print(
-      "world to Pixel : tile width " +
-          im.tileWidth.toString() +
-          " tile height " +
-          im.tileHeight.toString() +
-          " tile X :" +
-          im.tilesX.toString() +
-          " tile Y :" +
-          im.tilesY.toString(),
-    );
 
-    int tilesPerRow = im.width ~/ im.tileWidth;
-    int nTilerow = (uv.y.toInt() ~/ im.tileHeight) + 1;
-    int nTilecol = (uv.x.toInt() ~/ im.tileWidth) + 1;
-
-    gl.print(
-      "tile row " + nTilerow.toString() + " tile col " + nTilecol.toString(),
-    );
+    int tilesPerRow = (im.width ~/ im.tileWidth) + 1;
+    int nTilerow = (uv.y.toInt() ~/ im.tileHeight);
+    int nTilecol = (uv.x.toInt() ~/ im.tileWidth);
 
     Coordinate tileCoord = Coordinate(
-      uv.x - (nTilecol - 1) * im.tileWidth,
-      uv.y - (nTilerow - 1) * im.tileHeight,
+      (uv.x - (nTilecol) * im.tileWidth).floor().toDouble(),
+      (uv.y - (nTilerow) * im.tileHeight).floor().toDouble(),
     ); // coord du pixel dans la tile
     int tilePixNum =
         tileCoord.y.toInt() * im.tileWidth +
         tileCoord.x.toInt(); // numéro du pixel dans la tile
 
+    gl.print(
+      "uv " +
+          uv.toString() +
+          "tile row " +
+          nTilerow.toString() +
+          " tile col " +
+          nTilecol.toString() +
+          " tile coord " +
+          tileCoord.toString() +
+          " tile pix num " +
+          tilePixNum.toString() +
+          " compression " +
+          im.compression.toString(),
+    );
+
     final tileIndex = nTilerow * tilesPerRow + nTilecol;
 
     //final tileIndex = uv.y.toInt() * im.tilesX;
-    _input.offset = im.tileOffsets![tileIndex];
+    p.offset = im.tileOffsets![tileIndex];
     final byteCount = im.tileByteCounts![tileIndex];
 
-    final data = _input.toList(0, byteCount);
-    List<int> outData = const ZLibDecoder().decodeBytes(data);
+    //final data = p.toList(0, byteCount);
+    //List<int> outData = const ZLibDecoder().decodeBytes(data);
+    //List<int> outData;
 
+    //void _decodeTile(InputBuffer p, Image image, int tileX, int tileY) {
+    // Read the data, uncompressing as needed. There are four cases:
+    // bilevel, palette-RGB, 4-bit grayscale, and everything else.
+
+    var bytesInThisTile = im.tileWidth * im.tileHeight * im.samplesPerPixel;
     if (im.bitsPerSample == 16) {
-      aRes = (outData[(tilePixNum * 2) - 1] << 8) + outData[tilePixNum * 2];
-    } else {
-      aRes = outData[tilePixNum];
+      bytesInThisTile *= 2;
+    } else if (im.bitsPerSample == 32) {
+      bytesInThisTile *= 4;
     }
 
+    InputBuffer byteData;
+    if (im.bitsPerSample == 8 ||
+        im.bitsPerSample == 16 ||
+        im.bitsPerSample == 32 ||
+        im.bitsPerSample == 64) {
+      if (im.compression == TiffCompression.none) {
+        byteData = p;
+      } else if (im.compression == TiffCompression.lzw) {
+        byteData = InputBuffer(Uint8List(bytesInThisTile));
+        final decoder = LzwDecoder();
+        try {
+          decoder.decode(
+            InputBuffer.from(p, length: byteCount),
+            byteData.buffer,
+          );
+        } catch (e) {
+          //print(e);
+        }
+        aRes = byteData[tilePixNum];
+        // Horizontal Differencing Predictor
+        /*if (im.predictor == 2) {
+          int count;
+          for (var j = 0; j < im.tileHeight; j++) {
+            count = im.samplesPerPixel * (j * im.tileWidth + 1);
+            final len = im.tileWidth * im.samplesPerPixel;
+            for (var i = im.samplesPerPixel; i < len; i++) {
+              byteData[count] += byteData[count - im.samplesPerPixel];
+              count++;
+            }
+          }
+        }*/
+
+        //} else if (im.compression == TiffCompression.packBits) {
+        // byteData = InputBuffer(Uint8List(bytesInThisTile));
+        //_decodePackBits(p, bytesInThisTile, byteData.buffer);
+      } else if (im.compression == TiffCompression.deflate) {
+        final data = p.toList(0, byteCount);
+        final outData = const ZLibDecoder().decodeBytes(data);
+
+        if (im.bitsPerSample == 16) {
+          aRes = (outData[(tilePixNum * 2) - 1] << 8) + outData[tilePixNum * 2];
+        } else {
+          aRes = outData[tilePixNum];
+        }
+        //byteData = InputBuffer(outData);
+      } else if (im.compression == TiffCompression.zip) {
+        final data = p.toList(0, byteCount);
+        List<int> outData = const ZLibDecoder().decodeBytes(data);
+
+        File tata = File("${gl.pathExternalStorage}/tile_$tileIndex.csv");
+        tata.writeAsString(outData.join(';'));
+        tata.writeAsString("\n", mode: FileMode.append);
+
+        gl.print("outData length " + outData.length.toString());
+        if (im.bitsPerSample == 16) {
+          aRes = (outData[(tilePixNum * 2) - 1] << 8) + outData[tilePixNum * 2];
+        } else {
+          gl.print("value is " + outData[tilePixNum].toString());
+          aRes = outData[tilePixNum];
+        }
+        //byteData = InputBuffer(outData);
+        //} else if (im.compression == TiffCompression.oldJpeg ||
+        //  im.compression == TiffCompression.jpeg) {
+        //final data = p.toList(0, byteCount);
+        //final tile = JpegDecoder().decode(data as Uint8List);
+        //if (tile != null) {
+        //  _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight);
+        //}
+        //return;
+      }
+    } else {
+      throw ImageException('Unsupported Compression Type: $im.compression');
+    }
+    gl.print("value returned is " + aRes.toString());
     return aRes;
   }
 
@@ -85,8 +170,8 @@ class OnePixGeotifDecoder extends Decoder {
   // If the file is not a valid TIFF image, null is returned.
   @override
   TiffInfo? startDecode(Uint8List bytes) {
-    _input = InputBuffer(bytes);
-    info = _readHeader(_input);
+    p = InputBuffer(bytes);
+    info = _readHeader(p);
     if (info != null) {
       exif = ExifData.fromInputBuffer(InputBuffer(bytes));
     }
@@ -107,7 +192,7 @@ class OnePixGeotifDecoder extends Decoder {
       return null;
     }
 
-    final image = info!.images[frame].decode(_input);
+    final image = info!.images[frame].decode(p);
     if (exif != null) {
       image.exif = exif!;
     }
@@ -119,9 +204,9 @@ class OnePixGeotifDecoder extends Decoder {
   /// decoding the file, null is returned.
   @override
   Image? decode(Uint8List bytes, {int? frame}) {
-    _input = InputBuffer(bytes);
+    p = InputBuffer(bytes);
 
-    info = _readHeader(_input);
+    info = _readHeader(p);
     if (info == null) {
       return null;
     }

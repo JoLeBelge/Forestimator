@@ -18,7 +18,7 @@
 
 		 	<plain-ajax-sessions-ratio-limit>0.3</plain-ajax-sessions-ratio-limit>
 			<ajax-puzzle>true</ajax-puzzle>
-			<reload-is-new-session>true</reload-is-new-session>
+			<reload-is-new-session>false</reload-is-new-session>
 		</session-management>
 		<!--  par défaut 200, trop rapide, on y arrive pas-->
 		<double-click-timeout>500</double-click-timeout>
