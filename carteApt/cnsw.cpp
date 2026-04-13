@@ -94,7 +94,7 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
 
             } else {
 
-                if (poFeature->GetGeometryRef()->Intersect(poGeom)) {
+                if (poFeature->GetGeometryRef()->Intersects(poGeom)) {
                     //std::cout  << " intersection des deux géométries " << std::endl;
                     // cette ligne foire sur le pc sentinel 2. alors que j'ai fait en sorte de placer des MakeValid pour corriger les problèmes de self intersection
 
@@ -166,7 +166,7 @@ int cnsw::getIndexSol(double x, double y){
     return aRes;
 }
 
-dicoPedo::dicoPedo(sqlite3 *db):db_(db),mBDpath("jesaispas"){
+dicoPedo::dicoPedo(sqlite3 *db):db_(db){
     //std::cout << "dicoPedo::dicoPedo " << std::endl;
     loadInfo();
 }
@@ -347,6 +347,10 @@ std::vector<std::string> ptPedo::displayInfo(PEDO p){
             champ="Charge caillouteuse";
             desc=mDico->charge(idSigle);
             break;
+        }
+        default:
+        {
+             std::cout << "p = " << p << "is not handled in switch at line 148 in cnsw.cpp" << std::endl;
         }
         }
     }

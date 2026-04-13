@@ -182,7 +182,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     });
 
     // main stack : DOC and MAP and RESULTS divs
-    top_stack  = contPrincipal->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
+    top_stack  = contPrincipal->addWidget(std::make_unique<Wt::WStackedWidget>());
     top_stack->setMargin(0);
     //top_stack->setHeight("100%");
     top_stack->setOverflow(Overflow::Auto);
@@ -231,7 +231,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     //content_panier->setId("content_panier");
     content_panier->setOverflow(Overflow::Scroll);
 
-    auto menu = menu_gauche->addWidget(Wt::cpp14::make_unique<WMenu>());
+    auto menu = menu_gauche->addWidget(std::make_unique<WMenu>());
     menu->setStyleClass("nav-stacked");
     menu->addStyleClass("nav-apt");
 
@@ -269,24 +269,24 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     /*  DIALOGS info_point-légende-analyse-catalogue-cadastre */
 
     // info point
-    dialog_info = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&environment()));
+    dialog_info = layout_app->addChild(std::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&environment()));
 
     auto content_info = dialog_info->contents()->addWidget(std::make_unique<WContainerWidget>());
     content_info->addStyleClass("content_info");
 
     // analyse
-    dialog_anal = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&environment()));
+    dialog_anal = layout_app->addChild(std::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&environment()));
 
     // catalogue
-    dialog_catalog = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&environment()));
+    dialog_catalog = layout_app->addChild(std::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&environment()));
 
     auto content_catalog = dialog_catalog->contents()->addWidget(std::make_unique<WContainerWidget>());
     content_catalog->addStyleClass("content_catalog");
 
     // cadastre
-    dialog_cadastre = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&environment()));
+    dialog_cadastre = layout_app->addChild(std::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&environment()));
     // legende
-    dialog_legend = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Légende",menuitem_legend,&environment()));
+    dialog_legend = layout_app->addChild(std::make_unique<dialog>("Légende",menuitem_legend,&environment()));
     mLegendW = dialog_legend->contents()->addWidget(std::make_unique<WContainerWidget>());
     mLegendW->addStyleClass("content_legend");
 
@@ -303,7 +303,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     mGroupL = std::shared_ptr<groupLayers>(new groupLayers(this));
     if (globTest){printf("done\n");}
 
-    mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(this));
+    mPanier = content_panier->addWidget(std::make_unique<panier>(this));
 
     statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(mGroupL));
 

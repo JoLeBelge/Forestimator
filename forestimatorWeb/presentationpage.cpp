@@ -122,7 +122,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
         label = "";
         if (globTest){cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;}
     }
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, std::make_unique<Wt::WText>(getHtml(c)));
     menu->addItem(std::move(item2));
   }
 
@@ -171,7 +171,7 @@ std::unique_ptr<WMenuItem> presentationPage::downloadPage()
 
       for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr))
       {
-        if (l->getCatLayer() != TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code()) & l->getFilesize() < globMaxDownloadFileS)
+        if (l->getCatLayer() != TypeLayer::Externe && !l->Expert() && mDico->lay4Visu(l->Code()) && l->getFilesize() < globMaxDownloadFileS)
         {
           int row = t->rowCount();
           t->elementAt(row, 0)->addWidget(std::make_unique<WText>(WString::fromUTF8(l->Nom())));

@@ -220,7 +220,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
     {
         aRes->addWidget(std::make_unique<WText>("Pas de statistique pour cette couche"));
     }
-    return std::move(aRes);
+    return aRes;
 }
 
 std::unique_ptr<Wt::WContainerWidget> layerStatChart::getBarStat()
@@ -229,7 +229,7 @@ std::unique_ptr<Wt::WContainerWidget> layerStatChart::getBarStat()
     std::unique_ptr<Wt::WContainerWidget> aRes = std::make_unique<Wt::WContainerWidget>();
     aRes->addWidget(std::make_unique<batonnetApt>(this, mLay->Dico()->Dico_AptFull2AptAcro));
 
-    return std::move(aRes);
+    return aRes;
 }
 
 staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREnvelope *env, int aSz) : mLay(aLay), mSx(aSz), mSy(aSz), ext(env)

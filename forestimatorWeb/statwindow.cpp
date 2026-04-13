@@ -46,7 +46,7 @@ statWindow::statWindow(std::shared_ptr<groupLayers> aGL):mDico(aGL->Dico()), m_a
 void statWindow::genIndivCarteAndAptT(){
     for (std::shared_ptr<layerStatChart> chart : mGL->ptrVLStat()) {
         if (chart->deserveChart()){
-            if (chart->Lay()->getCatLayer()==TypeLayer::FEE | chart->Lay()->getCatLayer()==TypeLayer::CS){
+            if (chart->Lay()->getCatLayer()==TypeLayer::FEE || chart->Lay()->getCatLayer()==TypeLayer::CS){
                 add1Aptitude(chart);
             } else {
                 add1layerStat(chart);
@@ -190,7 +190,7 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
     //Je pourrais très simplement faire un "StatIndivCont" qui est générique à toute les cartes-> prend une autre forme et plus de place dans le pdf mais ça reste complêt et très bien.
     for (std::shared_ptr<layerStatChart> chart : mSW->mGL->ptrVLStat()) {
         if (chart->deserveChart()){
-            if (chart->Lay()->getCatLayer()==TypeLayer::FEE | chart->Lay()->getCatLayer()==TypeLayer::CS){
+            if (chart->Lay()->getCatLayer()==TypeLayer::FEE || chart->Lay()->getCatLayer()==TypeLayer::CS){
                 // problème : le layerStatChart d'une aptitude dois pouvoir utiliser la méthode getChart au lieu de getBarStat
                std::unique_ptr<WContainerWidget> toto= chart->getChart(1);
                toto->htmlText(o);
