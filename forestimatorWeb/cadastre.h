@@ -115,14 +115,14 @@ public:
     }
 
     std::string saveFeatAsGEOJSON(OGRFeature *f);
-    std::string mDirBDCadastre;
+    std::string mDirBDCadastre = "";
 
     private:
       boost::filesystem::path mShpCommunePath;
       boost::filesystem::path mShpDivisionPath;
       boost::filesystem::path mShpParcellePath;
 
-      std::string mTmpDir;
+      std::string mTmpDir = "";
 
       // clé ; code INS commune. valeur ; nom français
       std::map<int,std::string> mVCom;
@@ -150,8 +150,8 @@ public:
 private:
     dbo::Session session;
     std::shared_ptr<cadastre> mCad;
-    std::string mCaPaKey,mCommune;
-    int mFID;
+    std::string mCaPaKey = "",mCommune;
+    int mFID = 0;
 };
 
 

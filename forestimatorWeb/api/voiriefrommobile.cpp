@@ -9,7 +9,7 @@ voirieFromMobile::voirieFromMobile(std::string aFileDB)
     {
         session.createTables();
     }
-    catch (Wt::Dbo::Exception e)
+    catch (Wt::Dbo::Exception& e)
     {
         //std::cout << "table creation failed" << e.code() << std::endl;
     }

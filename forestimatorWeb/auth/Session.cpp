@@ -30,7 +30,7 @@ void Session::configureAuth()
             = std::make_unique<Auth::PasswordVerifier>();
     verifier->addHashFunction(std::make_unique<Auth::BCryptHashFunction>(7));
     myPasswordService.setVerifier(std::move(verifier));
-    myPasswordService.setAttemptThrottlingEnabled(true);
+    myPasswordService.setPasswordThrottle(std::unique_ptr<Auth::AuthThrottle>(new Auth::AuthThrottle()));
     //myPasswordService.setStrengthValidator(std::make_unique<Auth::PasswordStrengthValidator>());
 
     // paramètrer le validateur de password

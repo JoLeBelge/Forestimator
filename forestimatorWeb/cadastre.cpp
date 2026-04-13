@@ -10,7 +10,7 @@ inline bool exists(const std::string &name)
     return (stat(name.c_str(), &buffer) == 0);
 }
 
-cadastre::cadastre(sqlite3 *db) : mShpCommunePath(""), mShpDivisionPath(""), mShpParcellePath(""), mTmpDir(""), mDirBDCadastre("")
+cadastre::cadastre(sqlite3 *db) : mShpCommunePath(""), mShpDivisionPath(""), mShpParcellePath("")
 {
     if (globTest)
     {

@@ -35,7 +35,7 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
             response.out() << "{\n\"forestimatorAnalyses\":\"surface\",\n"
                            <<       "\"surface\":"<< OGR_G_Area(pol)/10000 <<",\n"
                                  <<       "\"RequestedLayers\":[\n";
-            int j(0);
+            size_t j(0);
             for (std::string code: aV){
 
                 response.out() << "    { \n\"layerCode\":\"" << code <<"\",\n";
@@ -63,7 +63,7 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
                             stat=mDico->simplifieAptStat(stat);
                         }
                         response.out()     << "    \"classes\":[\n";
-                        int c(0);
+                        size_t c(0);
                         for (auto kv:stat){
 
                             response.out() << "        {\n"
@@ -72,7 +72,7 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
                                            << "        \"prop\":" <<  roundDouble(kv.second) << "\n"
                                            << "        }";
                             c++;
-                            if (c<stat.size()) {response.out() << ",\n";}
+                            if (c < stat.size()) {response.out() << ",\n";}
                         }
                         response.out() << "\n      ]\n";
                         break;
@@ -84,7 +84,7 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
                 }
                 response.out()   << "    }";
                 j++;
-                if (j<aV.size()) {response.out() << ",\n";}
+                if (j < aV.size()) {response.out() << ",\n";}
                 // fin boucle sur layer
             }
             response.out() << "\n ]\n}\n";
