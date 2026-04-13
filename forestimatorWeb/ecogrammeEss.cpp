@@ -14,7 +14,7 @@ EcogrammeEss::EcogrammeEss(cEss * aEss, ST * aStation):mEss(aEss),mDico(aEss->Di
 
 void EcogrammeEss::paintEvent(Wt::WPaintDevice *paintDevice){
 
-    for (int i(0); i<this->areas().size();i++){
+    for (size_t i(0); i<this->areas().size();i++){
         this->removeArea(this->area(i));
     }
     //std::cout << "create painter" << std::endl;

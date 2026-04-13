@@ -167,7 +167,7 @@ protected:
     boost::filesystem::path mShpPath;
 private:
 
-    std::string mBDpath;
+    std::string mBDpath = "jesaispas";
     sqlite3 *db_;
 
     // clé ; code texture + code drainage . Valeur ; description drainage

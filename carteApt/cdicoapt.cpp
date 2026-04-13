@@ -198,7 +198,7 @@ bool cDicoApt::hasWMSinfo(std::string aCode){
 }
 
 WMSinfo * cDicoApt::getWMSinfo(std::string aCode){
-    WMSinfo * aRes;
+    WMSinfo * aRes = NULL;
     if (Dico_WMS.find(aCode)!=Dico_WMS.end()){
         aRes=&Dico_WMS.at(aCode);
     };
@@ -477,7 +477,10 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                     }
                     // end if polygon feature
                 }
-                lay->SetFeature(poFeature);
+                OGRErr err = lay->SetFeature(poFeature);
+                if (err != OGRERR_NONE) {
+                    std::cout << "Error setting feature: " << err << std::endl;
+                }
                 // next feature
             }
             break;

@@ -421,7 +421,11 @@ int rasterFiles::getValue(double x, double y){
             float *scanPix;
             scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
             // lecture du pixel
-            mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
+            CPLErr err = mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
+            if (err != CE_None) {
+                std::cout << "Error reading pixel: " << err << std::endl;
+            }
+
             aRes=scanPix[0];
             CPLFree(scanPix);
             if (mBand->GetNoDataValue()==aRes){aRes=0;}
@@ -461,7 +465,7 @@ void layerBase::createRasterColorInterpPalette(GDALRasterBand * aBand){
     aBand->SetColorTable(&colors);
 
     // ne fonctionne pas du tout pour l'instant
-    if (false & mTypeVar==TypeVar::Classe){
+    if (false && mTypeVar == TypeVar::Classe){
         GDALRasterAttributeTableH poRAT =GDALCreateRasterAttributeTable();
         //GDALRasterAttributeTableH poRAT =reinterpret_cast<GDALRasterAttributeTableH>(aBand->GetDefaultRAT( ));
         GDALRATInitializeFromColorTable(poRAT, reinterpret_cast<GDALColorTableH>(&colors));
@@ -517,7 +521,11 @@ double rasterFiles::getValueDouble(double x, double y){
             float *scanPix;
             scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
             // lecture du pixel
-            mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
+            CPLErr err = mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
+            if (err != CE_None) {
+                std::cout << "Error reading pixel: " << err << std::endl;
+            }
+
             aRes=scanPix[0];
             CPLFree(scanPix);
             if (mBand->GetNoDataValue()==aRes){aRes=0;}
@@ -575,9 +583,15 @@ std::map<std::string,int> layerBase::computeStat1(OGRGeometry *poGeom){
                 for ( int row = 0; row < ySize; row++ )
                 {
                     // lecture
-                    mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                    CPLErr err = mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                    if (err != CE_None) {
+                        std::cout << "Error reading raster line: " << err << std::endl;
+                    }
                     // lecture du masque
-                    mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                    err = mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                    if (err != CE_None) {
+                        std::cout << "Error reading mask line: " << err << std::endl;
+                    }
                     // boucle sur scanline et garder les pixels qui sont dans le polygone
                     for (int col = 0; col <  xSize; col++)
                     {
@@ -662,9 +676,15 @@ std::map<int,double> layerBase::computeStat2(OGRGeometry * poGeom){
                 for ( int row = 0; row < ySize; row++ )
                 {
                     // lecture
-                    mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                    CPLErr err = mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                    if (err != CE_None) {
+                        std::cout << "Error reading raster line: " << err << std::endl;
+                    }
                     // lecture du masque
-                    mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                    err = mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                    if (err != CE_None) {
+                        std::cout << "Error reading mask line: " << err << std::endl;
+                    }
                     // boucle sur scanline et garder les pixels qui sont dans le polygone
                     for (int col = 0; col <  xSize; col++)
                     {
@@ -787,7 +807,6 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             }*/
             // driver et dataset shp -- creation depuis la géométrie
             GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("Memory");
-            char name[L_tmpnam];
             boost::filesystem::path tmpPath = boost::filesystem::path("/vsimem/") / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%");
 
             std::string name1 = tmpPath.string();
@@ -800,7 +819,10 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
 
             OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
             feat->SetGeometry(poGeom);
-            lay->CreateFeature(feat);
+            OGRErr err = lay->CreateFeature(feat);
+            if (err != OGRERR_NONE) {
+                std::cout << "Error creating feature: " << err << std::endl;
+            }
 
             double transform[6];
             mGDALDat->GetGeoTransform(transform);
@@ -890,9 +912,15 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
             for ( int row = 0; row < ySize; row++ )
             {
                 // lecture
-                mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                CPLErr err = mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                if (err != CE_None) {
+                    std::cout << "Error reading raster line: " << err << std::endl;
+                }
                 // lecture du masque
-                mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                err = mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                if (err != CE_None) {
+                    std::cout << "Error reading mask line: " << err << std::endl;
+                }
                 // boucle sur scanline et garder les pixels qui sont dans le polygone
                 for (int col = 0; col <  xSize; col++)
                 {
@@ -983,9 +1011,15 @@ basicStat rasterFiles::computeBasicStatOnPolyg(OGRGeometry * poGeom){
         for ( int row = 0; row < ySize; row++ )
         {
             // lecture
-            mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+            CPLErr err =mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+            if (err != CE_None) {
+                std::cout << "Error reading raster line: " << err << std::endl;
+            }
             // lecture du masque
-            mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+            err = mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+            if (err != CE_None) {
+                std::cout << "Error reading mask line: " << err << std::endl;
+            }
             // boucle sur scanline et garder les pixels qui sont dans le polygone
             for (int col = 0; col <  xSize; col++)
             {
@@ -1186,7 +1220,7 @@ std::string getAbbreviation(std::string str)
     std::string word("");
     for (auto x : str)
     {
-        if (x == ' ' | x=='/')
+        if (x == ' ' || x=='/')
         {
             word=removeAccents(word);// si je n'enlève pas les accents maintenant, les accents sont codé sur deux charachtère et en gardant les 2 premiers du mot je tronque l'accent en deux ce qui donne ququch d'illisible type ?
             if (word.size()>1){words.push_back(word);}
@@ -1243,7 +1277,10 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
             OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
             OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
             feat->SetGeometry(poGeom);
-            lay->CreateFeature(feat);
+            OGRErr err = lay->CreateFeature(feat);
+            if (err != OGRERR_NONE) {
+                std::cout << "Error creating feature: " << err << std::endl;
+            }
 
             double transform[6];
             aGDALDat->GetGeoTransform(transform);
@@ -1355,9 +1392,15 @@ bool layerBase::cropIm(std::string aOut, OGREnvelope ext)
                 for (int row = 0; row < ySize; row++)
                 {
                     // lecture
-                    pInputRaster->GetRasterBand(1)->RasterIO(GF_Read, xOffset, row + yOffset, xSize, 1, scanline, xSize, 1, GDT_Float32, 0, 0);
+                    CPLErr err = pInputRaster->GetRasterBand(1)->RasterIO(GF_Read, xOffset, row + yOffset, xSize, 1, scanline, xSize, 1, GDT_Float32, 0, 0);
+                    if (err != CE_None) {
+                        std::cout << "Error reading raster line: " << err << std::endl;
+                    }
                     // écriture
-                    pCroppedRaster->GetRasterBand(1)->RasterIO(GF_Write, 0, row, xSize, 1, scanline, xSize, 1, GDT_Float32, 0, 0);
+                    err = pCroppedRaster->GetRasterBand(1)->RasterIO(GF_Write, 0, row, xSize, 1, scanline, xSize, 1, GDT_Float32, 0, 0);
+                    if (err != CE_None) {
+                        std::cout << "Error writing raster line: " << err << std::endl;
+                    }
                 }
                 CPLFree(scanline);
                 // define color palette for the cropped raster
