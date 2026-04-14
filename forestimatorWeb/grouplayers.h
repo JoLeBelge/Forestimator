@@ -85,7 +85,7 @@ protected:
     }
 };
 
-class groupLayers : public WContainerWidget, public groupStat , public std::enable_shared_from_this<groupLayers>
+class groupLayers : public WContainerWidget, public groupStat
 {
 public:
     groupLayers(cWebAptitude * cWebApt);
@@ -174,10 +174,6 @@ public:
 
     JSlot slotMapExport;
     simplepoint *mAnaPoint;
-
-    // bof finalement c'est mieux le conteneur parent
-    Wt::WContainerWidget *mParent;
-
     TypeClassifST mTypeClassifST; // 2 modes de classification des stations forestières ; FEE et CS. important de savoir le mode pour savoir quel tableau d'aptitude afficher quand on double-click sur une station
 
 private:

@@ -4,10 +4,10 @@
 
 extern bool globTest;
 
-groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mMap(cWebApt->mMap), mTypeClassifST(FEE), mParent(cWebApt->mGroupLayerW), mLegendDiv(cWebApt->mLegendW), mAnaPoint(NULL), mSelectLayers(NULL), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
+groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mMap(cWebApt->mMap), mTypeClassifST(FEE), mLegendDiv(cWebApt->mLegendW), mAnaPoint(NULL), mSelectLayers(NULL), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
 {
-    mParent->setOverflow(Wt::Overflow::Visible);
-    mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
+    setOverflow(Wt::Overflow::Visible);
+    setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
 
     slotMapExport.setJavaScript(
         "function () {"
@@ -127,10 +127,9 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
         }
     }
 
-    mParent->addWidget(std::make_unique<WText>(tr("coucheStep1")));
-    mParent->addWidget(std::move(tree));
+    addWidget(std::make_unique<WText>(tr("coucheStep1")));
+    addWidget(std::move(tree));
 
-    // mSelect4Stat= new selectLayers4Stat(this);
     mSelectLayers = new selectLayers(this);
     mStation = new ST(mDico);
 
@@ -188,7 +187,7 @@ void groupLayers::clickOnName(std::string aCode)
     }
 
     // cacher la fenetre popup
-    mParent->doJavaScript("overlay?.setVisible(0);");
+    doJavaScript("overlay?.setVisible(0);");
 
     // changer le mode CS vs FEE de grouplayer, utilise pour le tableau d'aptitude
     // attention de ne pas prendre la couche "CS_FEE" dans le tas (pour Chêne Sessile).
@@ -272,7 +271,7 @@ void groupLayers::extractInfo(double x, double y)
                         // attention, il faut escaper les caractères à problèmes du genre apostrophe
                         boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
                         boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
-                        mParent->doJavaScript("content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+                        doJavaScript("content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
                     }
                     else if ((l->IsActive()) && l->Code() == "CS_A")
                     {
@@ -286,7 +285,7 @@ void groupLayers::extractInfo(double x, double y)
                         {
                             std::string js = "content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A" + std::to_string(aVal) + ".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);";
                             // std::cout << "js : " << js << std::endl;
-                            mParent->doJavaScript(js);
+                            doJavaScript(js);
                         }
                     }
                 }
@@ -295,7 +294,7 @@ void groupLayers::extractInfo(double x, double y)
             // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay". Attention, CNSWrast n'est plus "Externe" maintenant que j'y ai associé la couche raster.
             if ((l->IsActive() && l->Code() == "CNSWrast"))
             {
-                mParent->doJavaScript("content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+                doJavaScript("content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
             }
 
             // si la couche active est le cadastre
@@ -304,9 +303,9 @@ void groupLayers::extractInfo(double x, double y)
 
                 ptCadastre *ptCad = new ptCadastre(mDico->mCadastre, x, y);
                 ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre, m_app->mPA, std::placeholders::_1, std::placeholders::_2));
-                mParent->doJavaScript("content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+                doJavaScript("content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
                 // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
-                WDialog *dialogPtr = mParent->addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
+                WDialog *dialogPtr = addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
                 dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));
                 WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Oui");
                 ok->setDefault(false);
@@ -762,12 +761,12 @@ void groupLayers::loadExtents(std::string id)
             bp->setInline(1);
             bp->clicked().connect([=]
                                   {
-            mParent->doJavaScript("map.getView().setCenter(["+cx+","+cy+" ]);");
-            mParent->doJavaScript("map.getView().setZoom("+z+");"); });
+            doJavaScript("map.getView().setCenter(["+cx+","+cy+" ]);");
+            doJavaScript("map.getView().setZoom("+z+");"); });
             WAnchor *del = mExtentDiv->addNew<Wt::WAnchor>(WLink(""), "(x)");
             del->clicked().connect([=]
                                    {
-            WDialog * dialogPtr =  mParent->addChild(std::make_unique<Wt::WDialog>(tr("extent_del_comfirm")));
+            WDialog * dialogPtr =  addChild(std::make_unique<Wt::WDialog>(tr("extent_del_comfirm")));
             WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Supprimer");
             ok->setDefault(false);
             ok->clicked().connect([=]{

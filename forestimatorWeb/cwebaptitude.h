@@ -105,10 +105,11 @@ public:
     Wt::WStackedWidget * top_stack;// celui qui navige entre la page de garde (home), la page de présentation et les volets analyse/carto
     Wt::Auth::AuthWidget* authWidget;
     Wt::WPushButton *b_login;
-    std::shared_ptr<groupLayers> mGroupL;
+    groupLayers * mGroupL;
 
-    WContainerWidget *mSimplepointW, *mGroupLayerW, *mLegendW;
-    WMenuItem * menuitem_analyse,* menuitem_app,*menuitem_legend,*menuitem_documentation,*menuitem_simplepoint,*menuitem_login,*menuitem_panier,*menuitem_catalog,*menuitem_cadastre;
+    WContainerWidget *mSimplepointW,  *mLegendW;//*mGroupLayerW,
+    // WMenuItem *menuitem_panier;
+    WMenuItem * menuitem_analyse,* menuitem_app,*menuitem_legend,*menuitem_documentation,*menuitem_simplepoint,*menuitem_login,*menuitem_catalog,*menuitem_cadastre;
     dialog *dialog_anal,*dialog_info,*dialog_catalog,*dialog_cadastre,*dialog_legend;
     panier * mPanier;
 

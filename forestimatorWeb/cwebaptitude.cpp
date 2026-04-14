@@ -104,10 +104,9 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     setTitle("Forestimator");
     loadStyles();
+    root()->addStyleClass("layout_main");
 
     auto layout = root()->setLayout(std::make_unique<Wt::WVBoxLayout>());
-    root()->setMargin(0);
-    root()->setPadding(0);
 
     dialog_auth = layout->addChild(std::make_unique<Wt::WDialog>("Connexion"));
     dialog_auth->setResizable(true);
@@ -179,63 +178,30 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     // load DOC page
     top_stack->addWidget(std::make_unique<presentationPage>(mDico,this));
     // load MAP page
-    std::unique_ptr<WContainerWidget> content_app = std::make_unique<WContainerWidget>();
-    content_app->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
-    content_app->addStyleClass("carto_div");
-    WHBoxLayout * layout_app = content_app->setLayout(std::make_unique<WHBoxLayout>());
-    layout_app->setContentsMargins(0,0,0,0);
-    content_app->setHeight("100%");
-    content_app->setOverflow(Overflow::Visible);
-    top_stack->addWidget(std::move(content_app));
 
-    // load RESULT page TODO
+    Wt::WTemplate * tpl_content_app = top_stack->addWidget(std::make_unique<Wt::WTemplate>(WString::tr("template.carto_div")));
 
-    /*** page principale application map ***/
+    mMap = tpl_content_app->bindWidget("WOpenLayers", std::make_unique<WOpenLayers>(mDico));
+    WMenu * menu = tpl_content_app->bindWidget("menu", std::make_unique<WMenu>());
 
-    /*	MAP	*/
-    if (globTest){std::cout << "create map" << std::endl;}
-    auto map = std::make_unique<WOpenLayers>(mDico);
-    mMap = map.get();
-
-
-    layout_app->addWidget(std::move(map), 0);
-
-    /*  Panel droit avec boutons et couches selectionnees */
-    auto content_couches = layout_app->addWidget(std::make_unique<WContainerWidget>());
-    content_couches->setId("content_couches");
-    content_couches->addStyleClass("content_couches");
-    auto layoutD = content_couches->setLayout(std::make_unique<WHBoxLayout>());
-    layoutD->setContentsMargins(0,0,0,0);
-
-    auto menu_gauche = layoutD->addWidget(std::make_unique<WContainerWidget>());
-
-    //mPanier = content_panier->addWidget(std::make_unique<panier>(this));
-
-    // le panier se connecte au grouplayer, donc il faut le créer après GL
-    mPanier = layoutD->addWidget(std::make_unique<panier>(this));
-
-    //menu_gauche->setWidth(60);
-    menu_gauche->addStyleClass("menu_gauche");
-
-
-    auto menu = menu_gauche->addWidget(std::make_unique<WMenu>());
     menu->setStyleClass("nav-stacked");
     menu->addStyleClass("nav-apt");
-
+    /*
     menuitem_panier = menu->addItem("resources/right_angle_circle_icon_149877.png","");
     menuitem_panier->clicked().connect([=] {
         std::cout << content_couches->width().value() << std::endl;
         if(content_couches->width().value()>60 || content_couches->width().value()==-1){
-            content_couches->setWidth(60);
+            //content_couches->setWidth(60);
             menuitem_panier->setIcon("resources/right_angle_circle_icon_149877d.png");
             mPanier->hide();
         }else{
-            content_couches->setWidth(400);
+            //content_couches->setWidth(400);
             menuitem_panier->setIcon("resources/right_angle_circle_icon_149877.png");
             mPanier->show();
         }
     });
     menuitem_panier->setToolTip(WString::tr("menu.button.tooltip.panier_collapse"));
+    */
     // bouton catalogue
     menuitem_catalog = menu->addItem("resources/warehouse_check_icon_149849.png","");
     menuitem_catalog->setToolTip(WString::tr("menu.button.tooltip.catalog"));
@@ -255,24 +221,24 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     /*  DIALOGS info_point-légende-analyse-catalogue-cadastre */
 
     // info point
-    dialog_info = layout_app->addChild(std::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&environment()));
+    dialog_info = tpl_content_app->addChild(std::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&environment()));
 
     auto content_info = dialog_info->contents()->addWidget(std::make_unique<WContainerWidget>());
     content_info->addStyleClass("content_info");
 
     // analyse
-    dialog_anal = layout_app->addChild(std::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&environment()));
-
+    dialog_anal = tpl_content_app->addChild(std::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&environment()));
     // catalogue
-    dialog_catalog = layout_app->addChild(std::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&environment()));
+    dialog_catalog = tpl_content_app->addChild(std::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&environment()));
 
-    auto content_catalog = dialog_catalog->contents()->addWidget(std::make_unique<WContainerWidget>());
-    content_catalog->addStyleClass("content_catalog");
+    dialog_catalog->contents()->setStyleClass("content_GL");
+    //auto content_catalog = dialog_catalog->contents()->addWidget(std::make_unique<WContainerWidget>());
+    //content_catalog->addStyleClass("content_catalog");
 
     // cadastre
-    dialog_cadastre = layout_app->addChild(std::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&environment()));
+    dialog_cadastre = tpl_content_app->addChild(std::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&environment()));
     // legende
-    dialog_legend = layout_app->addChild(std::make_unique<dialog>("Légende",menuitem_legend,&environment()));
+    dialog_legend = tpl_content_app->addChild(std::make_unique<dialog>("Légende",menuitem_legend,&environment()));
     mLegendW = dialog_legend->contents()->addWidget(std::make_unique<WContainerWidget>());
     mLegendW->addStyleClass("content_legend");
 
@@ -281,15 +247,14 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     content_cadastre->addStyleClass("content_cadastre");
 
     mSimplepointW = content_info;
-    mGroupLayerW  = content_catalog;
-    mGroupLayerW->setStyleClass("content_GL");
+
 
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     if (globTest){ printf("create GL\n");}
-    mGroupL = std::make_shared<groupLayers>(this);
+    mGroupL = dialog_catalog->contents()->addWidget(std::make_unique<groupLayers>(this));
     if (globTest){printf("done\n");}
 
-
+    mPanier = tpl_content_app->bindWidget("panier", std::make_unique<panier>(this));
 
     statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(mGroupL));
 
@@ -309,7 +274,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     internalPathChanged().connect(this, &cWebAptitude::handlePathChange);
 
     handlePathChange();
-    root()->addStyleClass("layout_main");
+
     loaded_=true;
     top_stack->setCurrentIndex(1);
 

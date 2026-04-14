@@ -45,7 +45,7 @@ extern Wt::WServer *globServer;
 class parcellaire : public WContainerWidget
 {
 public:
-    parcellaire(std::shared_ptr<groupLayers> aGL, cWebAptitude *app, statWindow *statW);
+    parcellaire(groupLayers* aGL, cWebAptitude *app, statWindow *statW);
     ~parcellaire();
     void cleanShpFile();
     bool to31370AndGeoJson(); // boite de dialogue pour choisir src si jamais la couche n'en a pas de défini

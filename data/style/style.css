@@ -84,9 +84,9 @@
 
 
 
-/* Differents Div imbriqués */
 .layout_main{
-
+	margin: 0;
+	padding: 0;
 }
 
 .cWebAptitude{
@@ -277,7 +277,9 @@ display:block;
 
 .stackfit {
 	height: calc(100% - 60px);
+	width: 100%;
 	margin: 0;
+	display:flex;
 }
 
 .unfolder { display: none; }
