@@ -1,4 +1,6 @@
 #include "panier.h"
+#include "cwebaptitude.h"
+#include "grouplayers.h"
 
 extern bool globTest;
 panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
@@ -173,4 +175,14 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
          mGroupL->updateActiveLay(mVLs.at(0)->Code());
     });
 }
+
+/*virtual void panier::refresh(){
+   if (globTest){std::cout << "refresh panier" << std::endl;}
+   for (std::shared_ptr<Layer> l : mVLs){
+         std::cout << "code " << l->Code()  << std::endl;
+    }
+
+    std::cout << "code " << mVLs.size() << std::endl;
+    WContainerWidget::refresh();
+}*/
 
