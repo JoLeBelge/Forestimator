@@ -123,13 +123,7 @@ void simplepoint::detailCalculAptFEE(ST *aST)
 
 void simplepoint::afficheAptAllEss()
 {
-    if (globTest)
-    {
-        std::cout << "simplepoint::afficheAptAllEss" << std::endl;
-    }
-    if (mGL->mTypeClassifST == TypeClassifST::FEE)
-    {
-        std::map<std::string, int> Apts = mGL->apts();
+        std::map<std::string, int> Apts = mGL->apts(TypeClassifST::FEE);
         if (Apts.size() > 1)
         {
             if (globTest)
@@ -170,8 +164,7 @@ void simplepoint::afficheAptAllEss()
             mAptAllEss->elementAt(row, 0)->setColumnSpan(nbCol);
             mAptAllEss->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
             mAptAllEss->elementAt(row, 0)->setPadding(10);
-            // WText *titre = mAptAllEss->elementAt(row,0)->addWidget(std::make_unique<WText>("<h4>Aptitude "+ mGL->TypeClasStr()+"</h4>"));
-            mAptAllEss->elementAt(row, 0)->addWidget(std::make_unique<WText>("<h4>Aptitude " + mGL->TypeClasStr() + "</h4>"));
+            mAptAllEss->elementAt(row, 0)->addWidget(std::make_unique<WText>("<h4>Aptitude FEE </h4>"));
             row++;
             std::shared_ptr<color> col = std::make_shared<color>(0, 0, 0);
             if (O.size() > 0)
@@ -249,9 +242,6 @@ void simplepoint::afficheAptAllEss()
                     }
                     mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
 
-                    // WImage * i1 = new WImage("data/img/E.png",mAptAllEss->elementAt(row, column));
-                    // Wt::WImage *i1 = mAptAllEss->elementAt(row, column)->addNew<Wt::WImage>(Wt::WLink("data/img/E.png"));
-                    // i1->resize("100%","100%");
                     row++;
                 }
                 column++;
@@ -262,49 +252,7 @@ void simplepoint::afficheAptAllEss()
         {
             std::cout << "simplePoint affiche tableau apt : pas d'essence pour le tableau" << std::endl;
         }
-    }
 }
-
-/*void simplepoint::export2pdfTitreDialog(){
-
-    // check si l'utilisateur à bien double-cliqué sur une station
-    if (mGL->mStation->isOK()){
-
-        // TITRE
-        Wt::WDialog * dialog = this->addChild(std::make_unique<Wt::WDialog>("Titre du rapport pdf"));
-        Wt::WLabel *label = dialog->contents()->addNew<Wt::WLabel>("Titre: ");
-        Wt::WLineEdit *edit =dialog->contents()->addNew<Wt::WLineEdit>();
-        edit->setText(tr("report.analyse.point.titre"));
-        label->setBuddy(edit);
-        dialog->contents()->addStyleClass("form-group");
-        Wt::WPush *ok =
-                dialog->footer()->addNew<Wt::WPushButton>("OK");
-        ok->setDefault(true);
-        ok->clicked().connect([=] {
-            dialog->accept();
-        });
-
-        dialog->finished().connect([=] {
-            export2pdf(edit->text().toUTF8());
-            removeChild(dialog);
-        });
-        dialog->show();
-    }else{
-    // pas de station donc pas d'export
-        WMessageBox * messageBox =addChild(std::make_unique<Wt::WMessageBox>(tr("ana.point.titre"),
-                                                                                   tr("ana.point.error.exportpdf.noStation"),
-                                                                                   Wt::Icon::Information,
-                                                                                   Wt::StandardButton::Ok));
-
-        messageBox->buttonClicked().connect([=] {
-            removeChild(messageBox);
-        });
-        messageBox->show();
-
-    }
-
-}
-*/
 
 void pointPdfResource::handleRequest(const Http::Request &request, Http::Response &response)
 {
@@ -326,8 +274,6 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     Wt::WString tpl = Wt::WText::tr("report.analyse.point");
     std::string tp = tpl.toUTF8();
     std::ostringstream o;
-    // renderer.addFontCollection("/usr/share/fonts/truetype",true); plus nécessaire si compilé avec pango
-
     boost::replace_all(tp, "TITRE_REPPORT", titre);
 
     // RENDU TABLE d'APTITUDE
@@ -390,7 +336,6 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
         int aHeigth(aEcoWidth * 15.0 / 7.0);
 
         Wt::WRasterImage pngImage("png", WLength(aEcoWidth), WLength(aHeigth));
-        // Create a safe unique temporary filename using boost::filesystem::unique_path
         boost::filesystem::path tmpPath = boost::filesystem::path(mSP->mDico->File("TMPDIR")) / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.png");
         std::string aEcoPng = tmpPath.string();
         std::ofstream f(aEcoPng, std::ios::out | std::ios::binary);

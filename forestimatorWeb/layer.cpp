@@ -106,7 +106,7 @@ void Layer::displayLayer() const{
             //opacity: Object.keys(activeLayers).length==0?1:0.5 // première image ; opaque. Les autres ; tranparence
            " opacity: 1"+
         "});";
-    //std::cout << "display layer " << std::endl;
+
 
     if (mTypeWMS==TypeWMS::ArcGisRest){
     JScommand=std::string("activeLayer  = new ol.layer.Tile({")+
@@ -138,7 +138,7 @@ void Layer::displayLayer() const{
     mGroupL->doJavaScript(JScommand);
 
     if (globTest) {
-        //std::cout << " javascript pour ajouter une couche "<< std::endl;
+        std::cout << " javascript pour ajouter une couche "<< std::endl;
         //std::cout << JScommand << std::endl;
     }
 }

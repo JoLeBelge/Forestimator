@@ -4,7 +4,7 @@
 
 extern bool globTest;
 
-groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mMap(cWebApt->mMap), mTypeClassifST(FEE), mLegendDiv(cWebApt->mLegendW), mAnaPoint(NULL), mSelectLayers(NULL), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
+groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mMap(cWebApt->mMap), mLegendDiv(cWebApt->mLegendW), mAnaPoint(NULL), mSelectLayers(NULL), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
 {
     setOverflow(Wt::Overflow::Visible);
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
@@ -26,15 +26,13 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
         sigMapCenter.createCall({"centre[0]", "centre[1]", "z"}) + "}");
     this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-    mTitle = mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
+    mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
 
     /* Liste cartes 1	*/
     std::unique_ptr<Wt::WTree> tree = std::make_unique<Wt::WTree>();
     tree->setSelectionMode(Wt::SelectionMode::Extended);
     tree->addStyleClass("tree_left");
-    // auto folderIcon = std::make_unique<Wt::WIconPair>("icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
-
-    auto main_node = std::make_unique<Wt::WTreeNode>(tr("groupeCoucheAll")); // std::move(folderIcon) // pour mettre des icones ouvert/fermé !
+    auto main_node = std::make_unique<Wt::WTreeNode>(tr("groupeCoucheAll"));
     tree->setTreeRoot(std::move(main_node));
     tree->treeRoot()->label()->setTextFormat(Wt::TextFormat::Plain);
     tree->treeRoot()->setLoadPolicy(Wt::ContentLoading::NextLevel);
@@ -85,10 +83,6 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                     aL->changeExpertMode().connect(n, &Wt::WTreeNode::setNodeVisible);
                     mVLs.push_back(aL);
                 }
-                else
-                {
-                    std::cout << "problème pour couche " << pair.first << " car n'as pas de groupe de couche atitré" << std::endl;
-                }
             }
             else
             {
@@ -118,7 +112,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                 wtext->doubleClicked().connect([this, aCode]
                                                { clickOnName(aCode); });
                 aL->changeExpertMode().connect(n, &Wt::WTreeNode::setNodeVisible);
-                mVLs.push_back(aL);
+                //mVLs.push_back(aL);
             }
             else
             {
@@ -134,7 +128,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
     mStation = new ST(mDico);
 
     /*   AUTRES DIV   */
-    mAnaPoint = new simplepoint(this, m_app->mSimplepointW);
+    mAnaPoint = new simplepoint(this, cWebApt->mSimplepointW);
 
     // updateGL pour cacher les couches expert
     // updateGL(); // -> bougé dans classe parent cwebapt car segfault not init refs !
@@ -151,10 +145,9 @@ groupLayers::~groupLayers()
     delete mAnaPoint;
     delete mStation;
     mMap = NULL;
-    m_app = NULL;
     mDico = NULL;
     mAnaPoint = NULL;
-    mVLs.clear();
+    //mVLs.clear();
 }
 
 void groupLayers::updateActiveLay(std::string aCode)
@@ -167,72 +160,9 @@ void groupLayers::updateActiveLay(std::string aCode)
     }
 }
 
-void groupLayers::clickOnName(std::string aCode)
-{
 
-    // std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
-    //  udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
-    updateActiveLay(aCode);
-
-    TypeLayer type = TypeLayer::Init;
-    std::shared_ptr<Layer> layer;
-    for (std::shared_ptr<Layer> l : mVLs)
-    {
-        if (aCode == l->Code())
-        {
-            layer = l;
-            type = l->getCatLayer();
-            break;
-        }
-    }
-
-    // cacher la fenetre popup
-    doJavaScript("overlay?.setVisible(0);");
-
-    // changer le mode CS vs FEE de grouplayer, utilise pour le tableau d'aptitude
-    // attention de ne pas prendre la couche "CS_FEE" dans le tas (pour Chêne Sessile).
-    if ((type == TypeLayer::CS) || (type == TypeLayer::KK) || (type == TypeLayer::Station && aCode.substr(0, 2) == "CS"))
-    {
-        if (globTest)
-        {
-            std::cout << " passe en mode classif CS , couche " << aCode << std::endl;
-        }
-        mTypeClassifST = TypeClassifST::CS;
-    }
-    else
-    {
-        mTypeClassifST = TypeClassifST::FEE;
-        if (globTest)
-        {
-            std::cout << " passe en mode classif FEE , couche " << aCode << std::endl;
-        }
-    }
-    // ajouter la couche à la carte
-    for (std::shared_ptr<Layer> l : mVLs)
-    {
-        if (l->IsActive())
-        {
-            l->displayLayer();
-            if (l->Code() != "IGN")
-            {
-                m_app->addLog("display layer " + l->Code(), typeLog::selectLayer);
-            }
-            break;
-        }
-    }
-    // ajout de la carte après le "diplaylayer" sinon ordre du code js pas bon? ben oui car couche pas encore dans activeLayers[]
-    m_app->mPanier->addMap(layer);
-    updateLegendeDiv(m_app->mPanier->mVLs);
-}
-
-/**
- * @brief groupLayers::extractInfo Affiche les stat d'un point clicqué sur la map.
- * @param x
- * @param y
- */
 void groupLayers::extractInfo(double x, double y)
 {
-
     if (!isnan(x) && !isnan(y) && !(x == 0 && y == 0))
     {
         if (globTest)
@@ -326,7 +256,7 @@ void groupLayers::extractInfo(double x, double y)
         for (std::shared_ptr<Layer> l : mVLs)
         {
             // on a bien une essence active et on est en mode FEE
-            if (l->IsActive() && l->getCatLayer() == TypeLayer::FEE && mTypeClassifST == FEE)
+            if (l->IsActive() && l->getCatLayer() == TypeLayer::FEE)
             {
                 // on note la chose dans l'objet ecogramme, car la classe simplepoint va devoir savoir si il y a un ecogramme à export en jpg ou non
                 mStation->setHasFEEApt(1);
@@ -367,14 +297,10 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale)
     m_app->addLog("compute stat, " + std::to_string(getNumSelect4Download()) + " traitements", typeLog::anas); // add some web stats
 }
 
-/**
- * @brief groupLayers::apts
- * @return
- */
-std::map<std::string, int> groupLayers::apts()
+std::map<std::string, int> groupLayers::apts(TypeClassifST aType)
 {
     std::map<std::string, int> aRes;
-    switch (mTypeClassifST)
+    switch(aType)
     {
     case FEE:
     {
@@ -431,9 +357,6 @@ std::map<std::string, int> groupLayers::apts()
     return aRes;
 }
 
-/**
- * @brief groupLayers::updateGL
- */
 void groupLayers::updateGL()
 {
     bool expertMode = 0;
@@ -469,26 +392,8 @@ void groupLayers::updateGL()
     expertMode_.emit(expertMode);
 }
 
-/**
- * @brief groupLayers::updateLegendeDiv Refresh les legendes pour les couches du panier
- * @param layers
- */
-void groupLayers::updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers)
-{
-    mLegendDiv->clear();
 
-    if (layers.size() == 0)
-        mTitle = mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
-    else
-    {
-        mTitle = mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendTitre")));
 
-        for (auto layer : layers)
-        {
-            this->updateLegende(layer);
-        }
-    }
-}
 
 /**
  * @brief groupLayers::updateLegende Refresh la legende pour une couche
@@ -969,4 +874,57 @@ GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
         GDALClose(DS);
     }
     return aRes;
+}
+
+void groupLayers::clickOnName(std::string aCode)
+{
+    updateActiveLay(aCode);
+    std::cout << "click on Name " << aCode << std::endl;
+    std::shared_ptr<Layer> layer;
+    for (std::shared_ptr<Layer> l : mVLs)
+    {
+        if (aCode == l->Code())
+        {
+             std::cout << "got the layer " << aCode << std::endl;
+            layer = l;
+            break;
+        }
+    }
+
+    // cacher la fenetre popup
+    m_app->doJavaScript("overlay?.setVisible(0);");
+
+    // ajouter la couche à la carte
+    for (std::shared_ptr<Layer> l : mVLs)
+    {
+        if (l->IsActive())
+        {
+            l->displayLayer();
+            if (l->Code() != "IGN")
+            {
+                m_app->addLog("display layer " + l->Code(), typeLog::selectLayer);
+            }
+            break;
+        }
+    }
+    // ajout de la carte au panier après le "diplaylayer" sinon ordre du code js pas bon? ben oui car couche pas encore dans activeLayers[]
+    // devrait être fait en mm temps.
+    m_app->mPanier->addMap(layer);
+    updateLegendeDiv(m_app->mPanier->mVLs);
+}
+void groupLayers::updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers)
+{
+    mLegendDiv->clear();
+
+    if (layers.size() == 0)
+        mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
+    else
+    {
+        mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendTitre")));
+
+        for (auto layer : layers)
+        {
+            this->updateLegende(layer);
+        }
+    }
 }

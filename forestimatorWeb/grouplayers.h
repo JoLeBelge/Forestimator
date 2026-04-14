@@ -94,77 +94,43 @@ public:
     void clickOnName(std::string aCode);
 
     // update du rendu du nom de la couche qui est sélectionnée
-    // gestion de la carte active ; celle qui est en haut du panier
     void updateActiveLay(std::string aCode);
     // update pour passer du mode expert au mode non expert et vice et versa
     void updateGL();
     // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
     void extractInfo(double x, double y);
     cDicoApt *Dico() { return mDico; }
-    TypeClassifST TypeClas() { return mTypeClassifST; }
-    std::string TypeClasStr()
-    { // pour afficher dans le titre du tableau d'aptitude
-        std::string aRes("");
-        switch (mTypeClassifST)
-        {
-        case FEE:
-            aRes = "FEE";
-            break;
-        case CS:
-            aRes = "CS";
-            break;
-        }
-        return aRes;
-    }
-
     void exportLayMapView();
-
     void computeStatGlob(OGRGeometry *poGeomGlobale);
 
     ST *mStation;
-    std::vector<std::shared_ptr<Layer>> Layers() { return mVLs; }
-    std::shared_ptr<Layer> getActiveLay();
 
-    std::shared_ptr<Layer> getLay(std::string aCode);
-    // retourne les aptitudes des essences pour une position donnée (click sur la carte)
-    // key ; code essence. Value ; code aptitude
-    std::map<std::string, int> apts();
 
     //  pour faire un processEvent, seul moyen de refresh de la progressbar.
-    cWebAptitude *m_app;
+    //cWebAptitude *m_app;
 
     std::vector<std::shared_ptr<Layer> > getSelect4Download();
-    // std::vector<rasterFiles> getSelect4Stat();
-
-
     WContainerWidget *afficheSelect4Download();
-    // int getNumSelect4Stat();
     int getNumSelect4Download();
-    // std::vector<std::shared_ptr<Layer>> getSelectedLayer4Stat();
     std::vector<std::shared_ptr<Layer>> getSelectedLayer4Download();
 
-    void closeConnection();
-    int openConnection();
-    bool getExpertModeForUser(std::string id);
-    void loadExtents(std::string id);
 
-    // pour changer le curseur quand on clique - public pour avoir accès depuis parcellaire
+
     WOpenLayers *mMap;
+    cWebAptitude * m_app;
 
     // gestion de la légende de la carte
-    void updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers);
+
     void updateLegende(const std::shared_ptr<Layer> l);
 
     Wt::WContainerWidget *mLegendDiv;
     Wt::WContainerWidget *mExtentDivGlob; // le glob contient le boutton et le extentDiv
     Wt::WContainerWidget *mExtentDiv;
     Wt::WLineEdit *tb_extent_name;
-    Wt::WText *mTitle;
 
     void saveExtent(double c_x, double c_y, double zoom);
     void deleteExtent(std::string id_extent);
 
-    // selectLayers4Stat * mSelect4Stat;
     selectLayers *mSelectLayers;
 
     // signal pour cacher les nodes qui sont en mode expert
@@ -172,22 +138,38 @@ public:
 
     OGREnvelope *getMapExtent() { return &mMapExtent; }
 
+
+    std::vector<std::shared_ptr<Layer>> Layers() { return mVLs; }
+    std::shared_ptr<Layer> getActiveLay();
+
+    std::vector<std::shared_ptr<Layer>> mVLs;
+
+    std::shared_ptr<Layer> getLay(std::string aCode);
+    // retourne les aptitudes des essences pour une position donnée (click sur la carte)
+    // key ; code essence. Value ; code aptitude
+    std::map<std::string, int> apts(TypeClassifST aType);
+    void closeConnection();
+    int openConnection();
+    bool getExpertModeForUser(std::string id);
+    void loadExtents(std::string id);
+
+    void updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers);
+
     JSlot slotMapExport;
     simplepoint *mAnaPoint;
-    TypeClassifST mTypeClassifST; // 2 modes de classification des stations forestières ; FEE et CS. important de savoir le mode pour savoir quel tableau d'aptitude afficher quand on double-click sur une station
 
 private:
-    std::vector<std::shared_ptr<Layer>> mVLs;
+
     cDicoApt *mDico;
     sqlite3 *db_;
     JSignal<double, double, double, double> sigMapExport;
+
     OGREnvelope mMapExtent;
     void updateMapExtentAndCropIm(double topX, double topY, double bottomX, double bottomY)
     {
         updateMapExtent(topX, topY, bottomX, bottomY);
         exportLayMapView();
     }
-
     // signal pour cacher les nodes qui sont en mode expert
     Wt::Signal<bool> expertMode_;
 
