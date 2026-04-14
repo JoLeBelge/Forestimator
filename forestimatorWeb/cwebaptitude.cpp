@@ -1,13 +1,13 @@
 #include "cwebaptitude.h"
+#include "grouplayers.h"
+#include "presentationpage.h"
+#include "panier.h"
+#include "wopenlayers.h"
+#include "statwindow.h"
 
 extern bool globTest;
 std::string cookies_clientIDName="clientID";
 
-
-/*
- * Redirections en fonction du internal path
- * (ne pas oublier de compléter dans le main.cpp si internalpath changés - S.Q.)
- */
 void cWebAptitude::handlePathChange()
 {
     bool baddLog(1);
@@ -50,10 +50,6 @@ void cWebAptitude::handlePathChange()
     }
 
     if (baddLog){addLog(internalPath());}
-
-    // TODO css min-size [menu_analyse] display:none if width<900
-    // TODO css @media-width<1200 -> map 60%  @media-width<900 -> [div stack] display:blocks et overflow:auto [map] width:90%  [linfo] min-height: 600px;
-
 }
 
 
@@ -68,7 +64,6 @@ void cWebAptitude::changeHeader(std::string aSection){
         removeMetaHeader(MetaHeaderType::Meta,"titre");
         addMetaHeader(MetaHeaderType::Meta,"titre", message, "fr");
     }
-
 }
 
 
@@ -103,7 +98,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
       session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db")
 {
 
-    // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
     messageResourceBundle().use(docRoot() + "/forestimator-documentation");
     messageResourceBundle().use(docRoot() + "/forestimator-CS");
@@ -141,8 +135,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     }
 
     contPrincipal->addStyleClass("cWebAptitude");
-    contPrincipal->setMargin(0);
-    contPrincipal->setPadding(0);
 
     /*	NAVIGATION BAR	*/
     navigation = contPrincipal->addWidget(std::make_unique<WNavigationBar>());
@@ -165,7 +157,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     menuitem_documentation->setLink(l);
     menuitem_documentation->setToolTip(Wt::WString::tr("menu.button.tooltip.doc"));
 
-
     // menu login
     menuitem_login = navbar_menu->addItem(isLoggedIn()?"resources/user_icon_logout.png":"resources/user_icon_149851.png","");
     menuitem_login->setToolTip(WString::tr("menu.button.tooltip.login"));
@@ -183,8 +174,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     // main stack : DOC and MAP and RESULTS divs
     top_stack  = contPrincipal->addWidget(std::make_unique<Wt::WStackedWidget>());
-    top_stack->setMargin(0);
-    //top_stack->setHeight("100%");
     top_stack->setOverflow(Overflow::Auto);
     top_stack->addStyleClass("stackfit");
     // load DOC page
@@ -209,7 +198,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     mMap = map.get();
 
 
-
     layout_app->addWidget(std::move(map), 0);
 
     /*  Panel droit avec boutons et couches selectionnees */
@@ -217,18 +205,16 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     content_couches->setId("content_couches");
     content_couches->addStyleClass("content_couches");
     auto layoutD = content_couches->setLayout(std::make_unique<WHBoxLayout>());
-    content_couches->setPadding(0);
     layoutD->setContentsMargins(0,0,0,0);
 
     auto menu_gauche = layoutD->addWidget(std::make_unique<WContainerWidget>());
     WContainerWidget * content_panier = layoutD->addWidget(std::make_unique<WContainerWidget>());
 
-    menu_gauche->setWidth(60);
+    //menu_gauche->setWidth(60);
     menu_gauche->addStyleClass("menu_gauche");
 
     content_panier->addNew<Wt::WText>(WString::tr("panier.header"));
     content_panier->setWidth("100%");
-    //content_panier->setId("content_panier");
     content_panier->setOverflow(Overflow::Scroll);
 
     auto menu = menu_gauche->addWidget(std::make_unique<WMenu>());
@@ -247,7 +233,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
             menuitem_panier->setIcon("resources/right_angle_circle_icon_149877.png");
             content_panier->show();
         }
-
     });
     menuitem_panier->setToolTip(WString::tr("menu.button.tooltip.panier_collapse"));
     // bouton catalogue
@@ -312,23 +297,17 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     mPA = dialog_anal->contents()->addWidget(std::make_unique<parcellaire>(mGroupL,this,page_camembert));
     mPA->addStyleClass("content_analyse");
 
-    mGroupL->updateGL();// updaGL utilise des pointeurs d'autres classe, donc je dois le faire après avoir instancier toutes les autres classes... StatWindows, SimplePoint et parcellaire
-    // des couches que l'on souhaite voir dans le panier dès le départ
+    mGroupL->updateGL();
     mGroupL->clickOnName("IGN");
 
     /*	ACTIONS	: on connect les events aux méthodes	*/
-    // dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
     mMap->xySelect().connect(std::bind(&parcellaire::selectPolygon,mPA, std::placeholders::_1,std::placeholders::_2));
-
     //cadastre
     content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1,std::placeholders::_2));
-
     internalPathChanged().connect(this, &cWebAptitude::handlePathChange);
-    // force first route
-    //setInternalPath(ointernalPath);
-    handlePathChange();
 
+    handlePathChange();
     root()->addStyleClass("layout_main");
     loaded_=true;
     top_stack->setCurrentIndex(1);
