@@ -85,10 +85,10 @@ protected:
     }
 };
 
-class groupLayers : public WContainerWidget, public groupStat
+class groupLayers : public WContainerWidget, public groupStat , public std::enable_shared_from_this<groupLayers>
 {
 public:
-    groupLayers(cWebAptitude *cWebApt);
+    groupLayers(cWebAptitude * cWebApt);
     ~groupLayers();
 
     void clickOnName(std::string aCode);
@@ -160,7 +160,6 @@ public:
     Wt::WContainerWidget *mExtentDiv;
     Wt::WLineEdit *tb_extent_name;
     Wt::WText *mTitle;
-    cWebAptitude *mcWebAptitude;
 
     void saveExtent(double c_x, double c_y, double zoom);
     void deleteExtent(std::string id_extent);

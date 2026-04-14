@@ -222,7 +222,7 @@ void groupLayers::clickOnName(std::string aCode)
         }
     }
     // ajout de la carte après le "diplaylayer" sinon ordre du code js pas bon? ben oui car couche pas encore dans activeLayers[]
-    m_app->mPanier->addMap(aCode, layer);
+    m_app->mPanier->addMap(layer);
     updateLegendeDiv(m_app->mPanier->mVLs);
 }
 
@@ -506,15 +506,12 @@ void groupLayers::updateLegende(const std::shared_ptr<Layer> l)
         panel->addStyleClass("centered-example");
         panel->setCollapsible(true);
         panel->setAnimation(animation);
-        // panel->setCollapsed(false);
-
         auto tab = std::make_unique<WTable>();
         tab->setHeaderCount(1);
         tab->setWidth(Wt::WLength("90%"));
         tab->toggleStyleClass("table-striped", true);
         tab->setMaximumSize(1000, 1000);
 
-        // mTitle->setText(WString::tr("legendTitre"));
         int row(0);
         for (auto kv : l->getDicoVal())
         {

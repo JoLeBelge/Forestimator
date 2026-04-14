@@ -4,9 +4,14 @@
 
 extern bool globTest;
 panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
-    mDico(cWebApt->mDico),m_app(cWebApt),mMap(cWebApt->mMap),mGroupL(cWebApt->mGroupL)
+    mDico(cWebApt->mDico),mMap(cWebApt->mMap),mGroupL(cWebApt->mGroupL)
 {
-    this->setMaximumSize(500,700);
+    m_app = WApplication::instance();
+
+    setMaximumSize(500,700);
+    addNew<Wt::WText>(WString::tr("panier.header"));
+    setWidth("100%");
+    setOverflow(Overflow::Scroll);
 
     // create table et layer nodes
     mTable = this->addWidget(std::make_unique<WTable>());
@@ -42,12 +47,13 @@ panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
     bExportTiff->clicked().connect(mGroupL->slotMapExport);
     //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
 
-    m_app->mGroupL->mExtentDivGlob=mExtentDivGlob;
-    m_app->mGroupL->mExtentDiv=mExtentDiv;
+    mGroupL->mExtentDivGlob=mExtentDivGlob;
+    mGroupL->mExtentDiv=mExtentDiv;
 }
 
 
-void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
+void panier::addMap(std::shared_ptr<Layer> l){
+    std::string aCode= l->Code();
     if (globTest) {std::cout << "aCode : " << aCode << std::endl;}
 
     // vérifie qu'elle n'est pas déjà dans le panier
@@ -176,13 +182,11 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
     });
 }
 
-/*virtual void panier::refresh(){
+void panier::refresh(){
    if (globTest){std::cout << "refresh panier" << std::endl;}
    for (std::shared_ptr<Layer> l : mVLs){
-         std::cout << "code " << l->Code()  << std::endl;
+          m_app->doJavaScript("activeLayers['"+l->Code()+"']?.setVisible(!activeLayers['"+l->Code()+"']?.values_.visible);");
     }
-
-    std::cout << "code " << mVLs.size() << std::endl;
     WContainerWidget::refresh();
-}*/
+}
 

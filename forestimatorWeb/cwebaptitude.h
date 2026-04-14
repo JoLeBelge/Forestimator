@@ -107,8 +107,6 @@ public:
     Wt::WPushButton *b_login;
     std::shared_ptr<groupLayers> mGroupL;
 
-
-    //WStackedWidget * stack_info; // cause que je dois changer de current index après avoir mis à jour la légende que je clique sur une station
     WContainerWidget *mSimplepointW, *mGroupLayerW, *mLegendW;
     WMenuItem * menuitem_analyse,* menuitem_app,*menuitem_legend,*menuitem_documentation,*menuitem_simplepoint,*menuitem_login,*menuitem_panier,*menuitem_catalog,*menuitem_cadastre;
     dialog *dialog_anal,*dialog_info,*dialog_catalog,*dialog_cadastre,*dialog_legend;

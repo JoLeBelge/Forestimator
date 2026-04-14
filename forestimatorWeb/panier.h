@@ -14,7 +14,7 @@ public:
 
     // var globales
     cDicoApt * mDico;
-    cWebAptitude * m_app;
+    WApplication * m_app;
     WOpenLayers * mMap;
     std::shared_ptr<groupLayers> mGroupL;
 
@@ -22,7 +22,10 @@ public:
     std::vector<std::shared_ptr<Layer>> mVLs;
 
     // functions
-    void addMap(std::string aCode, std::shared_ptr<Layer> l);
+    void addMap(std::shared_ptr<Layer> l);
+
+    virtual void refresh();
+
 private:
 
     Wt::WTable * mTable;

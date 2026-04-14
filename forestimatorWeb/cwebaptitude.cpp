@@ -208,14 +208,15 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     layoutD->setContentsMargins(0,0,0,0);
 
     auto menu_gauche = layoutD->addWidget(std::make_unique<WContainerWidget>());
-    WContainerWidget * content_panier = layoutD->addWidget(std::make_unique<WContainerWidget>());
+
+    //mPanier = content_panier->addWidget(std::make_unique<panier>(this));
+
+    // le panier se connecte au grouplayer, donc il faut le créer après GL
+    mPanier = layoutD->addWidget(std::make_unique<panier>(this));
 
     //menu_gauche->setWidth(60);
     menu_gauche->addStyleClass("menu_gauche");
 
-    content_panier->addNew<Wt::WText>(WString::tr("panier.header"));
-    content_panier->setWidth("100%");
-    content_panier->setOverflow(Overflow::Scroll);
 
     auto menu = menu_gauche->addWidget(std::make_unique<WMenu>());
     menu->setStyleClass("nav-stacked");
@@ -227,11 +228,11 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
         if(content_couches->width().value()>60 || content_couches->width().value()==-1){
             content_couches->setWidth(60);
             menuitem_panier->setIcon("resources/right_angle_circle_icon_149877d.png");
-            content_panier->hide();
+            mPanier->hide();
         }else{
             content_couches->setWidth(400);
             menuitem_panier->setIcon("resources/right_angle_circle_icon_149877.png");
-            content_panier->show();
+            mPanier->show();
         }
     });
     menuitem_panier->setToolTip(WString::tr("menu.button.tooltip.panier_collapse"));
@@ -285,10 +286,10 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     if (globTest){ printf("create GL\n");}
-    mGroupL = std::shared_ptr<groupLayers>(new groupLayers(this));
+    mGroupL = std::make_shared<groupLayers>(this);
     if (globTest){printf("done\n");}
 
-    mPanier = content_panier->addWidget(std::make_unique<panier>(this));
+
 
     statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(mGroupL));
 

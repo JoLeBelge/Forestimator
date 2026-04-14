@@ -90,16 +90,19 @@
 }
 
 .cWebAptitude{
-
+	margin: 0;
+	padding: 0;
 }
 
 .content_couches{
 	width:400px;
+	padding: 0;
 
 }
 
 .menu_gauche{
 	background-color:green;
+	width: 60px;
 	
 }
 .menu_gauche a{
@@ -274,6 +277,7 @@ display:block;
 
 .stackfit {
 	height: calc(100% - 60px);
+	margin: 0;
 }
 
 .unfolder { display: none; }
