@@ -103,28 +103,29 @@ void matAptCS::updateListeUS(){
     for (auto & kv : mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_))){
         if (mDicoApt->isStationMaj(zbio_, std::get<0>(kv.first),std::get<1>(kv.first))){
 
-        std::string stationName=mDicoApt->station(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first));
-        // un boutton avec un badge de la couleur de la station
-        Wt::WPushButton* us =contListeUS->addWidget(std::make_unique<Wt::WPushButton>());
-        us->addStyleClass("position-relative");
-        us->setTextFormat(Wt::TextFormat::XHTML);
-        std::shared_ptr<color> col=CSlay->getColor(std::get<0>(kv.first));
+            std::string stationName=mDicoApt->station(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first));
+            // un boutton avec un badge de la couleur de la station
+            Wt::WPushButton* us = contListeUS->addWidget(std::make_unique<Wt::WPushButton>());
+            us->addStyleClass("position-relative");
+            us->setTextFormat(Wt::TextFormat::XHTML);
+            std::shared_ptr<color> col = CSlay->getColor(std::get<0>(kv.first));
+            //TODO: la ligne suivante cr´ee des memory leaks...
+            //us->setText(tr("matAptCS.nobadge").arg(prefixZbio_).arg(std::to_string(std::get<0>(kv.first))).arg(stationName).arg(col->getRGB()));
+            us->setText(tr("matAptCS.nobadge"));
+            us->addStyleClass("us-button");
 
-        us->setText(tr("matAptCS.nobadge").arg(prefixZbio_).arg(std::to_string(std::get<0>(kv.first))).arg(stationName).arg(col->getRGB()));
-        us->addStyleClass("us-button");
+            //if (std::get<1>(kv.first)==""){
+            //    us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col->getRGB()));
+            //}else{
+            //    us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
+            //}
 
-        //if (std::get<1>(kv.first)==""){
-        //    us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col->getRGB()));
-        //}else{
-        //    us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
-        //}
+            //us->setToolTip(mDicoApt->stationEtVar(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first)));
 
-        //us->setToolTip(mDicoApt->stationEtVar(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first)));
-
-        us->setToolTip(stationName);
-        us->clicked().connect([=]{this->showFicheUS(std::get<0>(kv.first),std::get<1>(kv.first));});
-        mMapButtonUS.emplace(std::make_pair(kv.first,us));
-    }
+            us->setToolTip(stationName);
+            us->clicked().connect([=]{this->showFicheUS(std::get<0>(kv.first),std::get<1>(kv.first));});
+            mMapButtonUS.emplace(std::make_pair(kv.first,us));
+        }
     }
     if (mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_)).size()==0){
         contListeUS->addNew<Wt::WText>(tr("matAptCS.msg.noUS4Zbio").arg(mDicoApt->ZBIO(zbio_)));

@@ -40,8 +40,6 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         }
         sqlite3_finalize(stmt);
 
-
-
         SQLstring="SELECT raster_val,Nom FROM dico_topo;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)

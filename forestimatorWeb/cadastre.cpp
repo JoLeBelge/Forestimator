@@ -282,7 +282,6 @@ dbo::ptr<capa> cadastre::getCaPaPtr(std::string aCaPaKey, dbo::Session *session)
     dbo::ptr<capa> aRes = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
     // boost::replace_all(aCaPaKey, "/", "\/"); 
     // ben oui sinon ça marche pas le sql select de dbo wt si on échappe pas le slash...
-    // cout << "\/" == cout << "/"  est une erreur?
 
     // aRes = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
     // collectionCapa Capas = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
