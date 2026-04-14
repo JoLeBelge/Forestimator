@@ -1,6 +1,6 @@
 
 /*	Fonctions pour affichage label sur polygon	*/
-var getText = function(feature, resolution, dom) {
+/*var getText = function(feature, resolution, dom) {
 	var type = dom.text.value;
 	var maxResolution = dom.maxreso.value;
 	var text = feature.get('nom');
@@ -55,7 +55,7 @@ var createTextStyle = function(feature, resolution, dom) {
 	  overflow: overflow,
 	  rotation: rotation
 	});
-};
+};*/
 
 myDom = {
 	text: "Normal",
@@ -77,6 +77,7 @@ myDom = {
 };
 
 // Polygons
+/*
 function polygonStyleFunction(feature, resolution) {
 	return new ol.style.Style({
 	  stroke: new ol.style.Stroke({
@@ -85,7 +86,7 @@ function polygonStyleFunction(feature, resolution) {
 	  }),
 	  text: createTextStyle(feature, resolution, myDom)
 	});
-}
+}*/
 
 proj4.defs('EPSG:31370',
 '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs');
@@ -123,7 +124,6 @@ source = new ol.source.Vector({
 });
 
 extent=[42250.0001199999969685,21170.0001200000115205,295170.0001199999824166,167700.0001200000115205];
-res_zbio=[320,160,80,40,20,10];
 
 station = new ol.layer.Vector({
   	source: source,
@@ -139,6 +139,7 @@ station = new ol.layer.Vector({
     })
 });
 
+/*
 var commune_src = new ol.source.Vector({
 	format: new ol.format.GeoJSON(),
 	url: function(extent) {
@@ -148,9 +149,9 @@ var commune_src = new ol.source.Vector({
 		  'bbox=' + extent.join(',') + ',EPSG:31370';
 	},
 	strategy: ol.loadingstrategy.bbox
-});
+});*/
 
-
+/*
 style = new ol.style.Style({
 	text: new Text({
 		font: 'bold 11px "Open Sans", "Arial Unicode MS", "sans-serif"',
@@ -169,7 +170,7 @@ communes = new ol.layer.Vector({
 	extent: extent,
 	source: commune_src,
 	style: polygonStyleFunction
-});
+});*/
 
 layers = [
 	new ol.layer.Group({
@@ -177,8 +178,8 @@ layers = [
 		layers:[ ]
 	}),
 	new ol.layer.Group({
-		'title': 'Limites administratives',
-		layers:[ station, communes ]
+		'title': 'couches vectorielles',
+		layers:[ station ]//, communes ]
 	})
 ];
 
@@ -256,15 +257,13 @@ updateGroupeLayers = function(){
 		l.push(station);
 		groupe = new ol.layer.Group({
 			'title': 'parcellaire',
-			//attributions: 'Gembloux Agro-Bio Tech',
 			 layers:l
 		});
 	} else {
-		l.push(communes);
+		//l.push(communes);
 		l.push(station);
 		groupe = new ol.layer.Group({
 			'title': 'aptitude',
-			//attributions: 'Gembloux Agro-Bio Tech',
 			layers:l
 		});
 
