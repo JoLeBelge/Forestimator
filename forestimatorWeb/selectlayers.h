@@ -1,17 +1,23 @@
 #ifndef SELECTLAYERS_H
 #define SELECTLAYERS_H
-#include "grouplayers.h"
+#include "cdicoapt.h"
+#include "Wt/WContainerWidget.h"
+#include "Wt/WTreeTable.h"
+#include "Wt/WTreeTableNode.h"
+#include "Wt/WCheckBox.h"
+#include "Wt/WMessageBox.h"
+#include "Wt/WTree.h"
 
-class baseSelectLayers;
-//class selectLayers4Stat;
 class selectLayers;
 class rasterFiles;
+class groupLayers;
 
-class baseSelectLayers : public WContainerWidget{
+using namespace  Wt;
+
+class selectLayers : public WContainerWidget {
 public:
-    baseSelectLayers();
-    //std::vector<std::shared_ptr<layerBase>> getSelectedLayerBase();
-    std::vector<std::shared_ptr<Layer>> getSelectedLayer();
+    selectLayers(cDicoApt * aDico);
+    std::vector<std::shared_ptr<layerBase>> getSelectedLayer();
 
     int numSelectedLayer(){
         int aRes(0);
@@ -21,39 +27,28 @@ public:
         return aRes;
     }
 
-protected: // les classes qui héritent en mode public peuvent avoir accès
-
-    std::map<std::shared_ptr<Layer>,bool> mSelectedLayers;
+protected:
+    std::map<std::shared_ptr<layerBase>,bool> mSelectedLayers;
     // une map de pointeur vers checkbox qui est liée aux couches selectionnée
-    std::map<std::shared_ptr<Layer>,Wt::WCheckBox*> mLayersCBox;
+    std::map<std::shared_ptr<layerBase>,Wt::WCheckBox*> mLayersCBox;
     // une map de pointeur vers node qui est liée aux couches selectionnées
-    std::map<std::shared_ptr<Layer>,Wt::WTreeTableNode*> mLayersNode;
+    std::map<std::shared_ptr<layerBase>,Wt::WTreeTableNode*> mLayersNode;
 
     std::map<TypeLayer,Wt::WTreeTableNode*> mLayerGroupNode;
 
-    void SelectLayer(bool select,std::shared_ptr<Layer> l,bool afficheMsg=true);
+    void SelectLayer(bool select,std::shared_ptr<layerBase> l,bool afficheMsg=true);
     void SelectLayerGroup(bool select,TypeLayer aType);
 
-    bool isSelected(std::shared_ptr<Layer> l){
+    bool isSelected(std::shared_ptr<layerBase> l){
         bool aRes(0);
         if (mSelectedLayers.find(l)!=mSelectedLayers.end()){
             aRes=mSelectedLayers.at(l);
         }
         return aRes;
     }
-    std::vector<std::shared_ptr<Layer>> mVpLs;
+    std::vector<std::shared_ptr<layerBase>> mVpLs;
     int nbMax;
-
     Wt::WTreeTable * treeTable;
-    groupLayers * mGL;
-
-};
-
-class selectLayers : public baseSelectLayers{
-public:
-    selectLayers(groupLayers * aGL);
-private:
-
 };
 
 #endif // SELECTLAYERS_H

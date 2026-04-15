@@ -1,7 +1,7 @@
 #include "layerstatchart.h"
 #include <boost/filesystem.hpp>
 extern bool globTest;
-layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string, int> aStat, OGRGeometry *poGeom) : layerStat(aLay, aStat), rowAtMax(0), mGeom(poGeom)
+layerStatChart::layerStatChart(std::shared_ptr<layerBase> aLay, std::map<std::string, int> aStat, OGRGeometry *poGeom) : layerStat(aLay, aStat), rowAtMax(0), mGeom(poGeom)
 {
 
     // std::cout << "création d'un layer StatChart pour " << mLay->getLegendLabel() << std::endl;

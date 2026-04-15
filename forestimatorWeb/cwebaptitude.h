@@ -51,7 +51,6 @@ extern bool globTest;
 class parcellaire;
 class panier;
 
-
 class dialog : public Wt::WDialog
 {
 public:
@@ -88,9 +87,7 @@ public:
     bool isLoggedIn();
     void logout();
     Wt::Auth::User getUser();
-
     void clientIDcookies();
-
     void addLog(std::string page,typeLog cat=typeLog::page);   // ajoute un record aux stat web
 
     cDicoApt * mDico;
@@ -99,7 +96,6 @@ public:
 
     void handlePathChange();
 
-    /** VARS GLOBALES  **/
     WOpenLayers * mMap;
     Wt::WNavigationBar * navigation;
     Wt::WStackedWidget * top_stack;// celui qui navige entre la page de garde (home), la page de présentation et les volets analyse/carto
@@ -107,7 +103,8 @@ public:
     Wt::WPushButton *b_login;
     groupLayers * mGroupL;
 
-    WContainerWidget *mSimplepointW,  *mLegendW;//*mGroupLayerW,
+    WContainerWidget *mLegendW;
+    simplepoint *mAnaPoint;
     // WMenuItem *menuitem_panier;
     WMenuItem * menuitem_analyse,* menuitem_app,*menuitem_legend,*menuitem_documentation,*menuitem_simplepoint,*menuitem_login,*menuitem_catalog,*menuitem_cadastre;
     dialog *dialog_anal,*dialog_info,*dialog_catalog,*dialog_cadastre,*dialog_legend;
@@ -135,19 +132,16 @@ public:
         WApplication::refresh();
     }
 
-
-
     // un bon référencement dans moteur de recherche google passe par un header avec une description et un titre propre à chaque page. géré ici
     void changeHeader(std::string aSection);
 
      parcellaire * mPA;
-
+     std::string getActiveLay(){return activeLayerCode;}
 private:
-    void load_content_couches(WContainerWidget * content);
+    std::string activeLayerCode;
 
     Session session_;
     bool loaded_=false; // sert à éviter que void authEvent ne crash si refresh la page et que user connecté...
-
     Wt::WColor col_sel = Wt::WColor(23,87,23);
     Wt::WColor col_not_sel = Wt::WColor("transparent");
 };

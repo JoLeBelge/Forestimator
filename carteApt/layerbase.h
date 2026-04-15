@@ -175,6 +175,8 @@ public:
     std::string NomCourt(){return mNomCourt;}
     std::string getLegendLabel(bool escapeChar=true) const;
     std::string getShortLabel() const {return mNomCourt;}
+    bool l4Stat(){return mLay4Stat;}
+    bool l4StatP(){return mLay4StatPonctuel;}
 
     std::map<int, std::string> getDicoVal(){return mDicoVal;}
     std::map<int, std::shared_ptr<color>>  getDicoCol(){return mDicoCol;}
@@ -251,6 +253,7 @@ protected:
     // pour distinguer les cartes qui sont accèssible à tous ou pas
     bool mExpert;
     double mGain;
+    bool mLay4Stat,mLay4StatPonctuel,mLay4Visu;
 };
 
 class layerStat

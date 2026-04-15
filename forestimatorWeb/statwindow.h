@@ -18,10 +18,12 @@ class statWindow : public Wt::WContainerWidget
 {
 public:
     // a besoin du dictionnaire pour créer le layer qui contient la carte IGN pour faire la carte de situation globale
-    statWindow(groupLayers * aGL);
+    statWindow(cWebAptitude * aWebApp);
 
+    // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
+    void extractInfo(double x, double y);
     void vider();
-    void titre(std::string aTitre){mTitre->setText(aTitre);}
+    //void titre(std::string aTitre){mTitre->setText(aTitre);}
     void add1Aptitude(std::shared_ptr<layerStatChart> lstat);
     void add1layerStat(std::shared_ptr<layerStatChart> layerStat);
     void add1layerStat(std::unique_ptr<Wt::WContainerWidget> cont);
@@ -36,10 +38,11 @@ public:
 
 
     cDicoApt * mDico;
-    std::shared_ptr<groupLayers> mGL;
+    //std::shared_ptr<groupLayers> mGL;
+    cWebAptitude * m_app;
 private:
 
-    cWebAptitude * m_app;
+
     Wt::WVBoxLayout * layout;
 
     // pour la carte de localisation

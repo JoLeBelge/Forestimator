@@ -95,7 +95,7 @@ dialog::dialog(const WString& windowTitle, Wt::WMenuItem * aMenu, const WEnviron
 
 cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     : Wt::WApplication(env),
-      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db")
+      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db"),activeLayerCode("IGN")
 {
 
     messageResourceBundle().use(docRoot() + "/forestimator");
@@ -223,8 +223,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     // info point
     dialog_info = tpl_content_app->addChild(std::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&environment()));
 
-    auto content_info = dialog_info->contents()->addWidget(std::make_unique<WContainerWidget>());
-    content_info->addStyleClass("content_info");
+    mAnaPoint = dialog_info->contents()->addWidget(std::make_unique<simplepoint>(this));
 
     // analyse
     dialog_anal = tpl_content_app->addChild(std::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&environment()));
@@ -246,9 +245,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get(),this));
     content_cadastre->addStyleClass("content_cadastre");
 
-    mSimplepointW = content_info;
-
-
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     if (globTest){ printf("create GL\n");}
     mGroupL = dialog_catalog->contents()->addWidget(std::make_unique<groupLayers>(this));
@@ -256,7 +252,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     mPanier = tpl_content_app->bindWidget("panier", std::make_unique<panier>(this));
 
-    statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(mGroupL));
+    statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(this));
 
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
@@ -267,7 +263,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     mGroupL->clickOnName("IGN");
 
     /*	ACTIONS	: on connect les events aux méthodes	*/
-    mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
+    mMap->xy().connect(std::bind(&simplepoint::extractInfo,mAnaPoint, std::placeholders::_1,std::placeholders::_2));
     mMap->xySelect().connect(std::bind(&parcellaire::selectPolygon,mPA, std::placeholders::_1,std::placeholders::_2));
     //cadastre
     content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1,std::placeholders::_2));

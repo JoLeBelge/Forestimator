@@ -42,11 +42,6 @@ class cWebAptitude;
 class AuthApplication;
 class groupStat;
 
-enum TypeClassifST
-{
-    FEE,
-    CS
-};
 
 using namespace Wt;
 using namespace libzippp;
@@ -60,32 +55,8 @@ std::string getHtml(std::string);
 bool isValidHtml(const std::string &);
 bool isValidXmlIdentifier(const std::string &);
 
-// groupLayers héritera de cette classe , ça me permet d'avoir un meilleur visu des membres dédiés aux clacul des statistiques de surface
-class groupStat
-{
-public:
-    groupStat() {}
-    ~groupStat() { clearStat(); }
-    std::vector<std::shared_ptr<layerStatChart>> ptrVLStat() { return mVLStat; }
-    // j'y met directement le conteneur résultats
-    std::vector<std::unique_ptr<Wt::WContainerWidget>> mVLStatCont;
 
-protected:
-    // un vecteur pour les statistique des cartes variables de classes (majoritaire)
-    std::vector<std::shared_ptr<layerStatChart>> mVLStat;
-
-    void clearStat()
-    {
-        for (std::shared_ptr<layerStatChart> p : mVLStat)
-        {
-            p.reset();
-        }
-        mVLStatCont.clear();
-        mVLStat.clear();
-    }
-};
-
-class groupLayers : public WContainerWidget, public groupStat
+class groupLayers : public WContainerWidget
 {
 public:
     groupLayers(cWebAptitude * cWebApt);
@@ -97,24 +68,13 @@ public:
     void updateActiveLay(std::string aCode);
     // update pour passer du mode expert au mode non expert et vice et versa
     void updateGL();
-    // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
-    void extractInfo(double x, double y);
+
     cDicoApt *Dico() { return mDico; }
     void exportLayMapView();
-    void computeStatGlob(OGRGeometry *poGeomGlobale);
-
-    ST *mStation;
 
 
     //  pour faire un processEvent, seul moyen de refresh de la progressbar.
     //cWebAptitude *m_app;
-
-    std::vector<std::shared_ptr<Layer> > getSelect4Download();
-    WContainerWidget *afficheSelect4Download();
-    int getNumSelect4Download();
-    std::vector<std::shared_ptr<Layer>> getSelectedLayer4Download();
-
-
 
     WOpenLayers *mMap;
     cWebAptitude * m_app;
@@ -131,7 +91,7 @@ public:
     void saveExtent(double c_x, double c_y, double zoom);
     void deleteExtent(std::string id_extent);
 
-    selectLayers *mSelectLayers;
+    //selectLayers *mSelectLayers;
 
     // signal pour cacher les nodes qui sont en mode expert
     Wt::Signal<bool> &changeExpertMode() { return expertMode_; }
@@ -139,15 +99,13 @@ public:
     OGREnvelope *getMapExtent() { return &mMapExtent; }
 
 
-    std::vector<std::shared_ptr<Layer>> Layers() { return mVLs; }
+    //std::vector<std::shared_ptr<layerBase>> Layers() {return mVLs; }
     std::shared_ptr<Layer> getActiveLay();
 
     std::vector<std::shared_ptr<Layer>> mVLs;
-
     std::shared_ptr<Layer> getLay(std::string aCode);
-    // retourne les aptitudes des essences pour une position donnée (click sur la carte)
-    // key ; code essence. Value ; code aptitude
-    std::map<std::string, int> apts(TypeClassifST aType);
+
+
     void closeConnection();
     int openConnection();
     bool getExpertModeForUser(std::string id);
@@ -156,7 +114,7 @@ public:
     void updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers);
 
     JSlot slotMapExport;
-    simplepoint *mAnaPoint;
+
 
 private:
 
