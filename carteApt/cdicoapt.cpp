@@ -21,7 +21,6 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
         sqlite3_stmt * stmt;
 
-        
 
         std::string SQLstring="SELECT code,label,expert FROM groupe_couche ORDER BY id;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -96,8 +95,8 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
     }
 
-    const char *inputPath= this->File("ZBIOSIMP").c_str();
-    mDS_zbio= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+    std::string inputPath= this->File("ZBIOSIMP").c_str();
+    mDS_zbio= GDALDataset::Open(inputPath.c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY);
     if (boost::filesystem::exists(inputPath)){
 
         if( mDS_zbio == NULL )
