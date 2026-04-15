@@ -110,8 +110,9 @@ void matAptCS::updateListeUS(){
             us->setTextFormat(Wt::TextFormat::XHTML);
             std::shared_ptr<color> col = CSlay->getColor(std::get<0>(kv.first));
             //TODO: la ligne suivante cr´ee des memory leaks...
-            //us->setText(tr("matAptCS.nobadge").arg(prefixZbio_).arg(std::to_string(std::get<0>(kv.first))).arg(stationName).arg(col->getRGB()));
-            us->setText(tr("matAptCS.nobadge"));
+            std::cout << col->getRGB()<< std::endl;
+            us->setText(tr("matAptCS.nobadge").arg(prefixZbio_).arg(std::to_string(std::get<0>(kv.first))).arg(stationName));//.arg(col->getRGB()));
+            //us->setText(tr("matAptCS.nobadge"));
             us->addStyleClass("us-button");
 
             //if (std::get<1>(kv.first)==""){

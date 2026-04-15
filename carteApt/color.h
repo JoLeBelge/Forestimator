@@ -29,7 +29,7 @@ public:
         //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
         isDark();
     }
-    int mR,mG,mB;
+    int mR=0,mG=0,mB=0;
     void set(int &R,int &G,int &B) const{
         R=mR;
         G=mG;
