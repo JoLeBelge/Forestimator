@@ -4,7 +4,7 @@
 
 extern bool globTest;
 
-groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mMap(cWebApt->mMap), mLegendDiv(cWebApt->mLegendW), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
+groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mLegendDiv(cWebApt->mLegendW), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
 {
     setOverflow(Wt::Overflow::Visible);
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
@@ -132,15 +132,6 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
     if (globTest){std::cout << "done " << std::endl;}
 }
 
-groupLayers::~groupLayers()
-{
-    if (globTest)
-    {
-        std::cout << "destructeur de group layer " << std::endl;
-    }
-    //mVLs.clear();
-}
-
 void groupLayers::updateActiveLay(std::string aCode)
 {
     // std::cout << " group Layers je vais faire un update du rendu visuel de chacun des label de couche \n\n\n" << std::endl;
@@ -192,10 +183,6 @@ void groupLayers::updateGL()
 
 
 
-/**
- * @brief groupLayers::updateLegende Refresh la legende pour une couche
- * @param l
- */
 void groupLayers::updateLegende(const std::shared_ptr<Layer> l)
 {
     if (l->getCatLayer() != TypeLayer::Externe)
@@ -668,20 +655,19 @@ GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
 void groupLayers::clickOnName(std::string aCode)
 {
     updateActiveLay(aCode);
-    std::cout << "click on Name " << aCode << std::endl;
     std::shared_ptr<Layer> layer;
     for (std::shared_ptr<Layer> l : mVLs)
     {
         if (aCode == l->Code())
         {
-             std::cout << "got the layer " << aCode << std::endl;
             layer = l;
             break;
         }
     }
 
-    // cacher la fenetre popup
-    m_app->doJavaScript("overlay?.setVisible(0);");
+    // cacher la fenetre popup. plus propre de faire via wt que via js
+    m_app->mMap->popup->hide();
+    //m_app->doJavaScript("overlay?.setVisible(0);");
 
     // ajouter la couche à la carte
     for (std::shared_ptr<Layer> l : mVLs)

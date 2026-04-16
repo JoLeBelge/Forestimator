@@ -297,14 +297,14 @@ void parcellaire::upload()
             mLabelName = "";
             if (to31370AndGeoJson())
             {
-                mGL->m_app->addLog("upload a shp");
+                m_app->addLog("upload a shp");
                 if (computeExtentAndSurf())
                 {
                     hasValidShp = true;
                     downloadRasterBt->enable();
                     anaOnAllPolygBt->enable();
                     display();
-                    mGL->mMap->setToolTip(tr("tooltipMap2"));
+                    m_app->mMap->setToolTip(tr("tooltipMap2"));
                 }
             }
         }
@@ -339,7 +339,7 @@ void parcellaire::upload()
                 downloadRasterBt->enable();
                 anaOnAllPolygBt->enable();
                 display();
-                mGL->mMap->setToolTip(tr("tooltipMap2"));
+                m_app->mMap->setToolTip(tr("tooltipMap2"));
             }
         }
         msg->setText(tr("analyse.surf.msg.uploadOK"));
@@ -536,7 +536,7 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
         downloadRasterBt->enable();
         anaOnAllPolygBt->enable();
         display();
-        mGL->mMap->setToolTip(tr("tooltipMap2"));
+        m_app->mMap->setToolTip(tr("tooltipMap2"));
     }
 }
 
@@ -805,14 +805,14 @@ void parcellaire::to31370AndGeoJsonGDAL()
         GDALClose(hSrcDS);
     }
 
-    mGL->m_app->addLog("upload a shp");
+    m_app->addLog("upload a shp");
     if (computeExtentAndSurf())
     {
         hasValidShp = true;
         downloadRasterBt->enable();
         anaOnAllPolygBt->enable();
         display();
-        mGL->mMap->setToolTip(tr("tooltipMap2"));
+        m_app->mMap->setToolTip(tr("tooltipMap2"));
     }
     msg->setText(tr("analyse.surf.msg.uploadOK"));
 }

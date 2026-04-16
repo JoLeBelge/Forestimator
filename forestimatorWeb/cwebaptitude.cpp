@@ -186,22 +186,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     menu->setStyleClass("nav-stacked");
     menu->addStyleClass("nav-apt");
-    /*
-    menuitem_panier = menu->addItem("resources/right_angle_circle_icon_149877.png","");
-    menuitem_panier->clicked().connect([=] {
-        std::cout << content_couches->width().value() << std::endl;
-        if(content_couches->width().value()>60 || content_couches->width().value()==-1){
-            //content_couches->setWidth(60);
-            menuitem_panier->setIcon("resources/right_angle_circle_icon_149877d.png");
-            mPanier->hide();
-        }else{
-            //content_couches->setWidth(400);
-            menuitem_panier->setIcon("resources/right_angle_circle_icon_149877.png");
-            mPanier->show();
-        }
-    });
-    menuitem_panier->setToolTip(WString::tr("menu.button.tooltip.panier_collapse"));
-    */
+
     // bouton catalogue
     menuitem_catalog = menu->addItem("resources/warehouse_check_icon_149849.png","");
     menuitem_catalog->setToolTip(WString::tr("menu.button.tooltip.catalog"));
@@ -245,17 +230,14 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get(),this));
     content_cadastre->addStyleClass("content_cadastre");
 
-    /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
-    if (globTest){ printf("create GL\n");}
+
     mGroupL = dialog_catalog->contents()->addWidget(std::make_unique<groupLayers>(this));
-    if (globTest){printf("done\n");}
 
     mPanier = tpl_content_app->bindWidget("panier", std::make_unique<panier>(this));
 
     statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(this));
 
-    /* CHARGE ONGLET ANALYSES */
-    //printf("create PA\n");
+
     mPA = dialog_anal->contents()->addWidget(std::make_unique<parcellaire>(mGroupL,this,page_camembert));
     mPA->addStyleClass("content_analyse");
 
@@ -276,12 +258,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     clientIDcookies();
 
-    // avant c'était dans wopenwidget
-    std::ifstream t(mDico->File("initOL"));
-    std::stringstream ss;
-    ss << t.rdbuf();
-    t.close();
-    doJavaScript(ss.str(),false);
 }
 
 void cWebAptitude::loadStyles(){

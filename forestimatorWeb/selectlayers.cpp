@@ -74,7 +74,7 @@ selectLayers::selectLayers(cDicoApt *aDico){
 
 void selectLayers::SelectLayer(bool select, std::shared_ptr<layerBase> l, bool afficheMsg){
 
-    if (globTest){std::cout << "couche " << l->getLegendLabel() << ", baseSelectLayers::SelectLayer, select= " << select << std::endl;}
+    if (globTest){std::cout << "couche " << l->getLegendLabel() << ", selectLayers::SelectLayer, select= " << select << std::endl;}
     if ((!select) |(nbMax>(numSelectedLayer()))){
         if (mSelectedLayers.find(l)!=mSelectedLayers.end()){
             if (!l->Expert()){

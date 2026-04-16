@@ -12,7 +12,6 @@ class cdicoAptBase;
 class color;
 class cDicoApt;
 class layerBase;
-class ST;
 class cnsw;
 class cadastre;
 

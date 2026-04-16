@@ -2,24 +2,21 @@
 #define GROUPLAYERS_H
 #pragma once
 #include <Wt/WContainerWidget.h>
-#include <Wt/WTabWidget.h>
-#include <Wt/WStackedWidget.h>
 #include <Wt/WSignal.h>
 #include <Wt/WText.h>
 #include <Wt/WTable.h>
+#include <Wt/WPanel.h>
 #include <Wt/WTree.h>
 #include <Wt/WTreeTable.h>
 #include <Wt/WTreeTableNode.h>
 #include <Wt/WCheckBox.h>
 #include <Wt/WMessageBox.h>
 #include <Wt/WLoadingIndicator.h>
-#include <Wt/WPanel.h>
 #include <Wt/WAnchor.h>
 #include "cwebaptitude.h"
 #include "layer.h"
 #include "simplepoint.h"
 #include <fstream>
-#include "wopenlayers.h"
 #include <Wt/WProgressBar.h>
 #include "layerstatchart.h"
 #include "Wt/WFileResource.h"
@@ -28,25 +25,13 @@
 #include "selectlayers.h"
 #include <memory>
 
-class WOpenLayers;
 class Layer;
 class groupLayers;
-class simplepoint;
-class ST;
-class layerStatChart;
-class rasterFiles;
-class baseSelectLayers;
-class selectLayers4Stat;
 class selectLayers;
 class cWebAptitude;
-class AuthApplication;
-class groupStat;
-
 
 using namespace Wt;
 using namespace libzippp;
-
-//bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
 
 // retourne le dataset sur l'enveloppe d'un polygone
 GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom);
@@ -60,10 +45,8 @@ class groupLayers : public WContainerWidget
 {
 public:
     groupLayers(cWebAptitude * cWebApt);
-    ~groupLayers();
 
     void clickOnName(std::string aCode);
-
     // update du rendu du nom de la couche qui est sélectionnée
     void updateActiveLay(std::string aCode);
     // update pour passer du mode expert au mode non expert et vice et versa
@@ -72,11 +55,6 @@ public:
     cDicoApt *Dico() { return mDico; }
     void exportLayMapView();
 
-
-    //  pour faire un processEvent, seul moyen de refresh de la progressbar.
-    //cWebAptitude *m_app;
-
-    WOpenLayers *mMap;
     cWebAptitude * m_app;
 
     // gestion de la légende de la carte

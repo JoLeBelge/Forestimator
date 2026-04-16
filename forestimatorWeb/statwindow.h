@@ -1,7 +1,6 @@
 #ifndef STATWINDOW_H
 #define STATWINDOW_H
 #include "cwebaptitude.h"
-#include "grouplayers.h"
 #include "layerstatchart.h"
 #include <hpdf.h>
 #include <Wt/WResource.h>
@@ -9,10 +8,10 @@
 #include <Wt/Http/Response.h>
 #include <Wt/Render/WPdfRenderer.h>
 #include <Wt/WApplication.h>
-//#include "iostream"
 
 class statWindow;
 class cWebAptitude;
+class layerStatChart;
 
 class statWindow : public Wt::WContainerWidget
 {
@@ -23,7 +22,6 @@ public:
     // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
     void extractInfo(double x, double y);
     void vider();
-    //void titre(std::string aTitre){mTitre->setText(aTitre);}
     void add1Aptitude(std::shared_ptr<layerStatChart> lstat);
     void add1layerStat(std::shared_ptr<layerStatChart> layerStat);
     void add1layerStat(std::unique_ptr<Wt::WContainerWidget> cont);
@@ -36,9 +34,7 @@ public:
     WContainerWidget * mCarteGenCont;
     WContainerWidget * mAllStatIndivCont;
 
-
     cDicoApt * mDico;
-    //std::shared_ptr<groupLayers> mGL;
     cWebAptitude * m_app;
 private:
 
@@ -50,14 +46,6 @@ private:
     // pour les information générales
     std::shared_ptr<layerBase> mMNT, mZBIO, mPente;
 
-    //olOneLay *olStatic;
-
-    /*  Signal pour récupérer l'image en base float pour générer un PDF
-    JSlot slotImgPDF;
-    JSignal<std::string, int>  sigImgPDF;
-    int chunkImgPDF=0;
-    int chunkImgPDFind=0;
-    std::string strImgPDF;*/
 };
 
 class surfPdfResource : public Wt::WResource

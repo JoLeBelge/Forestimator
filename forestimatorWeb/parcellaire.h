@@ -23,7 +23,6 @@
 #include <Wt/Mail/Client.h>
 #include <memory>
 #include "selectlayers.h"
-
 #include "boost/filesystem.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -37,6 +36,7 @@ using namespace libzippp;
 class displayInfo;
 class statWindow;
 class cDicoApt;
+class groupLayers;
 
 extern Wt::WServer *globServer;
 
@@ -129,7 +129,7 @@ private:
     // Wt::WPushButton  *anaOnAllPolygBt;
     cWebAptitude *m_app;
     Wt::WText *msg;
-    std::shared_ptr<groupLayers> mGL;
+    groupLayers * mGL;
     cDicoApt *mDico;
     double centerX, centerY;
     OGREnvelope mParcellaireExtent;
@@ -141,7 +141,6 @@ private:
 class TaskComputing : public Task
 {
     std::string geoJsonName;
-    //std::shared_ptr<groupLayers> mGL;
     //std::string path;
     cWebAptitude *m_app;
     void run() override;

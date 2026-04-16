@@ -8,7 +8,6 @@
 #include <iostream>
 #include "grouplayers.h"
 #include "parcellaire.h"
-//#include "uploadcarte.h"
 #include <Wt/WContainerWidget.h>
 #include <Wt/WVBoxLayout.h>
 #include <Wt/WHBoxLayout.h>
@@ -29,16 +28,12 @@
 #include "simplepoint.h"
 #include "Wt/WEnvironment.h"
 #include "Wt/Http/Cookie.h"
-
 #include <Wt/WIntValidator.h>
 #include <Wt/WLineEdit.h>
-
+#include <curl/curl.h>
 #include "presentationpage.h"
 #include "panier.h"
 #include "analytics.h"
-
-#include <curl/curl.h>
-
 
 using namespace std;
 using namespace Wt;
@@ -50,6 +45,7 @@ extern bool globTest;
 
 class parcellaire;
 class panier;
+class simplepoint;
 
 class dialog : public Wt::WDialog
 {
@@ -60,9 +56,6 @@ public:
         // on ne peut pas utiliser l'environnement dans le constructeur, car au début de la session, la taille de l'écran n'est pas encore définie (plain html session without ajax machin)
         int w_=env_->screenWidth()*5.0/10.0;
         int h_=env_->screenHeight()*7.0/10.0;
-        //std::cout << " set size dialog " << w_ << " , " << h_ << std::endl;
-        // setMaximumSize(w_,h_);
-
         setMaximumSize(w_,h_);
         if (mShow){show();}
     }
@@ -88,7 +81,7 @@ public:
     void logout();
     Wt::Auth::User getUser();
     void clientIDcookies();
-    void addLog(std::string page,typeLog cat=typeLog::page);   // ajoute un record aux stat web
+    void addLog(std::string page,typeLog cat=typeLog::page);
 
     cDicoApt * mDico;
     Analytics mAnal;
@@ -105,7 +98,6 @@ public:
 
     WContainerWidget *mLegendW;
     simplepoint *mAnaPoint;
-    // WMenuItem *menuitem_panier;
     WMenuItem * menuitem_analyse,* menuitem_app,*menuitem_legend,*menuitem_documentation,*menuitem_simplepoint,*menuitem_login,*menuitem_catalog,*menuitem_cadastre;
     dialog *dialog_anal,*dialog_info,*dialog_catalog,*dialog_cadastre,*dialog_legend;
     panier * mPanier;
@@ -128,7 +120,7 @@ public:
     }
 
     virtual void refresh(){
-        if (globTest){std::cout << "ici je vais m'assurer que le refresh fasse ce qu'il faut" << std::endl;}
+        if (globTest){std::cout << "ici je vais m'assurer que le refresh fasse ce qu'il faut (persistance des cartes choisies par l'utilisateur, extent)" << std::endl;}
         WApplication::refresh();
     }
 
