@@ -9,8 +9,7 @@
 
 using namespace Wt;
 
-// C'est la classe qui hérite de layerbase et qui intègre tout le volêt Wt - site internet avec interface graphique
-// c'est également la classe qui fait le lien avec la classe Ess et les aptitudes qui vont avec
+// C'est la classe qui hérite de layerbase et qui contient une interface graphique dans Wt dans le catalogue (=grouplayer)
 
 class groupLayers;
 class Layer;
@@ -20,14 +19,8 @@ class Layer : public layerBase, public std::enable_shared_from_this<Layer>
 public:
 
     Layer(std::shared_ptr<layerBase> aLB,WText * PWText);
-    Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB,WText * PWText);
-
-
-    // JS and layerbase
+    // Javascript
     void displayLayer() const;
-
-
-
     void setActive(bool b=true);
     bool IsActive() const {return mActive;}
 
@@ -54,9 +47,6 @@ public:
 private:
     bool mIsVisible;
     bool mActive;
-
-    //groupLayers * mGroupL;
-
     WText * mWtText;
 };
 

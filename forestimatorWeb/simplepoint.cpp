@@ -328,7 +328,7 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     // ajout du logo IGN. ajout des crédits ; toujours les mêmes, en dur.
     sm.addImg(mSP->mDico->File("logoIGN"));
     boost::replace_all(tp, "PATH_CARTE", sm.getFileName());
-    boost::replace_all(tp, "TITRE_CARTE", mSP->m_app->mGroupL->getLay("IGN")->getLegendLabel(0));
+    boost::replace_all(tp, "TITRE_CARTE", mSP->mDico->getLayerBase("IGN")->getLegendLabel(0));
     boost::replace_all(tp, "POSITION_PTX", roundDouble(mSP->getX(), 1));
     boost::replace_all(tp, "POSITION_PTY", roundDouble(mSP->getY(), 1));
 

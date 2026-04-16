@@ -45,7 +45,6 @@ panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
     WPushButton * bExportTiff = this->addWidget(std::make_unique<WPushButton>("Télécharger"));
     bExportTiff->setToolTip(tr("panier.download_tooltip"));
     bExportTiff->clicked().connect(mGroupL->slotMapExport);
-    //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
 
     mGroupL->mExtentDivGlob=mExtentDivGlob;
     mGroupL->mExtentDiv=mExtentDiv;

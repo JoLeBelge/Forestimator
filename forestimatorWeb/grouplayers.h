@@ -69,20 +69,14 @@ public:
     void saveExtent(double c_x, double c_y, double zoom);
     void deleteExtent(std::string id_extent);
 
-    //selectLayers *mSelectLayers;
-
     // signal pour cacher les nodes qui sont en mode expert
     Wt::Signal<bool> &changeExpertMode() { return expertMode_; }
 
     OGREnvelope *getMapExtent() { return &mMapExtent; }
 
-
-    //std::vector<std::shared_ptr<layerBase>> Layers() {return mVLs; }
     std::shared_ptr<Layer> getActiveLay();
 
     std::vector<std::shared_ptr<Layer>> mVLs;
-    std::shared_ptr<Layer> getLay(std::string aCode);
-
 
     void closeConnection();
     int openConnection();

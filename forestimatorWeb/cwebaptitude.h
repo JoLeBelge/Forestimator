@@ -89,12 +89,12 @@ public:
 
     void handlePathChange();
 
+    groupLayers * mGroupL;
     WOpenLayers * mMap;
     Wt::WNavigationBar * navigation;
     Wt::WStackedWidget * top_stack;// celui qui navige entre la page de garde (home), la page de présentation et les volets analyse/carto
     Wt::Auth::AuthWidget* authWidget;
     Wt::WPushButton *b_login;
-    groupLayers * mGroupL;
 
     WContainerWidget *mLegendW;
     simplepoint *mAnaPoint;

@@ -71,8 +71,7 @@ protected:
 class parcellaire : public WContainerWidget, public groupStat
 {
 public:
-    parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW);
-    ~parcellaire();
+    parcellaire(cWebAptitude *app, statWindow *statW);
     void cleanShpFile();
     bool to31370AndGeoJson(); // boite de dialogue pour choisir src si jamais la couche n'en a pas de défini
     void to31370AndGeoJsonGDAL();

@@ -214,31 +214,24 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     dialog_anal = tpl_content_app->addChild(std::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&environment()));
     // catalogue
     dialog_catalog = tpl_content_app->addChild(std::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&environment()));
-
     dialog_catalog->contents()->setStyleClass("content_GL");
-    //auto content_catalog = dialog_catalog->contents()->addWidget(std::make_unique<WContainerWidget>());
-    //content_catalog->addStyleClass("content_catalog");
-
     // cadastre
     dialog_cadastre = tpl_content_app->addChild(std::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&environment()));
     // legende
     dialog_legend = tpl_content_app->addChild(std::make_unique<dialog>("Légende",menuitem_legend,&environment()));
-    mLegendW = dialog_legend->contents()->addWidget(std::make_unique<WContainerWidget>());
+    mLegendW = dialog_legend->contents();
     mLegendW->addStyleClass("content_legend");
 
     widgetCadastre * content_cadastre;
     content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get(),this));
     content_cadastre->addStyleClass("content_cadastre");
 
-
     mGroupL = dialog_catalog->contents()->addWidget(std::make_unique<groupLayers>(this));
-
     mPanier = tpl_content_app->bindWidget("panier", std::make_unique<panier>(this));
 
     statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(this));
 
-
-    mPA = dialog_anal->contents()->addWidget(std::make_unique<parcellaire>(mGroupL,this,page_camembert));
+    mPA = dialog_anal->contents()->addWidget(std::make_unique<parcellaire>(this,page_camembert));
     mPA->addStyleClass("content_analyse");
 
     mGroupL->updateGL();

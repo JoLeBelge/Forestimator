@@ -5,31 +5,9 @@ Layer::Layer(std::shared_ptr<layerBase> aLB, WText * PWText):
   ,mWtText(PWText)
   ,mIsVisible(1)
 {
-    //std::cout << "création de layer pour " << aCode << std::endl;
-    //mLabel=mNom;
     mWtText->setText(mNomCourt);
-
     setActive(false);
-    //std::cout << "done" << std::endl;
 }
-/*
-Layer::Layer(std::string aCode):
-   layerBase(aCode,aGroupL->Dico())
-  ,mIsVisible(0)
-{
-    //mLabel=mNomCourt;
-    mWtText=NULL;
-    setActive(false);
-}*/
-
-Layer::Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB, WText * PWText):
-    layerBase(aLB)
-   ,mWtText(PWText)
-   ,mIsVisible(1)
- {
-     mWtText->setText(mNomCourt);
-     setActive(false);
- }
 
 void Layer::setActive(bool b){
     mActive=b;
@@ -78,11 +56,6 @@ void Layer::displayLayer() const{
 
     JScommand+="activeLayers['MYCODE'] = activeLayer;updateGroupeLayers();";
 
-   /* std::ifstream in(aFileIn);
-    std::stringstream ss;
-    ss << in.rdbuf();
-    in.close();*/
-
     boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
     boost::replace_all(JScommand,"MYLAYER",mWMSLayerName);
     boost::replace_all(JScommand,"MYURL",mUrl);
@@ -91,6 +64,3 @@ void Layer::displayLayer() const{
 
     mWtText->doJavaScript(JScommand);
 }
-
-
-

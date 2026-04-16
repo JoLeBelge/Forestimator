@@ -6,10 +6,10 @@ int globVolMaxShp(10000);    // en ko // n'as pas l'air de fonctionner comme je 
 
 extern bool globTest;
 
-parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW) : mGL(aGL), centerX(0.0), centerY(0.0), mClientName(""), mName(""), mFullPath(""), m_app(app), fu(NULL), msg(NULL), hasValidShp(0), downloadRasterBt(NULL), mStatW(statW), mLabelName("")
+parcellaire::parcellaire(cWebAptitude *app, statWindow *statW) : centerX(0.0), centerY(0.0), mClientName(""), mName(""), mFullPath(""), m_app(app), fu(NULL), msg(NULL), hasValidShp(0), downloadRasterBt(NULL), mStatW(statW), mLabelName("")
 {
     // std::cout << "creation parcellaire " << std::endl;
-    mDico = aGL->Dico();
+    mDico = m_app->mDico;
     GDALAllRegister();
     mParcellaireExtent.MinX = 0;
     mParcellaireExtent.MinY = 0;
@@ -64,14 +64,6 @@ int parcellaire::getNumSelect4Download() { return mSelectLayers->numSelectedLaye
 
 std::vector<std::shared_ptr<layerBase> > parcellaire::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
 
-parcellaire::~parcellaire()
-{
-    // cleanShpFile();
-    m_app = NULL;
-    msg = NULL;
-    mGL = NULL;
-    mDico = NULL;
-}
 
 void parcellaire::cleanShpFile()
 {
@@ -332,7 +324,7 @@ void parcellaire::upload()
         mLabelName = "";
         if (to31370AndGeoJson())
         {
-            mGL->m_app->addLog("upload a shp gpkg");
+            m_app->addLog("upload a shp gpkg");
             if (computeExtentAndSurf())
             {
                 hasValidShp = true;
@@ -412,7 +404,6 @@ std::string parcellaire::fileName() { return mFullPath + "." + mExtention; }
 void parcellaire::downloadRaster()
 {
 
-    //std::vector<rasterFiles> vRs = mGL->getSelect4Download();
     if (getSelect4Download().size() > 0)
     {
         m_app->addLog("download " + getSelect4Download().size(), typeLog::dmulti);
@@ -426,7 +417,6 @@ void parcellaire::downloadRaster()
         for (std::shared_ptr<layerBase> &l : getSelect4Download())
         {
             std::string aCroppedRFile = mFullPath + "_" + l->Code() + ".tif";
-            // mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
             if (cropImWithShp(l, aCroppedRFile))
             {
                 zf->addFile(mClientName + "_" + l->Code() + ".tif", aCroppedRFile);

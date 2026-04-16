@@ -75,7 +75,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                     wtext = n->label();
 
                     // 2) création de la couche
-                    std::shared_ptr<Layer> aL = std::make_shared<Layer>(this, aLB, wtext);
+                    std::shared_ptr<Layer> aL = std::make_shared<Layer>(aLB, wtext);
                     // 3) ajout des interactions olala...
                     std::string aCode = aL->Code();
                     wtext->doubleClicked().connect([this, aCode]
@@ -84,10 +84,6 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                     mVLs.push_back(aL);
                 }
             }
-           /* else
-            {
-                //mVLs.push_back(std::make_shared<Layer>(this, aLB));
-            }*/
         }
     }
 
@@ -106,7 +102,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                 n = aMNodes.at(mDico->lay2groupe(aLB->Code()))->addChildNode(std::make_unique<Wt::WTreeNode>(""));
                 wtext = n->label();
                 // 2) création de la couche
-                std::shared_ptr<Layer> aL = std::make_shared<Layer>(this, aLB, wtext);
+                std::shared_ptr<Layer> aL = std::make_shared<Layer>(aLB, wtext);
                 // 3) ajout des interactions
                 std::string aCode = aL->Code();
                 wtext->doubleClicked().connect([this, aCode]
@@ -124,10 +120,6 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
     addWidget(std::make_unique<WText>(tr("coucheStep1")));
     addWidget(std::move(tree));
 
-    //mSelectLayers = new selectLayers(); NONONONON
-
-    // updateGL pour cacher les couches expert
-    // updateGL(); // -> bougé dans classe parent cwebapt car segfault not init refs !
 
     if (globTest){std::cout << "done " << std::endl;}
 }
@@ -248,28 +240,7 @@ std::shared_ptr<Layer> groupLayers::getActiveLay()
     return aRes;
 }
 
-/**
- * @brief groupLayers::getLay Getter d'une couche selon son code
- * @param aCode
- * @return
- */
-std::shared_ptr<Layer> groupLayers::getLay(std::string aCode)
-{
-    std::shared_ptr<Layer> aRes = NULL;
-    for (std::shared_ptr<Layer> l : mVLs)
-    {
-        if ((l->Code() == aCode))
-        {
-            aRes = l;
-            break;
-        }
-    }
-    return aRes;
-}
 
-/**
- * @brief groupLayers::exportLayMapView Exporte la vue actuelle de la top couche du panier
- */
 void groupLayers::exportLayMapView()
 {
 
