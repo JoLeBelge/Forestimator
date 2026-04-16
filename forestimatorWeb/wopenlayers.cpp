@@ -13,7 +13,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
     popup->setStyleClass("ol-popup");
     Wt::WLink link = Wt::WLink(""); // sert à rien en fait
     Wt::WAnchor *popupCloser = popup->addNew<Wt::WAnchor>(link);
-    popupCloser->clicked().connect([popup]
+    popupCloser->clicked().connect([this]
     { popup->hide(); });
 
     popupCloser->setId("popup-closer");
