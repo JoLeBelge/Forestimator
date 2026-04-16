@@ -1,6 +1,6 @@
 #include "ecogrammeEss.h"
 
-EcogrammeEss::EcogrammeEss(cEss * aEss, ST * aStation):mEss(aEss),mDico(aEss->Dico()),mST(aStation)
+EcogrammeEss::EcogrammeEss(cEss * aEss, simplepoint *aSP):mEss(aEss),mDico(aEss->Dico()),mST(aSP)
 { 
     resize(200,200*(15.0/7.0));
     //resize(this->parent()->width(),this->parent()->width()*15.0/7.0);

@@ -6,10 +6,10 @@ int globVolMaxShp(10000);    // en ko // n'as pas l'air de fonctionner comme je 
 
 extern bool globTest;
 
-parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW) : mGL(aGL), centerX(0.0), centerY(0.0), mClientName(""), mName(""), mFullPath(""), m_app(app), fu(NULL), msg(NULL), hasValidShp(0), downloadRasterBt(NULL), mStatW(statW), mLabelName("")
+parcellaire::parcellaire(cWebAptitude *app, statWindow *statW) : centerX(0.0), centerY(0.0), mClientName(""), mName(""), mFullPath(""), m_app(app), fu(NULL), msg(NULL), hasValidShp(0), downloadRasterBt(NULL), mStatW(statW), mLabelName("")
 {
     // std::cout << "creation parcellaire " << std::endl;
-    mDico = aGL->Dico();
+    mDico = m_app->mDico;
     GDALAllRegister();
     mParcellaireExtent.MinX = 0;
     mParcellaireExtent.MinY = 0;
@@ -55,18 +55,15 @@ parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW)
 
     downloadRasterBt->clicked().connect(this, &parcellaire::downloadRaster);
     anaOnAllPolygBt->clicked().connect(this, &parcellaire::anaAllPol);
-    //  ouu je pense que c'est mal, car si j'appui sur boutton télécharger les cartes, il me dis que toutes les cartes sont sélectionnées
-    mContSelect4D->addWidget(std::unique_ptr<baseSelectLayers>(mGL->mSelectLayers));
+    mSelectLayers= mContSelect4D->addWidget(std::make_unique<selectLayers>(mDico));
 }
 
-parcellaire::~parcellaire()
-{
-    // cleanShpFile();
-    m_app = NULL;
-    msg = NULL;
-    mGL = NULL;
-    mDico = NULL;
-}
+std::vector<std::shared_ptr<layerBase> > parcellaire::getSelect4Download() { return mSelectLayers->getSelectedLayer(); }
+
+int parcellaire::getNumSelect4Download() { return mSelectLayers->numSelectedLayer(); }
+
+std::vector<std::shared_ptr<layerBase> > parcellaire::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
+
 
 void parcellaire::cleanShpFile()
 {
@@ -292,14 +289,14 @@ void parcellaire::upload()
             mLabelName = "";
             if (to31370AndGeoJson())
             {
-                mGL->m_app->addLog("upload a shp");
+                m_app->addLog("upload a shp");
                 if (computeExtentAndSurf())
                 {
                     hasValidShp = true;
                     downloadRasterBt->enable();
                     anaOnAllPolygBt->enable();
                     display();
-                    mGL->mMap->setToolTip(tr("tooltipMap2"));
+                    m_app->mMap->setToolTip(tr("tooltipMap2"));
                 }
             }
         }
@@ -327,14 +324,14 @@ void parcellaire::upload()
         mLabelName = "";
         if (to31370AndGeoJson())
         {
-            mGL->m_app->addLog("upload a shp gpkg");
+            m_app->addLog("upload a shp gpkg");
             if (computeExtentAndSurf())
             {
                 hasValidShp = true;
                 downloadRasterBt->enable();
                 anaOnAllPolygBt->enable();
                 display();
-                mGL->mMap->setToolTip(tr("tooltipMap2"));
+                m_app->mMap->setToolTip(tr("tooltipMap2"));
             }
         }
         msg->setText(tr("analyse.surf.msg.uploadOK"));
@@ -349,10 +346,10 @@ void parcellaire::visuStat(OGRFeature *poFeature)
     }
 
     mStatW->vider();
-    mStatW->titre("<h4>Statistique pour polygone FID " + std::to_string(poFeature->GetFID()) + " de " + mClientName + "</h4>");
+    mStatW->mTitre->setText("<h4>Statistique pour polygone FID " + std::to_string(poFeature->GetFID()) + " de " + mClientName + "</h4>");
     if (mLabelName != "")
     {
-        mStatW->titre("<h4>Statistique pour " + mLabelName + "</h4>");
+        mStatW->mTitre->setText("<h4>Statistique pour " + mLabelName + "</h4>");
     }
     mStatW->generateGenCarte(poFeature);
     mStatW->genIndivCarteAndAptT();
@@ -381,7 +378,7 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId)
                 OGRGeometry *poGeom = poFeature->GetGeometryRef();
                 poGeom->closeRings();
                 poGeom->flattenTo2D(); // sinon la géométrie est genre polygone3D et pas pris en charge dans staticMap par ex
-                mGL->computeStatGlob(poGeom);
+                computeStatGlob(poGeom);
                 find = 1;
                 break;
             }
@@ -407,10 +404,9 @@ std::string parcellaire::fileName() { return mFullPath + "." + mExtention; }
 void parcellaire::downloadRaster()
 {
 
-    //std::vector<rasterFiles> vRs = mGL->getSelect4Download();
-    if (mGL->getSelect4Download().size() > 0)
+    if (getSelect4Download().size() > 0)
     {
-        m_app->addLog("download " + mGL->getSelect4Download().size(), typeLog::dmulti);
+        m_app->addLog("download " + getSelect4Download().size(), typeLog::dmulti);
         m_app->loadingIndicator()->setMessage(tr("LoadingI4"));
         m_app->loadingIndicator()->show();
         // crée l'archive
@@ -418,10 +414,9 @@ void parcellaire::downloadRaster()
         auto zf = std::make_unique<ZipArchive>(mFullPath + suffix);
         zf->open(ZipArchive::WRITE);
         // crop les raster selectionnés
-        for (std::shared_ptr<Layer> &l : mGL->getSelect4Download())
+        for (std::shared_ptr<layerBase> &l : getSelect4Download())
         {
             std::string aCroppedRFile = mFullPath + "_" + l->Code() + ".tif";
-            // mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
             if (cropImWithShp(l, aCroppedRFile))
             {
                 zf->addFile(mClientName + "_" + l->Code() + ".tif", aCroppedRFile);
@@ -531,7 +526,7 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
         downloadRasterBt->enable();
         anaOnAllPolygBt->enable();
         display();
-        mGL->mMap->setToolTip(tr("tooltipMap2"));
+        m_app->mMap->setToolTip(tr("tooltipMap2"));
     }
 }
 
@@ -546,22 +541,21 @@ void parcellaire::doComputingTask()
                 Wt::WString::tr("mail.anasMulti.title").toUTF8(),
                 Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName == "" ? mClientName : mLabelName).arg(ressourcePath).toUTF8());
 
-    parcellaire::TaskComputing *analyseSurfacique = new parcellaire::TaskComputing(geoJsonName(), mGL,mDico, &m_app);
+    TaskComputing *analyseSurfacique = new TaskComputing(geoJsonName(), m_app);
     analyseSurfacique->setCallbackAfter([this, mail]() -> void
     {
         tools::sendMail(mail);
         m_app->addLog("Surface analysis report sent to " + m_app->getUser().email(), typeLog::anasMulti); });
-
     pool->add(analyseSurfacique);
 }
 
-void parcellaire::TaskComputing::run()
+void TaskComputing::run()
 {
     std::string input(geoJsonName);
     const char *inputPath = input.c_str();
     cout << input.c_str();
     // je dois réouvrir le shp à chaque layer car le traitement modifie le fichier
-    for (auto &l : mGL->getSelectedLayer4Download())
+    for (auto &l : m_app->mPA->getSelectedLayer4Download())
     {
         if (l->l4Stat())
         {
@@ -570,7 +564,7 @@ void parcellaire::TaskComputing::run()
             {
                 OGRLayer *lay = mDS->GetLayer(0);
                 // ajout d'une colonne dans la layer
-                mDico->geoservice(l->Code(), "", "", typeAna::Mass,lay);
+                m_app->mDico->geoservice(l->Code(), "", "", typeAna::Mass,lay);
                 GDALClose(mDS);
             }
             else
@@ -801,14 +795,35 @@ void parcellaire::to31370AndGeoJsonGDAL()
         GDALClose(hSrcDS);
     }
 
-    mGL->m_app->addLog("upload a shp");
+    m_app->addLog("upload a shp");
     if (computeExtentAndSurf())
     {
         hasValidShp = true;
         downloadRasterBt->enable();
         anaOnAllPolygBt->enable();
         display();
-        mGL->mMap->setToolTip(tr("tooltipMap2"));
+        m_app->mMap->setToolTip(tr("tooltipMap2"));
     }
     msg->setText(tr("analyse.surf.msg.uploadOK"));
+}
+
+
+void parcellaire::computeStatGlob(OGRGeometry *poGeomGlobale)
+{
+    std::cout << " groupLayers::computeStatGlob " << std::endl;
+    clearStat();
+
+    // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
+    for (auto &l : getSelectedLayer4Download())
+    {
+
+        if (l->l4Stat())
+        {
+            // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+            std::map<std::string, int> stat = l->computeStat1(poGeomGlobale);
+            mVLStat.push_back(std::make_shared<layerStatChart>(l, stat, poGeomGlobale));
+        }
+    }
+
+    m_app->addLog("compute stat, " + std::to_string(getNumSelect4Download()) + " traitements", typeLog::anas); // add some web stats
 }

@@ -4,7 +4,7 @@
 
 extern bool globTest;
 
-groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mMap(cWebApt->mMap), mLegendDiv(cWebApt->mLegendW), mAnaPoint(NULL), mSelectLayers(NULL), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
+groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mLegendDiv(cWebApt->mLegendW), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
 {
     setOverflow(Wt::Overflow::Visible);
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
@@ -75,18 +75,14 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                     wtext = n->label();
 
                     // 2) création de la couche
-                    std::shared_ptr<Layer> aL = std::make_shared<Layer>(this, aLB, wtext);
-                    // 3) ajout des interactions
+                    std::shared_ptr<Layer> aL = std::make_shared<Layer>(aLB, wtext);
+                    // 3) ajout des interactions olala...
                     std::string aCode = aL->Code();
                     wtext->doubleClicked().connect([this, aCode]
                                                    { clickOnName(aCode); });
                     aL->changeExpertMode().connect(n, &Wt::WTreeNode::setNodeVisible);
                     mVLs.push_back(aL);
                 }
-            }
-            else
-            {
-                mVLs.push_back(std::make_shared<Layer>(this, aLB));
             }
         }
     }
@@ -106,7 +102,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                 n = aMNodes.at(mDico->lay2groupe(aLB->Code()))->addChildNode(std::make_unique<Wt::WTreeNode>(""));
                 wtext = n->label();
                 // 2) création de la couche
-                std::shared_ptr<Layer> aL = std::make_shared<Layer>(this, aLB, wtext);
+                std::shared_ptr<Layer> aL = std::make_shared<Layer>(aLB, wtext);
                 // 3) ajout des interactions
                 std::string aCode = aL->Code();
                 wtext->doubleClicked().connect([this, aCode]
@@ -124,30 +120,8 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
     addWidget(std::make_unique<WText>(tr("coucheStep1")));
     addWidget(std::move(tree));
 
-    mSelectLayers = new selectLayers(this);
-    mStation = new ST(mDico);
-
-    /*   AUTRES DIV   */
-    mAnaPoint = new simplepoint(this, cWebApt->mSimplepointW);
-
-    // updateGL pour cacher les couches expert
-    // updateGL(); // -> bougé dans classe parent cwebapt car segfault not init refs !
 
     if (globTest){std::cout << "done " << std::endl;}
-}
-
-groupLayers::~groupLayers()
-{
-    if (globTest)
-    {
-        std::cout << "destructeur de group layer " << std::endl;
-    }
-    delete mAnaPoint;
-    delete mStation;
-    mMap = NULL;
-    mDico = NULL;
-    mAnaPoint = NULL;
-    //mVLs.clear();
 }
 
 void groupLayers::updateActiveLay(std::string aCode)
@@ -161,201 +135,12 @@ void groupLayers::updateActiveLay(std::string aCode)
 }
 
 
-void groupLayers::extractInfo(double x, double y)
-{
-    if (!isnan(x) && !isnan(y) && !(x == 0 && y == 0))
-    {
-        if (globTest)
-        {
-            std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
-        }
-        mStation->vider();
-        mStation->setOK();
-        mStation->setX(x);
-        mStation->setY(y);
-        mAnaPoint->vider();
-
-        // tableau des informations globales - durant ce round, l'objet ST est modifié
-        mAnaPoint->titreInfoRaster();
-
-        ptPedo ptPed = ptPedo(mDico->mPedo, x, y);
-        mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::DRAINAGE));
-        mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::PROFONDEUR));
-        mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
-        mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::CHARGE));
-
-        for (std::shared_ptr<Layer> l : mVLs)
-        {
-            if (((l->getCatLayer() == TypeLayer::KK) | (l->getCatLayer() == TypeLayer::Station)) | ((l->IsActive()) & (l->getCatLayer() != TypeLayer::Externe)))
-            {
-                if (l->isVisible())
-                {
-                    std::vector<std::string> layerLabelAndValue = l->displayInfo(x, y);
-                    if (l->l4StatP())
-                    {
-                        mAnaPoint->add1InfoRaster(layerLabelAndValue);
-                    }
-                    if ((l->IsActive()) && l->Code() != "CS_A")
-                    {
-                        // affiche une popup pour indiquer la valeur pour cette couche
-                        // attention, il faut escaper les caractères à problèmes du genre apostrophe
-                        boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
-                        boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
-                        doJavaScript("content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
-                    }
-                    else if ((l->IsActive()) && l->Code() == "CS_A")
-                    {
-                        int aVal = l->getValue(x, y);
-                        // affiche une popup pour indiquer la valeur pour cette couche
-                        // attention, il faut escaper les caractères à problèmes du genre apostrophe
-                        boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
-                        boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
-
-                        if (aVal != 0)
-                        {
-                            std::string js = "content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A" + std::to_string(aVal) + ".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);";
-                            // std::cout << "js : " << js << std::endl;
-                            doJavaScript(js);
-                        }
-                    }
-                }
-            }
-
-            // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay". Attention, CNSWrast n'est plus "Externe" maintenant que j'y ai associé la couche raster.
-            if ((l->IsActive() && l->Code() == "CNSWrast"))
-            {
-                doJavaScript("content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
-            }
-
-            // si la couche active est le cadastre
-            if ((l->IsActive() && l->Code() == "Cadastre"))
-            {
-
-                ptCadastre *ptCad = new ptCadastre(mDico->mCadastre, x, y);
-                ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre, m_app->mPA, std::placeholders::_1, std::placeholders::_2));
-                doJavaScript("content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
-                // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
-                WDialog *dialogPtr = addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
-                dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));
-                WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Oui");
-                ok->setDefault(false);
-                ok->clicked().connect([=]
-                                      {
-                    ptCad->usePolyg4Stat();
-                    delete(ptCad);
-                    dialogPtr->reject(); });
-                WPushButton *annuler = dialogPtr->footer()->addNew<Wt::WPushButton>("Non");
-                annuler->setDefault(true);
-                annuler->clicked().connect([=]
-                                           {dialogPtr->reject();
-                delete(ptCad); });
-                dialogPtr->show();
-            }
-        }
-        // tableau du détail du calcul de l'aptitude d'une essence pour FEE
-        for (std::shared_ptr<Layer> l : mVLs)
-        {
-            // on a bien une essence active et on est en mode FEE
-            if (l->IsActive() && l->getCatLayer() == TypeLayer::FEE)
-            {
-                // on note la chose dans l'objet ecogramme, car la classe simplepoint va devoir savoir si il y a un ecogramme à export en jpg ou non
-                mStation->setHasFEEApt(1);
-                mAnaPoint->detailCalculAptFEE(mStation);
-            }
-        }
-        // tableau des aptitudes pour toutes les essences
-        mAnaPoint->afficheAptAllEss();
-        //mMap->updateView();
-    }
-    else
-    {
-        std::cout << "x et y ne sont pas des nombres , pas bien " << std::endl;
-    }
-}
 
 /**
  * @brief groupLayers::computeStatGlob
  * @param poGeomGlobale
  */
-void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale)
-{
-    std::cout << " groupLayers::computeStatGlob " << std::endl;
-    clearStat();
 
-    // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
-    for (auto &l : getSelectedLayer4Download())
-    {
-
-        if (l->l4Stat())
-        {
-            // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-            std::map<std::string, int> stat = l->computeStat1(poGeomGlobale);
-            mVLStat.push_back(std::make_shared<layerStatChart>(l, stat, poGeomGlobale));
-        }
-    }
-
-    m_app->addLog("compute stat, " + std::to_string(getNumSelect4Download()) + " traitements", typeLog::anas); // add some web stats
-}
-
-std::map<std::string, int> groupLayers::apts(TypeClassifST aType)
-{
-    std::map<std::string, int> aRes;
-    switch(aType)
-    {
-    case FEE:
-    {
-        if (globTest)
-        {
-            std::cout << " GL get apt pour mode FEE " << std::endl;
-        }
-        if (mStation->readyFEE())
-        {
-            if (globTest)
-            {
-                std::cout << "station a NT NH ZBIO et Topo " << std::endl;
-            }
-            for (std::shared_ptr<Layer> l : mVLs)
-            {
-                if (l->getCatLayer() == TypeLayer::FEE)
-                {
-                    // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-                    // std::shared_ptr<cEss> Ess= l->Ess();
-                    if (mDico->hasEss(l->EssCode()))
-                    {
-                        std::shared_ptr<cEss> Ess = mDico->getEss(l->EssCode());
-                        int apt = Ess->getFinalApt(mStation->mNT, mStation->mNH, mStation->mZBIO, mStation->mTOPO);
-                        aRes.emplace(std::make_pair(Ess->Code(), apt));
-                    }
-                }
-            }
-        }
-        break;
-    }
-    case CS:
-    {
-        if (globTest)
-        {
-            std::cout << " GL get apt pour mode CS " << std::endl;
-        }
-        if (mStation->readyCS())
-        {
-            if (globTest)
-            {
-                std::cout << "station a bien une station du catalogue " << std::endl;
-            }
-            for (auto kv : Dico()->getAllEss())
-            {
-                std::shared_ptr<cEss> Ess = kv.second;
-                int apt = Ess->getApt(mStation->mZBIO, mStation->mSt);
-                if (apt != 0)
-                    aRes.emplace(std::make_pair(Ess->Code(), apt));
-            }
-        }
-        break;
-    }
-    }
-    return aRes;
-}
 
 void groupLayers::updateGL()
 {
@@ -371,11 +156,6 @@ void groupLayers::updateGL()
     {
         mExtentDivGlob->hide();
     }
-
-    auto pdf = std::make_shared<pointPdfResource>(mAnaPoint);
-    auto pdfLink = Wt::WLink(pdf);
-    pdfLink.setTarget(Wt::LinkTarget::NewWindow);
-    mAnaPoint->createPdfBut->setLink(pdfLink);
 
     // report analyse surfacique
     auto pdfSurf = std::make_shared<surfPdfResource>(m_app->mPA->mStatW);
@@ -395,10 +175,6 @@ void groupLayers::updateGL()
 
 
 
-/**
- * @brief groupLayers::updateLegende Refresh la legende pour une couche
- * @param l
- */
 void groupLayers::updateLegende(const std::shared_ptr<Layer> l)
 {
     if (l->getCatLayer() != TypeLayer::Externe)
@@ -464,28 +240,7 @@ std::shared_ptr<Layer> groupLayers::getActiveLay()
     return aRes;
 }
 
-/**
- * @brief groupLayers::getLay Getter d'une couche selon son code
- * @param aCode
- * @return
- */
-std::shared_ptr<Layer> groupLayers::getLay(std::string aCode)
-{
-    std::shared_ptr<Layer> aRes = NULL;
-    for (std::shared_ptr<Layer> l : mVLs)
-    {
-        if ((l->Code() == aCode))
-        {
-            aRes = l;
-            break;
-        }
-    }
-    return aRes;
-}
 
-/**
- * @brief groupLayers::exportLayMapView Exporte la vue actuelle de la top couche du panier
- */
 void groupLayers::exportLayMapView()
 {
 
@@ -757,14 +512,6 @@ void groupLayers::deleteExtent(std::string id_extent)
 }
 /** FIN extents **/
 
-std::vector<std::shared_ptr<Layer> > groupLayers::getSelect4Download() { return mSelectLayers->getSelectedLayer(); }
-// std::vector<rasterFiles> groupLayers::getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
-
-// int groupLayers::getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
-int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLayer(); }
-
-std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
-
 bool isValidXmlIdentifier(const std::string &str)
 {
     return str.find("??") == std::string::npos;
@@ -879,20 +626,19 @@ GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
 void groupLayers::clickOnName(std::string aCode)
 {
     updateActiveLay(aCode);
-    std::cout << "click on Name " << aCode << std::endl;
     std::shared_ptr<Layer> layer;
     for (std::shared_ptr<Layer> l : mVLs)
     {
         if (aCode == l->Code())
         {
-             std::cout << "got the layer " << aCode << std::endl;
             layer = l;
             break;
         }
     }
 
-    // cacher la fenetre popup
-    m_app->doJavaScript("overlay?.setVisible(0);");
+    // cacher la fenetre popup. plus propre de faire via wt que via js
+    m_app->mMap->popup->hide();
+    //m_app->doJavaScript("overlay?.setVisible(0);");
 
     // ajouter la couche à la carte
     for (std::shared_ptr<Layer> l : mVLs)

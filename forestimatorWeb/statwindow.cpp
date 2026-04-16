@@ -1,7 +1,7 @@
 #include "statwindow.h"
 extern bool globTest;
 
-statWindow::statWindow(groupLayers *aGL):mDico(aGL->Dico()), m_app(aGL->m_app),mGL(aGL)
+statWindow::statWindow(cWebAptitude * aWebApp):mDico(aWebApp->mDico), m_app(aWebApp)
 {
     if (globTest){std::cout << "statWindow::statWindow" << std::endl;}
     setId("statWindow");
@@ -11,8 +11,8 @@ statWindow::statWindow(groupLayers *aGL):mDico(aGL->Dico()), m_app(aGL->m_app),m
     addStyleClass("statWindow");
 
     WContainerWidget * contTitre_ =  addWidget(std::make_unique<Wt::WContainerWidget>());
-    mTitre = contTitre_->addWidget(std::make_unique<WText>());
-    mTitre->setId("statWindowTitre");
+    //mTitre = contTitre_->addWidget(std::make_unique<WText>());
+    //mTitre->setId("statWindowTitre");
     contTitre_->addWidget(std::make_unique<WText>(tr("infoDansVisuStat")));
     // bouton retour
     auto * tpl = contTitre_->addWidget(std::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
@@ -44,7 +44,7 @@ statWindow::statWindow(groupLayers *aGL):mDico(aGL->Dico()), m_app(aGL->m_app),m
 }
 
 void statWindow::genIndivCarteAndAptT(){
-    for (std::shared_ptr<layerStatChart> chart : mGL->ptrVLStat()) {
+    for (std::shared_ptr<layerStatChart> chart : m_app->mPA->ptrVLStat()) {
         if (chart->deserveChart()){
             if (chart->Lay()->getCatLayer()==TypeLayer::FEE || chart->Lay()->getCatLayer()==TypeLayer::CS){
                 add1Aptitude(chart);
@@ -54,8 +54,7 @@ void statWindow::genIndivCarteAndAptT(){
         }
     }
 
-    for (std::unique_ptr<Wt::WContainerWidget> & chart : mGL->mVLStatCont) {
-
+    for (std::unique_ptr<Wt::WContainerWidget> & chart :  m_app->mPA->mVLStatCont) {
         add1layerStat(std::move(chart));
     }
 
@@ -188,7 +187,7 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
     o.str("");
     // le plus délicat, c'est ce portage des WpaintedWidget batonnet qui sont dans la table d'aptitude vers le pdf
     //Je pourrais très simplement faire un "StatIndivCont" qui est générique à toute les cartes-> prend une autre forme et plus de place dans le pdf mais ça reste complêt et très bien.
-    for (std::shared_ptr<layerStatChart> chart : mSW->mGL->ptrVLStat()) {
+    for (std::shared_ptr<layerStatChart> chart : mSW->m_app->mPA->ptrVLStat()) {
         if (chart->deserveChart()){
             if (chart->Lay()->getCatLayer()==TypeLayer::FEE || chart->Lay()->getCatLayer()==TypeLayer::CS){
                 // problème : le layerStatChart d'une aptitude dois pouvoir utiliser la méthode getChart au lieu de getBarStat
@@ -217,5 +216,5 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
 
     response.out (). write ((char *) buf, size);
     delete [] buf;
-    mSW->mGL->m_app->addLog("pdf ana surf", typeLog::danas);
+    mSW->m_app->addLog("pdf ana surf", typeLog::danas);
 }

@@ -45,6 +45,16 @@ public:
         doJavaScript("refreshLayers();");
     }*/
 
+    virtual void refresh(){
+        std::cout << "refresh wopenlayer";
+        /*std::ifstream t(mDico->File("initOL"));
+        std::stringstream ss;
+        ss << t.rdbuf();
+        t.close();
+        doJavaScript(ss.str());*/
+        WContainerWidget::refresh();
+    }
+
     // signaux; voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807
 
     void filterMouseEvent(WMouseEvent event){
@@ -88,6 +98,8 @@ public:
     JSignal<double,double>& xySelect() { return xySelect_; }
 
     JSlot slot2;
+
+    Wt::WContainerWidget * popup;
 
     static constexpr const char *clickWithShift_label = "toto";
 

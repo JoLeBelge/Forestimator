@@ -371,6 +371,9 @@ layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File
     mWMSLayerName=mDico->getWMSinfo(this->Code())->WMSLayerName();
     mTypeWMS=mDico->getWMSinfo(this->Code())->getTypeWMS();
     mResolution=mDico->RasterResolution(mCode);
+    mLay4Stat=mDico->lay4Stat(mCode);
+    mLay4StatPonctuel=mDico->lay4StatP(mCode);
+    mLay4Visu=mDico->lay4Visu(mCode);
 }
 
 layerBase::layerBase(std::shared_ptr<layerBase> aLB):rasterFiles(aLB->Dico()->File(aLB->Code()),aLB->Code()){
@@ -388,6 +391,9 @@ layerBase::layerBase(std::shared_ptr<layerBase> aLB):rasterFiles(aLB->Dico()->Fi
     mWMSLayerName=aLB->WMSLayerName();
     mTypeWMS=aLB->getTypeWMS();
     mResolution=aLB->mResolution;
+    mLay4Stat=aLB->mLay4Stat;
+    mLay4StatPonctuel=aLB->mLay4StatPonctuel;
+    mLay4Visu=aLB->mLay4Visu;
 }
 
 std::string layerBase::NomFile(){

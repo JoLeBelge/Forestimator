@@ -82,7 +82,7 @@ private:
 class layerStatChart : public layerStat
 {
 public:
-    layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string,int> aStat, OGRGeometry * poGeom);
+    layerStatChart(std::shared_ptr<layerBase> aLay, std::map<std::string,int> aStat, OGRGeometry * poGeom);
     // chart ; une carte individuelle + tableau
     std::unique_ptr<WContainerWidget> getChart(bool forRenderingInPdf=0);
     // barstat; pour aptitude, les statistiques des aptitudes résumées sous forme de battonnet

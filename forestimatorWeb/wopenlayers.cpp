@@ -8,6 +8,16 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
     setLayoutSizeAware(1);
 
     setId("map"); // sans ça le script js ne sert à rien car ne vise aucun objet cible
+    // le popup pour afficher la valeur de la couche en cours d'affichage
+    popup = addNew<Wt::WContainerWidget>();
+    popup->setId("popup");
+    popup->setStyleClass("ol-popup");
+    Wt::WLink link = Wt::WLink(""); // sert à rien en fait
+    Wt::WContainerWidget *popupCloser = popup->addNew<Wt::WAnchor>(link);
+    popupCloser->setId("popup-closer");
+    popupCloser->setStyleClass("ol-popup-closer");
+    Wt::WContainerWidget *popupContent = popup->addNew<Wt::WContainerWidget>();
+    popupContent->setId("popup-content");
 
     if (!exists(mDico->File("initOL")))
     {
@@ -21,7 +31,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
         ss << t.rdbuf();
         t.close();
         doJavaScript(ss.str());
-        if (globTest) { std::cout << "initOL done" << std::endl;}*/
+        if (globTest) { std::cout << "initOL done (well dojavascript order done)" << std::endl;}
+        */
 
         setToolTip(tr("tooltipMap1"));
 
@@ -82,17 +93,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
         //t.close();
     }
 
-    // le popup pour afficher la valeur de la couche en cours d'affichage
-    Wt::WContainerWidget *popup = addNew<Wt::WContainerWidget>();
-    popup->setId("popup");
-    popup->setStyleClass("ol-popup");
-    Wt::WLink link = Wt::WLink(""); // sert à rien en fait
-    Wt::WContainerWidget *popupCloser = popup->addNew<Wt::WAnchor>(link);
-    popupCloser->setId("popup-closer");
-    popupCloser->setStyleClass("ol-popup-closer");
-    Wt::WContainerWidget *popupContent = popup->addNew<Wt::WContainerWidget>();
-    popupContent->setId("popup-content");
-    setWidth("100%");
+
+    //setWidth("100%");
     //setMinimumSize(400,0);
-    setOverflow(Overflow::Visible);
+    //setOverflow(Overflow::Visible);
 }

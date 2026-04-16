@@ -1,45 +1,36 @@
 #ifndef LEGEND_H
 #define LEGEND_H
-#include "grouplayers.h"
-#include <Wt/WApplication.h>
+//#include "grouplayers.h"
+//#include <Wt/WApplication.h>
 #include <Wt/WContainerWidget.h>
 #include <Wt/WMenuItem.h>
-#include <Wt/WTabWidget.h>
-#include <Wt/WStackedWidget.h>
-#include <Wt/WNavigationBar.h>
-#include <Wt/WPopupMenu.h>
-#include <Wt/WPopupMenuItem.h>
-#include <Wt/WNavigationBar.h>
-#include <Wt/WBootstrapTheme.h>
-#include <Wt/WEnvironment.h>
-#include <Wt/WHBoxLayout.h>
-#include <Wt/WVBoxLayout.h>
-#include <Wt/WPopupMenu.h>
 #include <Wt/WPushButton.h>
 #include <Wt/WText.h>
 #include <Wt/WLabel.h>
-#include <Wt/WToolBar.h>
-#include <Wt/WTemplate.h>
 #include <Wt/WString.h>
-#include <sys/stat.h>
-#include <fstream>
-#include <boost/algorithm/string/replace.hpp>
 #include "ecogrammeEss.h"
 #include <hpdf.h>
 #include <Wt/WResource.h>
-#include <Wt/Http/Request.h>
-#include <Wt/Http/Response.h>
 #include <Wt/Render/WPdfRenderer.h>
 #include "iostream"
 #include <Wt/WRasterImage.h>
+#include "cwebaptitude.h";
 
+class EcogrammeEss;
 class simplepoint;
-class groupLayers;
+class cWebAptitude;
 class ST;
 class Layer;
 using namespace Wt;
 class color;
 class MyRenderer; // dérivé de classe WPdfRenderer pour laquelle on ajoute des footers, voir https://redmine.webtoolkit.eu/boards/2/topics/14334
+
+enum TypeClassifST
+{
+    FEE,
+    CS
+};
+
 
 namespace {
     void HPDF_STDCALL error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no,
@@ -52,28 +43,62 @@ namespace {
 class simplepoint: public WContainerWidget
 {
 public:
-    simplepoint(groupLayers *aGL,WContainerWidget *parent);
+    simplepoint(cWebAptitude * app);
     void vider();
-    void titreInfoRaster();
+    void initStation();
     void add1InfoRaster(std::vector<std::string> aV);
-    void detailCalculAptFEE(ST *aST);
-    //void afficheLegendeIndiv(const Layer *l);
+    void detailCalculAptFEE();
     void afficheAptAllEss();
-    //void export2pdf(std::string titre);
-    //void export2pdfTitreDialog();
+    void extractInfo(double x, double y);
+    // retourne les aptitudes des essences pour une position donnée (click sur la carte)
+    // key ; code essence. Value ; code aptitude
+    std::map<std::string, int> apts(TypeClassifST aType);
+
+    std::vector<std::string> displayInfo(std::shared_ptr<layerBase> al);
 
     Wt::WText                 *mIntroTxt;
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
     Wt::WTable                 *mAptAllEss;
-    Wt::WContainerWidget     * mParent;
     WPushButton * createPdfBut;
     EcogrammeEss       *mEcoEss;
-
     Wt::WContainerWidget     * mContEco;
-    groupLayers*mGL;
-    Wt::WText                  *titre_;
+    cWebAptitude *m_app;
+    //Wt::WText                  *titre_;
     cDicoApt * mDico;
+
+    std::string NH(){ return mDico->NH(mNH);}
+    std::string NT(){ return mDico->NT(mNT);}
+    std::string TOPO(){ return mDico->TOPO(mTOPO);}
+    std::string ZBIO(){ return mDico->ZBIO(mZBIO);}
+    std::string STATION(){return mDico->station(mZBIO,mSt);}
+
+    bool hasNH(){ return (mDico->NH()->find(mNH)!=mDico->NH()->end()) && mNH!=0;}
+    bool hasNT(){ return mDico->NT()->find(mNT)!=mDico->NT()->end();}
+    bool hasZBIO(){ return mDico->ZBIO()->find(mZBIO)!=mDico->ZBIO()->end();}
+    bool hasTOPO(){ return mDico->topo()->find(mTOPO)!=mDico->topo()->end();}
+    bool hasST(){ return mDico->station(mZBIO,mSt)!="not found";}
+    bool readyFEE(){ return hasNH() && hasNT() && hasZBIO() && hasTOPO();}
+    bool readyCS(){ return hasZBIO() && hasST();}
+    bool hasEss(){ return HaveEss;}
+    double getX(){return _x;}
+    double getY(){return _y;}
+    bool ecogramme(){return hasFEEApt;}
+    bool isOK(){return !mEmpty;}
+
+    int mNH,mNT,mZBIO,mTOPO;
+    bool HaveEss;
+    std::shared_ptr<cEss> mActiveEss; // l'essence qui intéresse l'utilisateur
+    // catalogue de station
+    int mSt;
+
+    OGRPoint getPoint(){
+        OGRPoint pt(_x,_y);
+        return pt;}
+private:
+    bool mEmpty;
+    bool hasFEEApt;// pour savoir si l'écogramme est dessiné ou pas
+    double _x,_y;
 
 };
 

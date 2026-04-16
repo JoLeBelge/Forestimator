@@ -1,29 +1,25 @@
 #ifndef ECOGRAMMEESS_H
 #define ECOGRAMMEESS_H
-
 #include <Wt/WImage.h>
-#include <Wt/WAny.h>
 #include <Wt/WSvgImage.h>
-
 #include <Wt/WContainerWidget.h>
 #include <Wt/WPaintDevice.h>
 #include <Wt/WPaintedWidget.h>
 #include <Wt/WPainter.h>
-#include <Wt/WSpinBox.h>
 #include <vector>
 #include <Wt/WAbstractArea.h>
 #include "cdicoapt.h"
 #include <Wt/WRectArea.h>
 #include <Wt/WRasterImage.h>
+#include "simplepoint.h"
 
 void reduire(Wt::WRectF * aRect,int prop);
-
+class simplepoint;
 
 class EcogrammeEss : public Wt::WPaintedWidget
 {
 public:
-    EcogrammeEss(cEss * aEss, ST * aStation);
-
+    EcogrammeEss(cEss * aEss, simplepoint * aSP);
 
     // ça ne fonctionne que avec un layout, et le layout ce n'est pas ce que je veux pour cette partie
     virtual void layoutSizeChanged(int width, int height)
@@ -41,8 +37,7 @@ public:
 private:
     cEss * mEss;
     cdicoAptBase *mDico;
-    //int mZbio,pixPerLevel;
-    ST  * mST;
+    simplepoint * mST;
     int pixPerLevel,Width;
     void paintEvent(Wt::WPaintDevice *paintDevice);
 };

@@ -95,7 +95,7 @@ dialog::dialog(const WString& windowTitle, Wt::WMenuItem * aMenu, const WEnviron
 
 cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     : Wt::WApplication(env),
-      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db")
+      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db"),activeLayerCode("IGN")
 {
 
     messageResourceBundle().use(docRoot() + "/forestimator");
@@ -186,22 +186,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     menu->setStyleClass("nav-stacked");
     menu->addStyleClass("nav-apt");
-    /*
-    menuitem_panier = menu->addItem("resources/right_angle_circle_icon_149877.png","");
-    menuitem_panier->clicked().connect([=] {
-        std::cout << content_couches->width().value() << std::endl;
-        if(content_couches->width().value()>60 || content_couches->width().value()==-1){
-            //content_couches->setWidth(60);
-            menuitem_panier->setIcon("resources/right_angle_circle_icon_149877d.png");
-            mPanier->hide();
-        }else{
-            //content_couches->setWidth(400);
-            menuitem_panier->setIcon("resources/right_angle_circle_icon_149877.png");
-            mPanier->show();
-        }
-    });
-    menuitem_panier->setToolTip(WString::tr("menu.button.tooltip.panier_collapse"));
-    */
+
     // bouton catalogue
     menuitem_catalog = menu->addItem("resources/warehouse_check_icon_149849.png","");
     menuitem_catalog->setToolTip(WString::tr("menu.button.tooltip.catalog"));
@@ -223,51 +208,37 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     // info point
     dialog_info = tpl_content_app->addChild(std::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&environment()));
 
-    auto content_info = dialog_info->contents()->addWidget(std::make_unique<WContainerWidget>());
-    content_info->addStyleClass("content_info");
+    mAnaPoint = dialog_info->contents()->addWidget(std::make_unique<simplepoint>(this));
 
     // analyse
     dialog_anal = tpl_content_app->addChild(std::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&environment()));
     // catalogue
     dialog_catalog = tpl_content_app->addChild(std::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&environment()));
-
     dialog_catalog->contents()->setStyleClass("content_GL");
-    //auto content_catalog = dialog_catalog->contents()->addWidget(std::make_unique<WContainerWidget>());
-    //content_catalog->addStyleClass("content_catalog");
-
     // cadastre
     dialog_cadastre = tpl_content_app->addChild(std::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&environment()));
     // legende
     dialog_legend = tpl_content_app->addChild(std::make_unique<dialog>("Légende",menuitem_legend,&environment()));
-    mLegendW = dialog_legend->contents()->addWidget(std::make_unique<WContainerWidget>());
+    mLegendW = dialog_legend->contents();
     mLegendW->addStyleClass("content_legend");
 
     widgetCadastre * content_cadastre;
     content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get(),this));
     content_cadastre->addStyleClass("content_cadastre");
 
-    mSimplepointW = content_info;
-
-
-    /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
-    if (globTest){ printf("create GL\n");}
     mGroupL = dialog_catalog->contents()->addWidget(std::make_unique<groupLayers>(this));
-    if (globTest){printf("done\n");}
-
     mPanier = tpl_content_app->bindWidget("panier", std::make_unique<panier>(this));
 
-    statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(mGroupL));
+    statWindow * page_camembert = top_stack->addWidget(std::make_unique<statWindow>(this));
 
-    /* CHARGE ONGLET ANALYSES */
-    //printf("create PA\n");
-    mPA = dialog_anal->contents()->addWidget(std::make_unique<parcellaire>(mGroupL,this,page_camembert));
+    mPA = dialog_anal->contents()->addWidget(std::make_unique<parcellaire>(this,page_camembert));
     mPA->addStyleClass("content_analyse");
 
     mGroupL->updateGL();
     mGroupL->clickOnName("IGN");
 
     /*	ACTIONS	: on connect les events aux méthodes	*/
-    mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
+    mMap->xy().connect(std::bind(&simplepoint::extractInfo,mAnaPoint, std::placeholders::_1,std::placeholders::_2));
     mMap->xySelect().connect(std::bind(&parcellaire::selectPolygon,mPA, std::placeholders::_1,std::placeholders::_2));
     //cadastre
     content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1,std::placeholders::_2));
@@ -280,12 +251,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     clientIDcookies();
 
-    // avant c'était dans wopenwidget
-    std::ifstream t(mDico->File("initOL"));
-    std::stringstream ss;
-    ss << t.rdbuf();
-    t.close();
-    doJavaScript(ss.str(),false);
 }
 
 void cWebAptitude::loadStyles(){

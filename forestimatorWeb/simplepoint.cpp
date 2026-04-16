@@ -1,32 +1,36 @@
 #include "simplepoint.h"
 #include <boost/filesystem.hpp>
 
-simplepoint::simplepoint(groupLayers *aGL, WContainerWidget *parent) : mGL(aGL), mParent(parent), mDico(aGL->Dico()), createPdfBut(NULL)
+simplepoint::simplepoint(cWebAptitude *app) : m_app(app), mDico(app->mDico), createPdfBut(NULL),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(NULL),HaveEss(0),mSt(0),mEmpty(1)
 {
-    mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
-    mParent->setMargin(1, Wt::Side::Bottom | Wt::Side::Top);
-    mParent->setInline(0); // si pas inline Et bizarrement si pas de setMargin autre que 0, pas de scrollbar pour l'overflow!
+    addStyleClass("content_info");
+    /*setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
+    setMargin(1, Wt::Side::Bottom | Wt::Side::Top);
+    setInline(0);*/
 
-    mIntroTxt = mParent->addWidget(std::make_unique<WText>(tr("sp_infoclic")));
-    mParent->addWidget(std::make_unique<Wt::WBreak>());
-    createPdfBut = mParent->addWidget(std::make_unique<WPushButton>(tr("ana.pt.export.pdf")));
-    // createPdfBut->clicked().connect(this,&simplepoint::export2pdfTitreDialog);
+    mIntroTxt = addWidget(std::make_unique<WText>(tr("sp_infoclic")));
+    addWidget(std::make_unique<Wt::WBreak>());
+    createPdfBut = addWidget(std::make_unique<WPushButton>(tr("ana.pt.export.pdf")));
+    auto pdf = std::make_shared<pointPdfResource>(this);
+    auto pdfLink = Wt::WLink(pdf);
+    pdfLink.setTarget(Wt::LinkTarget::NewWindow);
+    createPdfBut->setLink(pdfLink);
 
-    mAptAllEss = mParent->addWidget(std::make_unique<WTable>());
+    mAptAllEss = addWidget(std::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
     mAptAllEss->setWidth(Wt::WLength("90%"));
     mAptAllEss->toggleStyleClass("table-striped", true);
 
-    mDetAptFEE = mParent->addWidget(std::make_unique<WTable>());
+    mDetAptFEE = addWidget(std::make_unique<WTable>());
     mDetAptFEE->setHeaderCount(1);
     mDetAptFEE->setWidth(Wt::WLength("90%"));
     mDetAptFEE->toggleStyleClass("table-striped", true);
 
-    mParent->addWidget(std::make_unique<Wt::WBreak>());
-    mContEco = mParent->addWidget(std::make_unique<Wt::WContainerWidget>());
+    addWidget(std::make_unique<Wt::WBreak>());
+    mContEco = addWidget(std::make_unique<Wt::WContainerWidget>());
     mContEco->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
 
-    mInfoT = mParent->addWidget(std::make_unique<WTable>());
+    mInfoT = addWidget(std::make_unique<WTable>());
     mInfoT->setId("infoT");
     mInfoT->setHeaderCount(1);
     mInfoT->setWidth(Wt::WLength("90%"));
@@ -40,21 +44,22 @@ void simplepoint::vider()
     mAptAllEss->clear();
     mContEco->clear();
     mIntroTxt->hide();
+    initStation();
 }
 
-void simplepoint::titreInfoRaster()
-{
-    mInfoT->elementAt(0, 0)->setColumnSpan(2);
-    mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
-    mInfoT->elementAt(0, 0)->setPadding(10);
-    mInfoT->elementAt(0, 0)->addWidget(std::make_unique<WText>(tr("titre-InfoTableAna-point")));
-    // mInfoT->elementAt(1, 0)->addWidget(std::make_unique<WText>("Couche"));
-    // mInfoT->elementAt(1, 1)->addWidget(std::make_unique<WText>("Valeur"));
+void simplepoint::initStation(){
+    mNT=666;
+    mNH=666;
+    mZBIO=666;
+    mTOPO=666;
+    HaveEss=0;
+    mSt=666;
+    hasFEEApt=0;
+    mEmpty=1;
 }
 
 void simplepoint::add1InfoRaster(std::vector<std::string> aV)
 {
-
     if (aV.size() > 1 && aV.at(1) != "")
     {
         int row = mInfoT->rowCount();
@@ -70,10 +75,10 @@ void simplepoint::add1InfoRaster(std::vector<std::string> aV)
     }
 }
 
-void simplepoint::detailCalculAptFEE(ST *aST)
+void simplepoint::detailCalculAptFEE()
 {
 
-    std::shared_ptr<cEss> Ess = aST->mActiveEss;
+    std::shared_ptr<cEss> Ess = mActiveEss;
     // std::cout << " je vais afficher le détail du calcul de l'aptitude FEE pour " <<Ess->Nom() <<std::endl;
     int row(0);
     mDetAptFEE->elementAt(row, 0)->setColumnSpan(2);
@@ -83,175 +88,175 @@ void simplepoint::detailCalculAptFEE(ST *aST)
     mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("<h4>Détail de la détermination de l'aptitude FEE pour " + Ess->Nom() + "</h4>"));
     row++;
     mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("Aptitude bioclimatique"));
-    mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(aST->mDico->code2AptFull(Ess->getApt(aST->mZBIO))));
+    mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(mDico->code2AptFull(Ess->getApt(mZBIO))));
     row++;
     mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("Aptitude hydro-trophique"));
-    mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(aST->mDico->code2AptFull(Ess->getApt(aST->mNT, aST->mNH, aST->mZBIO, false))));
+    mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(mDico->code2AptFull(Ess->getApt(mNT, mNH, mZBIO, false))));
     row++;
-    int apt = Ess->getApt(aST->mNT, aST->mNH, aST->mZBIO, true);
-    int aptComp = Ess->getApt(aST->mNT, aST->mNH, aST->mZBIO, true, aST->mTOPO);
+    int apt = Ess->getApt(mNT, mNH, mZBIO, true);
+    int aptComp = Ess->getApt(mNT, mNH, mZBIO, true, mTOPO);
     if (aptComp != apt)
     {
         // la compensation liée à la situation topographique impacte l'aptitude finale :
         mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("Situation Topographique"));
-        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(aST->TOPO()));
+        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(TOPO()));
         row++;
         mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("rique pour l'essence :"));
         mDetAptFEE->elementAt(row, 0)->setToolTip(tr("tooltip.compensationTopo"));
         ;
-        int risque = Ess->getRisque(aST->mZBIO, aST->mTOPO);
-        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(aST->mDico->Risque(risque)));
+        int risque = Ess->getRisque(mZBIO, mTOPO);
+        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(mDico->Risque(risque)));
         row++;
         mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("Aptitude bioclimatique avec micro-climat:"));
-        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(aST->mDico->code2AptFull(Ess->corrigAptBioRisqueTopo(Ess->getApt(aST->mZBIO), aST->mTOPO, aST->mZBIO))));
+        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(mDico->code2AptFull(Ess->corrigAptBioRisqueTopo(Ess->getApt(mZBIO), mTOPO, mZBIO))));
         row++;
         mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("Aptitude Finale :"));
-        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(aST->mDico->code2AptFull(aptComp)));
+        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(mDico->code2AptFull(aptComp)));
         mDetAptFEE->elementAt(row, 1)->setToolTip(tr("tooltip.compensationTopo"));
     }
     else
     {
         mDetAptFEE->elementAt(row, 0)->addWidget(std::make_unique<WText>("Aptitude la plus contraignante :"));
-        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(aST->mDico->code2AptFull(apt)));
+        mDetAptFEE->elementAt(row, 1)->addWidget(std::make_unique<WText>(mDico->code2AptFull(apt)));
         row++;
     }
     // un titre pour l'écogramme
     mContEco->addWidget(std::make_unique<WText>(tr("titreEcogramme")));
-    mEcoEss = mContEco->addWidget(std::make_unique<EcogrammeEss>(Ess.get(), aST));
+    mEcoEss = mContEco->addWidget(std::make_unique<EcogrammeEss>(Ess.get(), this));
     mContEco->addWidget(std::make_unique<WText>(tr("legendEcogramme")));
 }
 
 void simplepoint::afficheAptAllEss()
 {
-        std::map<std::string, int> Apts = mGL->apts(TypeClassifST::FEE);
-        if (Apts.size() > 1)
+    std::map<std::string, int> Apts = apts(TypeClassifST::FEE);
+    if (Apts.size() > 1)
+    {
+        if (globTest)
         {
-            if (globTest)
-            {
-                std::cout << "Apts.size() : " << Apts.size() << std::endl;
-            }
+            std::cout << "Apts.size() : " << Apts.size() << std::endl;
+        }
 
-            // on splitte le vecteur aptitudes en 4 vecteurs, qui seront dans des colonnes différentes
-            std::map<std::string, int> O;
-            std::map<std::string, int> T;
-            std::map<std::string, int> TE;
-            std::map<std::string, int> E;
-            for (auto &kv : Apts)
+        // on splitte le vecteur aptitudes en 4 vecteurs, qui seront dans des colonnes différentes
+        std::map<std::string, int> O;
+        std::map<std::string, int> T;
+        std::map<std::string, int> TE;
+        std::map<std::string, int> E;
+        for (auto &kv : Apts)
+        {
+            switch (mDico->AptContraignante(kv.second))
             {
-                switch (mGL->Dico()->AptContraignante(kv.second))
-                {
-                case 1:
-                    O.emplace(kv);
-                    break;
-                case 2:
-                    T.emplace(kv);
-                    break;
-                case 3:
-                    TE.emplace(kv);
-                    break;
-                case 4:
-                    E.emplace(kv);
-                    break;
+            case 1:
+                O.emplace(kv);
+                break;
+            case 2:
+                T.emplace(kv);
+                break;
+            case 3:
+                TE.emplace(kv);
+                break;
+            case 4:
+                E.emplace(kv);
+                break;
 
-                default:
-                    if (globTest){std::cout << "aptitude code non pris en compte" << std::endl;}
-                    break;
-                }
-            }
-
-            int nbCol(4);
-            int row(0), column(0);
-            mAptAllEss->elementAt(row, 0)->setColumnSpan(nbCol);
-            mAptAllEss->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
-            mAptAllEss->elementAt(row, 0)->setPadding(10);
-            mAptAllEss->elementAt(row, 0)->addWidget(std::make_unique<WText>("<h4>Aptitude FEE </h4>"));
-            row++;
-            std::shared_ptr<color> col = std::make_shared<color>(0, 0, 0);
-            if (O.size() > 0)
-            {
-                col = mGL->Dico()->Apt2col(1);
-                for (auto &kv : O)
-                {
-                    mAptAllEss->elementAt(row, column)->addWidget(std::make_unique<WText>(kv.first));
-                    mAptAllEss->elementAt(row, column)->setStyleClass("O");
-                    mAptAllEss->elementAt(row, column)->addStyleClass("bold");
-                    mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
-                    mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
-                    row++;
-                }
-                column++;
-                row = 1;
-            }
-
-            if (T.size() > 0)
-            {
-                col = mGL->Dico()->Apt2col(2);
-                for (auto &kv : T)
-                {
-                    mAptAllEss->elementAt(row, column)->addWidget(std::make_unique<WText>(kv.first));
-                    mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
-                    // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
-                    if (kv.second != 2)
-                    {
-                        mAptAllEss->elementAt(row, column)->setToolTip(mAptAllEss->elementAt(row, column)->toolTip() + " - " + WString::fromUTF8(mDico->code2AptFull(kv.second)));
-                        mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor(120, 120, 120));
-                    }
-                    mAptAllEss->elementAt(row, column)->setStyleClass("T");
-                    mAptAllEss->elementAt(row, column)->addStyleClass("bold");
-                    mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
-                    row++;
-                }
-                column++;
-                row = 1;
-            }
-            if (TE.size() > 0)
-            {
-                col = mGL->Dico()->Apt2col(3);
-                for (auto &kv : TE)
-                {
-                    mAptAllEss->elementAt(row, column)->addWidget(std::make_unique<WText>(kv.first));
-                    mAptAllEss->elementAt(row, column)->setStyleClass("TE");
-                    mAptAllEss->elementAt(row, column)->addStyleClass("bold");
-                    mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
-                    // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
-                    if (kv.second != 3)
-                    {
-                        mAptAllEss->elementAt(row, column)->setToolTip(mAptAllEss->elementAt(row, column)->toolTip() + " - " + WString::fromUTF8(mDico->code2AptFull(kv.second)));
-                        mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor(120, 120, 120));
-                    }
-                    mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
-                    row++;
-                }
-                column++;
-                row = 1;
-            }
-            if (E.size() > 0)
-            {
-                col = mGL->Dico()->Apt2col(4);
-                for (auto &kv : E)
-                {
-                    mAptAllEss->elementAt(row, column)->addWidget(std::make_unique<WText>(kv.first));
-                    mAptAllEss->elementAt(row, column)->setStyleClass("E");
-                    mAptAllEss->elementAt(row, column)->addStyleClass("bold");
-                    mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
-                    // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
-                    if (kv.second != 4)
-                    {
-                        mAptAllEss->elementAt(row, column)->setToolTip(mAptAllEss->elementAt(row, column)->toolTip() + " - " + WString::fromUTF8(mDico->code2AptFull(kv.second)));
-                        mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
-                    }
-                    mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
-
-                    row++;
-                }
-                column++;
-                row = 0;
+            default:
+                if (globTest){std::cout << "aptitude code non pris en compte" << std::endl;}
+                break;
             }
         }
-        else
+
+        int nbCol(4);
+        int row(0), column(0);
+        mAptAllEss->elementAt(row, 0)->setColumnSpan(nbCol);
+        mAptAllEss->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+        mAptAllEss->elementAt(row, 0)->setPadding(10);
+        mAptAllEss->elementAt(row, 0)->addWidget(std::make_unique<WText>("<h4>Aptitude FEE </h4>"));
+        row++;
+        std::shared_ptr<color> col = std::make_shared<color>(0, 0, 0);
+        if (O.size() > 0)
         {
-            std::cout << "simplePoint affiche tableau apt : pas d'essence pour le tableau" << std::endl;
+            col = mDico->Apt2col(1);
+            for (auto &kv : O)
+            {
+                mAptAllEss->elementAt(row, column)->addWidget(std::make_unique<WText>(kv.first));
+                mAptAllEss->elementAt(row, column)->setStyleClass("O");
+                mAptAllEss->elementAt(row, column)->addStyleClass("bold");
+                mAptAllEss->elementAt(row, column)->setToolTip(mDico->accroEss2Nom(kv.first));
+                mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
+                row++;
+            }
+            column++;
+            row = 1;
         }
+
+        if (T.size() > 0)
+        {
+            col = mDico->Apt2col(2);
+            for (auto &kv : T)
+            {
+                mAptAllEss->elementAt(row, column)->addWidget(std::make_unique<WText>(kv.first));
+                mAptAllEss->elementAt(row, column)->setToolTip(mDico->accroEss2Nom(kv.first));
+                // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
+                if (kv.second != 2)
+                {
+                    mAptAllEss->elementAt(row, column)->setToolTip(mAptAllEss->elementAt(row, column)->toolTip() + " - " + WString::fromUTF8(mDico->code2AptFull(kv.second)));
+                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor(120, 120, 120));
+                }
+                mAptAllEss->elementAt(row, column)->setStyleClass("T");
+                mAptAllEss->elementAt(row, column)->addStyleClass("bold");
+                mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
+                row++;
+            }
+            column++;
+            row = 1;
+        }
+        if (TE.size() > 0)
+        {
+            col = mDico->Apt2col(3);
+            for (auto &kv : TE)
+            {
+                mAptAllEss->elementAt(row, column)->addWidget(std::make_unique<WText>(kv.first));
+                mAptAllEss->elementAt(row, column)->setStyleClass("TE");
+                mAptAllEss->elementAt(row, column)->addStyleClass("bold");
+                mAptAllEss->elementAt(row, column)->setToolTip(mDico->accroEss2Nom(kv.first));
+                // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
+                if (kv.second != 3)
+                {
+                    mAptAllEss->elementAt(row, column)->setToolTip(mAptAllEss->elementAt(row, column)->toolTip() + " - " + WString::fromUTF8(mDico->code2AptFull(kv.second)));
+                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor(120, 120, 120));
+                }
+                mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
+                row++;
+            }
+            column++;
+            row = 1;
+        }
+        if (E.size() > 0)
+        {
+            col = mDico->Apt2col(4);
+            for (auto &kv : E)
+            {
+                mAptAllEss->elementAt(row, column)->addWidget(std::make_unique<WText>(kv.first));
+                mAptAllEss->elementAt(row, column)->setStyleClass("E");
+                mAptAllEss->elementAt(row, column)->addStyleClass("bold");
+                mAptAllEss->elementAt(row, column)->setToolTip(mDico->accroEss2Nom(kv.first));
+                // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
+                if (kv.second != 4)
+                {
+                    mAptAllEss->elementAt(row, column)->setToolTip(mAptAllEss->elementAt(row, column)->toolTip() + " - " + WString::fromUTF8(mDico->code2AptFull(kv.second)));
+                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
+                }
+                mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
+
+                row++;
+            }
+            column++;
+            row = 0;
+        }
+    }
+    else
+    {
+        std::cout << "simplePoint affiche tableau apt : pas d'essence pour le tableau" << std::endl;
+    }
 }
 
 void pointPdfResource::handleRequest(const Http::Request &request, Http::Response &response)
@@ -293,7 +298,7 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     legendAcroEs->setId("legendAcroEs"); // dans le template html j'ai un style défini pour l'objet ayant cet id
     int row(0);
     int col(0);
-    for (auto kv : *mSP->mGL->Dico()->codeEs2Nom())
+    for (auto kv : *mSP->mDico->codeEs2Nom())
     {
         legendAcroEs->elementAt(row, col)->addWidget(std::make_unique<WText>(kv.first));
         legendAcroEs->elementAt(row, col + 1)->addWidget(std::make_unique<WText>(kv.second));
@@ -313,21 +318,21 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
 
     // RENDU CARTE ACTIVE AVEC POSITION de la STATION
 
-    OGRPoint pt = mSP->mGL->mStation->getPoint();
+    OGRPoint pt = mSP->getPoint();
 
     // je peux pas utiliser le membre mapextent de GL car celui-ci ne se met à jours que lorsqu'on télécharge une carte sur l'emprise courante...
     // staticMap sm(mGL->getActiveLay(),&pt,mGL->getMapExtent());
     // depuis que l'IGN est passé à la version 1.3 du serveur WMS, je ne parviens plus à télécharger les cartes wms en jpg.
     // donc il faut changer cette ligne. utiliser l'IGN du serveur grfmn?
-    staticMap sm = staticMap(mSP->mGL->getLay("IGNgrfmn"), &pt);
+    staticMap sm = staticMap(mSP->mDico->getLayerBase("IGNgrfmn"), &pt);
     // ajout du logo IGN. ajout des crédits ; toujours les mêmes, en dur.
     sm.addImg(mSP->mDico->File("logoIGN"));
     boost::replace_all(tp, "PATH_CARTE", sm.getFileName());
-    boost::replace_all(tp, "TITRE_CARTE", mSP->mGL->getLay("IGN")->getLegendLabel(0));
-    boost::replace_all(tp, "POSITION_PTX", roundDouble(mSP->mGL->mStation->getX(), 1));
-    boost::replace_all(tp, "POSITION_PTY", roundDouble(mSP->mGL->mStation->getY(), 1));
+    boost::replace_all(tp, "TITRE_CARTE", mSP->mDico->getLayerBase("IGN")->getLegendLabel(0));
+    boost::replace_all(tp, "POSITION_PTX", roundDouble(mSP->getX(), 1));
+    boost::replace_all(tp, "POSITION_PTY", roundDouble(mSP->getY(), 1));
 
-    if (mSP->mGL->mStation->ecogramme())
+    if (mSP->ecogramme())
     {
         // RENDU ECOGRAMME
         // export de l'image de l'écogramme - bug constaté ; https://redmine.webtoolkit.eu/issues/7769
@@ -356,7 +361,7 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
         // ajout dans le pdf
         std::string baliseEco = Wt::WText::tr("report.eco").toUTF8();
         boost::replace_all(baliseEco, "PATH_ECO", aEcoPng);
-        boost::replace_all(baliseEco, "TITRE_ECO", "Ecogramme - " + mSP->mGL->mStation->mActiveEss->Nom());
+        boost::replace_all(baliseEco, "TITRE_ECO", "Ecogramme - " + mSP->mActiveEss->Nom());
         mSP->mDetAptFEE->htmlText(o);
         boost::replace_all(baliseEco, "detAptFEE", o.str());
         o.str("");
@@ -379,4 +384,204 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     // Bug memoryleak HPDF_Free (pdf);
     response.out().write((char *)buf, size);
     delete[] buf;
+}
+
+void simplepoint::extractInfo(double x, double y)
+{
+    vider();
+    if (!isnan(x) && !isnan(y) && !(x == 0 && y == 0))
+    {
+        if (globTest){std::cout << "simplepoint::extractInfo" << x << " , " << y << std::endl;}
+        //setOK();
+        _x=x;
+        _y=y;
+        initStation();
+
+        // tableau des informations globales
+        mInfoT->elementAt(0, 0)->setColumnSpan(2);
+        mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+        mInfoT->elementAt(0, 0)->setPadding(10);
+        mInfoT->elementAt(0, 0)->addWidget(std::make_unique<WText>(tr("titre-InfoTableAna-point")));
+
+        ptPedo ptPed = ptPedo(mDico->mPedo, x, y);
+        add1InfoRaster(ptPed.displayInfo(PEDO::DRAINAGE));
+        add1InfoRaster(ptPed.displayInfo(PEDO::PROFONDEUR));
+        add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
+        add1InfoRaster(ptPed.displayInfo(PEDO::CHARGE));
+
+        for (auto &pair  : mDico->VlayerBase()) {
+            std::shared_ptr<layerBase> l = pair.second;
+            bool activeL=(l->Code()==m_app->getActiveLay());
+
+            if (((l->getCatLayer() == TypeLayer::KK) | (l->getCatLayer() == TypeLayer::Station)) | (activeL & (l->getCatLayer() != TypeLayer::Externe)))
+            {
+                if (!l->Expert())
+                {
+                    std::vector<std::string> layerLabelAndValue = displayInfo(l);
+                    if (l->l4StatP())
+                    {
+                        //mAnaPoint->add1InfoRaster(layerLabelAndValue);
+                    }
+                    if ((activeL && l->Code() != "CS_A"))
+                    {
+                        // affiche une popup pour indiquer la valeur pour cette couche
+                        // attention, il faut escaper les caractères à problèmes du genre apostrophe
+                        boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                        boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
+                        doJavaScript("content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+                    }
+                    else if (activeL && l->Code() == "CS_A")
+                    {
+                        int aVal = l->getValue(x, y);
+                        // affiche une popup pour indiquer la valeur pour cette couche
+                        // attention, il faut escaper les caractères à problèmes du genre apostrophe
+                        boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                        boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
+
+                        if (aVal != 0)
+                        {
+                            std::string js = "content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A" + std::to_string(aVal) + ".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);";
+                            // std::cout << "js : " << js << std::endl;
+                            doJavaScript(js);
+                        }
+                    }
+                }
+            }
+
+            // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay". Attention, CNSWrast n'est plus "Externe" maintenant que j'y ai associé la couche raster.
+            if ((activeL && l->Code() == "CNSWrast"))
+            {
+                doJavaScript("content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+            }
+
+            // si la couche active est le cadastre
+            if ((activeL && l->Code() == "Cadastre"))
+            {
+
+                ptCadastre *ptCad = new ptCadastre(mDico->mCadastre, x, y);
+                ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre, m_app->mPA, std::placeholders::_1, std::placeholders::_2));
+                doJavaScript("content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+                // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
+                WDialog *dialogPtr = addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
+                dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));
+                WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Oui");
+                ok->setDefault(false);
+                ok->clicked().connect([=]
+                {
+                    ptCad->usePolyg4Stat();
+                    delete(ptCad);
+                    dialogPtr->reject(); });
+                WPushButton *annuler = dialogPtr->footer()->addNew<Wt::WPushButton>("Non");
+                annuler->setDefault(true);
+                annuler->clicked().connect([=]
+                {dialogPtr->reject();
+                    delete(ptCad); });
+                dialogPtr->show();
+            }
+
+
+            if (activeL && l->getCatLayer() == TypeLayer::FEE)
+            {
+                hasFEEApt=true;
+                detailCalculAptFEE();
+            }
+        }
+
+        afficheAptAllEss();
+        //mMap->updateView();
+    }
+    else
+    {
+        std::cout << "x et y ne sont pas des nombres , pas bien " << std::endl;
+    }
+}
+
+std::map<std::string, int> simplepoint::apts(TypeClassifST aType)
+{
+    std::map<std::string, int> aRes;
+    switch(aType)
+    {
+    case FEE:
+    {
+        if (readyFEE())
+        {
+            if (globTest)
+            {
+                std::cout << "station a NT NH ZBIO et Topo " << std::endl;
+            }
+
+            for (auto &pair  : mDico->VlayerBase()) {
+                std::shared_ptr<layerBase> l = pair.second;
+                if (l->getCatLayer() == TypeLayer::FEE)
+                {
+                    // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
+                    // std::shared_ptr<cEss> Ess= l->Ess();
+                    if (mDico->hasEss(l->EssCode()))
+                    {
+                        std::shared_ptr<cEss> Ess = mDico->getEss(l->EssCode());
+                        int apt = Ess->getFinalApt(mNT, mNH, mZBIO, mTOPO);
+                        aRes.emplace(std::make_pair(Ess->Code(), apt));
+                    }
+                }
+            }
+        }
+        break;
+    }
+    case CS:
+    {
+        if (globTest)
+        {
+            std::cout << " GL get apt pour mode CS " << std::endl;
+        }
+        if (readyCS())
+        {
+            if (globTest)
+            {
+                std::cout << "station a bien une station du catalogue " << std::endl;
+            }
+            for (auto kv : mDico->getAllEss())
+            {
+                std::shared_ptr<cEss> Ess = kv.second;
+                int apt = Ess->getApt(mZBIO, mSt);
+                if (apt != 0)
+                    aRes.emplace(std::make_pair(Ess->Code(), apt));
+            }
+        }
+        break;
+    }
+    }
+    return aRes;
+}
+
+
+std::vector<std::string> simplepoint::displayInfo(std::shared_ptr<layerBase> al){
+    std::vector<std::string> aRes;
+    aRes.push_back(al->getLegendLabel(false));
+    std::string val("");
+    bool activeL=al->Code()==m_app->getActiveLay();
+    // on va affichier uniquement les informations de la couches d'apt qui est sélectionnée, et de toutes les couches thématiques (FEE et CS)
+    if ((al->getCatLayer()==TypeLayer::KK )| (al->getCatLayer()==TypeLayer::Station) |( activeL)){
+        // 1 extraction de la valeur
+        int aVal=al->getValue(_x,_y);
+        if (al->Code()=="NT"){ mNT=aVal;}
+        if (al->Code()=="NH"){ mNH=aVal;}
+        if (al->Code()=="ZBIO"){ mZBIO=aVal;}
+        if (al->Code()=="Topo"){ mTOPO=aVal;}
+
+        // station du CS
+        if (al->Code().substr(0,2)=="CS" && aVal!=0){
+            mSt=aVal;}
+        val=al->getValLabel(aVal);
+        if (al->getTypeVar()==TypeVar::Continu){ val=roundDouble(al->Gain()*(double) aVal,2);}
+        //if (globTest){std::cout << "Layer " << Code() << ", aVal is " << std::to_string(aVal) << std::endl;}
+    }
+
+    if ((al->getCatLayer()==TypeLayer::FEE || al->getCatLayer()==TypeLayer::CS) && (activeL)){
+        mActiveEss=mDico->getEss(al->EssCode());
+        HaveEss=1;
+    }
+
+    aRes.push_back(val);
+    if (activeL) {aRes.push_back("bold");}
+    return aRes;
 }

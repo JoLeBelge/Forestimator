@@ -12,7 +12,6 @@ class cdicoAptBase;
 class color;
 class cDicoApt;
 class layerBase;
-class ST;
 class cnsw;
 class cadastre;
 
@@ -202,6 +201,16 @@ public:
     }*/
 
     std::map<std::string,std::shared_ptr<layerBase>> VlayerBase(){return mVlayerBase;}
+
+
+    std::vector<std::shared_ptr<layerBase>> Layers(){
+        std::vector<std::shared_ptr<layerBase>> aRes;
+        for (auto & pair : mVlayerBase){
+            aRes.push_back(pair.second);
+        }
+        return aRes;
+    }
+
     bool hasLayerBase(std::string aCode){
         if (mVlayerBase.find(aCode)!=mVlayerBase.end()){return 1;} else {return 0;}
     }
@@ -235,7 +244,7 @@ private:
 
     std::map<std::string,std::shared_ptr<layerBase>> mVlayerBase;
 };
-
+/*
 class ST{
 public:
     ST(cDicoApt * aDico);
@@ -280,5 +289,5 @@ private:
 
     double x,y;
 
-};
+};*/
 #endif // CDICOAPT_H

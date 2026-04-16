@@ -7,6 +7,8 @@
 #include "grouplayers.h"
 #include <algorithm>
 
+class WOpenLayers;
+
 class panier: public WContainerWidget
 {
 public:
@@ -16,7 +18,7 @@ public:
     cDicoApt * mDico;
     WApplication * m_app;
     WOpenLayers * mMap;
-    std::shared_ptr<groupLayers> mGroupL;
+    groupLayers * mGroupL;
 
     // var de classe
     std::vector<std::shared_ptr<Layer>> mVLs;

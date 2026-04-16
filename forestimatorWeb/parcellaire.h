@@ -22,7 +22,7 @@
 #include <Wt/Mail/Message.h>
 #include <Wt/Mail/Client.h>
 #include <memory>
-
+#include "selectlayers.h"
 #include "boost/filesystem.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -33,20 +33,45 @@ using namespace libzippp;
 
 #include "threadpool/ThreadPool.hpp"
 
-class groupLayers;
+class displayInfo;
 class statWindow;
 class cDicoApt;
+class groupLayers;
 
 extern Wt::WServer *globServer;
 
 // objet qui comprend le shp d'un parcellaire DNF que l'on va afficher dans openlayer
 // cet objet contient également l'interface graphique wt avec les bouttons qui permettent de charger le shp, les bouttons pour démarrer les calcul, ect
 
-class parcellaire : public WContainerWidget
+class groupStat
 {
 public:
-    parcellaire(groupLayers* aGL, cWebAptitude *app, statWindow *statW);
-    ~parcellaire();
+    groupStat() {}
+    ~groupStat() { clearStat(); }
+    std::vector<std::shared_ptr<layerStatChart>> ptrVLStat() { return mVLStat; }
+    // j'y met directement le conteneur résultats
+    std::vector<std::unique_ptr<Wt::WContainerWidget>> mVLStatCont;
+
+protected:
+    // un vecteur pour les statistique des cartes variables de classes (majoritaire)
+    std::vector<std::shared_ptr<layerStatChart>> mVLStat;
+
+    void clearStat()
+    {
+        for (std::shared_ptr<layerStatChart> p : mVLStat)
+        {
+            p.reset();
+        }
+        mVLStatCont.clear();
+        mVLStat.clear();
+    }
+};
+
+
+class parcellaire : public WContainerWidget, public groupStat
+{
+public:
+    parcellaire(cWebAptitude *app, statWindow *statW);
     void cleanShpFile();
     bool to31370AndGeoJson(); // boite de dialogue pour choisir src si jamais la couche n'en a pas de défini
     void to31370AndGeoJsonGDAL();
@@ -62,6 +87,8 @@ public:
     void fuChanged();
 
     void selectPolygon(double x, double y);
+
+    void computeStatGlob(OGRGeometry *poGeomGlobale);
 
     void computeStatAndVisuSelectedPol(int aId);
 
@@ -83,19 +110,11 @@ public:
 
     void doComputingTask();
 
-    class TaskComputing : public Task
-    {
-        std::string geoJsonName;
-        std::shared_ptr<groupLayers> mGL;
-        cDicoApt * mDico;
-        //std::string path;
-        cWebAptitude **app;
-        void run() override;
+    std::vector<std::shared_ptr<layerBase> > getSelect4Download();
+    int getNumSelect4Download();
+    std::vector<std::shared_ptr<layerBase>> getSelectedLayer4Download();
 
-    public:
-        TaskComputing(std::string geoJsonName, std::shared_ptr<groupLayers> mGL, cDicoApt * aDico,cWebAptitude **app) : geoJsonName(geoJsonName), mGL(mGL),mDico(aDico), app(app)
-        {}
-    };
+
 
 private:
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
@@ -109,12 +128,25 @@ private:
     // Wt::WPushButton  *anaOnAllPolygBt;
     cWebAptitude *m_app;
     Wt::WText *msg;
-    std::shared_ptr<groupLayers> mGL;
+    groupLayers * mGL;
     cDicoApt *mDico;
     double centerX, centerY;
     OGREnvelope mParcellaireExtent;
     bool hasValidShp;
+    selectLayers * mSelectLayers;
     //OGRGeometry *poGeomGlobale;
+};
+
+class TaskComputing : public Task
+{
+    std::string geoJsonName;
+    //std::string path;
+    cWebAptitude *m_app;
+    void run() override;
+
+public:
+    TaskComputing(std::string geoJsonName,cWebAptitude *app) : geoJsonName(geoJsonName), m_app(app)
+    {}
 };
 
 #endif // PARCELLAIRE_H

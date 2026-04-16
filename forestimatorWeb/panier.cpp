@@ -45,7 +45,6 @@ panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
     WPushButton * bExportTiff = this->addWidget(std::make_unique<WPushButton>("Télécharger"));
     bExportTiff->setToolTip(tr("panier.download_tooltip"));
     bExportTiff->clicked().connect(mGroupL->slotMapExport);
-    //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
 
     mGroupL->mExtentDivGlob=mExtentDivGlob;
     mGroupL->mExtentDiv=mExtentDiv;
@@ -183,9 +182,15 @@ void panier::addMap(std::shared_ptr<Layer> l){
 }
 
 void panier::refresh(){
-   if (globTest){std::cout << "refresh panier" << std::endl;}
+   if (globTest){std::cout << "refresh panier : reinit openlayer et ajout map" << std::endl;}
+   std::ifstream t(mDico->File("initOL"));
+   std::stringstream ss;
+   ss << t.rdbuf();
+   t.close();
+   doJavaScript(ss.str());
+   // pour l'instant, la transparence n'est pas appliquée pendant les refresh, et la dernière s'affiche au dessus de la première..
    for (std::shared_ptr<Layer> l : mVLs){
-          m_app->doJavaScript("activeLayers['"+l->Code()+"']?.setVisible(!activeLayers['"+l->Code()+"']?.values_.visible);");
+       l->displayLayer();
     }
     WContainerWidget::refresh();
 }

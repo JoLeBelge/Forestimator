@@ -4,7 +4,6 @@ std::string dirBD("/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db");
 bool globTest(0);
 int globMaxSurf(200);
 
-
 cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 {
 
@@ -220,23 +219,6 @@ TypeLayer str2TypeLayer(const std::string& str)
     if(str == "CS") aRes=TypeLayer::CS;
     if(str == "KK") aRes=TypeLayer::KK;
     return aRes;
-}
-
-ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(NULL),HaveEss(0),mSt(0),mEmpty(1)
-{
-
-}
-
-void ST::vider()
-{
-    mNT=666;
-    mNH=666;
-    mZBIO=666;
-    mTOPO=666;
-    HaveEss=0;
-    mSt=666;
-    hasFEEApt=0;
-    mEmpty=1;
 }
 
 std::string removeAccents(std::string aStr){
