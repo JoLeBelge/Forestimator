@@ -845,12 +845,12 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
   <message id="readme.download.layer">Vous avez téléchargé une couche découpée sur une zone bien précise pour votre usage sous Système d'Information Géographique. Vous pouvez également télécharger la couche cartographique pour l'ensemble de la région wallonne depuis l'adresse  {1} </message>
   
 <message id="template.carto_div">
-<div class="carto_div" style="height: 90%; width: 90%; overflow: visible; display: flex; flex-flow: row;">
-	<div id="map" title="Double-cliquer sur une station pour afficher sa description dans l'onglet légende." class="" style="display: block; width: 100%; min-width: 400px; padding: 0px; margin: 	0px; overflow: hidden; flex: 1 1 auto; position: relative;">
+<div class="carto_div" >
+	<div id="map" title="Double-cliquer sur une station pour afficher sa description dans l'onglet légende." class="map_div">
 	${WOpenLayers}
 	</div>
-	<div id="content_couches" class="content_couches" style="padding: 0px; margin: 0px 3px; display: flex; flex: 1 1 auto; flex-flow: row; overflow: hidden;">
-		<div id="o111km2j" class="menu_gauche" style="width: 60px; margin: 0px 3px; flex: 1 1 auto; overflow: hidden;">
+	<div id="content_couches" class="content_couches">
+		<div id="o111km2j" class="menu_gauche">
 		${menu}
 		</div>
 		${panier}
