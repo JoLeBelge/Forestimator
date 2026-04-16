@@ -137,13 +137,7 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
 
     if (env.internalPath() == "/documentation" || env.internalPath().substr(0, 14) == "/documentation")
     {
-        auto app404 = std::make_unique<Wt::WApplication>(env);
-        auto theme = std::make_shared<Wt::WBootstrapTheme>();
-        theme->setVersion(Wt::BootstrapVersion::v3);
-        theme->setResponsive(true);
-        app404->setInternalPathValid(false);
-        app404->root()->addWidget(std::make_unique<Wt::WText>("new documentation app.."));
-        return app404;
+        ;
     }
     else if (env.internalPath() == "/cartographie")
     {

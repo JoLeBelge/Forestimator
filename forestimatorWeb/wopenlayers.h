@@ -4,11 +4,6 @@
 #include <Wt/WContainerWidget.h>
 #include <Wt/WMenuItem.h>
 #include <Wt/WTabWidget.h>
-#include <Wt/WStackedWidget.h>
-#include <Wt/WNavigationBar.h>
-#include <Wt/WPopupMenu.h>
-#include <Wt/WPopupMenuItem.h>
-#include <Wt/WNavigationBar.h>
 #include <Wt/WBootstrapTheme.h>
 #include <Wt/WEnvironment.h>
 #include <Wt/WHBoxLayout.h>
@@ -46,9 +41,7 @@ public:
     }*/
 
     virtual void refresh(){
-
-        std::cout << "refresh wopenlayer";
-        //WApplication *app = WApplication::instance();
+        //std::cout << "refresh wopenlayer";
         std::ifstream t(mDico->File("initOL"));
         std::stringstream ss;
         ss << t.rdbuf();
@@ -101,7 +94,7 @@ public:
 
     JSlot slot2;
 
-    Wt::WContainerWidget * popup;
+
 
     static constexpr const char *clickWithShift_label = "toto";
 

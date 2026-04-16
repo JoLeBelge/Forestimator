@@ -1440,7 +1440,7 @@ double getArea(OGREnvelope *env)
 
 
 std::string layerBase::getJSdisplayLayer() const{
-    std::string JScommand=std::string("console.log('display Layer');activeLayer  = new ol.layer.Tile({")+
+    std::string JScommand=std::string("console.log('display Layer'); if (typeof extent!='undefined'){activeLayer  = new ol.layer.Tile({")+
             "extent: extent,"+
             "title: 'MYTITLE',"+
             "source: new ol.source.TileWMS({"+
@@ -1464,7 +1464,7 @@ std::string layerBase::getJSdisplayLayer() const{
 
 
     if (mTypeWMS==TypeWMS::ArcGisRest){
-    JScommand=std::string("console.log('display Layer');activeLayer  = new ol.layer.Tile({")+
+    JScommand=std::string("console.log('display Layer');if (typeof extent!='undefined'){activeLayer  = new ol.layer.Tile({")+
             "extent: extent,"+
             "title: 'MYTITLE',"+
               "  source: new ol.source.TileArcGISRest({"+
@@ -1476,7 +1476,7 @@ std::string layerBase::getJSdisplayLayer() const{
 
     }
 
-    JScommand+="activeLayers['MYCODE'] = activeLayer;updateGroupeLayers();";
+    JScommand+="activeLayers['MYCODE'] = activeLayer;updateGroupeLayers();} else { console.log('extent not defined yet')}";
 
     boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
     boost::replace_all(JScommand,"MYLAYER",mWMSLayerName);

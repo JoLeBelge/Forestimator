@@ -9,10 +9,9 @@ Layer::Layer(std::shared_ptr<layerBase> aLB, WText * PWText):
     setActive(false);
 }
 
-void Layer::setActive(bool b){
-    mActive=b;
+void Layer::setActive(bool active){
     if (mWtText!=NULL){
-        mWtText->setStyleClass(mActive ? "currentEss" : "ess");
-        if (mActive) {mWtText->setToolTip(WString::tr("toolTipActiveLayer"));} else {mWtText->setToolTip(getLegendLabel(0));}
+        mWtText->setStyleClass(active ? "currentEss" : "ess");
+        if (active) {mWtText->setToolTip(WString::tr("toolTipActiveLayer"));} else {mWtText->setToolTip(getLegendLabel(0));}
     }
 }

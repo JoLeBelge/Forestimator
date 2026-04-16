@@ -124,21 +124,11 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
 
 void groupLayers::updateActiveLay(std::string aCode)
 {
-    // std::cout << " group Layers je vais faire un update du rendu visuel de chacun des label de couche \n\n\n" << std::endl;
-    //  désactiver toutes les couches actives et changer le rendu du label
     for (std::shared_ptr<Layer> l : mVLs)
     {
         l->setActive(aCode == l->Code());
     }
 }
-
-
-
-/**
- * @brief groupLayers::computeStatGlob
- * @param poGeomGlobale
- */
-
 
 void groupLayers::updateGL()
 {

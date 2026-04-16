@@ -45,7 +45,6 @@ class groupLayers : public WContainerWidget
 public:
     groupLayers(cWebAptitude * cWebApt);
 
-    void clickOnName(std::string aCode);
     // update du rendu du nom de la couche qui est sélectionnée
     void updateActiveLay(std::string aCode);
     // update pour passer du mode expert au mode non expert et vice et versa

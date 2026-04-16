@@ -150,10 +150,10 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     menuitem_app->setToolTip(Wt::WString::tr("menu.button.tooltip.carto"));
     // menu doc
     menuitem_documentation = navbar_menu->addItem("resources/problem_analysis_icon_149897.png","");
-    //menuitem_documentation->setLink(WLink(LinkType::Url, "https://forestimator.gembloux.ulg.ac.be/documentation"));
-    WLink l= WLink(LinkType::Url, "https://forestimator.gembloux.ulg.ac.be/documentation");
+    menuitem_documentation->setLink(WLink(LinkType::InternalPath, "/documentation"));
+    //WLink l= WLink(LinkType::Url, "https://forestimator.gembloux.ulg.ac.be/documentation");
     //l.setTarget(LinkTarget::NewWindow);
-    menuitem_documentation->setLink(l);
+    //menuitem_documentation->setLink(l);
     menuitem_documentation->setToolTip(Wt::WString::tr("menu.button.tooltip.doc"));
 
     // menu login

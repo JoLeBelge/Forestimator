@@ -846,11 +846,15 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
   
 <message id="template.carto_div">
 <div class="carto_div" >
-	<div id="map" title="Double-cliquer sur une station pour afficher sa description dans l'onglet légende." class="map_div">
-	${WOpenLayers}
+	
+	${WOpenLayers title="Double-cliquer sur une station pour afficher sa description dans l'onglet légende." class="map_div"}
+	<div id="popup" class="ol-popup">
+	<a id="popup-closer" class="ol-popup-closer"></a>
+	<div id="popup-content"></div>
 	</div>
+	
 	<div id="content_couches" class="content_couches">
-		<div id="o111km2j" class="menu_gauche">
+		<div class="menu_gauche">
 		${menu}
 		</div>
 		${panier}

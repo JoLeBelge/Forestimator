@@ -16,7 +16,6 @@ panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
     mTable = this->addWidget(std::make_unique<WTable>());
     mTable->setHeaderCount(0);
     mTable->addStyleClass("panier_table");
-    //mTable->setWidth(Wt::WLength("90%"));
     mTable->toggleStyleClass("table-striped",true);
 
     // extent div si user connecté
@@ -48,12 +47,6 @@ panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
     mGroupL->mExtentDivGlob=mExtentDivGlob;
     mGroupL->mExtentDiv=mExtentDiv;
 
-    std::ifstream t(mDico->File("initOL"));
-            std::stringstream ss;
-            ss << t.rdbuf();
-            t.close();
-            doJavaScript(ss.str());
-            if (globTest) { std::cout << "first initOL done" << std::endl;}
     addMap("IGN");
 }
 
@@ -76,9 +69,8 @@ void panier::addMap(string aCode){
 
     activeLayerCode=aCode;
 
-    // cacher la fenetre popup. plus propre de faire via wt que via js
-    mMap->popup->hide();
-    //doJavaScript("overlay?.setVisible(0);");
+    // cacher la fenetre popup
+    doJavaScript("if (typeof overlay!='undefined'){overlay.setPosition(undefined);}");
 
     std::shared_ptr<layerBase> l =mDico->getLayerBase(activeLayerCode);
     if (globTest){std::cout << " panier addMap : doJavascript displayLayer pour " << activeLayerCode << std::endl;}
@@ -153,7 +145,7 @@ void panier::addMap(string aCode){
                 // del layer
                 doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
                 updateLegendeDiv();
-                mGroupL->updateActiveLay(mVLs.at(0)->Code());
+                activeLayerCode=mVLs.at(0)->Code();
             } else {
                 Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>("Retirer une carte","<p>Il ne reste que cette couche dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
                 messageBox->setModal(true);
@@ -181,7 +173,7 @@ void panier::addMap(string aCode){
         mTable->moveRow(i,i+1);
         // move layer
         doJavaScript("moveLayerUp('"+aCode+"');");
-        mGroupL->updateActiveLay(mVLs.at(0)->Code());
+        activeLayerCode=mVLs.at(0)->Code();
     });
     bvis = r->elementAt(5)->addWidget(std::make_unique<WPushButton>(""));
     bvis->addStyleClass("button_carto moveup");
@@ -190,7 +182,6 @@ void panier::addMap(string aCode){
         if (mVLs.size()==1) return; // skipt 1 element
         size_t i;
         for (i=0; i<mVLs.size(); i++){
-            //std::cout << "i" << i << ", lay = " << l << std::endl;
             if(mVLs.at(i)==l){break;}
         }
         if (i==0) return; // skipt first element
@@ -199,18 +190,18 @@ void panier::addMap(string aCode){
         // move row in table
         mTable->moveRow(i,i-1);
         // move layer
-         doJavaScript("moveLayerDown('"+aCode+"');");
-         mGroupL->updateActiveLay(mVLs.at(0)->Code());
+        doJavaScript("moveLayerDown('"+aCode+"');");
+        activeLayerCode=mVLs.at(0)->Code();
     });
 }
 
 void panier::refresh(){
-   if (globTest){std::cout << "refresh panier : reinit openlayer et ajout map" << std::endl;}
-   std::ifstream t(mDico->File("initOL"));
+   if (globTest){std::cout << "refresh panier" << std::endl;}
+   /*std::ifstream t(mDico->File("initOL"));
    std::stringstream ss;
    ss << t.rdbuf();
    t.close();
-   doJavaScript(ss.str());
+   doJavaScript(ss.str());*/
    // pour l'instant, la transparence n'est pas appliquée pendant les refresh, et la dernière s'affiche au dessus de la première..
    for (std::shared_ptr<layerBase> l : mVLs){
        doJavaScript(l->getJSdisplayLayer());

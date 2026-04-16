@@ -428,7 +428,6 @@ void simplepoint::extractInfo(double x, double y)
                         boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
                         boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
                         doJavaScript("if (content) {content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
-                        m_app->mMap->popup->show();
                     }
                     else if (activeL && l->Code() == "CS_A")
                     {
@@ -443,7 +442,6 @@ void simplepoint::extractInfo(double x, double y)
                             std::string js = "if (content) {content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A" + std::to_string(aVal) + ".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}";
                             // std::cout << "js : " << js << std::endl;
                             doJavaScript(js);
-                            m_app->mMap->popup->show();
                         }
                     }
                 }
@@ -453,7 +451,6 @@ void simplepoint::extractInfo(double x, double y)
             if ((activeL && l->Code() == "CNSWrast"))
             {
                 doJavaScript("if (content) {content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
-                m_app->mMap->popup->show();
             }
 
             // si la couche active est le cadastre
@@ -463,7 +460,6 @@ void simplepoint::extractInfo(double x, double y)
                 ptCadastre *ptCad = new ptCadastre(mDico->mCadastre, x, y);
                 ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre, m_app->mPA, std::placeholders::_1, std::placeholders::_2));
                 doJavaScript("if (content) {content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
-                m_app->mMap->popup->show();
                 // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
                 WDialog *dialogPtr = addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
                 dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));
@@ -491,7 +487,6 @@ void simplepoint::extractInfo(double x, double y)
         }
 
         afficheAptAllEss();
-        //mMap->updateView();
     }
     else
     {

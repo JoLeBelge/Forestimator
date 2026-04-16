@@ -8,7 +8,7 @@
 
 using namespace Wt;
 
-// C'est la classe qui hérite de layerbase et qui contient une interface graphique dans Wt dans le catalogue (=grouplayer)
+// C'est une classe qui hérite de layerbase et qui contient une interface graphique dans Wt dans le catalogue (=grouplayer).
 
 class Layer : public layerBase, public std::enable_shared_from_this<Layer>
 {
@@ -16,8 +16,7 @@ public:
 
     Layer(std::shared_ptr<layerBase> aLB,WText * PWText);
 
-    void setActive(bool b=true);
-    bool IsActive() const {return mActive;}
+    void setActive(bool active=true);
 
     // signal pour cacher les nodes qui sont en mode expert
     Wt::Signal<bool>& changeExpertMode() { return expertMode_; }
@@ -41,7 +40,6 @@ public:
 
 private:
     bool mIsVisible;
-    bool mActive;
     WText * mWtText;
 };
 

@@ -186,6 +186,8 @@ layers = [
 ];
 
 /*	Overlay clic info	*/
+
+
 var container = document.getElementById('popup');
 content = document.getElementById('popup-content');
 var closer = document.getElementById('popup-closer');
@@ -218,7 +220,7 @@ map = new ol.Map({
  	interactions : ol.interaction.defaults.defaults({doubleClickZoom :false, shiftDragZoom: false}),
 	renderer: 'canvas',
 	layers: layers,
-	target: 'map',
+	target: 'mapDiv',
 	overlays: [overlay],
 	view: _view,
 	pixelRatio: 1
@@ -232,7 +234,7 @@ map = new ol.Map({
  * @return {boolean} Don't follow the href.
  */ 
 // pas bonne compatibilité tablette car le touch sur le closer va questionner la carte sur la station ou on clique, mm si en dessous du popup.
-/*
+
 closer.onclick = function() {
   overlay.setPosition(undefined);
   closer.blur();
@@ -244,7 +246,7 @@ closer.ontouch = function() {
   closer.blur();
   return false;
 };
-*/
+
 /***
  *	Redéfini les couches à afficher
  *

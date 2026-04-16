@@ -6,21 +6,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
     // pour que layoutSizeChange fonctionne
     setLayoutSizeAware(1);
 
-    setId("map"); // sans ça le script js ne sert à rien car ne vise aucun objet cible
-    // le popup pour afficher la valeur de la couche en cours d'affichage
-    popup = addNew<Wt::WContainerWidget>();
-    popup->setId("popup");
-    popup->setStyleClass("ol-popup");
-    Wt::WLink link = Wt::WLink(""); // sert à rien en fait
-    Wt::WAnchor *popupCloser = popup->addNew<Wt::WAnchor>(link);
-    popupCloser->clicked().connect([this]
-    { popup->hide(); });
-
-    popupCloser->setId("popup-closer");
-    popupCloser->setStyleClass("ol-popup-closer");
-    Wt::WContainerWidget *popupContent = popup->addNew<Wt::WContainerWidget>();
-    popupContent->setId("popup-content");
-
+    setId("mapDiv"); // sans ça le script js ne sert à rien car ne vise aucun objet cible
 
     if (!exists(mDico->File("initOL")))
     {
@@ -29,18 +15,10 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
     }
     else
     {
-        /*std::ifstream t(mDico->File("initOL"));
-        std::stringstream ss;
-        ss << t.rdbuf();
-        t.close();
-        doJavaScript(ss.str());
-        if (globTest) { std::cout << "first initOL done" << std::endl;}*/
-
 
         setToolTip(tr("tooltipMap1"));
 
         // slots
-
         // permet de récuper les coodonnées de la carte dans wt lors d'un click dessus + dessine un point là ou l'utilisateur a cliqué
 
         slot.setJavaScript("function getXY(owt,evt){"
@@ -92,7 +70,5 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
         touchStarted().preventDefaultAction(true);
         touchMoved().preventDefaultAction(true);
         touchEnded().preventDefaultAction(true);
-        // openfileBug
-        //t.close();
     }
 }
