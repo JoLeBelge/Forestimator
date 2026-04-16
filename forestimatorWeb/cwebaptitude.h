@@ -128,9 +128,10 @@ public:
     void changeHeader(std::string aSection);
 
      parcellaire * mPA;
-     std::string getActiveLay(){return activeLayerCode;}
+     std::string getActiveLay();
+
 private:
-    std::string activeLayerCode;
+
 
     Session session_;
     bool loaded_=false; // sert à éviter que void authEvent ne crash si refresh la page et que user connecté...

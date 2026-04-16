@@ -240,6 +240,8 @@ public:
 
     bool cropIm(std::string aOut, OGREnvelope ext);
 
+    std::string getJSdisplayLayer() const;
+
 protected:
     TypeVar mTypeVar; // var continue ou discontinue, pour le calcul de statistique
     TypeLayer mType;

@@ -5,7 +5,6 @@
 #include <Wt/WSignal.h>
 #include <Wt/WText.h>
 #include <Wt/WTable.h>
-#include <Wt/WPanel.h>
 #include <Wt/WTree.h>
 #include <Wt/WTreeTable.h>
 #include <Wt/WTreeTableNode.h>
@@ -57,11 +56,6 @@ public:
 
     cWebAptitude * m_app;
 
-    // gestion de la légende de la carte
-
-    void updateLegende(const std::shared_ptr<Layer> l);
-
-    Wt::WContainerWidget *mLegendDiv;
     Wt::WContainerWidget *mExtentDivGlob; // le glob contient le boutton et le extentDiv
     Wt::WContainerWidget *mExtentDiv;
     Wt::WLineEdit *tb_extent_name;
@@ -74,8 +68,6 @@ public:
 
     OGREnvelope *getMapExtent() { return &mMapExtent; }
 
-    std::shared_ptr<Layer> getActiveLay();
-
     std::vector<std::shared_ptr<Layer>> mVLs;
 
     void closeConnection();
@@ -83,7 +75,7 @@ public:
     bool getExpertModeForUser(std::string id);
     void loadExtents(std::string id);
 
-    void updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers);
+    void updateLegendeDiv(std::vector<std::shared_ptr<layerBase> > layers);
 
     JSlot slotMapExport;
 

@@ -4,23 +4,18 @@
 #include <Wt/WText.h>
 #include "cdicoapt.h"
 #include <Wt/WString.h>
-//#include "grouplayers.h"
 #include "cwebaptitude.h"
 
 using namespace Wt;
 
 // C'est la classe qui hérite de layerbase et qui contient une interface graphique dans Wt dans le catalogue (=grouplayer)
 
-class groupLayers;
-class Layer;
-
 class Layer : public layerBase, public std::enable_shared_from_this<Layer>
 {
 public:
 
     Layer(std::shared_ptr<layerBase> aLB,WText * PWText);
-    // Javascript
-    void displayLayer() const;
+
     void setActive(bool b=true);
     bool IsActive() const {return mActive;}
 

@@ -2,8 +2,7 @@
 
 WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot(this), slot2(this), xySelect_(this, "2.0") //,polygId_(this,"1")
 {
-    setPadding(0);
-    setMargin(0);
+
     // pour que layoutSizeChange fonctionne
     setLayoutSizeAware(1);
 
@@ -13,11 +12,15 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
     popup->setId("popup");
     popup->setStyleClass("ol-popup");
     Wt::WLink link = Wt::WLink(""); // sert à rien en fait
-    Wt::WContainerWidget *popupCloser = popup->addNew<Wt::WAnchor>(link);
+    Wt::WAnchor *popupCloser = popup->addNew<Wt::WAnchor>(link);
+    popupCloser->clicked().connect([popup]
+    { popup->hide(); });
+
     popupCloser->setId("popup-closer");
     popupCloser->setStyleClass("ol-popup-closer");
     Wt::WContainerWidget *popupContent = popup->addNew<Wt::WContainerWidget>();
     popupContent->setId("popup-content");
+
 
     if (!exists(mDico->File("initOL")))
     {
@@ -31,8 +34,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
         ss << t.rdbuf();
         t.close();
         doJavaScript(ss.str());
-        if (globTest) { std::cout << "initOL done (well dojavascript order done)" << std::endl;}
-        */
+        if (globTest) { std::cout << "first initOL done" << std::endl;}*/
+
 
         setToolTip(tr("tooltipMap1"));
 
@@ -92,9 +95,4 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico) : xy_(this, "1.0"), mDico(aDico), slot
         // openfileBug
         //t.close();
     }
-
-
-    //setWidth("100%");
-    //setMinimumSize(400,0);
-    //setOverflow(Overflow::Visible);
 }

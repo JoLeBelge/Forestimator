@@ -3,7 +3,6 @@ extern bool globTest;
 
 statWindow::statWindow(cWebAptitude * aWebApp):mDico(aWebApp->mDico), m_app(aWebApp)
 {
-    if (globTest){std::cout << "statWindow::statWindow" << std::endl;}
     setId("statWindow");
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
@@ -11,8 +10,6 @@ statWindow::statWindow(cWebAptitude * aWebApp):mDico(aWebApp->mDico), m_app(aWeb
     addStyleClass("statWindow");
 
     WContainerWidget * contTitre_ =  addWidget(std::make_unique<Wt::WContainerWidget>());
-    //mTitre = contTitre_->addWidget(std::make_unique<WText>());
-    //mTitre->setId("statWindowTitre");
     contTitre_->addWidget(std::make_unique<WText>(tr("infoDansVisuStat")));
     // bouton retour
     auto * tpl = contTitre_->addWidget(std::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));

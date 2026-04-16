@@ -321,7 +321,6 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     OGRPoint pt = mSP->getPoint();
 
     // je peux pas utiliser le membre mapextent de GL car celui-ci ne se met à jours que lorsqu'on télécharge une carte sur l'emprise courante...
-    // staticMap sm(mGL->getActiveLay(),&pt,mGL->getMapExtent());
     // depuis que l'IGN est passé à la version 1.3 du serveur WMS, je ne parviens plus à télécharger les cartes wms en jpg.
     // donc il faut changer cette ligne. utiliser l'IGN du serveur grfmn?
     staticMap sm = staticMap(mSP->mDico->getLayerBase("IGNgrfmn"), &pt);
@@ -420,7 +419,7 @@ void simplepoint::extractInfo(double x, double y)
                     std::vector<std::string> layerLabelAndValue = displayInfo(l);
                     if (l->l4StatP())
                     {
-                        //mAnaPoint->add1InfoRaster(layerLabelAndValue);
+                        add1InfoRaster(layerLabelAndValue);
                     }
                     if ((activeL && l->Code() != "CS_A"))
                     {
@@ -428,7 +427,8 @@ void simplepoint::extractInfo(double x, double y)
                         // attention, il faut escaper les caractères à problèmes du genre apostrophe
                         boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
                         boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
-                        doJavaScript("content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+                        doJavaScript("if (content) {content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
+                        m_app->mMap->popup->show();
                     }
                     else if (activeL && l->Code() == "CS_A")
                     {
@@ -440,9 +440,10 @@ void simplepoint::extractInfo(double x, double y)
 
                         if (aVal != 0)
                         {
-                            std::string js = "content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A" + std::to_string(aVal) + ".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);";
+                            std::string js = "if (content) {content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A" + std::to_string(aVal) + ".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}";
                             // std::cout << "js : " << js << std::endl;
                             doJavaScript(js);
+                            m_app->mMap->popup->show();
                         }
                     }
                 }
@@ -451,7 +452,8 @@ void simplepoint::extractInfo(double x, double y)
             // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay". Attention, CNSWrast n'est plus "Externe" maintenant que j'y ai associé la couche raster.
             if ((activeL && l->Code() == "CNSWrast"))
             {
-                doJavaScript("content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+                doJavaScript("if (content) {content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
+                m_app->mMap->popup->show();
             }
 
             // si la couche active est le cadastre
@@ -460,7 +462,8 @@ void simplepoint::extractInfo(double x, double y)
 
                 ptCadastre *ptCad = new ptCadastre(mDico->mCadastre, x, y);
                 ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre, m_app->mPA, std::placeholders::_1, std::placeholders::_2));
-                doJavaScript("content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);");
+                doJavaScript("if (content) {content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
+                m_app->mMap->popup->show();
                 // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
                 WDialog *dialogPtr = addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
                 dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));

@@ -95,7 +95,7 @@ dialog::dialog(const WString& windowTitle, Wt::WMenuItem * aMenu, const WEnviron
 
 cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     : Wt::WApplication(env),
-      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db"),activeLayerCode("IGN")
+      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db")
 {
 
     messageResourceBundle().use(docRoot() + "/forestimator");
@@ -221,6 +221,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     dialog_legend = tpl_content_app->addChild(std::make_unique<dialog>("Légende",menuitem_legend,&environment()));
     mLegendW = dialog_legend->contents();
     mLegendW->addStyleClass("content_legend");
+    mLegendW->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
 
     widgetCadastre * content_cadastre;
     content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get(),this));
@@ -235,7 +236,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     mPA->addStyleClass("content_analyse");
 
     mGroupL->updateGL();
-    mGroupL->clickOnName("IGN");
 
     /*	ACTIONS	: on connect les events aux méthodes	*/
     mMap->xy().connect(std::bind(&simplepoint::extractInfo,mAnaPoint, std::placeholders::_1,std::placeholders::_2));
@@ -356,3 +356,4 @@ void cWebAptitude::clientIDcookies(){
     }
 }
 
+std::string cWebAptitude::getActiveLay(){return mPanier->activeLayerCode;}

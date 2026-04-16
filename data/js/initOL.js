@@ -1,4 +1,5 @@
-
+if (typeof extent == 'undefined') {
+console.log("initOL.js");
 /*	Fonctions pour affichage label sur polygon	*/
 /*var getText = function(feature, resolution, dom) {
 	var type = dom.text.value;
@@ -111,7 +112,8 @@ tileGrid = new ol.tilegrid.TileGrid({
 	tileSize: [512, 512]
 });
 
-console.log(resolutions);
+
+//console.log(resolutions);
 
 
 activeLayer=1;
@@ -185,8 +187,8 @@ layers = [
 
 /*	Overlay clic info	*/
 var container = document.getElementById('popup');
-//content = document.getElementById('popup-content');
-//var closer = document.getElementById('popup-closer');
+content = document.getElementById('popup-content');
+var closer = document.getElementById('popup-closer');
 
 overlay = new ol.Overlay({
 	element: container,
@@ -261,10 +263,9 @@ updateGroupeLayers = function(){
 			 layers:l
 		});
 	} else {
-		//l.push(communes);
 		l.push(station);
 		groupe = new ol.layer.Group({
-			'title': 'aptitude',
+			'title': 'mes layers',
 			layers:l
 		});
 
@@ -318,3 +319,5 @@ moveLayerUp = function(code){
 	activeLayers=a;	
 	updateGroupeLayers();
 }
+
+} else { console.log("initOl already done")}

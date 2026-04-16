@@ -4,9 +4,8 @@
 
 extern bool globTest;
 panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
-    mDico(cWebApt->mDico),mMap(cWebApt->mMap),mGroupL(cWebApt->mGroupL)
+    mDico(cWebApt->mDico),mMap(cWebApt->mMap),mGroupL(cWebApt->mGroupL),m_app(cWebApt),activeLayerCode("IGN"), mLegendDiv(cWebApt->mLegendW)
 {
-    m_app = WApplication::instance();
 
     setMaximumSize(500,700);
     addNew<Wt::WText>(WString::tr("panier.header"));
@@ -48,15 +47,22 @@ panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
 
     mGroupL->mExtentDivGlob=mExtentDivGlob;
     mGroupL->mExtentDiv=mExtentDiv;
+
+    std::ifstream t(mDico->File("initOL"));
+            std::stringstream ss;
+            ss << t.rdbuf();
+            t.close();
+            doJavaScript(ss.str());
+            if (globTest) { std::cout << "first initOL done" << std::endl;}
+    addMap("IGN");
 }
 
+void panier::addMap(string aCode){
 
-void panier::addMap(std::shared_ptr<Layer> l){
-    std::string aCode= l->Code();
     if (globTest) {std::cout << "aCode : " << aCode << std::endl;}
 
     // vérifie qu'elle n'est pas déjà dans le panier
-    for (std::shared_ptr<Layer> l : mVLs){
+    for (std::shared_ptr<layerBase> l : mVLs){
         if (l->Code()==aCode){
             Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>("Sélection d'une carte","<p>Cette couche est déjà dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
             messageBox->setModal(true);
@@ -68,8 +74,25 @@ void panier::addMap(std::shared_ptr<Layer> l){
         }
     }
 
+    activeLayerCode=aCode;
+
+    // cacher la fenetre popup. plus propre de faire via wt que via js
+    mMap->popup->hide();
+    //doJavaScript("overlay?.setVisible(0);");
+
+    std::shared_ptr<layerBase> l =mDico->getLayerBase(activeLayerCode);
+    if (globTest){std::cout << " panier addMap : doJavascript displayLayer pour " << activeLayerCode << std::endl;}
+    doJavaScript(l->getJSdisplayLayer());
+
+    if (activeLayerCode != "IGN")
+    {
+        m_app->addLog("display layer " + l->Code(), typeLog::selectLayer);
+    }
+
     // je la met au début du vecteur
     mVLs.insert(mVLs.begin(),l);
+    updateLegendeDiv();
+    mGroupL->updateActiveLay(activeLayerCode);
     // je met la nouvelle couche en haut du tableau
     Wt::WTableRow * r =mTable->insertRow(0);
     r->elementAt(0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
@@ -86,7 +109,7 @@ void panier::addMap(std::shared_ptr<Layer> l){
             bvis->setIcon("resources/eye_visible.png");
         else
             bvis->setIcon("resources/eye_notvisible.png");
-        m_app->doJavaScript("activeLayers['"+aCode+"']?.setVisible(!activeLayers['"+aCode+"']?.values_.visible);");
+        doJavaScript("activeLayers['"+aCode+"']?.setVisible(!activeLayers['"+aCode+"']?.values_.visible);");
     });
     /* bouton transparent/opaque */
     bvis = r->elementAt(2)->addWidget(std::make_unique<WPushButton>("T"));
@@ -99,7 +122,7 @@ void panier::addMap(std::shared_ptr<Layer> l){
             bvis->setText("T");
         else
             bvis->setText("O");
-        m_app->doJavaScript("activeLayers['"+aCode+"']?.setOpacity(activeLayers['"+aCode+"']?.getOpacity()==1?0.5:1);");
+        doJavaScript("activeLayers['"+aCode+"']?.setOpacity(activeLayers['"+aCode+"']?.getOpacity()==1?0.5:1);");
     });
 
     int row=mTable->rowCount();
@@ -128,8 +151,8 @@ void panier::addMap(std::shared_ptr<Layer> l){
                 // del row in table
                 mTable->removeRow(i);
                 // del layer
-                m_app->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
-                mGroupL->updateLegendeDiv(mVLs);
+                doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
+                updateLegendeDiv();
                 mGroupL->updateActiveLay(mVLs.at(0)->Code());
             } else {
                 Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>("Retirer une carte","<p>Il ne reste que cette couche dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
@@ -157,7 +180,7 @@ void panier::addMap(std::shared_ptr<Layer> l){
         // move row in table
         mTable->moveRow(i,i+1);
         // move layer
-        m_app->doJavaScript("moveLayerUp('"+aCode+"');");
+        doJavaScript("moveLayerUp('"+aCode+"');");
         mGroupL->updateActiveLay(mVLs.at(0)->Code());
     });
     bvis = r->elementAt(5)->addWidget(std::make_unique<WPushButton>(""));
@@ -176,7 +199,7 @@ void panier::addMap(std::shared_ptr<Layer> l){
         // move row in table
         mTable->moveRow(i,i-1);
         // move layer
-         m_app->doJavaScript("moveLayerDown('"+aCode+"');");
+         doJavaScript("moveLayerDown('"+aCode+"');");
          mGroupL->updateActiveLay(mVLs.at(0)->Code());
     });
 }
@@ -189,9 +212,60 @@ void panier::refresh(){
    t.close();
    doJavaScript(ss.str());
    // pour l'instant, la transparence n'est pas appliquée pendant les refresh, et la dernière s'affiche au dessus de la première..
-   for (std::shared_ptr<Layer> l : mVLs){
-       l->displayLayer();
+   for (std::shared_ptr<layerBase> l : mVLs){
+       doJavaScript(l->getJSdisplayLayer());
     }
     WContainerWidget::refresh();
+}
+
+void panier::updateLegendeDiv()
+{
+    mLegendDiv->clear();
+
+    if (mVLs.size() == 0)
+        mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
+    else
+    {
+        mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendTitre")));
+
+        for (auto layer : mVLs)
+        {
+            this->updateLegende(layer);
+        }
+    }
+}
+
+void panier::updateLegende(const std::shared_ptr<layerBase> l)
+{
+    if (l->getCatLayer() != TypeLayer::Externe)
+    {
+        Wt::WAnimation animation(Wt::AnimationEffect::SlideInFromTop, Wt::TimingFunction::EaseOut, 100);
+
+        auto panel = std::make_unique<Wt::WPanel>();
+        panel->setTitle("<h3>" + l->getLegendLabel() + "</h3>");
+        panel->addStyleClass("centered-example");
+        panel->setCollapsible(true);
+        panel->setAnimation(animation);
+        auto tab = std::make_unique<WTable>();
+        tab->setHeaderCount(1);
+        tab->setWidth(Wt::WLength("90%"));
+        tab->toggleStyleClass("table-striped", true);
+        tab->setMaximumSize(1000, 1000);
+
+        int row(0);
+        for (auto kv : l->getDicoVal())
+        {
+            if (l->hasColor(kv.first))
+            {
+                std::shared_ptr<color> col = l->getColor(kv.first);
+                tab->elementAt(row, 0)->addWidget(std::make_unique<WText>(kv.second));
+                tab->elementAt(row, 1)->setWidth("40%");
+                tab->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col->mR, col->mG, col->mB));
+                row++;
+            }
+        }
+        panel->setCentralWidget(std::move(tab));
+        mLegendDiv->addWidget(std::move(panel));
+    }
 }
 

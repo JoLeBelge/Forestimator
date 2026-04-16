@@ -46,12 +46,14 @@ public:
     }*/
 
     virtual void refresh(){
+
         std::cout << "refresh wopenlayer";
-        /*std::ifstream t(mDico->File("initOL"));
+        //WApplication *app = WApplication::instance();
+        std::ifstream t(mDico->File("initOL"));
         std::stringstream ss;
         ss << t.rdbuf();
         t.close();
-        doJavaScript(ss.str());*/
+        doJavaScript(ss.str());
         WContainerWidget::refresh();
     }
 

@@ -4,29 +4,27 @@
 
 extern bool globTest;
 
-groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), mLegendDiv(cWebApt->mLegendW), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
+groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(cWebApt), sigMapExport(this, "1.0"), sigMapCenter(this, "2.0"), slotMapCenter(this)
 {
     setOverflow(Wt::Overflow::Visible);
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
 
     slotMapExport.setJavaScript(
-        "function () {"
-        "var extent = map.getView().calculateExtent(map.getSize());"
-        "var bottomLeft = ol.extent.getBottomLeft(extent);"
-        "var topRight =ol.extent.getTopRight(extent);"
-        "if (bottomLeft != null) {" +
-        sigMapExport.createCall({"topRight[0]", "topRight[1]", "bottomLeft[0]", "bottomLeft[1]"}) + "}}");
+                "function () {"
+                "var extent = map.getView().calculateExtent(map.getSize());"
+                "var bottomLeft = ol.extent.getBottomLeft(extent);"
+                "var topRight =ol.extent.getTopRight(extent);"
+                "if (bottomLeft != null) {" +
+                sigMapExport.createCall({"topRight[0]", "topRight[1]", "bottomLeft[0]", "bottomLeft[1]"}) + "}}");
 
     this->sigMapExport.connect(std::bind(&groupLayers::updateMapExtentAndCropIm, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 
     slotMapCenter.setJavaScript(
-        "function () {"
-        "var centre = map.getView().getCenter();"
-        "var z = map.getView().getZoom();" +
-        sigMapCenter.createCall({"centre[0]", "centre[1]", "z"}) + "}");
+                "function () {"
+                "var centre = map.getView().getCenter();"
+                "var z = map.getView().getZoom();" +
+                sigMapCenter.createCall({"centre[0]", "centre[1]", "z"}) + "}");
     this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
-    mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
 
     /* Liste cartes 1	*/
     std::unique_ptr<Wt::WTree> tree = std::make_unique<Wt::WTree>();
@@ -47,7 +45,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
         node1->addStyleClass("tree_node");
         Wt::WTreeNode *n = tree->treeRoot()->addChildNode(std::move(node1));
         n->label()->clicked().connect([=]
-                                      {
+        {
             if(n->isExpanded()){n->collapse();} else {
                 n->expand();} });
 
@@ -79,7 +77,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                     // 3) ajout des interactions olala...
                     std::string aCode = aL->Code();
                     wtext->doubleClicked().connect([this, aCode]
-                                                   { clickOnName(aCode); });
+                    { m_app->mPanier->addMap(aCode);});
                     aL->changeExpertMode().connect(n, &Wt::WTreeNode::setNodeVisible);
                     mVLs.push_back(aL);
                 }
@@ -106,7 +104,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
                 // 3) ajout des interactions
                 std::string aCode = aL->Code();
                 wtext->doubleClicked().connect([this, aCode]
-                                               { clickOnName(aCode); });
+                    { m_app->mPanier->addMap(aCode);});
                 aL->changeExpertMode().connect(n, &Wt::WTreeNode::setNodeVisible);
                 //mVLs.push_back(aL);
             }
@@ -175,78 +173,13 @@ void groupLayers::updateGL()
 
 
 
-void groupLayers::updateLegende(const std::shared_ptr<Layer> l)
-{
-    if (l->getCatLayer() != TypeLayer::Externe)
-    {
-        Wt::WAnimation animation(Wt::AnimationEffect::SlideInFromTop, Wt::TimingFunction::EaseOut, 100);
-
-        auto panel = std::make_unique<Wt::WPanel>();
-        panel->setTitle("<h3>" + l->getLegendLabel() + "</h3>");
-        panel->addStyleClass("centered-example");
-        panel->setCollapsible(true);
-        panel->setAnimation(animation);
-        auto tab = std::make_unique<WTable>();
-        tab->setHeaderCount(1);
-        tab->setWidth(Wt::WLength("90%"));
-        tab->toggleStyleClass("table-striped", true);
-        tab->setMaximumSize(1000, 1000);
-
-        int row(0);
-        for (auto kv : l->getDicoVal())
-        {
-            if (l->hasColor(kv.first))
-            {
-                std::shared_ptr<color> col = l->getColor(kv.first);
-                tab->elementAt(row, 0)->addWidget(std::make_unique<WText>(kv.second));
-                tab->elementAt(row, 1)->setWidth("40%");
-                tab->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col->mR, col->mG, col->mB));
-                row++;
-            }
-        }
-        panel->setCentralWidget(std::move(tab));
-        mLegendDiv->addWidget(std::move(panel));
-    }
-}
-
-/**
- * @brief groupLayers::getActiveLay
- * @return
- */
-std::shared_ptr<Layer> groupLayers::getActiveLay()
-{
-    std::shared_ptr<Layer> aRes = NULL;
-    for (std::shared_ptr<Layer> l : mVLs)
-    {
-        if ((l->IsActive()))
-        {
-            aRes = l;
-            break;
-        }
-    }
-    // au lancement de l'appli, aucune couche n'est active
-    if (aRes == NULL)
-    {
-        for (std::shared_ptr<Layer> l : mVLs)
-        {
-            if ((l->Code() == "IGN"))
-            {
-                aRes = l;
-                l->setActive();
-                break;
-            }
-        }
-    }
-    return aRes;
-}
-
 
 void groupLayers::exportLayMapView()
 {
 
     std::cout << "exportLayMapView " << std::endl;
 
-    std::shared_ptr<Layer> l = getActiveLay(); // attention, si on vient d'ouvrir le soft, aucune layer n'est actives!! gerer les ptr null
+    std::shared_ptr<layerBase> l = mDico->getLayerBase(m_app->getActiveLay());
     if (l && l->getCatLayer() != TypeLayer::Externe)
     {
 
@@ -254,13 +187,13 @@ void groupLayers::exportLayMapView()
         if (l->getTypeVar() == TypeVar::Continu && l->Gain() != 1.0)
         {
             Wt::WMessageBox *messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-                "Attention",
-                tr("msg.Gain.info").arg(l->Gain()),
-                Wt::Icon::Information,
-                Wt::StandardButton::Ok));
+                                                             "Attention",
+                                                             tr("msg.Gain.info").arg(l->Gain()),
+                                                             Wt::Icon::Information,
+                                                             Wt::StandardButton::Ok));
             messageBox->setModal(true);
             messageBox->buttonClicked().connect([=]
-                                                { this->removeChild(messageBox); });
+            { this->removeChild(messageBox); });
             messageBox->show();
         }
 
@@ -310,13 +243,13 @@ void groupLayers::exportLayMapView()
         else
         {
             Wt::WMessageBox *messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-                "Erreur",
-                "<p> Cette couche ne peut être découpée sur cette emprise, essayer avec une zone plus petite.</p>",
-                Wt::Icon::Critical,
-                Wt::StandardButton::Ok));
+                                                             "Erreur",
+                                                             "<p> Cette couche ne peut être découpée sur cette emprise, essayer avec une zone plus petite.</p>",
+                                                             Wt::Icon::Critical,
+                                                             Wt::StandardButton::Ok));
             messageBox->setModal(true);
             messageBox->buttonClicked().connect([=]
-                                                { this->removeChild(messageBox); });
+            { this->removeChild(messageBox); });
             messageBox->show();
         }
 
@@ -326,14 +259,14 @@ void groupLayers::exportLayMapView()
     else
     {
         Wt::WMessageBox *messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-            "Erreur",
-            "<p> Cette couche ne peut être téléchargé, veillez essayer avec une autres couche.</p>",
-            Wt::Icon::Critical,
-            Wt::StandardButton::Ok));
+                                                         "Erreur",
+                                                         "<p> Cette couche ne peut être téléchargé, veillez essayer avec une autres couche.</p>",
+                                                         Wt::Icon::Critical,
+                                                         Wt::StandardButton::Ok));
 
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=]
-                                            { this->removeChild(messageBox); });
+        { this->removeChild(messageBox); });
         messageBox->show();
     }
 }
@@ -414,32 +347,29 @@ void groupLayers::loadExtents(std::string id)
             std::string z = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2)));
             std::string n = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3)));
             std::string id_extent = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4)));
-            /*std::cout << " value 1 : " << cx << std::endl;
-            std::cout << " value 2 : " << cy << std::endl;
-            std::cout << " value 3 : " << z << std::endl;*/
             WPushButton *bp = mExtentDiv->addNew<Wt::WPushButton>(n);
             bp->setInline(1);
             bp->clicked().connect([=]
-                                  {
-            doJavaScript("map.getView().setCenter(["+cx+","+cy+" ]);");
-            doJavaScript("map.getView().setZoom("+z+");"); });
+            {
+                doJavaScript("map.getView().setCenter(["+cx+","+cy+" ]);");
+                doJavaScript("map.getView().setZoom("+z+");"); });
             WAnchor *del = mExtentDiv->addNew<Wt::WAnchor>(WLink(""), "(x)");
             del->clicked().connect([=]
-                                   {
-            WDialog * dialogPtr =  addChild(std::make_unique<Wt::WDialog>(tr("extent_del_comfirm")));
-            WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Supprimer");
-            ok->setDefault(false);
-            ok->clicked().connect([=]{
-                printf("delete extent\n");
-                deleteExtent(id_extent);
-                dialogPtr->reject();
-            });
+            {
+                WDialog * dialogPtr =  addChild(std::make_unique<Wt::WDialog>(tr("extent_del_comfirm")));
+                WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Supprimer");
+                ok->setDefault(false);
+                ok->clicked().connect([=]{
+                    printf("delete extent\n");
+                    deleteExtent(id_extent);
+                    dialogPtr->reject();
+                });
 
-            WPushButton * annuler = dialogPtr->footer()->addNew<Wt::WPushButton>("Annuler");
-            annuler->setDefault(true);
-            annuler->clicked().connect([=]{dialogPtr->reject();});
+                WPushButton * annuler = dialogPtr->footer()->addNew<Wt::WPushButton>("Annuler");
+                annuler->setDefault(true);
+                annuler->clicked().connect([=]{dialogPtr->reject();});
 
-            dialogPtr->show(); });
+                dialogPtr->show(); });
         }
         closeConnection();
 
@@ -510,7 +440,6 @@ void groupLayers::deleteExtent(std::string id_extent)
     loadExtents(m_app->getUser().id());
     m_app->addLog("delete an extent", typeLog::extend); // add some web stats
 }
-/** FIN extents **/
 
 bool isValidXmlIdentifier(const std::string &str)
 {
@@ -524,10 +453,6 @@ bool isValidHtml(const std::string &text)
     if (t.textFormat() == Wt::TextFormat::XHTML)
     {
         aRes = 1;
-    }
-    else
-    {
-        // std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
     }
     return aRes;
 }
@@ -621,56 +546,4 @@ GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
         GDALClose(DS);
     }
     return aRes;
-}
-
-void groupLayers::clickOnName(std::string aCode)
-{
-    updateActiveLay(aCode);
-    std::shared_ptr<Layer> layer;
-    for (std::shared_ptr<Layer> l : mVLs)
-    {
-        if (aCode == l->Code())
-        {
-            layer = l;
-            break;
-        }
-    }
-
-    // cacher la fenetre popup. plus propre de faire via wt que via js
-    m_app->mMap->popup->hide();
-    //m_app->doJavaScript("overlay?.setVisible(0);");
-
-    // ajouter la couche à la carte
-    for (std::shared_ptr<Layer> l : mVLs)
-    {
-        if (l->IsActive())
-        {
-            l->displayLayer();
-            if (l->Code() != "IGN")
-            {
-                m_app->addLog("display layer " + l->Code(), typeLog::selectLayer);
-            }
-            break;
-        }
-    }
-    // ajout de la carte au panier après le "diplaylayer" sinon ordre du code js pas bon? ben oui car couche pas encore dans activeLayers[]
-    // devrait être fait en mm temps.
-    m_app->mPanier->addMap(layer);
-    updateLegendeDiv(m_app->mPanier->mVLs);
-}
-void groupLayers::updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers)
-{
-    mLegendDiv->clear();
-
-    if (layers.size() == 0)
-        mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
-    else
-    {
-        mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendTitre")));
-
-        for (auto layer : layers)
-        {
-            this->updateLegende(layer);
-        }
-    }
 }
