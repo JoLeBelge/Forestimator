@@ -227,6 +227,9 @@ class _MyApp extends State<MyApp> {
     if (GeometricLayer.essenceLayerExists()) {
       Geometry.sendEssencePointsInBackground();
     }
+    if (GeometricLayer.pathpointsLayerExists()) {
+      Geometry.sendPathPointsInBackground();
+    }
   }
 
   @override

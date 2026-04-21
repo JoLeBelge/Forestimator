@@ -1039,7 +1039,7 @@ class _SelectPolyType extends State<SelectPolyType> {
             },
             child: Column(
               children: [
-                FaIcon(FontAwesomeIcons.pentagon, color: Colors.white),
+                Icon(Icons.pentagon_outlined, color: Colors.white),
                 Text("Polygon", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS)),
               ],
             ),

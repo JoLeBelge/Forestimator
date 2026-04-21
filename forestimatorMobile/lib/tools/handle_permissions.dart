@@ -22,8 +22,7 @@ String system = "";
 
 /* Ask permissions at start of map and if not granted ask to grant them */
 bool getLocation() => location.isGranted;
-bool getStorage() =>
-    system == "Android" && release < 13 ? storage.isGranted : true;
+bool getStorage() => system == "Android" && release < 13 ? storage.isGranted : true;
 bool getExtStorage() => extStorage.isGranted;
 
 Future<bool> openPhoneForestimatorSettings() async => await openAppSettings();
@@ -35,21 +34,19 @@ void initPermissions() async {
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await infos.androidInfo;
     if (androidInfo.version.release.length > 1) {
-      release = double.parse(
-        androidInfo.version.release[0] + androidInfo.version.release[1],
-      );
+      release = double.parse(androidInfo.version.release[0] + androidInfo.version.release[1]);
     } else {
       release = double.parse(androidInfo.version.release[0]);
     }
     sdkInt = androidInfo.version.sdkInt;
     gl.print("Android $release (sdk $sdkInt)");
-  } else if (getVersion && Platform.isIOS) {
+  } /* else if (getVersion && Platform.isIOS) {
     system = "iOS";
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     IosDeviceInfo iOSInfo = await infos.iosInfo;
     release = double.parse(iOSInfo.systemVersion);
     gl.print("iOS $release ${iOSInfo.systemName}");
-  }
+  }*/
   getVersion = false;
 }
 
@@ -67,10 +64,7 @@ void makeAllPermissionRequests() {
   Permission.location.request();
 }
 
-Widget handlePermissionForLocation({
-  required Widget child,
-  required VoidSetter refreshParentWidgetTree,
-}) {
+Widget handlePermissionForLocation({required Widget child, required VoidSetter refreshParentWidgetTree}) {
   if (!askOnceForLocation) return child;
   if (location.isPermanentlyDenied) {
     return PopupPermissions(
@@ -116,10 +110,7 @@ Widget handlePermissionForLocation({
   return child;
 }
 
-Widget handlePermissionForStorage({
-  required Widget child,
-  required VoidSetter refreshParentWidgetTree,
-}) {
+Widget handlePermissionForStorage({required Widget child, required VoidSetter refreshParentWidgetTree}) {
   if (!askOnceForStorage) return child;
   if (storage.isDenied && release < 13) {
     return PopupPermissions(

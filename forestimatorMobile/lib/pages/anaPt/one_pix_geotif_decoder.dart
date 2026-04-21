@@ -29,10 +29,7 @@ class OnePixGeotifDecoder extends Decoder {
     TiffImage im = info!.images[0];
     GeoInfo geoi = GeoInfo(im);
     Coordinate uv = Coordinate(0, 0);
-    geoi.worldToPixel(
-      Coordinate(x, y),
-      uv,
-    ); // determiner la position du pixel qui nous intéresse
+    geoi.worldToPixel(Coordinate(x, y), uv); // determiner la position du pixel qui nous intéresse
 
     // determiner l'offset et le byteCount de la tile qui contient la valeur du pixel que l'on souhaite - fonctionne QUE avec mes tif qui on un Tile par ligne
     // A modifier!!, maintenant j'utlise des rasters tuilés depuis début avril 2026
@@ -45,23 +42,10 @@ class OnePixGeotifDecoder extends Decoder {
       (uv.x - (nTilecol) * im.tileWidth).floor().toDouble(),
       (uv.y - (nTilerow) * im.tileHeight).floor().toDouble(),
     ); // coord du pixel dans la tile
-    int tilePixNum =
-        tileCoord.y.toInt() * im.tileWidth +
-        tileCoord.x.toInt(); // numéro du pixel dans la tile
+    int tilePixNum = tileCoord.y.toInt() * im.tileWidth + tileCoord.x.toInt(); // numéro du pixel dans la tile
 
     gl.print(
-      "uv " +
-          uv.toString() +
-          "tile row " +
-          nTilerow.toString() +
-          " tile col " +
-          nTilecol.toString() +
-          " tile coord " +
-          tileCoord.toString() +
-          " tile pix num " +
-          tilePixNum.toString() +
-          " compression " +
-          im.compression.toString(),
+      "uv ${uv}tile row $nTilerow tile col $nTilecol tile coord $tileCoord tile pix num $tilePixNum compression ${im.compression}",
     );
 
     final tileIndex = nTilerow * tilesPerRow + nTilecol;
@@ -86,20 +70,14 @@ class OnePixGeotifDecoder extends Decoder {
     }
 
     InputBuffer byteData;
-    if (im.bitsPerSample == 8 ||
-        im.bitsPerSample == 16 ||
-        im.bitsPerSample == 32 ||
-        im.bitsPerSample == 64) {
+    if (im.bitsPerSample == 8 || im.bitsPerSample == 16 || im.bitsPerSample == 32 || im.bitsPerSample == 64) {
       if (im.compression == TiffCompression.none) {
         byteData = p;
       } else if (im.compression == TiffCompression.lzw) {
         byteData = InputBuffer(Uint8List(bytesInThisTile));
         final decoder = LzwDecoder();
         try {
-          decoder.decode(
-            InputBuffer.from(p, length: byteCount),
-            byteData.buffer,
-          );
+          decoder.decode(InputBuffer.from(p, length: byteCount), byteData.buffer);
         } catch (e) {
           //print(e);
         }
@@ -138,11 +116,11 @@ class OnePixGeotifDecoder extends Decoder {
         tata.writeAsString(outData.join(';'));
         tata.writeAsString("\n", mode: FileMode.append);
 
-        gl.print("outData length " + outData.length.toString());
+        gl.print("outData length ${outData.length}");
         if (im.bitsPerSample == 16) {
           aRes = (outData[(tilePixNum * 2) - 1] << 8) + outData[tilePixNum * 2];
         } else {
-          gl.print("value is " + outData[tilePixNum].toString());
+          gl.print("value is ${outData[tilePixNum]}");
           aRes = outData[tilePixNum];
         }
         //byteData = InputBuffer(outData);
@@ -158,7 +136,7 @@ class OnePixGeotifDecoder extends Decoder {
     } else {
       throw ImageException('Unsupported Compression Type: $im.compression');
     }
-    gl.print("value returned is " + aRes.toString());
+    gl.print("value returned is $aRes");
     return aRes;
   }
 
