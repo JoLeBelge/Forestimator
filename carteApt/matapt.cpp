@@ -514,14 +514,19 @@ zbioPainted::zbioPainted(cDicoApt *aDico)
 
     if( mDico->mDS_zbio != NULL ){
         mlay = mDico->mDS_zbio->GetLayer(0);
-        std::shared_ptr<OGREnvelope> ext = std::shared_ptr<OGREnvelope>(new OGREnvelope());
-        OGRErr e = mlay->GetExtent(ext.get());
+        ext = OGREnvelope();
+        ext.MinX=42932.3278102874755859;
+        ext.MinY=21818.2029323577880859;
+        ext.MaxX=294853.8289432525634766;
+        ext.MaxY=167384.3000011444091797;
+
+        /*OGRErr e = mlay->GetExtent(ext);
         if (e != OGRERR_NONE){
             std::cout << " error getting extent for zbio layer " << std::endl;
-        }
+        }*/
         // taille de l'emprise de l'image
-        mWx = ext->MaxX-ext->MinX;
-        mWy = ext->MaxY-ext->MinY;
+        mWx = ext.MaxX-ext.MinX;
+        mWy = ext.MaxY-ext.MinY;
     }
 }
 
@@ -634,10 +639,10 @@ void zbioPainted::drawPol(OGRPolygon * pol, WPainter *painter){
 }
 
 double zbioPainted::xGeo2Im(double x){
-    return mSx*(x-ext->MinX)/mWx;
+    return mSx*(x-ext.MinX)/mWx;
 }
 double zbioPainted::yGeo2Im(double y){
-    return mSy-(mSy*(y-ext->MinY)/mWy);
+    return mSy-(mSy*(y-ext.MinY)/mWy);
 }
 
 void matApt::selectLevel4comparison(std::tuple<int,int> ntnh){   

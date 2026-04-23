@@ -197,11 +197,6 @@ void panier::addMap(string aCode){
 
 void panier::refresh(){
    if (globTest){std::cout << "refresh panier" << std::endl;}
-   /*std::ifstream t(mDico->File("initOL"));
-   std::stringstream ss;
-   ss << t.rdbuf();
-   t.close();
-   doJavaScript(ss.str());*/
    // pour l'instant, la transparence n'est pas appliquée pendant les refresh, et la dernière s'affiche au dessus de la première..
    for (std::shared_ptr<layerBase> l : mVLs){
        doJavaScript(l->getJSdisplayLayer());

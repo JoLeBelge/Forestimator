@@ -35,53 +35,53 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     WContainerWidget * rowCont = contlisteEss->addNew<Wt::WContainerWidget>();
     rowCont->setStyleClass("col-6");
     for (auto & kv : mDicoApt->getAllEss()){
-     cEss * ess=kv.second.get();
-     if (ess->hasCSApt()){
-         Wt::WText * t = rowCont->addNew<Wt::WText>(ess->Code()+ " - " +ess->Nom());
-         t->setStyleClass("ess");
-         rowCont->addNew<Wt::WBreak>();
-         t->mouseWentOver().connect([=] {
-             displayNiche(ess->Code());
-             //graphZbio->displayAptMap(ess->Code());
-             t->setStyleClass("currentEss");
-         });
-         t->mouseWentOut().connect([=] {
-             resetNiche();
-             //graphZbio->selectZbio(zbio_);
-             t->setStyleClass("ess");
-         });
+        cEss * ess=kv.second.get();
+        if (ess->hasCSApt()){
+            Wt::WText * t = rowCont->addNew<Wt::WText>(ess->Code()+ " - " +ess->Nom());
+            t->setStyleClass("ess");
+            rowCont->addNew<Wt::WBreak>();
+            t->mouseWentOver().connect([=] {
+                displayNiche(ess->Code());
+                //graphZbio->displayAptMap(ess->Code());
+                t->setStyleClass("currentEss");
+            });
+            t->mouseWentOut().connect([=] {
+                resetNiche();
+                //graphZbio->selectZbio(zbio_);
+                t->setStyleClass("ess");
+            });
 
-         t->clicked().connect([=] {
-             t->setStyleClass("ess");
-             Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-                                                               ess->Nom(),
-                                                               "",
-                                                               Wt::Icon::Information,
-                                                               Wt::StandardButton::Ok));
-             Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+ess->Code()+".pdf");
-             l.setTarget(Wt::LinkTarget::NewWindow);
-             Wt::WString s("Fiche-essence disponible ici");
-             Wt::WAnchor * a =messageBox->contents()->addNew<Wt::WAnchor>(l,s);
-             a->clicked().connect([=] {
-                 this->removeChild(messageBox);
-             });
-             messageBox->setModal(true);
-             messageBox->buttonClicked().connect([=] {
-                 this->removeChild(messageBox);
-             });
-             messageBox->show();
-         });
+            t->clicked().connect([=] {
+                t->setStyleClass("ess");
+                Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                                  ess->Nom(),
+                                                                  "",
+                                                                  Wt::Icon::Information,
+                                                                  Wt::StandardButton::Ok));
+                Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+ess->Code()+".pdf");
+                l.setTarget(Wt::LinkTarget::NewWindow);
+                Wt::WString s("Fiche-essence disponible ici");
+                Wt::WAnchor * a =messageBox->contents()->addNew<Wt::WAnchor>(l,s);
+                a->clicked().connect([=] {
+                    this->removeChild(messageBox);
+                });
+                messageBox->setModal(true);
+                messageBox->buttonClicked().connect([=] {
+                    this->removeChild(messageBox);
+                });
+                messageBox->show();
+            });
 
-        r++;
-         if (r==ncells){
-             rowCont = contlisteEss->addNew<Wt::WContainerWidget>();
-             rowCont->setStyleClass("col-6");
-             r=1;
-         }
-     }
+            r++;
+            if (r==ncells){
+                rowCont = contlisteEss->addNew<Wt::WContainerWidget>();
+                rowCont->setStyleClass("col-6");
+                r=1;
+            }
+        }
     }
 
-     /* 4 Description de unités stationnelles ---------------------------*/
+    /* 4 Description de unités stationnelles ---------------------------*/
     contFicheUS = addWidget(std::make_unique<WContainerWidget>());
     contFicheUS->setId("ficheUS");
 
@@ -109,10 +109,7 @@ void matAptCS::updateListeUS(){
             us->addStyleClass("position-relative");
             us->setTextFormat(Wt::TextFormat::XHTML);
             std::shared_ptr<color> col = CSlay->getColor(std::get<0>(kv.first));
-            //TODO: la ligne suivante cr´ee des memory leaks...
-            std::cout << col->getRGB()<< std::endl;
-            us->setText(tr("matAptCS.nobadge").arg(prefixZbio_).arg(std::to_string(std::get<0>(kv.first))).arg(stationName));//.arg(col->getRGB()));
-            //us->setText(tr("matAptCS.nobadge"));
+            us->setText(tr("matAptCS.nobadge").arg(prefixZbio_).arg(std::to_string(std::get<0>(kv.first))).arg(stationName).arg(col->getRGB()));
             us->addStyleClass("us-button");
 
             //if (std::get<1>(kv.first)==""){
@@ -120,9 +117,7 @@ void matAptCS::updateListeUS(){
             //}else{
             //    us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
             //}
-
             //us->setToolTip(mDicoApt->stationEtVar(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first)));
-
             us->setToolTip(stationName);
             us->clicked().connect([=]{this->showFicheUS(std::get<0>(kv.first),std::get<1>(kv.first));});
             mMapButtonUS.emplace(std::make_pair(kv.first,us));
@@ -148,8 +143,8 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     // consultation du pdf - si il existe.
 
     if (boost::filesystem::exists(mDicoApt->File("docroot")+"/pdf/US-"+prefixZbio_+std::to_string(US_)+".pdf")){
-    WAnchor * a = cont->addNew<WAnchor>(WLink("pdf/US-A"+std::to_string(US_)+".pdf"));
-    a->setImage(std::make_unique<Wt::WImage>(WLink("img/CS/US-A"+std::to_string(US_)+".jpeg"),"illustration de l'unité stationnelle"));
+        WAnchor * a = cont->addNew<WAnchor>(WLink("pdf/US-A"+std::to_string(US_)+".pdf"));
+        a->setImage(std::make_unique<Wt::WImage>(WLink("img/CS/US-A"+std::to_string(US_)+".jpeg"),"illustration de l'unité stationnelle"));
     }
 
     // 7 classe d'apt, moins 1 qui est l'exclusion
@@ -188,7 +183,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
             });
             c->mouseWentOut().connect([=] {
                 hoverBubble(c,0);
-               resetNiche();
+                resetNiche();
             });
             c->clicked().connect([=] {
                 Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(

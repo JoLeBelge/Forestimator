@@ -3,7 +3,7 @@ extern bool globTest;
 void staticMapResource::handleRequest(const Http::Request &request,Http::Response &response){
         if (globTest) {std::cout << "staticMapResource:: handle request" << std::endl;}
         auto params = request.urlParams();
-        std::string lCode(""),aPolyg(""),aEnv("");
+        std::string lCode(""),aPolyg("");//,aEnv("");
         int aSz=500;
 
         for (const auto &param : params) {
@@ -11,7 +11,7 @@ void staticMapResource::handleRequest(const Http::Request &request,Http::Respons
             const auto &value = param.second;
             if (name=="layerCode") {lCode=value;}
             if (name=="pol") {aPolyg=value;}
-            if (name=="env") {aEnv=value;}
+            //if (name=="env") {aEnv=value;}
             if (name=="sz") {aSz=std::stoi(value);}
         }
         GDALAllRegister();
@@ -19,16 +19,17 @@ void staticMapResource::handleRequest(const Http::Request &request,Http::Respons
         if (mDico->hasLayerBase(lCode)){
         std::shared_ptr<layerBase> l =mDico->getLayerBase(lCode);
         OGRGeometry * pol=mDico->checkPolyg(aPolyg);
-        OGRGeometry * envGeom=mDico->checkPolyg(aEnv,10000);
+        //OGRGeometry * envGeom=mDico->checkPolyg(aEnv,10000);
          if (pol!=NULL){
-         OGREnvelope * env= new OGREnvelope;
-             if (envGeom!=NULL){
+         //OGREnvelope * env= new OGREnvelope;
+            /* if (envGeom!=NULL){
                  envGeom->getEnvelope(env);
              } else {
                  env=NULL;
              }
+             */
 
-         staticMap sm(l,pol,env,aSz);
+         staticMap sm(l,pol,aSz);
          std::ifstream r(sm.getFileName(), std::ios::in | std::ios::binary);
          response.addHeader("Content-Type","image/png");
          response.out() << r.rdbuf();

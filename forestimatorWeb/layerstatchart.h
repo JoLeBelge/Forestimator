@@ -51,7 +51,7 @@ class  staticMap
 {
 public:
     // constructeur ; a besoin d'un extend et de quoi créer la variable js de la carte, donc pointer vers le layer
-    staticMap(std::shared_ptr<layerBase> aLay,OGRGeometry *poGeom, OGREnvelope * env=NULL, int aSz=500);
+    staticMap(std::shared_ptr<layerBase> aLay,OGRGeometry *poGeom, int aSz=500);
     double xGeo2Im(double x);
     double yGeo2Im(double y);
     std::string getFileName(){return mFileName;}

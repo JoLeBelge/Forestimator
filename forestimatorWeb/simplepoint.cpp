@@ -4,9 +4,6 @@
 simplepoint::simplepoint(cWebAptitude *app) : m_app(app), mDico(app->mDico), createPdfBut(NULL),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(NULL),HaveEss(0),mSt(0),mEmpty(1)
 {
     addStyleClass("content_info");
-    /*setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
-    setMargin(1, Wt::Side::Bottom | Wt::Side::Top);
-    setInline(0);*/
 
     mIntroTxt = addWidget(std::make_unique<WText>(tr("sp_infoclic")));
     addWidget(std::make_unique<Wt::WBreak>());
@@ -388,111 +385,96 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
 void simplepoint::extractInfo(double x, double y)
 {
     vider();
-    if (!isnan(x) && !isnan(y) && !(x == 0 && y == 0))
-    {
-        if (globTest){std::cout << "simplepoint::extractInfo" << x << " , " << y << std::endl;}
-        //setOK();
-        _x=x;
-        _y=y;
-        initStation();
+    if (globTest){std::cout << "simplepoint::extractInfo " << x << " , " << y << std::endl;}
+    _x=x;
+    _y=y;
+    initStation();
 
-        // tableau des informations globales
-        mInfoT->elementAt(0, 0)->setColumnSpan(2);
-        mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
-        mInfoT->elementAt(0, 0)->setPadding(10);
-        mInfoT->elementAt(0, 0)->addWidget(std::make_unique<WText>(tr("titre-InfoTableAna-point")));
+    // tableau des informations globales
+    mInfoT->elementAt(0, 0)->setColumnSpan(2);
+    mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+    mInfoT->elementAt(0, 0)->setPadding(10);
+    mInfoT->elementAt(0, 0)->addWidget(std::make_unique<WText>(tr("titre-InfoTableAna-point")));
 
-        ptPedo ptPed = ptPedo(mDico->mPedo, x, y);
-        add1InfoRaster(ptPed.displayInfo(PEDO::DRAINAGE));
-        add1InfoRaster(ptPed.displayInfo(PEDO::PROFONDEUR));
-        add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
-        add1InfoRaster(ptPed.displayInfo(PEDO::CHARGE));
+    ptPedo ptPed = ptPedo(mDico->mPedo, x, y);
+    add1InfoRaster(ptPed.displayInfo(PEDO::DRAINAGE));
+    add1InfoRaster(ptPed.displayInfo(PEDO::PROFONDEUR));
+    add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
+    add1InfoRaster(ptPed.displayInfo(PEDO::CHARGE));
 
-        for (auto &pair  : mDico->VlayerBase()) {
-            std::shared_ptr<layerBase> l = pair.second;
-            bool activeL=(l->Code()==m_app->getActiveLay());
+    for (auto &pair  : mDico->VlayerBase()) {
+        std::shared_ptr<layerBase> l = pair.second;
+        bool activeL=(l->Code()==m_app->getActiveLay());
 
-            if (((l->getCatLayer() == TypeLayer::KK) | (l->getCatLayer() == TypeLayer::Station)) | (activeL & (l->getCatLayer() != TypeLayer::Externe)))
+        if ((l->getCatLayer() == TypeLayer::Station) | (activeL && (l->getCatLayer() != TypeLayer::Externe)))
+        {
+            if (!l->Expert())
             {
-                if (!l->Expert())
+                std::vector<std::string> layerLabelAndValue = displayInfo(l);
+                if (l->l4StatP())
                 {
-                    std::vector<std::string> layerLabelAndValue = displayInfo(l);
-                    if (l->l4StatP())
-                    {
-                        add1InfoRaster(layerLabelAndValue);
-                    }
-                    if ((activeL && l->Code() != "CS_A"))
-                    {
-                        // affiche une popup pour indiquer la valeur pour cette couche
-                        // attention, il faut escaper les caractères à problèmes du genre apostrophe
-                        boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
-                        boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
-                        doJavaScript("if (content) {content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
-                    }
-                    else if (activeL && l->Code() == "CS_A")
-                    {
-                        int aVal = l->getValue(x, y);
-                        // affiche une popup pour indiquer la valeur pour cette couche
-                        // attention, il faut escaper les caractères à problèmes du genre apostrophe
-                        boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
-                        boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
+                    add1InfoRaster(layerLabelAndValue);
+                }
+                if ((activeL && l->Code() != "CS_A"))
+                {
+                    boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                    boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
+                    doJavaScript("if (content) {content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
+                }
+                else if (activeL && l->Code() == "CS_A")
+                {
+                    int aVal = l->getValue(x, y);
+                    boost::replace_all(layerLabelAndValue.at(1), "'", "\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                    boost::replace_all(layerLabelAndValue.at(0), "'", "\\'");
 
-                        if (aVal != 0)
-                        {
-                            std::string js = "if (content) {content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A" + std::to_string(aVal) + ".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}";
-                            // std::cout << "js : " << js << std::endl;
-                            doJavaScript(js);
-                        }
+                    if (aVal != 0)
+                    {
+                        std::string js = "if (content) {content.innerHTML = '<p>" + layerLabelAndValue.at(0) + ":</p><code>" + layerLabelAndValue.at(1) + "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A" + std::to_string(aVal) + ".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}";
+                        doJavaScript(js);
                     }
                 }
             }
-
-            // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay". Attention, CNSWrast n'est plus "Externe" maintenant que j'y ai associé la couche raster.
-            if ((activeL && l->Code() == "CNSWrast"))
-            {
-                doJavaScript("if (content) {content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
-            }
-
-            // si la couche active est le cadastre
-            if ((activeL && l->Code() == "Cadastre"))
-            {
-
-                ptCadastre *ptCad = new ptCadastre(mDico->mCadastre, x, y);
-                ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre, m_app->mPA, std::placeholders::_1, std::placeholders::_2));
-                doJavaScript("if (content) {content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
-                // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
-                WDialog *dialogPtr = addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
-                dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));
-                WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Oui");
-                ok->setDefault(false);
-                ok->clicked().connect([=]
-                {
-                    ptCad->usePolyg4Stat();
-                    delete(ptCad);
-                    dialogPtr->reject(); });
-                WPushButton *annuler = dialogPtr->footer()->addNew<Wt::WPushButton>("Non");
-                annuler->setDefault(true);
-                annuler->clicked().connect([=]
-                {dialogPtr->reject();
-                    delete(ptCad); });
-                dialogPtr->show();
-            }
-
-
-            if (activeL && l->getCatLayer() == TypeLayer::FEE)
-            {
-                hasFEEApt=true;
-                detailCalculAptFEE();
-            }
         }
 
-        afficheAptAllEss();
+        // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay".
+        if ((activeL && l->Code() == "CNSWrast"))
+        {
+            doJavaScript("if (content) {content.innerHTML = '" + ptPed.displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
+        }
+        if ((activeL && l->Code() == "Cadastre"))
+        {
+
+            ptCadastre *ptCad = new ptCadastre(mDico->mCadastre, x, y);
+            ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre, m_app->mPA, std::placeholders::_1, std::placeholders::_2));
+            doJavaScript("if (content) {content.innerHTML = '" + ptCad->displayAllInfoInOverlay() + "';" + "var coordinate = [" + std::to_string(x) + "," + std::to_string(y) + "];" + "overlay.setPosition(coordinate);}");
+            WDialog *dialogPtr = addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
+            dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));
+            WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Oui");
+            ok->setDefault(false);
+            ok->clicked().connect([=]
+            {
+                ptCad->usePolyg4Stat();
+                delete(ptCad);
+                dialogPtr->reject(); });
+            WPushButton *annuler = dialogPtr->footer()->addNew<Wt::WPushButton>("Non");
+            annuler->setDefault(true);
+            annuler->clicked().connect([=]
+            {dialogPtr->reject();
+                delete(ptCad); });
+            dialogPtr->show();
+        }
+
+
+        if (activeL && l->getCatLayer() == TypeLayer::FEE)
+        {
+            hasFEEApt=true;
+            detailCalculAptFEE();
+        }
     }
-    else
-    {
-        std::cout << "x et y ne sont pas des nombres , pas bien " << std::endl;
-    }
+
+    afficheAptAllEss();
 }
+
 
 std::map<std::string, int> simplepoint::apts(TypeClassifST aType)
 {
@@ -503,11 +485,6 @@ std::map<std::string, int> simplepoint::apts(TypeClassifST aType)
     {
         if (readyFEE())
         {
-            if (globTest)
-            {
-                std::cout << "station a NT NH ZBIO et Topo " << std::endl;
-            }
-
             for (auto &pair  : mDico->VlayerBase()) {
                 std::shared_ptr<layerBase> l = pair.second;
                 if (l->getCatLayer() == TypeLayer::FEE)
@@ -571,7 +548,6 @@ std::vector<std::string> simplepoint::displayInfo(std::shared_ptr<layerBase> al)
             mSt=aVal;}
         val=al->getValLabel(aVal);
         if (al->getTypeVar()==TypeVar::Continu){ val=roundDouble(al->Gain()*(double) aVal,2);}
-        //if (globTest){std::cout << "Layer " << Code() << ", aVal is " << std::to_string(aVal) << std::endl;}
     }
 
     if ((al->getCatLayer()==TypeLayer::FEE || al->getCatLayer()==TypeLayer::CS) && (activeL)){

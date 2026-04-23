@@ -28,7 +28,6 @@ using namespace  Wt;
 
 bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2);
 
-// inspiré de staticMap, forestimator
 class zbioPainted : public Wt::WPaintedWidget {
 public:
     zbioPainted(cDicoApt* aDico);
@@ -52,7 +51,7 @@ protected:
     void paintEvent(Wt::WPaintDevice *paintDevice);
 
 private:
-    OGREnvelope * ext;
+    OGREnvelope ext;
     // taille de l'image en pixel
     int mSx,mSy;
     // taille de l'emprise de l'image en mètre

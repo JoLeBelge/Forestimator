@@ -3,32 +3,24 @@
 extern bool globTest;
 layerStatChart::layerStatChart(std::shared_ptr<layerBase> aLay, std::map<std::string, int> aStat, OGRGeometry *poGeom) : layerStat(aLay, aStat), rowAtMax(0), mGeom(poGeom)
 {
-
-    // std::cout << "création d'un layer StatChart pour " << mLay->getLegendLabel() << std::endl;
     mModel = std::make_shared<WStandardItemModel>();
-    // pas sur que j'ai besoin de spécifier le proto
-    // mModel->setItemPrototype(std::make_unique<WStandardItem>());
 
     // Configure the header.
     mModel->insertColumns(mModel->columnCount(), 2);
-    // mModel->setHeaderData(0, WString(mLay->getLegendLabel()));
     mModel->setHeaderData(0, "Catégories");
     mModel->setHeaderData(1, WString("Proportions"));
-    // mModel->setHeaderData(2, WString("Code couleur"));
 
     // Set data in the model.
     mModel->insertRows(mModel->rowCount(), mStatSimple.size());
     int row = 0;
     int aMax(1);
 
-    // std::cout << "set data in model" << std::endl;
     for (auto &kv : mStatSimple)
     {
         // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
         mModel->setData(row, 0, WString(kv.first));
         mModel->setData(row, 1, WString(kv.first), ItemDataRole::ToolTip);
         mModel->setData(row, 1, kv.second);
-        // mModel->setData(  row, 2, WString(""));
         //  ça me retourne la couleur, moi j'aimerai le nom de cette couleur qui est utilisé pour l'ajout d'un style dans la styleClass de l'application
         std::shared_ptr<color> col = mLay->getColor(kv.first);
         mModel->itemFromIndex(mModel->index(row, 1))->setStyleClass(col->getStyleNameShort());
@@ -61,7 +53,6 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
     }
     std::unique_ptr<WContainerWidget> aRes = std::make_unique<Wt::WContainerWidget>();
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
-    // aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
     staticMap sm(mLay, mGeom);
     WContainerWidget *aContTableAndPie;
@@ -102,10 +93,6 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
             table->setSortingEnabled(1, false);
             table->setSortingEnabled(0, false); // pas très utile
             table->setModel(mModel);
-            // delegate ; met à 0 mes valeurs de pct dans la colonne, mais pour les labels de pct dans le graph ça fonctionne
-            // std::shared_ptr<WItemDelegate> delegate = std::make_shared<WItemDelegate>();
-            // delegate->setTextFormat("%.0f");
-            // table->setItemDelegate(delegate);
             table->setColumnWidth(0, 200);
             table->setColumnWidth(1, 150);
             table->setRowHeight(28);
@@ -232,7 +219,7 @@ std::unique_ptr<Wt::WContainerWidget> layerStatChart::getBarStat()
     return aRes;
 }
 
-staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREnvelope *env, int aSz) : mLay(aLay), mSx(aSz), mSy(aSz), ext(env)
+staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, int aSz) : mLay(aLay), mSx(aSz), mSy(aSz), ext(NULL)
 {
     // std::cout << "staticMap::staticMap" << std::endl;
     //  Use boost::filesystem::unique_path to obtain a safe unique temporary file name
@@ -241,17 +228,15 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
     // nécessaire pour Wlink
     mFileNameRel = "tmp/" + tmpPath.filename().string();
 
-    if (ext == NULL)
-    {
-        ext = new OGREnvelope;
-        poGeom->getEnvelope(ext);
-        // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
-        int buf = (ext->MaxX - ext->MinX) / 5;
-        ext->MaxX += buf;
-        ext->MaxY += buf;
-        ext->MinX -= buf;
-        ext->MinY -= buf;
-    }
+
+    ext = new OGREnvelope;
+    poGeom->getEnvelope(ext);
+    // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
+    int buf = (ext->MaxX - ext->MinX) / 5;
+    ext->MaxX += buf;
+    ext->MaxY += buf;
+    ext->MinX -= buf;
+    ext->MinY -= buf;
     // si la géométrie est un point, alors j'agrandi sinon division par 0== bug
     if (ext->MaxX - ext->MinX < 10)
     {
@@ -268,11 +253,9 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
     // on rectifie la taille de l'image en pixel en fonction de la forme de la zone
     mSy = (double)mSx * (mWy / mWx);
 
-    // std::cout << ext->MinX << ", " << ext->MinY << ", " << ext->MaxX << ", " << ext->MaxY << std::endl;
     //  d'abord transformer la couche wms en image locale, puis réouvrir et y dessiner le polygone
     if (mLay->wms2jpg(ext, mSx, mSy, mFileName))
     {
-
         // création d'un wrasterImage et copier dedans l'image existante
         Wt::WRasterImage pngImage("png", mSx, mSy);
         WPainter painter(&pngImage);
@@ -282,7 +265,6 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
         Wt::WPen pen0(Wt::WColor(Wt::StandardColor::Yellow));
         pen0.setWidth(3);
         painter.setPen(pen0);
-
         switch (poGeom->getGeometryType())
         {
         case (wkbPolygon):
@@ -338,7 +320,6 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
 
         default:
             std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge (static map)" << std::endl;
-
             break;
         }
         drawScaleLine(&painter);
@@ -347,6 +328,7 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
         pngImage.write(f);
         f.close();
     }
+    if (ext!=NULL){delete ext;}
 }
 
 void staticMap::drawPol(OGRPolygon *pol, WPainter *painter)

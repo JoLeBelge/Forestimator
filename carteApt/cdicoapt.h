@@ -153,8 +153,6 @@ public:
 
     WMSinfo * getWMSinfo(std::string aCode);
 
-    //std::map<int,std::map<int,std::vector<std::string>>> getHabitatCS(std::string aColName);
-
     // pour les cRasterInfo, carte thématique
     std::map<int, std::shared_ptr<color> > getDicoRasterCol(std::string aCode);
 
@@ -191,17 +189,7 @@ public:
         return aRes;
     }
 
-
-    // pour debug
-   /* void summaryRasterFile(){
-        for (auto kv : Dico_GISfile){
-            std::string code=kv.first;
-            std::cout << "raster layer " << code << ", nom " << RasterNom(code) << ", fichier " << File(code) << " catégorie " << RasterCategorie(code) << std::endl;
-        }
-    }*/
-
     std::map<std::string,std::shared_ptr<layerBase>> VlayerBase(){return mVlayerBase;}
-
 
     std::vector<std::shared_ptr<layerBase>> Layers(){
         std::vector<std::shared_ptr<layerBase>> aRes;

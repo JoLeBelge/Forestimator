@@ -45,7 +45,6 @@ widgetCadastre::widgetCadastre(cadastre * aCad, cWebAptitude *app):mCad(aCad),WT
 }
 
 void widgetCadastre::refreshDivision(){
-    //std::cout << "refresh Division  Combobox" << std::endl;
     division_->clear();
     aMLabelDiv.clear();
     section_->clear();
@@ -84,7 +83,6 @@ void widgetCadastre::refreshSection(){
 }
 
 void widgetCadastre::refreshPaCa(){
-    //std::cout << "refresh paca Combobox" << std::endl;
         paCa_->clear();
         aMLabelPaCa.clear();
         paCa_->enable();
