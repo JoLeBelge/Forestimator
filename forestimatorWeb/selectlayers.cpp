@@ -12,7 +12,6 @@ std::vector<std::shared_ptr<layerBase> >selectLayers::getSelectedLayer(){
 
 selectLayers::selectLayers(cDicoApt *aDico){
 
-
     setOverflow(Wt::Overflow::Auto);
     treeTable = addWidget(std::make_unique<WTreeTable>());
     treeTable->setHeight(241);
@@ -24,13 +23,12 @@ selectLayers::selectLayers(cDicoApt *aDico){
     treeTable->setTreeRoot(std::move(root), "Raster");
     treeTable->treeRoot()->expand();
 
-    mLayerGroupNode.emplace(std::make_pair(TypeLayer::KK,new WTreeTableNode(tr("groupeCoucheKKCS"))));
+   // mLayerGroupNode.emplace(std::make_pair(TypeLayer::KK,new WTreeTableNode(tr("groupeCoucheKKCS"))));
     mLayerGroupNode.emplace(std::make_pair(TypeLayer::Station,new WTreeTableNode(tr("groupeCoucheThem"))));
     mLayerGroupNode.emplace(std::make_pair(TypeLayer::FEE,new WTreeTableNode(tr("groupeCoucheAptFEE"))));
     mLayerGroupNode.emplace(std::make_pair(TypeLayer::CS,new WTreeTableNode(tr("groupeCoucheAptCS"))));
     mLayerGroupNode.emplace(std::make_pair(TypeLayer::Peuplement,new WTreeTableNode(tr("groupeCouchePeup"))));
 
-    //mGL=aDico;
     mVpLs=aDico->Layers();
     nbMax=15;
 
@@ -51,7 +49,6 @@ selectLayers::selectLayers(cDicoApt *aDico){
     for (std::shared_ptr<layerBase> l : mVpLs){
         if (l->getCatLayer()!=TypeLayer::Externe && l->l4Stat()){
             bool selected(0);
-            //if ((l->getCatLayer()==TypeLayer::FEE) && (l->Code()=="HE"| l->Code()=="CS" | l->Code()=="CP" | l->Code()=="EP" | l->Code()=="DO" | l->Code()=="ME")){ selected=1;}
             if ((l->Code()=="HE_FEE")| (l->Code()=="CS_FEE") | (l->Code()=="CP_FEE") | (l->Code()=="EP_FEE") | (l->Code()=="DO_FEE") | (l->Code()=="ME_FEE")){ selected=1;}
             if ((l->Code()=="COMPOALL")| (l->Code()=="dendro_vha")){ selected=1;}
 
@@ -67,7 +64,9 @@ selectLayers::selectLayers(cDicoApt *aDico){
             mLayersNode.emplace(std::make_pair(l,n));
             n->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(checkB));
             // ajout au noeux racine opportun
+            if (mLayerGroupNode.find(l->getCatLayer())!=mLayerGroupNode.end()){
             mLayerGroupNode.at(l->getCatLayer())->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
+            }
         }
     }
 }

@@ -257,16 +257,16 @@ void cWebAptitude::loadStyles(){
     std::shared_ptr<Wt::WBootstrap5Theme> theme = std::make_shared<Wt::WBootstrap5Theme>();
     setTheme(theme);
     // tout les style de wt gallery
-    useStyleSheet("resources/themes/default/wt.css");
+    /*useStyleSheet("resources/themes/default/wt.css");
     useStyleSheet("style/everywidget.css");
     useStyleSheet("style/dragdrop.css");
     useStyleSheet("style/combostyle.css");
     useStyleSheet("style/pygments.css");
     useStyleSheet("style/filedrop.css");
     useStyleSheet("style/form.css");
-    useStyleSheet("resources/jPlayer/skin/jplayer.blue.monday.css");
-    useStyleSheet("style/widgetgallery.css");
-    // CSS custom pour faire beau
+    useStyleSheet("resources/jPlayer/skin/jplayer.blue.monday.css");*/
+    useStyleSheet("style/widgetgallery.css"); // pour la table des matières/menu de la doc
+    // CSS custom
     useStyleSheet("style/style.css");
 
     WCssDecorationStyle EssStyle;

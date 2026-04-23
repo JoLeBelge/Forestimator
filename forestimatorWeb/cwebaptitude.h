@@ -120,7 +120,6 @@ public:
     }
 
     virtual void refresh(){
-        if (globTest){std::cout << "ici je vais m'assurer que le refresh fasse ce qu'il faut (persistance des cartes choisies par l'utilisateur, extent)" << std::endl;}
         WApplication::refresh();
     }
 

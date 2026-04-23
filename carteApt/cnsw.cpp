@@ -2,27 +2,11 @@
 
 extern std::string columnPath;
 extern bool globTest;
-/*
-cnsw::cnsw(std::string aBDFile):dicoPedo(aBDFile)
-{
-}*/
 
 cnsw::cnsw(sqlite3 *db):dicoPedo(db){
     //loadCNSW();
 }
 
-/*
-void cnsw::loadCNSW(){
-      GDALAllRegister();
-      const char *inputPath= mShpPath.c_str();
-      GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
-      if( mDS == NULL )
-      {
-          std::cout << inputPath << " : " ;
-          printf( " cnsw::loadCNSW : Open failed." );
-      }
-
-}*/
 
 std::vector<std::string> cnsw::displayInfo(double x, double y,PEDO p){
     std::vector<std::string> aRes;
@@ -74,20 +58,13 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
         // layer
         OGRLayer * lay = DS->GetLayer(0);
         OGRFeature *poFeature;
-        //lay->ResetReading();
         lay->SetSpatialFilter(poGeom);
-
-        //poGeom->MakeValid();
 
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
-            //poFeature->GetGeometryRef()->MakeValid();
-            //std::cout  << " test within" << std::endl;
             int solId=poFeature->GetFieldAsInteger("INDEX_SOL");
             if (poFeature->GetGeometryRef()->Within(poGeom)) {
-                //std::cout  << " intersection des deux géométries OGRMultiPolygon" << std::endl;
                 OGRMultiPolygon * pol =poFeature->GetGeometryRef()->toMultiPolygon();
-                //pol->MakeValid();
                 if (aRes.find(solId)==aRes.end()){ aRes.emplace(solId,pol->get_Area());} else {
                     aRes.at(solId)+=pol->get_Area();
                 }
@@ -100,9 +77,7 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
 
                     if( poFeature->GetGeometryRef()->IsValid()){
                         OGRGeometry* pol1 = poFeature->GetGeometryRef()->Intersection(poGeom);
-                        //pol1->MakeValid();
                         OGRMultiPolygon* pol = pol1->toMultiPolygon();
-                        //pol->MakeValid();
                         if (aRes.find(solId)==aRes.end()){ aRes.emplace(solId,pol->get_Area());} else {
                             aRes.at(solId)+=pol->get_Area();
                         }
@@ -122,8 +97,6 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
         kv.second=(100.0*kv.second)/surfTot;
         //  pctTot+=kv.second;
     }
-    //std::cout << " somme des pourcentage de surface ; " << pctTot << std::endl;
-
     return aRes;
 }
 
