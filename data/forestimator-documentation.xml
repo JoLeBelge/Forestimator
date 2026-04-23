@@ -530,5 +530,15 @@ Pour réaliser des statistiques, Forestimator collecte également et traite <mar
 <message id="MNT.label">Altitude du sol</message>
 <message id="SWC.label">Réserve en eau</message>
 
+<message id="page_presentation.forestimatorMobile">
+<h4>Forestimator Mobile</h4>
+Disponible sur Android et iOS depuis 2024, l'application mobile Forestimator propose les mêmes fonctionnalités que le portail cartographique en ligne, mais avec une interface plus raffinée et adaptée à une utilisation sur smartphone et tablette.
+<br></br>
+Le manuel d'utilisation est téléchargeable sous format pdf
+<a target="_blank" rel="noopener noreferrer" href="/pdf/DocForestimatorMobile.pdf" download="DocForestimatorMobile">
+ ici
+</a>.
+</message>
+
 </messages>
 

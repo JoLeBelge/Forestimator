@@ -40,6 +40,9 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
   item->setPathComponent("");
   subMenu->addItem(std::move(item));
 
+  item = std::make_unique<Wt::WMenuItem>("Forestimator Mobile", std::make_unique<Wt::WText>(WString::tr("page_presentation.forestimatorMobile")));
+  subMenu->addItem(std::move(item));
+
   item = std::make_unique<Wt::WMenuItem>("Crédit et contact", std::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
   subMenu->addItem(std::move(item));
 

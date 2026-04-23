@@ -22,7 +22,11 @@
       <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator/cr_dit-et-contact</loc>
       <changefreq>monthly</changefreq>
    </url>
-         <url>
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator/forestimator-mobile</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   <url>
       <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator/t_l_chargement</loc>
       <changefreq>monthly</changefreq>
    </url>
