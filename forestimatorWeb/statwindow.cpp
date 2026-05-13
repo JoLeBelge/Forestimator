@@ -10,7 +10,7 @@ statWindow::statWindow(cWebAptitude * aWebApp):mDico(aWebApp->mDico), m_app(aWeb
     addStyleClass("statWindow");
 
     WContainerWidget * contTitre_ =  addWidget(std::make_unique<Wt::WContainerWidget>());
-    contTitre_->addWidget(std::make_unique<WText>(tr("infoDansVisuStat")));
+    mTitre =contTitre_->addWidget(std::make_unique<WText>(tr("infoDansVisuStat")));
     // bouton retour
     auto * tpl = contTitre_->addWidget(std::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
     WPushButton * retour = tpl->bindWidget("retour", std::make_unique<WPushButton>("Retour"));

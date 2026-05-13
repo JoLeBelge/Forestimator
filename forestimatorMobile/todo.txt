@@ -35,6 +35,7 @@ Debug suite à la formation SFRSB
 -mode points/polygones de l'utilisateur ; passage de l'interface "liste des layers" au mode compact pas très intuitif : si pas de layer sélectionnée, appuyer sur le bouton "reduire" fait quitter le mode points/polygones. Il faudrai à la place afficher l'interface "compact" avec la première layer de la liste, par exemple.
 -permission GPS ; demande la permission à chaque utilisation de l'appli, devrait demander une seule et unique fois.
 -bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli!
+-Ios : export d'un pdf analyse surfacique : doit se faire dans le document "Download" de IOS! -> préciser dans un popup ou a été exporté le pdf.
 -visu toujour ON pour les layers si mode edition de polygones (si jamais l'utilisateur a mis à off via le sélecteur de couche)
 -message erreur si ana Surfacique sur surface trop importante (affichage dans une fenetre le message d'erreur renvoyé par le serveur)
 -check firewall si de très nombreuses personnes utilisent forestimator depuis la fac
@@ -50,5 +51,6 @@ Debug suite à la formation SFRSB
 
 -analyse surfacique : ajouter dans le rapport d'analyse , tout en haut, le nom du polygone et sa surface.
 
--manuel d'utilisation : le mettre en ligne sur forestimator Web --> JL
+CARTO ROUTES
 
+Les points routes (pas les points obstacles) doivent s'encoder obligatoirement dans une séquence de DEBUT de rout (symbole du point : un carré), INTERMEDIAIRE (symbole triangle) et FIN (symbole rond). Tant que l'utilisateur n'as pas encodé la fin d'une route, il ne peux pas encoder un nouveau début.
