@@ -1489,46 +1489,41 @@ class _AddEssence extends State<AddEssence> {
   static void reset() => {_custom = "", _selected = -1};
 }
 
-class PopupRoadChanged {
+class PopupPoiOnPiste {
   VoidCallback? callbackOnStartTyping;
   VoidCallback? onTapOutside;
 
-  PopupRoadChanged(BuildContext context, LatLng coordinates, {this.onTapOutside, this.callbackOnStartTyping}) {
+  PopupPoiOnPiste(BuildContext context, LatLng coordinates, {this.onTapOutside, this.callbackOnStartTyping}) {
     gl.refreshStack(() {
-      _AddRoadPoint.reset();
+      String id = "poiPiste";
       popupForestimatorWindow(
-        id: "observeRoad",
-        title: "Observation de la voirie",
+        id: id,
+        title: "Nouveau Point DPCI",
         onDiscard: () {
           gl.refreshStack(() {
-            gl.stack.pop("observeRoad");
+            gl.stack.pop(id);
           });
         },
-        child: AddRoadPoint(
+        child: DefinePOI(
           height: 120 * gl.eqPx,
           messageAccept: "Placer",
           messageDecline: "Annuler",
           onAccept: (String ess, Color col, String type, String rmq) {
             gl.refreshStack(() {
-              GeometricLayer.getPathPointsLayer().addGeometry(
-                name: "Observation - ${GeometricLayer.getPathPointsLayer().geometries.length + 1}",
-              );
-              GeometricLayer.getPathPointsLayer().geometries.last.addPoint(coordinates);
-              GeometricLayer.getPathPointsLayer().geometries.last.attributes[0].value = ess;
-              GeometricLayer.getPathPointsLayer().geometries.last.attributes[1].value = type;
-              GeometricLayer.getPathPointsLayer().geometries.last.attributes[2].value = rmq;
-              GeometricLayer.getPathPointsLayer().geometries.last.attributes[3].value = DateTime.now().toString();
-              GeometricLayer.getPathPointsLayer().geometries.last.colorLine = col;
+              GeometricLayer.getPisteDFCILayer().geometries.last.addPoint(coordinates);
+              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value += ",$ess";
+              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value += ",$type";
+              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value += ",$rmq";
+              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value += ",${DateTime.now().toString()}";
               gl.lastUsedCategory = col;
-              GeometricLayer.getPathPointsLayer().geometries.last.serialize();
+              GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
               gl.Mode.serialize();
-              GeometricLayer.getPathPointsLayer().geometries.last.sendPathpointToServer();
-              gl.stack.pop("observeRoad");
+              gl.stack.pop(id);
             });
           },
           onDecline: () {
             gl.refreshStack(() {
-              gl.stack.pop("observeRoad");
+              gl.stack.pop(id);
             });
           },
         ),
@@ -1537,7 +1532,55 @@ class PopupRoadChanged {
   }
 }
 
-class AddRoadPoint extends StatefulWidget {
+class PopupNewCatPiste {
+  VoidCallback? callbackOnStartTyping;
+  VoidCallback? onTapOutside;
+
+  PopupNewCatPiste(BuildContext context, LatLng coordinates, {this.onTapOutside, this.callbackOnStartTyping}) {
+    gl.refreshStack(() {
+      String id = "pdpci";
+      _DefineCategory.reset();
+      popupForestimatorWindow(
+        id: id,
+        title: "Nouvelle piste DPCI",
+        onDiscard: () {
+          gl.refreshStack(() {
+            gl.stack.pop(id);
+          });
+        },
+        child: DefineCategory(
+          height: 120 * gl.eqPx,
+          messageAccept: "Placer",
+          messageDecline: "Annuler",
+          onAccept: (String ess, Color col, String type, String rmq) {
+            gl.refreshStack(() {
+              GeometricLayer.getPisteDFCILayer().addGeometry(
+                name: "Piste - ${GeometricLayer.getPisteDFCILayer().geometries.length + 1}",
+              );
+              GeometricLayer.getPisteDFCILayer().geometries.last.addPoint(coordinates);
+              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value = ess;
+              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value = type;
+              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value = rmq;
+              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value = DateTime.now().toString();
+              GeometricLayer.getPisteDFCILayer().geometries.last.colorLine = col;
+              gl.lastUsedCategory = col;
+              GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+              gl.Mode.serialize();
+              gl.stack.pop(id);
+            });
+          },
+          onDecline: () {
+            gl.refreshStack(() {
+              gl.stack.pop(id);
+            });
+          },
+        ),
+      );
+    });
+  }
+}
+
+class DefinePOI extends StatefulWidget {
   final VoidCallback? callbackOnStartTyping;
   final Function(String, Color, String, String) onAccept;
   final VoidCallback onDecline;
@@ -1545,7 +1588,7 @@ class AddRoadPoint extends StatefulWidget {
   final String messageDecline;
   final double height;
 
-  const AddRoadPoint({
+  const DefinePOI({
     super.key,
     this.callbackOnStartTyping,
     required this.onAccept,
@@ -1556,10 +1599,10 @@ class AddRoadPoint extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _AddRoadPoint();
+  State<StatefulWidget> createState() => _DefinePOI();
 }
 
-class _AddRoadPoint extends State<AddRoadPoint> {
+class _DefinePOI extends State<DefinePOI> {
   static int _type = 1;
   static int _selected = -1;
   static String _custom = "";
@@ -1576,148 +1619,178 @@ class _AddRoadPoint extends State<AddRoadPoint> {
             switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
-                height: 24 * gl.eqPx,
+                height: widget.height - 70 * gl.eqPx,
                 child: lt.ForestimatorScrollView(
-                  height: 24 * gl.eqPx,
+                  height: widget.height - 70 * gl.eqPx,
                   child: Column(
-                    children: [
-                      AnimatedContainer(
-                        color: _type == 1 ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                    children: List<Widget>.generate(gl.roadObstacleChoice.length, (index) {
+                      return AnimatedContainer(
+                        color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
                         duration: Duration(milliseconds: 500),
                         child: TextButton(
                           style: lt.borderlessStyle,
                           onPressed: () {
+                            _selected = index;
                             setState(() {
-                              _type = 1;
-                              _selected = -1;
-                              _custom = "";
+                              _custom = gl.roadObstacleChoice.keys.toList()[index];
+                              _color = gl.lastUsedCategory;
                             });
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Categorie",
+                                gl.roadObstacleChoice.keys.toList()[index],
                                 style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
                               ),
-                              CircleAvatar(backgroundColor: Colors.white, radius: gl.iconSizeXS * gl.eqPx * .75),
                             ],
                           ),
                         ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                height: _selected == gl.roadObstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
+                child: Column(
+                  children: [
+                    if (_selected == gl.roadObstacleChoice.length - 1)
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                    if (_selected == gl.roadObstacleChoice.length - 1)
+                      AnimatedOpacity(
+                        opacity: _selected == gl.roadObstacleChoice.length - 1 ? 1 : 0,
+                        duration: Duration(milliseconds: 200),
+                        child: TextFormField(
+                          cursorColor: Colors.white,
+                          maxLength: 256,
+                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          onChanged: (value) {
+                            setState(() {
+                              _custom = "Autre";
+                              _rmq = value;
+                            });
+                          },
+                          onTap: () => widget.callbackOnStartTyping ?? () {},
+                          onTapOutside: (pointer) {},
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                      AnimatedContainer(
-                        color: _type == 2 ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                    lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        if (_selected > -1 && _selected < gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty ||
+                            _selected == gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty)
+                          SizedBox(
+                            width: gl.menuBarLength * .5 * gl.eqPx,
+                            child: TextButton(
+                              style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
+                              onPressed: () {
+                                widget.onAccept(_custom, _color, _type == 1 ? "Categorie" : "Obstacle", _rmq);
+                              },
+                              child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
+                            ),
+                          ),
+                        SizedBox(
+                          width: gl.menuBarLength * .5 * gl.eqPx,
+                          child: TextButton(
+                            style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Retour".length),
+                            onPressed: widget.onDecline,
+                            child: Text(widget.messageDecline, style: dialogTextButtonStyle()),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ]),
+          ],
+        );
+      },
+    );
+  }
+
+  static void reset() => {_custom = "", _selected = -1, _type = 1};
+}
+
+class DefineCategory extends StatefulWidget {
+  final VoidCallback? callbackOnStartTyping;
+  final Function(String, Color, String, String) onAccept;
+  final VoidCallback onDecline;
+  final String messageAccept;
+  final String messageDecline;
+  final double height;
+
+  const DefineCategory({
+    super.key,
+    this.callbackOnStartTyping,
+    required this.onAccept,
+    required this.onDecline,
+    required this.messageAccept,
+    required this.messageDecline,
+    required this.height,
+  });
+
+  @override
+  State<StatefulWidget> createState() => _DefineCategory();
+}
+
+class _DefineCategory extends State<DefineCategory> {
+  static int _type = 1;
+  static int _selected = -1;
+  static String _custom = "";
+  static Color _color = Colors.transparent;
+  static String _rmq = "";
+
+  @override
+  Widget build(BuildContext context) {
+    return OrientationBuilder(
+      builder: (c, o) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
+              AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                height: widget.height - 70 * gl.eqPx,
+                child: lt.ForestimatorScrollView(
+                  height: widget.height - 70 * gl.eqPx,
+                  child: Column(
+                    children: List<Widget>.generate(gl.roadCategoryChoice.length, (index) {
+                      return AnimatedContainer(
+                        color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
                         duration: Duration(milliseconds: 500),
                         child: TextButton(
                           style: lt.borderlessStyle,
                           onPressed: () {
+                            _selected = index;
                             setState(() {
-                              _type = 2;
-                              _selected = -1;
-                              _custom = "";
+                              _custom = gl.roadCategoryChoice.keys.toList()[index];
+                              _color = gl.roadCategoryChoice.values.toList()[index];
                             });
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("Obstacle", style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx)),
-                              CircleAvatar(backgroundColor: Colors.white, radius: gl.iconSizeXS * gl.eqPx * .75),
+                              Text(
+                                gl.roadCategoryChoice.keys.toList()[index],
+                                style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                              ),
+                              CircleAvatar(
+                                backgroundColor: gl.roadCategoryChoice.values.toList()[index],
+                                radius: gl.iconSizeXS * gl.eqPx * .75,
+                              ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
+                      );
+                    }),
                   ),
                 ),
               ),
-              lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-              if (_type == 1)
-                AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
-                  height: widget.height - 70 * gl.eqPx,
-                  child: lt.ForestimatorScrollView(
-                    height: widget.height - 70 * gl.eqPx,
-                    child: Column(
-                      children: List<Widget>.generate(gl.roadCategoryChoice.length, (index) {
-                        return AnimatedContainer(
-                          color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
-                          duration: Duration(milliseconds: 500),
-                          child: TextButton(
-                            style: lt.borderlessStyle,
-                            onPressed: () {
-                              _selected = index;
-                              setState(() {
-                                _custom = gl.roadCategoryChoice.keys.toList()[index];
-                                _color = gl.roadCategoryChoice.values.toList()[index];
-                              });
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  gl.roadCategoryChoice.keys.toList()[index],
-                                  style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
-                                ),
-                                CircleAvatar(
-                                  backgroundColor: gl.roadCategoryChoice.values.toList()[index],
-                                  radius: gl.iconSizeXS * gl.eqPx * .75,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-                ),
-              if (_type == 2)
-                AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
-                  height:
-                      _selected == gl.roadObstacleChoice.length - 1
-                          ? widget.height - 85 * gl.eqPx
-                          : widget.height - 70 * gl.eqPx,
-                  child: lt.ForestimatorScrollView(
-                    height:
-                        _selected == gl.roadObstacleChoice.length - 1
-                            ? widget.height - 85 * gl.eqPx
-                            : widget.height - 70 * gl.eqPx,
-                    child: Column(
-                      children: List<Widget>.generate(gl.roadObstacleChoice.length, (index) {
-                        return AnimatedContainer(
-                          color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
-                          duration: Duration(milliseconds: 500),
-                          child: TextButton(
-                            style: lt.borderlessStyle,
-                            onPressed: () {
-                              _selected = index;
-                              setState(() {
-                                _custom = gl.roadObstacleChoice.keys.toList()[index];
-                                _color = gl.lastUsedCategory;
-                              });
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  gl.roadObstacleChoice.keys.toList()[index],
-                                  style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
-                                ),
-                                Icon(
-                                  gl.roadObstacleChoice.values.toList()[index],
-                                  color: gl.lastUsedCategory,
-                                  size: gl.iconSizeS * gl.eqPx,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-                ),
-            ]),
-            if (_type > 0)
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
                 height: _type == 2 && _selected == gl.roadObstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
@@ -1773,6 +1846,7 @@ class _AddRoadPoint extends State<AddRoadPoint> {
                   ],
                 ),
               ),
+            ]),
           ],
         );
       },
