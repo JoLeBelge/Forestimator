@@ -48,6 +48,7 @@ class Geometry {
   Map<String, dynamic> decodedJson = {};
   List<Attribute> attributes = [];
 
+  bool finished = false;
   bool _writeToMemory = false;
 
   Geometry({String polygonName = ""}) {
@@ -553,7 +554,7 @@ class Geometry {
 
   static Future<bool> sendPathBackground() async {
     bool allFinished = true;
-    GeometricLayer pathpoints = GeometricLayer.getPathPointsLayer();
+    GeometricLayer pathpoints = GeometricLayer.getPisteDFCILayer();
     for (int i = 0; i < pathpoints.geometries.length; i++) {
       if (!pathpoints.geometries[i].sentToServer) {
         if (!await pathpoints.geometries[i].sendPathpointToServer()) {
@@ -653,6 +654,7 @@ class Geometry {
     await gl.shared!.setString('$prefix.name', name);
     await gl.shared!.setString('$prefix.type', type);
     await gl.shared!.setBool('$prefix.visibleOnMap', visibleOnMap);
+    await gl.shared!.setBool('$prefix.finished', finished);
     await gl.shared!.setBool('$prefix.labelsVisibleOnMap', labelsVisibleOnMap);
     await gl.shared!.setInt('$prefix.selectedPointIcon', selectedPointIcon);
     await gl.shared!.setDouble('$prefix.iconSize', iconSize);
@@ -719,8 +721,10 @@ class Geometry {
     labelsVisibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap') ?? true;
     selectedPointIcon = gl.shared!.getInt('$id.selectedPointIcon') ?? 0;
     iconSize = gl.shared!.getDouble('$id.iconSize') ?? 10.0;
+    finished = gl.shared!.getBool('$id.finished') ?? false;
     area = gl.shared!.getDouble('$id.area')!;
     perimeter = gl.shared!.getDouble('$id.perimeter')!;
+
     transparencyInside = gl.shared!.getDouble('$id.transparencyInside')!;
     transparencyLine = gl.shared!.getDouble('$id.transparencyLine')!;
     colorInside = _getColorFromMemory('$id.colorInside');
