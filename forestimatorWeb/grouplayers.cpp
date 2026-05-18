@@ -495,7 +495,7 @@ std::string getHtml(std::string groupCode)
     return title + project + description + version + logs + copyright + references;
 }
 
-GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
+/*GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
 {
     OGREnvelope ext;
     poGeom->getEnvelope(&ext);
@@ -503,7 +503,7 @@ GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
     GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpen(inputRaster.c_str(), GA_ReadOnly));
     if (DS == NULL)
     {
-        std::cout << "je n'ai pas lu l'image " << inputRaster << std::endl;
+        std::cout << "getDSonEnv ; je n'ai pas lu l'image " << inputRaster << std::endl;
     }
     else
     {
@@ -536,4 +536,4 @@ GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
         GDALClose(DS);
     }
     return aRes;
-}
+}*/

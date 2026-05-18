@@ -19,7 +19,7 @@ double getArea(OGREnvelope *env);
 
 std::string getAbbreviation(std::string str);
 
-GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat);
+//GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat);
 
 // renvoie une liste de polgone qui sont des hexagones
 std::vector<OGRPolygon*> hexGeombin(GDALDataset *mask);

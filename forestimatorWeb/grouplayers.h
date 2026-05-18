@@ -33,7 +33,7 @@ using namespace Wt;
 using namespace libzippp;
 
 // retourne le dataset sur l'enveloppe d'un polygone
-GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom);
+//GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom);
 
 std::string getHtml(std::string);
 bool isValidHtml(const std::string &);

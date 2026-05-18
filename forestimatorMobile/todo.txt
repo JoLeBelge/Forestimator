@@ -34,23 +34,21 @@ Debug suite à la formation SFRSB
 
 -mode points/polygones de l'utilisateur ; passage de l'interface "liste des layers" au mode compact pas très intuitif : si pas de layer sélectionnée, appuyer sur le bouton "reduire" fait quitter le mode points/polygones. Il faudrai à la place afficher l'interface "compact" avec la première layer de la liste, par exemple.
 -permission GPS ; demande la permission à chaque utilisation de l'appli, devrait demander une seule et unique fois.
--bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli!
--Ios : export d'un pdf analyse surfacique : doit se faire dans le document "Download" de IOS! -> préciser dans un popup ou a été exporté le pdf.
 -visu toujour ON pour les layers si mode edition de polygones (si jamais l'utilisateur a mis à off via le sélecteur de couche)
--message erreur si ana Surfacique sur surface trop importante (affichage dans une fenetre le message d'erreur renvoyé par le serveur)
 -check firewall si de très nombreuses personnes utilisent forestimator depuis la fac
 -mode offline : changer le logo dans les couches du catalogue offline, logo disquette.
 -mode offline : carte numérique des sols de wallonie ; ne pas mettre de bouton "afficher" car on ne peut pas l'afficher (pour l'instant le bouton existe mais ne sert à rien)
 -dans les logs de l'appli, trouver d'ou viens le message "oops no layerBase 2" et résoudre.
--ouverture de pdf (ex fiche essences) ne se fait pas à la bonne page..
--sélection d'une couche pour l'analyse surfacique : le choix de l'utilisateur n'est pas sauvé dans les préférences (je modifie le code mais je n'ai pas testé si ça fonctionne)
-
 -si une couche en mode offline dans le sélecteur et que je clique dessus : ouvre le catalogue online!
-
 -si une couche ne mode offline numéro 1 dans sélecteur et que je fait un appui court sur la carte ; envoie la demande de légende au serveur (devrais faire l'analyse en offline pour cette couche)
-
--analyse surfacique : ajouter dans le rapport d'analyse , tout en haut, le nom du polygone et sa surface.
 
 CARTO ROUTES
 
 Les points routes (pas les points obstacles) doivent s'encoder obligatoirement dans une séquence de DEBUT de rout (symbole du point : un carré), INTERMEDIAIRE (symbole triangle) et FIN (symbole rond). Tant que l'utilisateur n'as pas encodé la fin d'une route, il ne peux pas encoder un nouveau début.
+
+TODO avant prochaine release:
+-bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli! TODO
+-Ios : export d'un pdf analyse surfacique : doit se faire dans le document "Download" de IOS! -> préciser dans un popup ou a été exporté le pdf. TODO
+-message erreur si ana Surfacique sur surface trop importante (affichage dans une fenetre le message d'erreur renvoyé par le serveur) TODO
+-ouverture de pdf (ex fiche essences) ne se fait pas à la bonne page.. TODO
+-analyse surfacique : ajouter dans le rapport d'analyse , tout en haut, le nom du polygone et sa surface. TODO

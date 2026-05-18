@@ -676,6 +676,73 @@ Vous pouvez générer un rapport au format pdf contenant l'analyse ponctuelle ef
 	\label{fig:gl-pdf}
 \end{figure}
 
+\section{Utilisation du mode \textit{Observation des essences}}
+
+\subsection{Contexte}
+
+La performance du matériel et des algorithmes informatiques ont atteint des niveaux inimaginables. Le défi actuel réside dès lors dans la constitution de jeu de donnée permettant une modélisation fidèle de l'état actuel de nos forêts. La couche cartographique à la fois la plus aboutie mais aussi la plus utilisée produite par notre laboratoire de recherche est la \textbf{carte de la composition forestière}. Cette dernière est réalisée en utilisant des observations relatives à plus de 300 000 arbres représentatif des 20 essences majoritaires et permet la prédiction de 9 groupes d'essence au départ des acquisitions LiDAR de 2021 utilisé conjointement avec des prises de vues satellitaires. La majorité de ces observations proviennent de placettes d'inventaires forestiers. Pour certaines essences plus rares ou pour lesquelles les variations de taille, de forme ou de réponse phénologique requièrent des observations supplémentaires, des enquêtes supplémentaires ont été réalisées.
+
+Forestimator Mobile est doté d'un outil de science participative: c'est le mode \textit{Observation des essences} qui permet à n'importe quel utilisateur d'ajouter des observations sur les essences en place. Ces observations seront utilisées pour améliorer la carte de composition. Elle sont particulièrement utiles pour les zones pour lesquelles la carte de composition est actuellement erronée. La procédure d'ajout de nouvelles observations est présentée ci-dessous au moyen d'illustrations. Une fois qu'une observation est réalisée, cette dernière est automatiquement et instantanément envoyée à nos serveur et ajoutée à notre jeu de donnée. L'usage de ces données est strictement limité à l'amélioration de notre modèle, elles ne seront donc jamais partagée, diffusée ou publiée.
+ 
+\subsection{Activation du mode \textit{Observation des essences}}
+
+\begin{figure}[H]
+	\begin{subfigure}{0.35\textwidth}
+		\includegraphics[width=\textwidth]{obEss_01.png}
+	\end{subfigure}
+	\centering
+	\begin{subfigure}{0.35\textwidth}
+		\includegraphics[width=\textwidth]{obEss_02.png}
+	\end{subfigure}
+	\caption{Pour activer le mode \textit{Observation des essences}, ouvrez la page des paramètres.}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{subfigure}{0.35\textwidth}
+		\includegraphics[width=\textwidth]{obEss_03.png}
+	\end{subfigure}
+	\centering
+	\begin{subfigure}{0.35\textwidth}
+		\includegraphics[width=\textwidth]{obEss_04.png}
+	\end{subfigure}
+	\caption{Vous devez renseigner vos nom, prénom et adresse e-mail de manière à ce que l'on puisse vous contacter en cas de questions relatives aux observations des essences que vous nous transmettez. Un appui long permet d'encoder vos coordonnées.}
+\end{figure}
+
+\begin{figure}[H]
+		\begin{subfigure}{0.35\textwidth}
+			\includegraphics[width=\textwidth]{obEss_05.png}
+		\end{subfigure}
+		\centering
+		\begin{subfigure}{0.35\textwidth}
+			\includegraphics[width=\textwidth]{obEss_06.png}
+		\end{subfigure}
+		\caption{Vous pouvez ensuite activer le mode \textit{Observation des essences} au moyen du bouton prévu à cet effet (figure de gauche). Lorsque ce mode est actif, une cible est visible au centre de la carte et un bouton est ajouté en bas à droite pour ajouter une nouvelle observation (figure de droite).}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{subfigure}{0.35\textwidth}
+		\includegraphics[width=\textwidth]{obEss_07.png}
+	\end{subfigure}
+	\centering
+	\begin{subfigure}{0.35\textwidth}
+		\includegraphics[width=\textwidth]{obEss_07B.png}
+	\end{subfigure}
+	\caption{Appuyez sur le bouton en bas à droite pour ajouter une observation à la position de la cible, c'est-à-dire au centre de l'écran. La fenêtre qui s'affiche (à gauche) vous permet de choisir une essence dans une liste prédéfinie, mais vous pouvez également renseigner une essence en écrivant son nom (choisir pour cela l'élément "entrer du texte").}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{subfigure}{0.35\textwidth}
+		\includegraphics[width=\textwidth]{obEss_08.png}
+	\end{subfigure}
+	\centering
+	\begin{subfigure}{0.35\textwidth}
+		\includegraphics[width=\textwidth]{obEss_09.png}
+	\end{subfigure}
+	\caption{Une icône d'arbre est placée là ou vous avez renseigné une observation, et une étiquette précise l'essence (gauche). Depuis le menu des points et polygone de l'utilisateur (bouton \includegraphics[width=0.05\textwidth]{icons/hexagon.png}), vous pouvez consulter toutes les observations que vous avez réalisées (figure de droite).}
+\end{figure}
+
+
+
 %\section{Analyse surfacique}
 \if01% False
 
@@ -723,7 +790,7 @@ En \gls{offline}, vous ne  pourrez visualiser qu'une seule et unique couche cart
 
 \subsection{Réaliser une analyse ponctuelle}
 
-Un appui long sur la carte va permettre de réaliser une analyse ponctuelle. Le résultats diffère de l'analyse en mode en ligne, car seule les couches téléchargées en local sont analysées.
+Un appui long sur la carte va permettre de réaliser une analyse ponctuelle. Le résultat diffère de l'analyse en mode en ligne, car seule les couches téléchargées en local sont analysées.
 \fi
 %\begin{warningbox}{Attention}
 %	Si vous avez téléchargé des couches, vous pouvez également mélanger une couche téléchargée avec les autres provenant du serveur. Une petite icône dans le sélecteur qui indique si une couche est disponible en ligne ou si elle provient du disque.
@@ -732,9 +799,5 @@ Un appui long sur la carte va permettre de réaliser une analyse ponctuelle. Le 
 %-exo : télécharger une carte pour usage hors ligne : guide des stations et zbio
 %\section{Observation collaborative d'essences forestières pour l'amélioration de la carte de composition}
 
-\notespage
-\notespage
-\notespage
-\notespage
 
 \end{document}

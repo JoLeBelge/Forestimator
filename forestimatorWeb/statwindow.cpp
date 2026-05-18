@@ -110,7 +110,6 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
     staticMap sm(mIGN,poFeature->GetGeometryRef());
     Wt::WImage * im =layoutH->addWidget(std::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
     im->resize(350,"100%");
-    // need to set it here after initialization of the map id !
 
     // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
     WContainerWidget * aContInfo = layoutH->addWidget(std::make_unique<WContainerWidget>());

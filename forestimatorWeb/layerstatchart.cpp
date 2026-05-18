@@ -221,14 +221,10 @@ std::unique_ptr<Wt::WContainerWidget> layerStatChart::getBarStat()
 
 staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, int aSz) : mLay(aLay), mSx(aSz), mSy(aSz), ext(NULL)
 {
-    // std::cout << "staticMap::staticMap" << std::endl;
-    //  Use boost::filesystem::unique_path to obtain a safe unique temporary file name
     boost::filesystem::path tmpPath = boost::filesystem::path(mLay->Dico()->File("TMPDIR")) / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.png");
     mFileName = tmpPath.string();
     // nécessaire pour Wlink
     mFileNameRel = "tmp/" + tmpPath.filename().string();
-
-
     ext = new OGREnvelope;
     poGeom->getEnvelope(ext);
     // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
