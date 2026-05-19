@@ -244,13 +244,11 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1,std::placeholders::_2));
     internalPathChanged().connect(this, &cWebAptitude::handlePathChange);
 
-    handlePathChange();
-
     loaded_=true;
     top_stack->setCurrentIndex(1);
 
+    handlePathChange();
     clientIDcookies();
-
 }
 
 void cWebAptitude::loadStyles(){
