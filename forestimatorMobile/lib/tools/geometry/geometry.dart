@@ -89,7 +89,7 @@ class Geometry {
     );
   }
 
-  Geometry.firePaths({String polygonName = ""}) {
+  Geometry.firePath({String polygonName = ""}) {
     type = "Point";
     name = polygonName;
     visibleOnMap = true;

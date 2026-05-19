@@ -2273,7 +2273,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             gl.Mode.essence ||
             (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
             gl.Mode.recordPathPoints ||
-            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfcl") ||
+            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfci") ||
             gl.geoReady && gl.selLay.type.contains("Polygon")) {
           refreshView(() {
             gl.Mode.recordPathPoints
@@ -2557,7 +2557,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             }
                           },
                           icon: Icon(
-                            layer.subtype == "dfcl" && type[j] == "Obstacle"
+                            layer.subtype == "dfci"
                                 ? gl.roadObstacleChoice[ess[j]] ?? FontAwesomeIcons.bug
                                 : gl.selectableIcons[geometry.selectedPointIcon],
                             size: geometry.iconSize * gl.eqPx,
@@ -2565,7 +2565,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           ),
                         )
                         : Icon(
-                          layer.subtype == "dfcl" && type[j] == "Obstacle"
+                          layer.subtype == "dfci"
                               ? gl.roadObstacleChoice[ess[j]] ?? FontAwesomeIcons.bug
                               : gl.selectableIcons[geometry.selectedPointIcon],
                           size: geometry.iconSize * gl.eqPx,

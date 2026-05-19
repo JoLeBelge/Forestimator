@@ -1498,7 +1498,7 @@ class PopupPoiOnPiste {
       String id = "poiPiste";
       popupForestimatorWindow(
         id: id,
-        title: "Nouveau Point DPCI",
+        title: "Nouveau Point DFCI",
         onDiscard: () {
           gl.refreshStack(() {
             gl.stack.pop(id);
@@ -1542,7 +1542,7 @@ class PopupNewCatPiste {
       _DefineCategory.reset();
       popupForestimatorWindow(
         id: id,
-        title: "Nouvelle piste DPCI",
+        title: "Nouvelle piste DPCL",
         onDiscard: () {
           gl.refreshStack(() {
             gl.stack.pop(id);
@@ -4888,7 +4888,9 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   icon: Icon(Icons.info_outline, size: gl.eqPx * gl.iconSizeXS, color: gl.colorBack),
                 ),
 
-                variableBooleanSlider("Classification des chemins de secours.", gl.Mode.recordPathPoints, (bool it) {
+                variableBooleanSlider("Observation des équipements contre les incendies.", gl.Mode.recordPathPoints, (
+                  bool it,
+                ) {
                   if (gl.Mode.userDataFilled) {
                     setState(() {
                       gl.Mode.recordPathPoints = it;
