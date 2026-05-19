@@ -899,7 +899,6 @@ Map<String, IconData> roadObstacleChoice = {
   "Aire d'alimentation HBE": FontAwesomeIcons.roadSpikes,
   "Tour d'observation": FontAwesomeIcons.roadSpikes,
   "Ligne éléctrique": FontAwesomeIcons.roadSpikes,
-  "Impasse non amenagée": FontAwesomeIcons.roadSpikes,
 };
 
 Map<String, Color> roadCategoryChoice = {
@@ -907,6 +906,7 @@ Map<String, Color> roadCategoryChoice = {
   "Categorie 2": Colors.orange,
   "Categorie 3": Colors.yellow,
   "Voie d'access à une piste": Colors.green,
+  "Impasse non amenagée": Colors.blue,
 };
 
 Color lastUsedCategory = Colors.red;
