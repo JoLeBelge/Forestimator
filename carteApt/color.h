@@ -1,8 +1,10 @@
 #ifndef COLOR_H
 #define COLOR_H
 #include <cmath>
+#include <algorithm>
+#include <string>
 
-
+extern bool globTest;
 class color
 {
 public:
@@ -13,11 +15,19 @@ public:
     color(std::string aHex,std::string name):mStyleClassName(name),mHTMLcode(aHex){
         //color(std::string aHex):mStyleClassName(aHex),mHTMLcode(aHex){
         // j'enlève le diaise qui semble ne pas convenir
+        //std::transform(aHex.begin(), aHex.end(), aHex.begin(), ::toupper);
         const char* c=aHex.c_str();
         if(aHex.at(0)=='#'){
-            c=aHex.substr(1,aHex.size()).c_str();
-        }
+
+            //c=aHex.substr(1,aHex.size()).c_str();
+            //unsigned int x = std::stoul(c, nullptr, 16);
+            mR=std::stoul(aHex.substr(1,2).c_str(), nullptr, 16);
+            mG=std::stoul(aHex.substr(3,2).c_str(), nullptr, 16);
+            mB=std::stoul(aHex.substr(5,2).c_str(), nullptr, 16);
+            //if(globTest){std::cout << " R " <<  << ", g ", std::stoul(aHex.substr(3,4).c_str(), nullptr, 16) << std::endl;}
+        } else{
         sscanf(c, "%02i%02i%02i", &mR, &mG, &mB);
+        }
         // fonctionne pas si #000000
         if ((mR < 0) | (mG < 0) | (mB < 0)){
             mR=0;
@@ -26,8 +36,7 @@ public:
             mStyleClassName="toto";
             mHTMLcode="#000000";
         }
-        //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
-        isDark();
+        //if (globTest){std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;}
     }
     int mR=0,mG=0,mB=0;
     void set(int &R,int &G,int &B) const{

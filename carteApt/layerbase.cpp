@@ -869,7 +869,7 @@ layerStat::layerStat(std::shared_ptr<layerBase> aLay, std::map<std::string,int> 
 std::string layerBase::getLegendLabel(bool escapeChar) const{
     std::string aRes=mNom;
     if (escapeChar) {
-        boost::replace_all(aRes,"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+        boost::replace_all(aRes,"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée (utilisé pour script ajout de la layer dans openlayer)
     }
     return aRes;
 }

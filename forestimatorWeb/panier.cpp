@@ -228,7 +228,7 @@ void panier::updateLegende(const std::shared_ptr<layerBase> l)
         Wt::WAnimation animation(Wt::AnimationEffect::SlideInFromTop, Wt::TimingFunction::EaseOut, 100);
 
         auto panel = std::make_unique<Wt::WPanel>();
-        panel->setTitle("<h3>" + l->getLegendLabel() + "</h3>");
+        panel->setTitle("<h3>" + l->getLegendLabel(false) + "</h3>");
         panel->addStyleClass("centered-example");
         panel->setCollapsible(true);
         panel->setAnimation(animation);
