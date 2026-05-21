@@ -97,8 +97,9 @@ void matAptCS::updateListeUS(){
     contFicheUS->clear();
     contListeUS->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.US").arg(mDicoApt->ZBIO(zbio_))));
 
-    // pour avoir les couleurs des stations, je dois utiliser la layer
-    std::shared_ptr<layerBase> CSlay=mDicoApt->getLayerBase(mDicoApt->ZBIO2CSlay(zbio_));
+    // pour avoir les couleurs des stations, je dois utiliser la layer.
+    //std::shared_ptr<layerBase> CSlay=mDicoApt->getLayerBase(mDicoApt->ZBIO2CSlay(zbio_));
+    std::shared_ptr<layerBase> CSlay=mDicoApt->getLayerBase("CS_A");
 
     for (auto & kv : mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_))){
         if (mDicoApt->isStationMaj(zbio_, std::get<0>(kv.first),std::get<1>(kv.first))){
