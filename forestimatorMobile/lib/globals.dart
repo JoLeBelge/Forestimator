@@ -886,18 +886,18 @@ Map<String, String> essenceChoice = {
 };
 
 Map<String, IconData> roadObstacleChoice = {
-  "Point de première destination": FontAwesomeIcons.roadCircleCheck,
+  "Point de première destination": FontAwesomeIcons.poo,
   "Barrière": FontAwesomeIcons.roadCircleCheck,
-  "Obstacle": FontAwesomeIcons.roadSpikes,
-  "Aire de croisement": FontAwesomeIcons.roadSpikes,
-  "Aire de retournement sans impasse": FontAwesomeIcons.roadSpikes,
-  "Aire de retournement au bout d'une impasse": FontAwesomeIcons.roadSpikes,
-  "Parking": FontAwesomeIcons.roadSpikes,
-  "Bouche ou Borne d'incendie": FontAwesomeIcons.roadSpikes,
-  "Citerne": FontAwesomeIcons.roadSpikes,
-  "Point d'aspiration": FontAwesomeIcons.roadSpikes,
-  "Aire d'alimentation HBE": FontAwesomeIcons.roadSpikes,
-  "Tour d'observation": FontAwesomeIcons.roadSpikes,
+  "Obstacle": FontAwesomeIcons.roadBarrier,
+  "Aire de croisement": FontAwesomeIcons.road,
+  "Aire de retournement sans impasse": FontAwesomeIcons.roadCircleCheck,
+  "Aire de retournement au bout d'une impasse": FontAwesomeIcons.roadCircleCheck,
+  "Parking": FontAwesomeIcons.squareParking,
+  "Bouche ou Borne d'incendie": FontAwesomeIcons.fireExtinguisher,
+  "Citerne": FontAwesomeIcons.water,
+  "Point d'aspiration": FontAwesomeIcons.arrowPointer,
+  "Aire d'alimentation HBE": FontAwesomeIcons.placeOfWorship,
+  "Tour d'observation": FontAwesomeIcons.towerObservation,
   "Ligne éléctrique": FontAwesomeIcons.roadSpikes,
 };
 

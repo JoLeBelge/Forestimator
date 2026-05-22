@@ -84,6 +84,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   Offset get _mainMenuFinishAnimOffScreenPos =>
       Offset(gl.dsp.alignX(gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignBottom - 40));
 
+  Offset get _mainMenuPisteInterAnimOnScreenPos =>
+      Offset(gl.dsp.alignX(gl.dsp.eqAlignRight), gl.dsp.alignY(gl.dsp.eqAlignBottom - 60));
+  Offset get _mainMenuPisteInterAnimOffScreenPos =>
+      Offset(gl.dsp.alignX(gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignBottom - 60));
+
   Offset get _mainMenuWarningsAnimOnScreenPos =>
       Offset(gl.dsp.alignX(gl.dsp.eqAlignRight), gl.dsp.alignY(gl.dsp.eqAlignTop));
   Offset get _mainMenuWarningsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.dsp.eqAlignTop));
@@ -1913,9 +1918,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           setState(() {
                                             if (gl.selLay.type.contains("Polygon") && gl.selGeo.points.length > 2) {
                                               centerOnPolygon(gl.selGeo);
-                                            } else if (gl.selLay.type.contains("Point") &&
-                                                gl.selGeo.center.longitude != 0.0 &&
-                                                gl.selGeo.center.latitude != 0.0) {
+                                            } else if ((gl.selLay.type.contains("Point") ||
+                                                    gl.selLay.type.contains("Path")) &&
+                                                (gl.selGeo.center.longitude != 0.0 &&
+                                                    gl.selGeo.center.latitude != 0.0)) {
                                               centerOnPoint(gl.selGeo);
                                             }
                                           });
@@ -2076,12 +2082,34 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   void _finishLastPiste(LatLng coordinates) {
     gl.refreshStack(() {
       GeometricLayer.getPisteDFCILayer().geometries.last.finished = true;
-      GeometricLayer.getPisteDFCILayer().geometries.last.addPoint(coordinates);
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value += ",";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value += ",FIN";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value += ",";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value += ",${DateTime.now().toString()}";
+      GeometricLayer.getPisteDFCILayer().geometries.last.points.insert(0, coordinates);
+      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value =
+          "FIN,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value}";
+      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value =
+          "FIN,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value}";
+      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value =
+          ",${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value}";
+      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value =
+          "${DateTime.now().toString()},${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value}";
       GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+      ge.Geometry.sendPathPointsInBackground();
+      gl.Mode.serialize();
+    });
+  }
+
+  void _addPistesInterNode(LatLng coordinates) {
+    gl.refreshStack(() {
+      GeometricLayer.getPisteDFCILayer().geometries.last.points.insert(0, coordinates);
+      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value =
+          "Point,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value}";
+      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value =
+          "Point,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value}";
+      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value =
+          ",${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value}";
+      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value =
+          "${DateTime.now().toString()},${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value}";
+      GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+      ge.Geometry.sendPathPointsInBackground();
       gl.Mode.serialize();
     });
   }
@@ -2145,16 +2173,47 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
-                ? gl.Mode.addVertexesPolygon && gl.layerReady && gl.selLay.type == "Point" ||
-                        (gl.Mode.recordPathPoints &&
-                            (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
-                                !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
-                    ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
-                    : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy)
-                : gl.Mode.addVertexesPolygon && gl.layerReady && gl.selLay.type == "Point" ||
-                    (gl.Mode.recordPathPoints &&
+                ? (gl.Mode.recordPathPoints &&
                         (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
                             !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                    ? AlignmentGeometry.xy(_mainMenuPisteInterAnimOnScreenPos.dx, _mainMenuPisteInterAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(
+                      _mainMenuPisteInterAnimOffScreenPos.dx,
+                      _mainMenuPisteInterAnimOffScreenPos.dy,
+                    )
+                : (gl.Mode.recordPathPoints &&
+                    (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
+                        !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                ? AlignmentGeometry.xy(_mainMenuPisteInterAnimOnScreenPos.dx, _mainMenuPisteInterAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_mainMenuPisteInterAnimOffScreenPos.dx, _mainMenuPisteInterAnimOffScreenPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _forestimatorFinishPiste,
+      ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? (gl.Mode.recordPathPoints &&
+                        (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
+                            !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                    ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy)
+                : (gl.Mode.recordPathPoints &&
+                    (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
+                        !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
+                : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: _forestimatorPistesAddInterNode,
+      ),
+      AnimatedContainer(
+        alignment:
+            gl.dsp.orientation.name == "Portrait"
+                ? gl.Mode.addVertexesPolygon && gl.layerReady && gl.selLay.type == "Point"
+                    ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
+                    : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy)
+                : gl.Mode.addVertexesPolygon && gl.layerReady && gl.selLay.type == "Point"
                 ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
                 : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
@@ -2352,11 +2411,41 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     child: FloatingActionButton(
       backgroundColor: gl.colorBack,
       onPressed: () {
-        (gl.Mode.recordPathPoints &&
-                (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
-                    !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
-            ? _finishLastPiste(_mapController.camera.center)
-            : _closeEditingMenu();
+        _closeEditingMenu();
+      },
+      child: Icon(
+        Icons.verified_outlined,
+        color: gl.Mode.essence ? Colors.black : Colors.white,
+        size: gl.eqPx * gl.iconSizeSettings,
+      ),
+    ),
+  );
+
+  Widget get _forestimatorFinishPiste => Container(
+    alignment: Alignment.center,
+    width: gl.eqPx * 12,
+    height: gl.eqPx * 12,
+    child: FloatingActionButton(
+      backgroundColor: gl.colorBack,
+      onPressed: () {
+        _finishLastPiste(_mapController.camera.center);
+      },
+      child: Icon(
+        Icons.verified_outlined,
+        color: gl.Mode.essence ? Colors.black : Colors.white,
+        size: gl.eqPx * gl.iconSizeSettings,
+      ),
+    ),
+  );
+
+  Widget get _forestimatorPistesAddInterNode => Container(
+    alignment: Alignment.center,
+    width: gl.eqPx * 12,
+    height: gl.eqPx * 12,
+    child: FloatingActionButton(
+      backgroundColor: gl.colorAgroBioTech,
+      onPressed: () {
+        _addPistesInterNode(_mapController.camera.center);
       },
       child: Icon(
         Icons.verified_outlined,
@@ -3032,7 +3121,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             },
             child: Text(
               overflow: TextOverflow.visible,
-              count == gl.selGeo.numPoints - 1 ? "1" : "${count + 2}",
+              gl.selGeo.type.contains("Path")
+                  ? "${gl.selGeo.numPoints - count}"
+                  : count == gl.selGeo.numPoints - 1
+                  ? "1"
+                  : "${count + 2}",
               maxLines: 1,
               style: TextStyle(color: Colors.black, fontSize: iconSize / 3),
             ),
@@ -3702,6 +3795,17 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                         }),
                   ),
                 ),
+              )
+              : gl.selLay.geometries[i].type.contains("Path")
+              ? Marker(
+                alignment: Alignment.center,
+                width:
+                    textArea.length > gl.selLay.geometries[i].name.length
+                        ? gl.eqPx * gl.infoBoxPolygon * 2.5 + textArea.length * gl.fontSizeS
+                        : gl.eqPx * gl.infoBoxPolygon * 1.5 + gl.selLay.geometries[i].name.length * gl.fontSizeS,
+                height: gl.eqPx * gl.infoBoxPolygon * 1.5,
+                point: gl.selLay.geometries[i].center,
+                child: Column(),
               )
               : Marker(
                 alignment: Alignment.center,

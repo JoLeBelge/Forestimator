@@ -72,3 +72,6 @@ flutter:
     - family: CustomIcons
       fonts:
         - asset: fonts/forestimatorIcons.ttf
+    - family: dfclIcons
+      fonts:
+        - asset: fonts/dfclIcons.ttf
