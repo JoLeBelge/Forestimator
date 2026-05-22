@@ -172,12 +172,12 @@ std::map<int,std::shared_ptr<color>> cDicoApt::getDicoRasterCol(std::string aCod
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
-        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){ // attention, la colonne col peut être vide!! ha ben non plus maintenant.
+        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
             int aA=sqlite3_column_int( stmt, 0 );
             std::string aB("");
             if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ) {aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );}
-            if (aB.substr(0,1)=="#") {
-                //if (globTest){std::cout << " ajout dans dicoCol " << aA << " , col " << aB << " table" << nom_dico << std::endl;}
+            if (aB.at(0)=='#') {
+                if (globTest){std::cout << "layer " << aCode << ", ajout dans dicoCol " << aA << " , col " << aB << " table " << nom_dico << std::endl;}
                 // il faut d'office l'ajouter au vecteur colors, car les styles sont créé via ce vecteur
                 colors.emplace(std::make_pair(aB,std::make_shared<color>(aB,aB)));
             }
