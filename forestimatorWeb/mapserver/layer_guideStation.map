@@ -288,9 +288,10 @@ LAYER
       "wms_title"           "Catalogue de station Ardenne et FFC"
       "wms_srs"             "EPSG:31370"
       "wcs_label"           "Catalogue de station Ardenne et FFC"
-      "wcs_enable_request"  "*"
+      "wcs_title"           "GS"
       "wcs_rangeset_name"   "RangeSet1"
       "wcs_rangeset_label"  "Raster Data Values"
+      "wcs_formats"         "image/tiff" 
    END
    TEMPLATE "../template.html"
 END
