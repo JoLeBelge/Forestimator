@@ -18,10 +18,6 @@ MAP
 		"wms_service_onlineresource"   "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
 	    	"wms_srs"             "EPSG:31370"
 		"wms_enable_request"  "*"
-		"wcs_title"        "Serveur WCS des cartes de description stationnelle de Forestimator"
-		"wcs_service_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
-    		"wcs_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
-    		"wcs_enable_request" "*"
 	  	END
   	END
   	
