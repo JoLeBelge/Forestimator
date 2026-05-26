@@ -4,6 +4,8 @@ MAP
 	SIZE           800 800
 	SHAPEPATH      "/media/Data10/Forestimator/Station/"
 	IMAGECOLOR     255 255 255
+	CONFIG "MS_ERRORFILE" "/home/jo/app/Forestimator/data/tmp/ms_stationFEE_error.txt"
+	DEBUG 3
 
 	PROJECTION
 		"init=epsg:31370"
