@@ -1498,7 +1498,7 @@ class PopupPoiOnPiste {
       String id = "poiPiste";
       popupForestimatorWindow(
         id: id,
-        title: "Nouveau Point DFCI",
+        title: "Nouveau Point DFCL",
         onDiscard: () {
           gl.refreshStack(() {
             gl.stack.pop(id);
@@ -1508,15 +1508,19 @@ class PopupPoiOnPiste {
           height: 120 * gl.eqPx,
           messageAccept: "Placer",
           messageDecline: "Annuler",
-          onAccept: (String ess, Color col, String type, String rmq) {
+          onAccept: (String object, Color col, String type, String rmq) {
             gl.refreshStack(() {
-              GeometricLayer.getPisteDFCILayer().geometries.last.addPoint(coordinates);
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value += ",$ess";
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value += ",$type";
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value += ",$rmq";
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value += ",${DateTime.now().toString()}";
+              GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value =
+                  "$object,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value}";
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value =
+                  "$type,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value}";
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value =
+                  "$rmq,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value}";
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value =
+                  "${DateTime.now().toString()},${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value}";
               gl.lastUsedCategory = col;
-              GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+              GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
               gl.Mode.serialize();
               gl.stack.pop(id);
             });
@@ -1549,22 +1553,22 @@ class PopupNewCatPiste {
           });
         },
         child: DefineCategory(
-          height: 120 * gl.eqPx,
+          height: 150 * gl.eqPx,
           messageAccept: "Placer",
           messageDecline: "Annuler",
-          onAccept: (String ess, Color col, String type, String rmq) {
+          onAccept: (String object, Color col, String type, String rmq) {
             gl.refreshStack(() {
-              GeometricLayer.getPisteDFCILayer().addGeometry(
-                name: "Piste - ${GeometricLayer.getPisteDFCILayer().geometries.length + 1}",
+              GeometricLayer.getPisteDFCLLayer().addGeometry(
+                name: "Piste - ${GeometricLayer.getPisteDFCLLayer().geometries.length + 1}",
               );
-              GeometricLayer.getPisteDFCILayer().geometries.last.addPoint(coordinates);
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value = ess;
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value = type;
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value = rmq;
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value = DateTime.now().toString();
-              GeometricLayer.getPisteDFCILayer().geometries.last.colorLine = col;
+              GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value = object;
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value = type;
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value = rmq;
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value = DateTime.now().toString();
+              GeometricLayer.getPisteDFCLLayer().geometries.last.colorLine = col;
               gl.lastUsedCategory = col;
-              GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+              GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
               gl.Mode.serialize();
               gl.stack.pop(id);
             });
@@ -1603,7 +1607,6 @@ class DefinePOI extends StatefulWidget {
 }
 
 class _DefinePOI extends State<DefinePOI> {
-  static int _type = 1;
   static int _selected = -1;
   static String _custom = "";
   static Color _color = Colors.transparent;
@@ -1619,9 +1622,10 @@ class _DefinePOI extends State<DefinePOI> {
             switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
-                height: widget.height - 70 * gl.eqPx,
+                height: widget.height - 40 * gl.eqPx,
+                width: 98 * gl.eqPx,
                 child: lt.ForestimatorScrollView(
-                  height: widget.height - 70 * gl.eqPx,
+                  height: widget.height - 40 * gl.eqPx,
                   child: Column(
                     children: List<Widget>.generate(gl.roadObstacleChoice.length, (index) {
                       return AnimatedContainer(
@@ -1639,9 +1643,18 @@ class _DefinePOI extends State<DefinePOI> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                gl.roadObstacleChoice.keys.toList()[index],
-                                style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                              SizedBox(
+                                width: gl.eqPx * 75,
+                                child: Text(
+                                  gl.roadObstacleChoice.keys.toList()[index],
+                                  style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                ),
+                              ),
+                              Icon(
+                                gl.roadObstacleChoice.values.toList()[index].icon,
+                                color: gl.roadObstacleChoice.values.toList()[index].color,
+                                shadows: [Shadow(color: Colors.white, blurRadius: gl.eqPx * 4)],
+                                size: gl.dsp.equipixel * gl.iconSizeS,
                               ),
                             ],
                           ),
@@ -1688,7 +1701,7 @@ class _DefinePOI extends State<DefinePOI> {
                             child: TextButton(
                               style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
                               onPressed: () {
-                                widget.onAccept(_custom, _color, _type == 1 ? "Categorie" : "Obstacle", _rmq);
+                                widget.onAccept(_custom, _color, "POI", _rmq);
                               },
                               child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
                             ),
@@ -1712,8 +1725,6 @@ class _DefinePOI extends State<DefinePOI> {
       },
     );
   }
-
-  static void reset() => {_custom = "", _selected = -1, _type = 1};
 }
 
 class DefineCategory extends StatefulWidget {
@@ -1739,7 +1750,6 @@ class DefineCategory extends StatefulWidget {
 }
 
 class _DefineCategory extends State<DefineCategory> {
-  static int _type = 1;
   static int _selected = -1;
   static String _custom = "";
   static Color _color = Colors.transparent;
@@ -1755,9 +1765,10 @@ class _DefineCategory extends State<DefineCategory> {
             switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
-                height: widget.height - 70 * gl.eqPx,
+                height: widget.height - 40 * gl.eqPx,
+                width: 85 * gl.eqPx,
                 child: lt.ForestimatorScrollView(
-                  height: widget.height - 70 * gl.eqPx,
+                  height: widget.height - 40 * gl.eqPx,
                   child: Column(
                     children: List<Widget>.generate(gl.roadCategoryChoice.length, (index) {
                       return AnimatedContainer(
@@ -1793,14 +1804,14 @@ class _DefineCategory extends State<DefineCategory> {
               ),
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
-                height: _type == 2 && _selected == gl.roadObstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
+                height: _selected == gl.roadObstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
                 child: Column(
                   children: [
-                    if (_type == 2 && _selected == gl.roadObstacleChoice.length - 1)
+                    if (_selected == gl.roadObstacleChoice.length - 1)
                       lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                    if (_type == 2 && _selected == gl.roadObstacleChoice.length - 1)
+                    if (_selected == gl.roadObstacleChoice.length - 1)
                       AnimatedOpacity(
-                        opacity: _type == 2 && _selected == gl.roadObstacleChoice.length - 1 ? 1 : 0,
+                        opacity: _selected == gl.roadObstacleChoice.length - 1 ? 1 : 0,
                         duration: Duration(milliseconds: 200),
                         child: TextFormField(
                           cursorColor: Colors.white,
@@ -1828,7 +1839,7 @@ class _DefineCategory extends State<DefineCategory> {
                             child: TextButton(
                               style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
                               onPressed: () {
-                                widget.onAccept(_custom, _color, _type == 1 ? "Categorie" : "Obstacle", _rmq);
+                                widget.onAccept(_custom, _color, "Categorie", _rmq);
                               },
                               child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
                             ),
@@ -1853,7 +1864,7 @@ class _DefineCategory extends State<DefineCategory> {
     );
   }
 
-  static void reset() => {_custom = "", _selected = -1, _type = 1};
+  static void reset() => {_custom = "", _selected = -1};
 }
 
 class PopupValueChange {

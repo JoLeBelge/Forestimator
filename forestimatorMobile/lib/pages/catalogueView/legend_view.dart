@@ -20,6 +20,7 @@ class _LegendView extends State<LegendView> {
   bool _graduatedMode = false;
   BoxConstraints _constraintsLeft = BoxConstraints(), _constraintsRight = BoxConstraints();
   int _magicNumber = 1;
+
   @override
   Widget build(BuildContext context) {
     _computeBoxContraintsPerColorTile();
@@ -45,16 +46,17 @@ class _LegendView extends State<LegendView> {
                   if (_graduatedMode) {
                     if (i % _magicNumber == 0 || i == gl.dico.mLayerBases[widget.layerKey]!.mDicoVal.length - 1) {
                       return Container(
-                        alignment: AlignmentGeometry.topCenter,
+                        color: i % 2 == 1 ? Colors.white10 : Color.fromRGBO(220, 220, 220, 1),
+                        alignment: AlignmentGeometry.centerLeft,
                         constraints: BoxConstraints(
                           minWidth: 0,
-                          maxWidth: _constraintsLeft.maxWidth,
+                          maxWidth: _constraintsLeft.maxWidth * 1.2,
                           minHeight: 0,
-                          maxHeight: gl.fontSizeS * gl.eqPx,
+                          maxHeight: _constraintsLeft.maxHeight * 1.65,
                         ),
                         child: Text(
                           gl.dico.mLayerBases[widget.layerKey]!.mDicoVal[key]!,
-                          style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXS, fontWeight: FontWeight.w300),
+                          style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXXS, fontWeight: FontWeight.w500),
                         ),
                       );
                     } else {
@@ -62,10 +64,17 @@ class _LegendView extends State<LegendView> {
                     }
                   } else {
                     return Container(
-                      constraints: _constraintsLeft,
+                      alignment: AlignmentGeometry.centerLeft,
+                      color: i % 2 == 1 ? Colors.white10 : Color.fromRGBO(220, 220, 220, 1),
+                      constraints: BoxConstraints(
+                        minWidth: 0,
+                        maxWidth: _constraintsLeft.maxWidth * 1.2,
+                        minHeight: 0,
+                        maxHeight: _constraintsLeft.maxHeight * 1.65,
+                      ),
                       child: Text(
                         gl.dico.mLayerBases[widget.layerKey]!.mDicoVal[key]!,
-                        style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXS, fontWeight: FontWeight.w300),
+                        style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXXS, fontWeight: FontWeight.w500),
                       ),
                     );
                   }
@@ -78,9 +87,9 @@ class _LegendView extends State<LegendView> {
                   return Container(
                     constraints: BoxConstraints(
                       minWidth: 0,
-                      maxWidth: _constraintsRight.maxWidth,
+                      maxWidth: _constraintsRight.maxWidth * .75,
                       minHeight: 0,
-                      maxHeight: _constraintsRight.maxHeight,
+                      maxHeight: _constraintsRight.maxHeight * 1.65,
                     ),
                     color: gl.dico.mLayerBases[widget.layerKey]!.mDicoCol[key]!,
                   );
@@ -165,7 +174,7 @@ class _LegendView extends State<LegendView> {
     }
   }
 
-  BoxConstraints _initConstraints(double x, x_, y, y_) {
+  BoxConstraints _initConstraints(double x, double x_, double y, double y_) {
     return BoxConstraints(minHeight: x, maxHeight: x_, minWidth: y, maxWidth: y_);
   }
 

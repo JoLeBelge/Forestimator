@@ -554,10 +554,10 @@ class Geometry {
 
   static Future<bool> sendPathBackground() async {
     bool allFinished = true;
-    GeometricLayer pathpoints = GeometricLayer.getPisteDFCILayer();
-    for (int i = 0; i < pathpoints.geometries.length; i++) {
-      if (!pathpoints.geometries[i].sentToServer) {
-        if (!await pathpoints.geometries[i].sendPathpointToServer()) {
+    GeometricLayer path = GeometricLayer.getPisteDFCLLayer();
+    for (int i = 0; i < path.geometries.length; i++) {
+      if (!path.geometries[i].sentToServer) {
+        if (!await path.geometries[i].sendPathToServer()) {
           allFinished = false;
         }
       }
@@ -566,7 +566,7 @@ class Geometry {
     return allFinished;
   }
 
-  Future<bool> sendPathpointToServer() async {
+  Future<bool> sendPathToServer() async {
     if (sentToServer) {
       gl.print("Pathpoint $name already sent once!");
       return false;
