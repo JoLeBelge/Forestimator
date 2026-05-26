@@ -886,7 +886,7 @@ Map<String, String> essenceChoice = {
 };
 
 Map<String, IconData> roadObstacleChoice = {
-  "Point de première destination": FontAwesomeIcons.poo,
+  "Point de première destination": DFCLIcons.barrier,
   "Barrière": FontAwesomeIcons.roadCircleCheck,
   "Obstacle": FontAwesomeIcons.roadBarrier,
   "Aire de croisement": FontAwesomeIcons.road,

@@ -21,5 +21,5 @@ class DFCLIcons {
   static const _kFontFam = 'dfclIcons';
   static const String? _kFontPkg = null;
 
-  static const IconData barrier = IconData(0x0088, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData barrier = IconData(0x0080, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }
