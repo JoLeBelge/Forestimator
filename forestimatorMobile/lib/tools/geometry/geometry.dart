@@ -554,7 +554,7 @@ class Geometry {
 
   static Future<bool> sendPathBackground() async {
     bool allFinished = true;
-    GeometricLayer path = GeometricLayer.getPisteDFCILayer();
+    GeometricLayer path = GeometricLayer.getPisteDFCLLayer();
     for (int i = 0; i < path.geometries.length; i++) {
       if (!path.geometries[i].sentToServer) {
         if (!await path.geometries[i].sendPathToServer()) {

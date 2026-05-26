@@ -2081,17 +2081,17 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
 
   void _finishLastPiste(LatLng coordinates) {
     gl.refreshStack(() {
-      GeometricLayer.getPisteDFCILayer().geometries.last.finished = true;
-      GeometricLayer.getPisteDFCILayer().geometries.last.points.insert(0, coordinates);
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value =
-          "FIN,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value}";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value =
-          "FIN,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value}";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value =
-          ",${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value}";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value =
-          "${DateTime.now().toString()},${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value}";
-      GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+      GeometricLayer.getPisteDFCLLayer().geometries.last.finished = true;
+      GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
+      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value =
+          "FIN,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value}";
+      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value =
+          "FIN,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value}";
+      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value =
+          ",${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value}";
+      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value =
+          "${DateTime.now().toString()},${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value}";
+      GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
       ge.Geometry.sendPathPointsInBackground();
       gl.Mode.serialize();
     });
@@ -2099,16 +2099,16 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
 
   void _addPistesInterNode(LatLng coordinates) {
     gl.refreshStack(() {
-      GeometricLayer.getPisteDFCILayer().geometries.last.points.insert(0, coordinates);
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value =
-          "Point,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value}";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value =
-          "Point,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value}";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value =
-          ",${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value}";
-      GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value =
-          "${DateTime.now().toString()},${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value}";
-      GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+      GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
+      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value =
+          "Point,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value}";
+      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value =
+          "Point,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value}";
+      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value =
+          ",${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value}";
+      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value =
+          "${DateTime.now().toString()},${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value}";
+      GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
       ge.Geometry.sendPathPointsInBackground();
       gl.Mode.serialize();
     });
@@ -2174,16 +2174,16 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         alignment:
             gl.dsp.orientation.name == "Portrait"
                 ? (gl.Mode.recordPathPoints &&
-                        (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
-                            !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                        (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
+                            !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                     ? AlignmentGeometry.xy(_mainMenuPisteInterAnimOnScreenPos.dx, _mainMenuPisteInterAnimOnScreenPos.dy)
                     : AlignmentGeometry.xy(
                       _mainMenuPisteInterAnimOffScreenPos.dx,
                       _mainMenuPisteInterAnimOffScreenPos.dy,
                     )
                 : (gl.Mode.recordPathPoints &&
-                    (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
-                        !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                    (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
+                        !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                 ? AlignmentGeometry.xy(_mainMenuPisteInterAnimOnScreenPos.dx, _mainMenuPisteInterAnimOnScreenPos.dy)
                 : AlignmentGeometry.xy(_mainMenuPisteInterAnimOffScreenPos.dx, _mainMenuPisteInterAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
@@ -2194,13 +2194,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         alignment:
             gl.dsp.orientation.name == "Portrait"
                 ? (gl.Mode.recordPathPoints &&
-                        (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
-                            !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                        (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
+                            !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                     ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
                     : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy)
                 : (gl.Mode.recordPathPoints &&
-                    (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
-                        !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                    (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
+                        !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                 ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
                 : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
@@ -2332,12 +2332,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             gl.Mode.essence ||
             (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
             gl.Mode.recordPathPoints ||
-            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfci") ||
+            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfcl") ||
             gl.geoReady && gl.selLay.type.contains("Polygon")) {
           refreshView(() {
             gl.Mode.recordPathPoints
-                ? (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
-                        !GeometricLayer.getPisteDFCILayer().geometries.last.finished)
+                ? (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
+                        !GeometricLayer.getPisteDFCLLayer().geometries.last.finished)
                     ? PopupPoiOnPiste(context, _mapController.camera.center)
                     : PopupNewCatPiste(context, _mapController.camera.center)
                 : gl.Mode.addVertexesPolygon && gl.selLay.subtype != "Essence"
@@ -2394,8 +2394,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                 child: Icon(FontAwesomeIcons.road, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
               ),
             (gl.Mode.recordPathPoints &&
-                    (GeometricLayer.getPisteDFCILayer().geometries.isNotEmpty &&
-                        !GeometricLayer.getPisteDFCILayer().geometries.last.finished))
+                    (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
+                        !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                 ? Icon(Icons.adjust_rounded, color: Colors.white, size: gl.eqPx * gl.iconSizeS)
                 : Icon(Icons.add, color: Colors.white, size: gl.eqPx * gl.iconSizeS),
           ],
@@ -2646,7 +2646,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             }
                           },
                           icon: Icon(
-                            layer.subtype == "dfci"
+                            layer.subtype == "dfcl"
                                 ? gl.roadObstacleChoice[ess[j]] ?? FontAwesomeIcons.bug
                                 : gl.selectableIcons[geometry.selectedPointIcon],
                             size: geometry.iconSize * gl.eqPx,
@@ -2654,7 +2654,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           ),
                         )
                         : Icon(
-                          layer.subtype == "dfci"
+                          layer.subtype == "dfcl"
                               ? gl.roadObstacleChoice[ess[j]] ?? FontAwesomeIcons.bug
                               : gl.selectableIcons[geometry.selectedPointIcon],
                           size: geometry.iconSize * gl.eqPx,

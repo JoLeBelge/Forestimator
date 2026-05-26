@@ -63,9 +63,9 @@ class GeometricLayer {
     defaultPointIcon = 4;
   }
 
-  GeometricLayer.pisteDFCI() {
+  GeometricLayer.pisteDFCL() {
     type = "Path";
-    subtype = "dfci";
+    subtype = "dfcl";
     defaultColor = gl.colorPathPoints.withAlpha(150);
     defaultPointIcon = 5;
     defaultIconSize = 7.5;
@@ -78,7 +78,7 @@ class GeometricLayer {
     for (int i = 0; i < 2; i++) {
       defaultAttributes[i].visibleOnMapLabel = true;
     }
-    name = "Catégories des pistes DFCI";
+    name = "Catégories des pistes DFCL";
   }
 
   static void deleteLayer(int index) {
@@ -330,10 +330,10 @@ class GeometricLayer {
     return gl.geoLayers.last;
   }
 
-  static bool pathPisteDFCILayerExists() {
+  static bool pathPisteDFCLLayerExists() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
-      if (g.type == "Path" && g.subtype == "dfci") {
+      if (g.type == "Path" && g.subtype == "dfcl") {
         gl.selectedGeoLayer = index;
         return true;
       }
@@ -342,16 +342,16 @@ class GeometricLayer {
     return false;
   }
 
-  static GeometricLayer getPisteDFCILayer() {
+  static GeometricLayer getPisteDFCLLayer() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
-      if (g.type == "Path" && g.subtype == "dfci") {
+      if (g.type == "Path" && g.subtype == "dfcl") {
         gl.selectedGeoLayer = index;
         return g;
       }
       index++;
     }
-    gl.geoLayers.add(GeometricLayer.pisteDFCI());
+    gl.geoLayers.add(GeometricLayer.pisteDFCL());
     gl.selectedGeoLayer = gl.geoLayers.length - 1;
     gl.geoLayers.last.serialize();
     return gl.geoLayers.last;

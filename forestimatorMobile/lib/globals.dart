@@ -886,19 +886,19 @@ Map<String, String> essenceChoice = {
 };
 
 Map<String, IconData> roadObstacleChoice = {
-  "Point de première destination": DFCLIcons.barrier,
-  "Barrière": FontAwesomeIcons.roadCircleCheck,
-  "Obstacle": FontAwesomeIcons.roadBarrier,
-  "Aire de croisement": FontAwesomeIcons.road,
-  "Aire de retournement sans impasse": FontAwesomeIcons.roadCircleCheck,
-  "Aire de retournement au bout d'une impasse": FontAwesomeIcons.roadCircleCheck,
-  "Parking": FontAwesomeIcons.squareParking,
-  "Bouche ou Borne d'incendie": FontAwesomeIcons.fireExtinguisher,
-  "Citerne": FontAwesomeIcons.water,
-  "Point d'aspiration": FontAwesomeIcons.arrowPointer,
-  "Aire d'alimentation HBE": FontAwesomeIcons.placeOfWorship,
-  "Tour d'observation": FontAwesomeIcons.towerObservation,
-  "Ligne éléctrique": FontAwesomeIcons.roadSpikes,
+  "Point de première destination": DFCLIcons.pointdepremieredestination,
+  "Barrière": DFCLIcons.barriere,
+  "Obstacle": DFCLIcons.obstacles,
+  "Aire de croisement": DFCLIcons.airedecroisement,
+  "Aire de retournement sans impasse": DFCLIcons.airederetournement,
+  "Aire de retournement au bout d'une impasse": DFCLIcons.airederetournement,
+  "Parking": DFCLIcons.parking,
+  "Bouche ou Borne d'incendie": DFCLIcons.borneincendie,
+  "Citerne": DFCLIcons.citerne,
+  "Point d'aspiration": DFCLIcons.pointaspiration,
+  "Aire d'alimentation HBE": DFCLIcons.airealimentationhbe,
+  "Tour d'observation": DFCLIcons.tourdobservation,
+  "Ligne éléctrique": DFCLIcons.ligneelectrique,
 };
 
 Map<String, Color> roadCategoryChoice = {

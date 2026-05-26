@@ -1498,7 +1498,7 @@ class PopupPoiOnPiste {
       String id = "poiPiste";
       popupForestimatorWindow(
         id: id,
-        title: "Nouveau Point DFCI",
+        title: "Nouveau Point DFCL",
         onDiscard: () {
           gl.refreshStack(() {
             gl.stack.pop(id);
@@ -1510,17 +1510,17 @@ class PopupPoiOnPiste {
           messageDecline: "Annuler",
           onAccept: (String object, Color col, String type, String rmq) {
             gl.refreshStack(() {
-              GeometricLayer.getPisteDFCILayer().geometries.last.points.insert(0, coordinates);
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value =
-                  "$object,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value}";
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value =
-                  "$type,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value}";
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value =
-                  "$rmq,${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value}";
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value =
-                  "${DateTime.now().toString()},${GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value}";
+              GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value =
+                  "$object,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value}";
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value =
+                  "$type,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value}";
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value =
+                  "$rmq,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value}";
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value =
+                  "${DateTime.now().toString()},${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value}";
               gl.lastUsedCategory = col;
-              GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+              GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
               gl.Mode.serialize();
               gl.stack.pop(id);
             });
@@ -1558,17 +1558,17 @@ class PopupNewCatPiste {
           messageDecline: "Annuler",
           onAccept: (String object, Color col, String type, String rmq) {
             gl.refreshStack(() {
-              GeometricLayer.getPisteDFCILayer().addGeometry(
-                name: "Piste - ${GeometricLayer.getPisteDFCILayer().geometries.length + 1}",
+              GeometricLayer.getPisteDFCLLayer().addGeometry(
+                name: "Piste - ${GeometricLayer.getPisteDFCLLayer().geometries.length + 1}",
               );
-              GeometricLayer.getPisteDFCILayer().geometries.last.points.insert(0, coordinates);
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[0].value = object;
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[1].value = type;
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[2].value = rmq;
-              GeometricLayer.getPisteDFCILayer().geometries.last.attributes[3].value = DateTime.now().toString();
-              GeometricLayer.getPisteDFCILayer().geometries.last.colorLine = col;
+              GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value = object;
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value = type;
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value = rmq;
+              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value = DateTime.now().toString();
+              GeometricLayer.getPisteDFCLLayer().geometries.last.colorLine = col;
               gl.lastUsedCategory = col;
-              GeometricLayer.getPisteDFCILayer().geometries.last.serialize();
+              GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
               gl.Mode.serialize();
               gl.stack.pop(id);
             });
@@ -1647,7 +1647,7 @@ class _DefinePOI extends State<DefinePOI> {
                                 gl.roadObstacleChoice.keys.toList()[index],
                                 style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
                               ),
-                              Icon(DFCLIcons.barrier),
+                              Icon(gl.roadObstacleChoice.values.toList()[index]),
                             ],
                           ),
                         ),
