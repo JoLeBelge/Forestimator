@@ -885,20 +885,27 @@ Map<String, String> essenceChoice = {
   "Entrer du texte": "",
 };
 
-Map<String, IconData> roadObstacleChoice = {
-  "Point de première destination": DFCLIcons.pointdepremieredestination,
-  "Barrière": DFCLIcons.barriere,
-  "Obstacle": DFCLIcons.obstacles,
-  "Aire de croisement": DFCLIcons.airedecroisement,
-  "Aire de retournement sans impasse": DFCLIcons.airederetournement,
-  "Aire de retournement au bout d'une impasse": DFCLIcons.airederetournement,
-  "Parking": DFCLIcons.parking,
-  "Bouche ou Borne d'incendie": DFCLIcons.borneincendie,
-  "Citerne": DFCLIcons.citerne,
-  "Point d'aspiration": DFCLIcons.pointaspiration,
-  "Aire d'alimentation HBE": DFCLIcons.airealimentationhbe,
-  "Tour d'observation": DFCLIcons.tourdobservation,
-  "Ligne éléctrique": DFCLIcons.ligneelectrique,
+class DfclI {
+  IconData icon;
+  Color color;
+
+  DfclI(this.icon, this.color);
+}
+
+Map<String, DfclI> roadObstacleChoice = {
+  "Point de première destination": DfclI(DFCLIcons.pointdepremieredestination, Colors.black),
+  "Barrière": DfclI(DFCLIcons.barriere, Colors.black),
+  "Obstacle": DfclI(DFCLIcons.obstacles, Colors.black),
+  "Aire de croisement": DfclI(DFCLIcons.airedecroisement, Colors.black),
+  "Aire de retournement sans impasse": DfclI(DFCLIcons.airederetournement, Colors.black),
+  "Aire de retournement au bout d'une impasse": DfclI(DFCLIcons.airederetournement, Colors.red),
+  "Parking": DfclI(DFCLIcons.parking, Colors.black),
+  "Bouche ou Borne d'incendie": DfclI(DFCLIcons.borneincendie, Colors.blue),
+  "Citerne": DfclI(DFCLIcons.citerne, Colors.lightBlue),
+  "Point d'aspiration": DfclI(DFCLIcons.pointaspiration, Colors.lightBlue),
+  "Aire d'alimentation HBE": DfclI(DFCLIcons.airealimentationhbe, Colors.lightBlue),
+  "Tour d'observation": DfclI(DFCLIcons.tourdobservation, Colors.red),
+  "Ligne éléctrique": DfclI(DFCLIcons.ligneelectrique, Colors.pink),
 };
 
 Map<String, Color> roadCategoryChoice = {

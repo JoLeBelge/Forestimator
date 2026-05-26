@@ -1643,11 +1643,19 @@ class _DefinePOI extends State<DefinePOI> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                gl.roadObstacleChoice.keys.toList()[index],
-                                style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                              SizedBox(
+                                width: gl.eqPx * 75,
+                                child: Text(
+                                  gl.roadObstacleChoice.keys.toList()[index],
+                                  style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                ),
                               ),
-                              Icon(gl.roadObstacleChoice.values.toList()[index]),
+                              Icon(
+                                gl.roadObstacleChoice.values.toList()[index].icon,
+                                color: gl.roadObstacleChoice.values.toList()[index].color,
+                                shadows: [Shadow(color: Colors.white, blurRadius: gl.eqPx * 4)],
+                                size: gl.dsp.equipixel * gl.iconSizeS,
+                              ),
                             ],
                           ),
                         ),

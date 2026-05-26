@@ -1786,12 +1786,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                 gl.selLay.type == "Point" && gl.selLay.subtype == "PathPoint"
                                                     ? gl.selLay.geometries[index].attributes[1].value == "Categorie"
                                                         ? FontAwesomeIcons.road
-                                                        : gl.roadObstacleChoice[gl
+                                                        : gl
+                                                            .roadObstacleChoice[gl
                                                                 .selLay
                                                                 .geometries[index]
                                                                 .attributes[0]
-                                                                .value] ??
-                                                            FontAwesomeIcons.bug
+                                                                .value]!
+                                                            .icon
                                                     : gl.selLay.type == "Point"
                                                     ? gl.selectableIcons[gl.selLay.geometries[index].selectedPointIcon]
                                                     : gl.selectableIconGeo[gl
@@ -1799,6 +1800,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                         .geometries[index]
                                                         .selectedPointIcon],
                                                 color: gl.selLay.geometries[index].colorLine,
+                                                shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 1)],
                                                 size: gl.eqPx * gl.iconSizeXS * 1.2,
                                               ),
                                             ),
@@ -2080,21 +2082,28 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   }
 
   void _finishLastPiste(LatLng coordinates) {
-    gl.refreshStack(() {
-      GeometricLayer.getPisteDFCLLayer().geometries.last.finished = true;
-      GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
-      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value =
-          "FIN,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value}";
-      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value =
-          "FIN,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value}";
-      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value =
-          ",${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value}";
-      GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value =
-          "${DateTime.now().toString()},${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value}";
-      GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
-      ge.Geometry.sendPathPointsInBackground();
-      gl.Mode.serialize();
-    });
+    PopupDoYouReally(
+      () {
+        gl.refreshStack(() {
+          GeometricLayer.getPisteDFCLLayer().geometries.last.finished = true;
+          GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
+          GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value =
+              "FIN,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value}";
+          GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value =
+              "FIN,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value}";
+          GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value =
+              ",${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value}";
+          GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value =
+              "${DateTime.now().toString()},${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value}";
+          GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
+          ge.Geometry.sendPathPointsInBackground();
+          gl.Mode.serialize();
+        });
+      },
+      "Attention",
+      "Si vous terminez l'édition vous ne pourrez plus ajouter des points à cette piste.",
+    );
+    ;
   }
 
   void _addPistesInterNode(LatLng coordinates) {
@@ -2426,15 +2435,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     width: gl.eqPx * 12,
     height: gl.eqPx * 12,
     child: FloatingActionButton(
-      backgroundColor: gl.colorBack,
+      backgroundColor: Colors.red,
       onPressed: () {
         _finishLastPiste(_mapController.camera.center);
       },
-      child: Icon(
-        Icons.verified_outlined,
-        color: gl.Mode.essence ? Colors.black : Colors.white,
-        size: gl.eqPx * gl.iconSizeSettings,
-      ),
+      child: Icon(Icons.back_hand, color: Colors.white, size: gl.eqPx * gl.iconSizeSettings),
     ),
   );
 
@@ -2448,7 +2453,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         _addPistesInterNode(_mapController.camera.center);
       },
       child: Icon(
-        Icons.verified_outlined,
+        Icons.polyline_outlined,
         color: gl.Mode.essence ? Colors.black : Colors.white,
         size: gl.eqPx * gl.iconSizeSettings,
       ),
@@ -2647,17 +2652,21 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           },
                           icon: Icon(
                             layer.subtype == "dfcl"
-                                ? gl.roadObstacleChoice[ess[j]] ?? FontAwesomeIcons.bug
+                                ? gl.roadObstacleChoice[ess[j]]?.icon ?? Icons.bug_report
                                 : gl.selectableIcons[geometry.selectedPointIcon],
                             size: geometry.iconSize * gl.eqPx,
+                            shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 10)],
+                            weight: 8954.91,
                             color: geometry.colorLine,
                           ),
                         )
                         : Icon(
                           layer.subtype == "dfcl"
-                              ? gl.roadObstacleChoice[ess[j]] ?? FontAwesomeIcons.bug
+                              ? gl.roadObstacleChoice[ess[j]]?.icon ?? Icons.bug_report
                               : gl.selectableIcons[geometry.selectedPointIcon],
                           size: geometry.iconSize * gl.eqPx,
+                          shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 10)],
+                          weight: 8954.91,
                           color: geometry.colorLine,
                         ),
               ),
@@ -2714,7 +2723,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                         },
                         icon: Icon(
                           layer.subtype == "PathPoint" && geometry.attributes[1].value == "Obstacle"
-                              ? gl.roadObstacleChoice[geometry.attributes[0].value] ?? FontAwesomeIcons.bug
+                              ? gl.roadObstacleChoice[geometry.attributes[0].value]!.icon
                               : gl.selectableIcons[geometry.selectedPointIcon],
                           size: geometry.iconSize * gl.eqPx,
                           color: geometry.colorLine,
@@ -2722,7 +2731,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                       )
                       : Icon(
                         layer.subtype == "PathPoint" && geometry.attributes[1].value == "Obstacle"
-                            ? gl.roadObstacleChoice[geometry.attributes[0].value] ?? FontAwesomeIcons.bug
+                            ? gl.roadObstacleChoice[geometry.attributes[0].value]!.icon
                             : gl.selectableIcons[geometry.selectedPointIcon],
                         size: geometry.iconSize * gl.eqPx,
                         color: geometry.colorLine,
