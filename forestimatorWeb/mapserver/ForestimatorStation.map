@@ -1,399 +1,389 @@
 MAP
-	NAME		"Description des stations forestières"
-	EXTENT	42250.0001199999969685 21170.0001200000115205 295170.0001199999824166 167700.0001200000115205
-	SIZE           800 800
-	SHAPEPATH      "/media/Data10/Forestimator/Station/"
-	IMAGECOLOR     255 255 255
-
-	PROJECTION
-		"init=epsg:31370"
-	END
-	
-	WEB
-		METADATA
-	    	"wms_label"           "Serveur WMS des cartes de description stationnelle de Forestimator"
-	    	"wms_onlineresource"  "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
-		"wms_service_onlineresource"   "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
-	    	"wms_srs"             "EPSG:31370"
-		"wms_enable_request"  "*"
-		#"wcs_title"        "Serveur WCS des cartes de description stationnelle de Forestimator"
-		#"wcs_service_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
-    		#"wcs_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
-    		#"wcs_enable_request" "*"
-	  	END
-  	END
-  	
-INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/layer_guideStation.map"
-
-LAYER
-  NAME "AE"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "AE_RW_202408.tif" 
-   PROCESSING "BANDS=1" 
-   CLASSITEM "[pixel]" 
-   CLASS 
-      NAME "Sans apport d'eau"
-      EXPRESSION "1"
-      STYLE 
-          COLOR 215 222 216
-       END
-   END
-   CLASS 
-      NAME "Apport variable"
-      EXPRESSION "2"
-      STYLE 
-          COLOR 37 161 214
-       END
-   END
-   CLASS 
-      NAME "Apport permanent"
-      EXPRESSION "3"
-      STYLE 
-          COLOR 25 30 160
-       END
-   END
- METADATA
-      "wms_title"           "Situation d'apport en eau hors précipitation"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-
-
-LAYER
-  NAME "NH"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "NH202408.tif" 
-   PROCESSING "BANDS=1" 
-   CLASSITEM "[pixel]" 
-   CLASS 
-      NAME "-4"
-      EXPRESSION "6"
-      STYLE 
-          COLOR 255 44 220
-       END
-   END
-   CLASS 
-      NAME "-3"
-      EXPRESSION "7"
-      STYLE 
-          COLOR 11 15 255
-       END
-   END
-   CLASS 
-      NAME "-2"
-      EXPRESSION "8"
-      STYLE 
-          COLOR 38 154 255
-       END
-   END
-   CLASS 
-      NAME "-1"
-      EXPRESSION "9"
-      STYLE 
-          COLOR 84 255 224
-       END
-   END
-   CLASS 
-      NAME "0"
-      EXPRESSION "10"
-      STYLE 
-          COLOR 13 152 29
-       END
-   END
-   CLASS 
-      NAME "1"
-      EXPRESSION "11"
-      STYLE 
-          COLOR 75 255 99
-       END
-   END
-   CLASS 
-      NAME "2"
-      EXPRESSION "12"
-      STYLE 
-          COLOR 187 255 123
-       END
-   END
-   CLASS 
-      NAME "3"
-      EXPRESSION "13"
-      STYLE 
-          COLOR 237 255 101
-       END
-   END
-   CLASS 
-      NAME "4"
-      EXPRESSION "14"
-      STYLE 
-          COLOR 225 126 12
-       END
-   END
-   CLASS 
-      NAME "5"
-      EXPRESSION "15"
-      STYLE 
-          COLOR 255 77 18
-       END
-   END
-   CLASS 
-      NAME "-1RHA"
-      EXPRESSION "17"
-      STYLE 
-          COLOR "#b0abb0"
-       END
-   END
-   CLASS 
-      NAME "-2RHA"
-      EXPRESSION "18"
-      STYLE 
-          COLOR "#63666d"
-       END
-   END
-   CLASS 
-      NAME "-3RHA"
-      EXPRESSION "19"
-      STYLE 
-          COLOR "#303235"
-       END
-   END
- METADATA
-      "wms_title"           "Niveaux Hydrique"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "NT"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "NT2023.tif" 
-   PROCESSING "BANDS=1" 
-   CLASSITEM "[pixel]" 
-   CLASS 
-      NAME "-3"
-      EXPRESSION "7"
-      STYLE 
-          COLOR 255 10 210
-       END
-   END
-   CLASS 
-      NAME "-2"
-      EXPRESSION "8"
-      STYLE 
-          COLOR 240 0 56
-       END
-   END
-   CLASS 
-      NAME "-1"
-      EXPRESSION "9"
-      STYLE 
-          COLOR 253 150 4
-       END
-   END
-   CLASS 
-      NAME "0"
-      EXPRESSION "10"
-      STYLE 
-          COLOR 255 245 55
-       END
-   END
-   CLASS 
-      NAME "1"
-      EXPRESSION "11"
-      STYLE 
-          COLOR 89 192 255
-       END
-   END
-   CLASS 
-      NAME "2"
-      EXPRESSION "12"
-      STYLE 
-          COLOR 22 107 255
-       END
-   END
- METADATA
-      "wms_title"           "Niveaux Trophiques"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "SS"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "SS_W_201911.tif" 
-   PROCESSING "BANDS=1" 
-   CLASSITEM "[pixel]" 
-   CLASS 
-      NAME "Sous-secteur froid"
-      EXPRESSION "1"
-      STYLE 
-          COLOR 25 30 160
-       END
-   END
-   CLASS 
-      NAME "Sous-secteur neutre"
-      EXPRESSION "2"
-      STYLE 
-          COLOR 215 222 216
-       END
-   END
-   CLASS 
-      NAME "Sous-secteur chaud"
-      EXPRESSION "3"
-      STYLE 
-          COLOR 236 36 42
-       END
-   END
- METADATA
-      "wms_title"           "Sous-secteur radiatif"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "Topo"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "TOPO2020.tif" 
-   PROCESSING "BANDS=1" 
-   CLASSITEM "[pixel]" 
-   CLASS 
-      NAME "Versant nord"
-      EXPRESSION "1"
-      STYLE 
-          COLOR 25 30 160
-       END
-   END
-   CLASS 
-      NAME "Plateau et faible pente"
-      EXPRESSION "2"
-      STYLE 
-          COLOR 215 222 216
-       END
-   END
-   CLASS 
-      NAME "Versant sud"
-      EXPRESSION "3"
-      STYLE 
-          COLOR 236 36 42
-       END
-   END
-   CLASS 
-      NAME "Fond de vallee etroite"
-      EXPRESSION "4"
-      STYLE 
-          COLOR 4 6 2
-       END
-   END
- METADATA
-      "wms_title"           "Situation Topographique"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "ZBIO"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "ZBIO.tif" 
-   PROCESSING "BANDS=1" 
-   CLASSITEM "[pixel]" 
-   CLASS 
-      NAME "Ardenne centro-orientale"
-      EXPRESSION "1"
-      STYLE 
-          COLOR 49 158 54
-       END
-   END
-   CLASS 
-      NAME "Basse et moyenne Ardenne"
-      EXPRESSION "2"
-      STYLE 
-          COLOR 76 188 138
-       END
-   END
-   CLASS 
-      NAME "Basse Lorraine"
-      EXPRESSION "3"
-      STYLE 
-          COLOR 233 142 226
-       END
-   END
-   CLASS 
-      NAME "Fagne - Famenne - Calestienne"
-      EXPRESSION "4"
-      STYLE 
-          COLOR 37 161 214
-       END
-   END
-   CLASS 
-      NAME "Haute Lorraine"
-      EXPRESSION "5"
-      STYLE 
-          COLOR 199 84 182
-       END
-   END
-   CLASS 
-      NAME "Hesbino-Brabançon"
-      EXPRESSION "6"
-      STYLE 
-          COLOR 195 161 39
-       END
-   END
-   CLASS 
-      NAME "Plaines et Vallees Scaldisiennes"
-      EXPRESSION "7"
-      STYLE 
-          COLOR 236 36 42
-       END
-   END
-   CLASS 
-      NAME "Condroz - Sambre et Meuse"
-      EXPRESSION "8"
-      STYLE 
-          COLOR 247 237 24
-       END
-   END
-   CLASS 
-      NAME "Thierache"
-      EXPRESSION "9"
-      STYLE 
-          COLOR 25 30 160
-       END
-   END
-   CLASS 
-      NAME "Haute Ardenne"
-      EXPRESSION "10"
-      STYLE 
-          COLOR 36 84 4
-       END
-   END
- METADATA
-      "wms_title"           "Zone Bioclimatique"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
+    NAME "Description des stations forestières"
+    EXTENT 42250.00012 21170.00012000001 295170.00012 167700.00012
+    SIZE 800 800
+    SHAPEPATH "/media/Data10/Forestimator/Station/"
+    IMAGECOLOR 255 255 255
+    PROJECTION
+        "init=epsg:31370"
+    END
+    WEB
+        METADATA
+            "wms_label" "Serveur WMS des cartes de description stationnelle de Forestimator" 
+            "wms_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?" 
+            "wms_service_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?" 
+            "wms_srs" "EPSG:31370" 
+            "wms_enable_request" "*" 
+        END
+    END
+    INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/layer_guideStation.map"
+    LAYER
+        NAME "AE"
+        TYPE RASTER
+        STATUS ON
+        PROJECTION
+            "init=epsg:31370"
+        END
+        DATA "AE_RW_202408.tif"
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
+        CLASS
+            NAME "Sans apport d'eau"
+            EXPRESSION "1"
+            STYLE
+                COLOR 215 222 216
+            END
+        END
+        CLASS
+            NAME "Apport variable"
+            EXPRESSION "2"
+            STYLE
+                COLOR 37 161 214
+            END
+        END
+        CLASS
+            NAME "Apport permanent"
+            EXPRESSION "3"
+            STYLE
+                COLOR 25 30 160
+            END
+        END
+        METADATA
+            "wms_title" "Situation d'apport en eau hors précipitation" 
+            "wms_srs" "EPSG:31370" 
+        END
+        TEMPLATE "../template.html"
+    END
+    LAYER
+        NAME "NH"
+        TYPE RASTER
+        STATUS ON
+        PROJECTION
+            "init=epsg:31370"
+        END
+        DATA "NH202408.tif"
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
+        CLASS
+            NAME "-4"
+            EXPRESSION "6"
+            STYLE
+                COLOR 255 44 220
+            END
+        END
+        CLASS
+            NAME "-3"
+            EXPRESSION "7"
+            STYLE
+                COLOR 11 15 255
+            END
+        END
+        CLASS
+            NAME "-2"
+            EXPRESSION "8"
+            STYLE
+                COLOR 38 154 255
+            END
+        END
+        CLASS
+            NAME "-1"
+            EXPRESSION "9"
+            STYLE
+                COLOR 84 255 224
+            END
+        END
+        CLASS
+            NAME "0"
+            EXPRESSION "10"
+            STYLE
+                COLOR 13 152 29
+            END
+        END
+        CLASS
+            NAME "1"
+            EXPRESSION "11"
+            STYLE
+                COLOR 75 255 99
+            END
+        END
+        CLASS
+            NAME "2"
+            EXPRESSION "12"
+            STYLE
+                COLOR 187 255 123
+            END
+        END
+        CLASS
+            NAME "3"
+            EXPRESSION "13"
+            STYLE
+                COLOR 237 255 101
+            END
+        END
+        CLASS
+            NAME "4"
+            EXPRESSION "14"
+            STYLE
+                COLOR 225 126 12
+            END
+        END
+        CLASS
+            NAME "5"
+            EXPRESSION "15"
+            STYLE
+                COLOR 255 77 18
+            END
+        END
+        CLASS
+            NAME "-1RHA"
+            EXPRESSION "17"
+            STYLE
+                COLOR "#b0abb0"
+            END
+        END
+        CLASS
+            NAME "-2RHA"
+            EXPRESSION "18"
+            STYLE
+                COLOR "#63666d"
+            END
+        END
+        CLASS
+            NAME "-3RHA"
+            EXPRESSION "19"
+            STYLE
+                COLOR "#303235"
+            END
+        END
+        METADATA
+            "wms_title" "Niveaux Hydrique" 
+            "wms_srs" "EPSG:31370" 
+        END
+        TEMPLATE "../template.html"
+    END
+    LAYER
+        NAME "NT"
+        TYPE RASTER
+        STATUS ON
+        PROJECTION
+            "init=epsg:31370"
+        END
+        DATA "NT2023.tif"
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
+        CLASS
+            NAME "-3"
+            EXPRESSION "7"
+            STYLE
+                COLOR 255 10 210
+            END
+        END
+        CLASS
+            NAME "-2"
+            EXPRESSION "8"
+            STYLE
+                COLOR 240 0 56
+            END
+        END
+        CLASS
+            NAME "-1"
+            EXPRESSION "9"
+            STYLE
+                COLOR 253 150 4
+            END
+        END
+        CLASS
+            NAME "0"
+            EXPRESSION "10"
+            STYLE
+                COLOR 255 245 55
+            END
+        END
+        CLASS
+            NAME "1"
+            EXPRESSION "11"
+            STYLE
+                COLOR 89 192 255
+            END
+        END
+        CLASS
+            NAME "2"
+            EXPRESSION "12"
+            STYLE
+                COLOR 22 107 255
+            END
+        END
+        METADATA
+            "wms_title" "Niveaux Trophiques" 
+            "wms_srs" "EPSG:31370" 
+        END
+        TEMPLATE "../template.html"
+    END
+    LAYER
+        NAME "SS"
+        TYPE RASTER
+        STATUS ON
+        PROJECTION
+            "init=epsg:31370"
+        END
+        DATA "SS_W_201911.tif"
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
+        CLASS
+            NAME "Sous-secteur froid"
+            EXPRESSION "1"
+            STYLE
+                COLOR 25 30 160
+            END
+        END
+        CLASS
+            NAME "Sous-secteur neutre"
+            EXPRESSION "2"
+            STYLE
+                COLOR 215 222 216
+            END
+        END
+        CLASS
+            NAME "Sous-secteur chaud"
+            EXPRESSION "3"
+            STYLE
+                COLOR 236 36 42
+            END
+        END
+        METADATA
+            "wms_title" "Sous-secteur radiatif" 
+            "wms_srs" "EPSG:31370" 
+        END
+        TEMPLATE "../template.html"
+    END
+    LAYER
+        NAME "Topo"
+        TYPE RASTER
+        STATUS ON
+        PROJECTION
+            "init=epsg:31370"
+        END
+        DATA "TOPO2020.tif"
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
+        CLASS
+            NAME "Versant nord"
+            EXPRESSION "1"
+            STYLE
+                COLOR 25 30 160
+            END
+        END
+        CLASS
+            NAME "Plateau et faible pente"
+            EXPRESSION "2"
+            STYLE
+                COLOR 215 222 216
+            END
+        END
+        CLASS
+            NAME "Versant sud"
+            EXPRESSION "3"
+            STYLE
+                COLOR 236 36 42
+            END
+        END
+        CLASS
+            NAME "Fond de vallee etroite"
+            EXPRESSION "4"
+            STYLE
+                COLOR 4 6 2
+            END
+        END
+        METADATA
+            "wms_title" "Situation Topographique" 
+            "wms_srs" "EPSG:31370" 
+        END
+        TEMPLATE "../template.html"
+    END
+    LAYER
+        NAME "ZBIO"
+        TYPE RASTER
+        STATUS ON
+        PROJECTION
+            "init=epsg:31370"
+        END
+        DATA "ZBIO.tif"
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
+        CLASS
+            NAME "Ardenne centro-orientale"
+            EXPRESSION "1"
+            STYLE
+                COLOR 49 158 54
+            END
+        END
+        CLASS
+            NAME "Basse et moyenne Ardenne"
+            EXPRESSION "2"
+            STYLE
+                COLOR 76 188 138
+            END
+        END
+        CLASS
+            NAME "Basse Lorraine"
+            EXPRESSION "3"
+            STYLE
+                COLOR 233 142 226
+            END
+        END
+        CLASS
+            NAME "Fagne - Famenne - Calestienne"
+            EXPRESSION "4"
+            STYLE
+                COLOR 37 161 214
+            END
+        END
+        CLASS
+            NAME "Haute Lorraine"
+            EXPRESSION "5"
+            STYLE
+                COLOR 199 84 182
+            END
+        END
+        CLASS
+            NAME "Hesbino-Brabançon"
+            EXPRESSION "6"
+            STYLE
+                COLOR 195 161 39
+            END
+        END
+        CLASS
+            NAME "Plaines et Vallees Scaldisiennes"
+            EXPRESSION "7"
+            STYLE
+                COLOR 236 36 42
+            END
+        END
+        CLASS
+            NAME "Condroz - Sambre et Meuse"
+            EXPRESSION "8"
+            STYLE
+                COLOR 247 237 24
+            END
+        END
+        CLASS
+            NAME "Thierache"
+            EXPRESSION "9"
+            STYLE
+                COLOR 25 30 160
+            END
+        END
+        CLASS
+            NAME "Haute Ardenne"
+            EXPRESSION "10"
+            STYLE
+                COLOR 36 84 4
+            END
+        END
+        METADATA
+            "wms_title" "Zone Bioclimatique" 
+            "wms_srs" "EPSG:31370" 
+        END
+        TEMPLATE "../template.html"
+    END
 END
