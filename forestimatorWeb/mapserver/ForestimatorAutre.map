@@ -15,7 +15,7 @@ MAP
 	
 	WEB
 		METADATA
-	    	"wms_label"           "Serveur WWS de divers cartes utilisées dans la plateforme Forestimator"
+	    	"wms_label"           "Serveur WWS de diverses cartes utilisées dans la plateforme Forestimator"
 	    	"wms_onlineresource"  "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?"
 			"wms_service_onlineresource"   "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?"
 	    	"wms_srs"             "EPSG:31370"
@@ -23,8 +23,8 @@ MAP
 	  	END
   	END
   	
-  	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/OGF_layers.map"
-  	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/routes_layers.map"
+  	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/layer_OGF.map"
+  	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/layer_routesDFCI.map"
   	
   	LAYER
   	NAME "parcellaire_DNF"
@@ -2629,153 +2629,7 @@ LAYER
    END
    TEMPLATE "../template.html"
 END
-LAYER
-  NAME "COMPO1"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_1_AU.tif" 
-   PROCESSING "BANDS=1" 
-	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
-   METADATA
-      "wms_title"           "Présence des Autres essences"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "COMPO2"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_2_BO.tif" 
-   PROCESSING "BANDS=1" 
-  
- INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
 
- METADATA
-      "wms_title"           "Présence des bouleaux"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "COMPO3"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_3_CH.tif" 
-   PROCESSING "BANDS=1" 
-   INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
- METADATA
-      "wms_title"           "Présence des chênes indigènes"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "COMPO4"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_4_DO.tif" 
-   PROCESSING "BANDS=1" 
-  INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
-   METADATA
-      "wms_title"           "Présence du douglas"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "COMPO5"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_5_EP.tif" 
-   PROCESSING "BANDS=1" 
- INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
- METADATA
-      "wms_title"           "Présence de l'épicea"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "COMPO6"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_6_HE.tif" 
-   PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
- METADATA
-      "wms_title"           "Présence du hêtre"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "COMPO7"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_7_MZ.tif" 
-   PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
- METADATA
-      "wms_title"           "Présence des mélèzes"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "COMPO8"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_8_PE.tif" 
-   PROCESSING "BANDS=1" 
-	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
- METADATA
-      "wms_title"           "Présence de peuplier"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "COMPO9"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "compo_9_PI.tif" 
-   PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
- METADATA
-      "wms_title"           "Présence des pins"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
 NAME "ES_EP_2016"
 GROUP "ES_EP_2016_PYR"
    TYPE RASTER
