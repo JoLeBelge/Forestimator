@@ -38,17 +38,29 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
     for (std::string code: aV){
         if (mDico->hasLayerBase(code)){
              std::shared_ptr<layerBase> l =mDico->getLayerBase(code);
+             if (l->getCatLayer() != TypeLayer::Externe){
              int v = l->getValue(x,y);
              std::string foundR=l->rasterExist() ? "true" : "false";
              response.out() << "    { \n\"layerCode\":\"" << code <<"\",\n"
                             << "    \"foundLayer\":true,\n"
+                            << "    \"internalLayer\":true,\n"
                             << "    \"foundRastFile\":"<< foundR<< ",\n"
                             << "    \"rastValue\":"<<  v<< ",\n"
                             << "    \"value\":\""<<  l->getValLabel(v) << "\"\n"
                             << "    }";
+             } else {
+                 response.out() << "    { \n" << "\"layerCode\":\"" << code <<"\",\n"
+                                << "    \"foundLayer\":true,\n"
+                                << "    \"internalLayer\":false,\n"
+                                << "    \"foundRastFile\":false,\n"
+                                << "    \"rastValue\":0,\n"
+                                << "    \"value\":\"\"\n"
+                                << "    }";
+             }
         } else {
             response.out() << "    { \n" << "\"layerCode\":\"" << code <<"\",\n"
                            << "    \"foundLayer\":false,\n"
+                           << "    \"internalLayer\":false,\n"
                            << "    \"foundRastFile\":false,\n"
                            << "    \"rastValue\":0,\n"
                            << "    \"value\":\"\"\n"

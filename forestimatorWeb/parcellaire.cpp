@@ -262,12 +262,13 @@ void parcellaire::upload()
     for (Http::UploadedFile file : fu->uploadedFiles())
     {
         boost::filesystem::path a(file.clientFileName());
-        // boost::filesystem::rename(file.spoolFileName(),mFullPath+a.extension().c_str());
+         boost::filesystem::rename(file.spoolFileName(),mFullPath+a.extension().c_str());
         //  sur server boost::filesystem::rename: Invalid cross-device link:  car /data1 et tmp sont sur des différents volumes.
         // solution ; copy! de toute manière tmp/ est pugé souvent
         // std::cout << "ACHTUNG: " << mFullPath+a.extension().c_str() << ";" << std::endl;
-        string it = "cp " + file.spoolFileName() + " " + mFullPath + a.extension().c_str();
-        std::system(it.c_str());
+        //2026 05 not working on file with ( character
+        //string it = "cp " + file.spoolFileName() + " " + mFullPath + a.extension().c_str();
+        //std::system(it.c_str());
         if ((a.extension().string() == ".shp") | (a.extension().string() == ".shx") | (a.extension().string() == ".dbf"))
         {
             nbFiles++;
