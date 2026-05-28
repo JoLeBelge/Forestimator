@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:async';
 import 'package:area_polygon/area_polygon.dart';
+import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/anaPt/requested_layer.dart';
@@ -80,7 +81,7 @@ class Geometry {
   }
 
   Geometry.path({String polygonName = ""}) {
-    type = "Path";
+    type = "MP";
     name = polygonName;
     Random randomColor = Random();
     setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
@@ -90,7 +91,7 @@ class Geometry {
   }
 
   Geometry.firePath({String polygonName = ""}) {
-    type = "Point";
+    type = "MP";
     name = polygonName;
     visibleOnMap = true;
     selectedPointIcon = 4;
@@ -514,7 +515,7 @@ class Geometry {
           "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
 
       String request = "https://forestimator.gembloux.ulg.ac.be/api/polygFromMobile/$geometry";
-      gl.print(request);
+      print(request);
       http.Response? response;
       try {
         response = await http.get(Uri.parse(request));
@@ -556,7 +557,7 @@ class Geometry {
     bool allFinished = true;
     GeometricLayer path = GeometricLayer.getPisteDFCLLayer();
     for (int i = 0; i < path.geometries.length; i++) {
-      if (!path.geometries[i].sentToServer) {
+      if (!path.geometries[i].sentToServer && path.geometries[i].finished) {
         if (!await path.geometries[i].sendPathToServer()) {
           allFinished = false;
         }
@@ -568,7 +569,7 @@ class Geometry {
 
   Future<bool> sendPathToServer() async {
     if (sentToServer) {
-      gl.print("Pathpoint $name already sent once!");
+      gl.print("Multipoint $name already sent once!");
       return false;
     }
     bool internet = await InternetConnection().hasInternetAccess;
@@ -579,24 +580,31 @@ class Geometry {
         coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
       }
       if (coordinates.length > 1) {
-        coordinates = coordinates.substring(0, coordinates.length - 1);
+        coordinates = "[${coordinates.substring(0, coordinates.length - 1)}]";
       }
       String properties = "";
       properties = "$properties\"name\":\"$name\",";
       properties = "$properties\"nom_contact\":\"${gl.UserData.name} ${gl.UserData.forename}\",";
       properties = "$properties\"contact\":\"${gl.UserData.mail}\",";
-      for (Attribute attribute in attributes) {
-        properties = "$properties\"${attribute.name}\":\"${attribute.value.toString()}\",";
+
+      String ppoints = "[";
+      for (int i = 0; i < attributes[0].value.split(',').length; i++) {
+        ppoints = "$ppoints{";
+        for (int j = 0; j < 4; j++) {
+          ppoints = "$ppoints\"${attributes[j].name}\":\"${attributes[j].value.split(',')[i].toString()}\",";
+        }
+        ppoints = "${ppoints.substring(0, ppoints.length - 1)}},";
       }
-      properties = properties.substring(0, properties.length - 1);
+      ppoints = "${ppoints.substring(0, ppoints.length - 1)}]";
+      properties = "$properties\"points\":$ppoints";
       String path =
           "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
       String request = "https://forestimator.gembloux.ulg.ac.be/api/voirieFromMobile/$path";
 
-      gl.print(request);
+      gl.print(path.replaceAll("'", ""));
       http.Response? response;
       try {
-        response = await http.get(Uri.parse(request));
+        response = await http.get(Uri.parse(request.replaceAll("'", "")));
         if (response.statusCode != 200) {
           throw HttpException('${response.statusCode}');
         }
@@ -610,7 +618,7 @@ class Geometry {
           throw Exception("server said not OK to geometry");
         }
       } catch (e) {
-        gl.print("Error with answer after sending geometry to server");
+        gl.print(response.bodyBytes);
         gl.print("$e");
         return false;
       }
@@ -625,6 +633,7 @@ class Geometry {
   }
 
   String getProperTypeForCarto(String s) {
+    if (s.contains("MP")) return "MultiPoint";
     if (s.contains("Point")) return "Point";
     return s;
   }

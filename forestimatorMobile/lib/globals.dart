@@ -892,7 +892,7 @@ class DfclI {
   DfclI(this.icon, this.color);
 }
 
-Map<String, DfclI> roadObstacleChoice = {
+Map<String, DfclI> obstacleChoice = {
   "Point de première destination": DfclI(DFCLIcons.pointdepremieredestination, Colors.black),
   "Barrière": DfclI(DFCLIcons.barriere, Colors.black),
   "Obstacle": DfclI(DFCLIcons.obstacles, Colors.black),

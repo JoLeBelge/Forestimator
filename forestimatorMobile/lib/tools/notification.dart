@@ -1055,7 +1055,7 @@ class _SelectPolyType extends State<SelectPolyType> {
                 setState(() {
                   _selectedType = 2;
                 });
-                widget.state("Path");
+                widget.state("MP");
               },
               child: Column(
                 children: [
@@ -1505,7 +1505,7 @@ class PopupPoiOnPiste {
           });
         },
         child: DefinePOI(
-          height: 120 * gl.eqPx,
+          height: 160 * gl.eqPx,
           messageAccept: "Placer",
           messageDecline: "Annuler",
           onAccept: (String object, Color col, String type, String rmq) {
@@ -1561,7 +1561,8 @@ class PopupNewCatPiste {
               GeometricLayer.getPisteDFCLLayer().addGeometry(
                 name: "Piste - ${GeometricLayer.getPisteDFCLLayer().geometries.length + 1}",
               );
-              GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
+              print(GeometricLayer.getPisteDFCLLayer().geometries.length);
+              GeometricLayer.getPisteDFCLLayer().geometries.last.points.add(coordinates);
               GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value = object;
               GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value = type;
               GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value = rmq;
@@ -1627,7 +1628,7 @@ class _DefinePOI extends State<DefinePOI> {
                 child: lt.ForestimatorScrollView(
                   height: widget.height - 40 * gl.eqPx,
                   child: Column(
-                    children: List<Widget>.generate(gl.roadObstacleChoice.length, (index) {
+                    children: List<Widget>.generate(gl.obstacleChoice.length, (index) {
                       return AnimatedContainer(
                         color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
                         duration: Duration(milliseconds: 500),
@@ -1636,7 +1637,7 @@ class _DefinePOI extends State<DefinePOI> {
                           onPressed: () {
                             _selected = index;
                             setState(() {
-                              _custom = gl.roadObstacleChoice.keys.toList()[index];
+                              _custom = gl.obstacleChoice.keys.toList()[index];
                               _color = gl.lastUsedCategory;
                             });
                           },
@@ -1646,13 +1647,13 @@ class _DefinePOI extends State<DefinePOI> {
                               SizedBox(
                                 width: gl.eqPx * 75,
                                 child: Text(
-                                  gl.roadObstacleChoice.keys.toList()[index],
+                                  gl.obstacleChoice.keys.toList()[index],
                                   style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
                                 ),
                               ),
                               Icon(
-                                gl.roadObstacleChoice.values.toList()[index].icon,
-                                color: gl.roadObstacleChoice.values.toList()[index].color,
+                                gl.obstacleChoice.values.toList()[index].icon,
+                                color: gl.obstacleChoice.values.toList()[index].color,
                                 shadows: [Shadow(color: Colors.white, blurRadius: gl.eqPx * 4)],
                                 size: gl.dsp.equipixel * gl.iconSizeS,
                               ),
@@ -1666,14 +1667,14 @@ class _DefinePOI extends State<DefinePOI> {
               ),
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
-                height: _selected == gl.roadObstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
+                height: _selected == gl.obstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
                 child: Column(
                   children: [
-                    if (_selected == gl.roadObstacleChoice.length - 1)
+                    if (_selected == gl.obstacleChoice.length - 1)
                       lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                    if (_selected == gl.roadObstacleChoice.length - 1)
+                    if (_selected == gl.obstacleChoice.length - 1)
                       AnimatedOpacity(
-                        opacity: _selected == gl.roadObstacleChoice.length - 1 ? 1 : 0,
+                        opacity: _selected == gl.obstacleChoice.length - 1 ? 1 : 0,
                         duration: Duration(milliseconds: 200),
                         child: TextFormField(
                           cursorColor: Colors.white,
@@ -1694,8 +1695,8 @@ class _DefinePOI extends State<DefinePOI> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        if (_selected > -1 && _selected < gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty ||
-                            _selected == gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty)
+                        if (_selected > -1 && _selected < gl.obstacleChoice.length && _custom.isNotEmpty ||
+                            _selected == gl.obstacleChoice.length - 1 && _custom.isNotEmpty)
                           SizedBox(
                             width: gl.menuBarLength * .5 * gl.eqPx,
                             child: TextButton(
@@ -1804,36 +1805,14 @@ class _DefineCategory extends State<DefineCategory> {
               ),
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
-                height: _selected == gl.roadObstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
+                height: 20 * gl.eqPx,
                 child: Column(
                   children: [
-                    if (_selected == gl.roadObstacleChoice.length - 1)
-                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                    if (_selected == gl.roadObstacleChoice.length - 1)
-                      AnimatedOpacity(
-                        opacity: _selected == gl.roadObstacleChoice.length - 1 ? 1 : 0,
-                        duration: Duration(milliseconds: 200),
-                        child: TextFormField(
-                          cursorColor: Colors.white,
-                          maxLength: 256,
-                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                          onChanged: (value) {
-                            setState(() {
-                              _custom = "Autre";
-                              _rmq = value;
-                            });
-                          },
-                          onTap: () => widget.callbackOnStartTyping ?? () {},
-                          onTapOutside: (pointer) {},
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
                     lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        if (_selected > -1 && _selected < gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty ||
-                            _selected == gl.roadObstacleChoice.length - 1 && _custom.isNotEmpty)
+                        if (_selected > -1 && _selected < gl.roadCategoryChoice.length && _custom.isNotEmpty)
                           SizedBox(
                             width: gl.menuBarLength * .5 * gl.eqPx,
                             child: TextButton(
@@ -2276,7 +2255,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                                 case "Polygon":
                                   gl.geoLayers.add(GeometricLayer.polygon());
                                   break;
-                                case "Path":
+                                case "MP":
                                   gl.geoLayers.add(GeometricLayer.path());
                                   break;
                               }
@@ -2291,7 +2270,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                               case "Polygon":
                                 gl.geoLayers.add(GeometricLayer.polygon());
                                 break;
-                              case "Path":
+                              case "MP":
                                 gl.geoLayers.add(GeometricLayer.path());
                                 break;
                             }
@@ -2495,7 +2474,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                                                               fontSize: gl.eqPx * gl.fontSizeXS * .9,
                                                             ),
                                                           )
-                                                          : gl.geoLayers[i].type == "Path"
+                                                          : gl.geoLayers[i].type == "MP"
                                                           ? Text(
                                                             "CHEMIN",
                                                             style: TextStyle(
