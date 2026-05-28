@@ -1,0 +1,119 @@
+   CLASS 
+      NAME "A1 Tourbière acide"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "A2 Marais et source"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 23 45 242
+       END
+   END
+   CLASS 
+      NAME "A3 Argile blanche humide"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 109 117 114
+       END
+   END
+   CLASS 
+      NAME "A4 Sol blanchi à régime hydrique alternatif"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 223 200 165
+       END
+   END
+   CLASS 
+      NAME "A5 Sol brun à régime hydrique alternatif"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 182 128 2
+       END
+   END
+   CLASS 
+      NAME "A6 Terrasse alluviale humide"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 80 153 243
+       END
+   END
+   CLASS 
+      NAME "A7 Terrasse alluviale fraiche"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 132 233 253
+       END
+   END
+   CLASS 
+      NAME "A8 Vallon frais"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 98 249 196
+       END
+   END
+   CLASS 
+      NAME "A9 Ravin hygrosciaphile"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 254 85 248
+       END
+   END
+   CLASS 
+      NAME "A10 Versant chauds au sol superficiel"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 254 47 3
+       END
+   END
+   CLASS 
+      NAME "A11 Versant chaud"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 249 155 31
+       END
+   END
+   CLASS 
+      NAME "A12 Versant frais pauvre"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 204 134 213
+       END
+   END
+   CLASS 
+      NAME "A13 Versant frais riche"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 121 6 187
+       END
+   END
+   CLASS 
+      NAME "A14 Sol profond des plateaux"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 153 235 130
+       END
+   END
+   CLASS 
+      NAME "A15 Sol peu profond des plateaux"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 13 186 4
+       END
+   END
+   CLASS 
+      NAME "A16 Sol superficiel des plateaux"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 20 112 14
+       END
+   END
+   CLASS 
+      NAME "A17 Affleurements rocheux"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 205 191 188
+       END
+   END

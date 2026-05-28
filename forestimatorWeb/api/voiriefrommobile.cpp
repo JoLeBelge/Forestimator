@@ -30,8 +30,11 @@ void voirieFromMobile::handleRequest(const Http::Request &request,Http::Response
      if( ds == NULL ){
           response.out() << "NOK" ;
      } else{
+
     OGRLayer * lay = ds->GetLayer(0);
     OGRFeature *poFeature=lay->GetFeature(0);
+    if (poFeature==nullptr) {std::cout << "null feature" << std::endl;}
+    if(poFeature->GetGeometryRef() == nullptr){response.out() << "NOK";std::cout << "null geom" << std::endl;} else {
     std::unique_ptr<observationVoirie> a = std::make_unique<observationVoirie>();
     a->type = poFeature->GetFieldAsString("type");
     a->categorie = poFeature->GetFieldAsString("categorie");
@@ -45,7 +48,7 @@ void voirieFromMobile::handleRequest(const Http::Request &request,Http::Response
     dbo::Transaction transaction(session);
     dbo::ptr<observationVoirie> aNewPolyg = session.add(std::move(a));
     response.out() << "OK" ;
-
+    }
     GDALClose(ds);
     }
 }

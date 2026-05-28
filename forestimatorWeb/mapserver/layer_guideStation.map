@@ -1,0 +1,70 @@
+LAYER
+    NAME "CS_Ardenne"
+    TYPE RASTER
+    STATUS ON
+    PROJECTION
+        "init=epsg:31370"
+    END
+    DATA "GSA_V7_202409_RW.tif"
+    PROCESSING "BANDS=1"
+    CLASSITEM "[pixel]"
+    INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_cs_a.map"
+    INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_cs_ffc.map"
+    CLASS
+        NAME "Non définis"
+        EXPRESSION "0"
+        STYLE
+            COLOR 255 255 255
+        END
+    END
+    METADATA
+        "wms_title" "Catalogue de station (toutes les régions)" 
+    END
+    TEMPLATE "../template.html"
+END
+LAYER
+    NAME "CS_region_Ardenne"
+    TYPE RASTER
+    STATUS ON
+    PROJECTION
+        "init=epsg:31370"
+    END
+    DATA "GSA_V7_202409_RW.tif"
+    PROCESSING "BANDS=1"
+    CLASSITEM "[pixel]"
+    INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_cs_a.map"
+    CLASS
+        NAME "Non définis"
+        EXPRESSION "0"
+        STYLE
+            COLOR 255 255 255
+        END
+    END
+    METADATA
+        "wms_title" "Catalogue de station pour l'Ardenne" 
+    END
+    TEMPLATE "../template.html"
+END
+LAYER
+    NAME "CS_region_FFC"
+    TYPE RASTER
+    STATUS ON
+    PROJECTION
+        "init=epsg:31370"
+    END
+    DATA "GSA_V7_202409_RW.tif"
+    PROCESSING "BANDS=1"
+    CLASSITEM "[pixel]"
+    INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_cs_ffc.map"
+    CLASS
+        NAME "Non définis"
+        EXPRESSION "0"
+        STYLE
+            COLOR 255 255 255
+        END
+    END
+    METADATA
+        "wms_title" "Catalogue de station pour la Fagne-Famenne-Calestienne" 
+    END
+    TEMPLATE "../template.html"
+END

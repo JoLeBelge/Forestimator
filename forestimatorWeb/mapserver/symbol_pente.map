@@ -1,0 +1,707 @@
+ CLASS 
+      NAME "0"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 6 6 6
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 12 12 12
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 18 18 18
+       END
+   END
+   CLASS 
+      NAME "7"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 24 24 24
+       END
+   END
+   CLASS 
+      NAME "8"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 30 30 30
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 36 36 36
+       END
+   END
+   CLASS 
+      NAME "10"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 42 42 42
+       END
+   END
+   CLASS 
+      NAME "11"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 48 48 48
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 54 54 54
+       END
+   END
+   CLASS 
+      NAME "13"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 60 60 60
+       END
+   END
+   CLASS 
+      NAME "14"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 66 66 66
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 72 72 72
+       END
+   END
+   CLASS 
+      NAME "16"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 78 78 78
+       END
+   END
+   CLASS 
+      NAME "17"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 84 84 84
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 90 90 90
+       END
+   END
+   CLASS 
+      NAME "19"
+      EXPRESSION "19"
+      STYLE 
+          COLOR 96 96 96
+       END
+   END
+   CLASS 
+      NAME "20"
+      EXPRESSION "20"
+      STYLE 
+          COLOR 102 102 102
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION "21"
+      STYLE 
+          COLOR 108 108 108
+       END
+   END
+   CLASS 
+      NAME "22"
+      EXPRESSION "22"
+      STYLE 
+          COLOR 114 114 114
+       END
+   END
+   CLASS 
+      NAME "23"
+      EXPRESSION "23"
+      STYLE 
+          COLOR 120 120 120
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION "24"
+      STYLE 
+          COLOR 126 126 126
+       END
+   END
+   CLASS 
+      NAME "25"
+      EXPRESSION "25"
+      STYLE 
+          COLOR 132 132 132
+       END
+   END
+   CLASS 
+      NAME "26"
+      EXPRESSION "26"
+      STYLE 
+          COLOR 138 138 138
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION "27"
+      STYLE 
+          COLOR 144 144 144
+       END
+   END
+   CLASS 
+      NAME "28"
+      EXPRESSION "28"
+      STYLE 
+          COLOR 150 150 150
+       END
+   END
+   CLASS 
+      NAME "29"
+      EXPRESSION "29"
+      STYLE 
+          COLOR 156 156 156
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION "30"
+      STYLE 
+          COLOR 162 162 162
+       END
+   END
+   CLASS 
+      NAME "31"
+      EXPRESSION "31"
+      STYLE 
+          COLOR 168 168 168
+       END
+   END
+   CLASS 
+      NAME "32"
+      EXPRESSION "32"
+      STYLE 
+          COLOR 174 174 174
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION "33"
+      STYLE 
+          COLOR 180 180 180
+       END
+   END
+   CLASS 
+      NAME "34"
+      EXPRESSION "34"
+      STYLE 
+          COLOR 186 186 186
+       END
+   END
+   CLASS 
+      NAME "35"
+      EXPRESSION "35"
+      STYLE 
+          COLOR 192 192 192
+       END
+   END
+   CLASS 
+      NAME "36"
+      EXPRESSION "36"
+      STYLE 
+          COLOR 198 198 198
+       END
+   END
+   CLASS 
+      NAME "37"
+      EXPRESSION "37"
+      STYLE 
+          COLOR 204 204 204
+       END
+   END
+   CLASS 
+      NAME "38"
+      EXPRESSION "38"
+      STYLE 
+          COLOR 210 210 210
+       END
+   END
+   CLASS 
+      NAME "39"
+      EXPRESSION "39"
+      STYLE 
+          COLOR 216 216 216
+       END
+   END
+   CLASS 
+      NAME "40"
+      EXPRESSION "40"
+      STYLE 
+          COLOR 222 222 222
+       END
+   END
+   CLASS 
+      NAME "41"
+      EXPRESSION "41"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "42"
+      EXPRESSION "42"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "43"
+      EXPRESSION "43"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "44"
+      EXPRESSION "44"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "45"
+      EXPRESSION "45"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "46"
+      EXPRESSION "46"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "47"
+      EXPRESSION "47"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "48"
+      EXPRESSION "48"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "49"
+      EXPRESSION "49"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "50"
+      EXPRESSION "50"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "51"
+      EXPRESSION "51"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "52"
+      EXPRESSION "52"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "53"
+      EXPRESSION "53"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "54"
+      EXPRESSION "54"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "55"
+      EXPRESSION "55"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "56"
+      EXPRESSION "56"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "57"
+      EXPRESSION "57"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "58"
+      EXPRESSION "58"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "59"
+      EXPRESSION "59"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "60"
+      EXPRESSION "60"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "61"
+      EXPRESSION "61"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "62"
+      EXPRESSION "62"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "63"
+      EXPRESSION "63"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "64"
+      EXPRESSION "64"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "65"
+      EXPRESSION "65"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "66"
+      EXPRESSION "66"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "67"
+      EXPRESSION "67"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "68"
+      EXPRESSION "68"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "69"
+      EXPRESSION "69"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "70"
+      EXPRESSION "70"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "71"
+      EXPRESSION "71"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "72"
+      EXPRESSION "72"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "73"
+      EXPRESSION "73"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "74"
+      EXPRESSION "74"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "75"
+      EXPRESSION "75"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "76"
+      EXPRESSION "76"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "77"
+      EXPRESSION "77"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "78"
+      EXPRESSION "78"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "79"
+      EXPRESSION "79"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "80"
+      EXPRESSION "80"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "81"
+      EXPRESSION "81"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "82"
+      EXPRESSION "82"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "83"
+      EXPRESSION "83"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "84"
+      EXPRESSION "84"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "85"
+      EXPRESSION "85"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "86"
+      EXPRESSION "86"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "87"
+      EXPRESSION "87"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "88"
+      EXPRESSION "88"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "89"
+      EXPRESSION "89"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "90"
+      EXPRESSION "90"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "91"
+      EXPRESSION "91"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "92"
+      EXPRESSION "92"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "93"
+      EXPRESSION "93"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "94"
+      EXPRESSION "94"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "95"
+      EXPRESSION "95"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "96"
+      EXPRESSION "96"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "97"
+      EXPRESSION "97"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "98"
+      EXPRESSION "98"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "99"
+      EXPRESSION "99"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "100"
+      EXPRESSION "100"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
