@@ -577,7 +577,7 @@ class Geometry {
       String coordinates = "";
       for (LatLng point in points) {
         proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
-        coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
+        coordinates = "[${tLb72.x}, ${tLb72.y}],$coordinates";
       }
       if (coordinates.length > 1) {
         coordinates = "[${coordinates.substring(0, coordinates.length - 1)}]";
@@ -596,14 +596,16 @@ class Geometry {
           pprop = "$pprop\"${attributes[j].name}\":\"${attributes[j].value.split(',')[i].toString()}\",";
         }
         ppoints =
-            "$ppoints{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[attributes[0].value.split(',').length - 2 - i]}]},\"properties\":{$pprop}},";
+            "$ppoints{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[ attributes[0].value.split(',').length - 1 -i]}]},\"properties\":{$pprop}},";
       }
-      ppoints = ppoints.substring(0, ppoints.length - 1);
+      if (ppoints.length > 1) {
+        ppoints = ppoints.substring(0, ppoints.length - 1);
+      }
       String path =
           "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}},$ppoints]}";
       String request = "https://forestimator.gembloux.ulg.ac.be/api/voirieFromMobile/$path";
 
-      print(path.replaceAll("'", ""));
+      gl.print(path.replaceAll("'", ""));
       http.Response? response;
       try {
         response = await http.get(Uri.parse(request.replaceAll("'", "")));

@@ -93,11 +93,11 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
                           side: BorderSide(color: Colors.white, width: gl.eqPx * .5),
                         ),
                         label: Text(
-                          "Aller à la page ${pages! ~/ 2}",
+                          "Aller à la page ${0}",
                           style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXS, color: Colors.black),
                         ),
                         onPressed: () async {
-                          await snapshot.data!.setPage(pages! ~/ 2);
+                          await snapshot.data!.setPage(0);
                         },
                       );
                     }

@@ -2699,15 +2699,15 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
 
   IconData getIconForPiste(String name) =>
       (name.contains("FIN")
-          ? Icons.circle
+          ? Icons.circle_outlined
           : name.contains("Categorie")
-          ? Icons.square
+          ? Icons.square_outlined
           : name.contains("access à une piste")
-          ? Icons.square
+          ? Icons.square_outlined
           : name.contains("Impasse non amena")
-          ? Icons.square
+          ? Icons.square_outlined
           : name.contains("Point")
-          ? Icons.arrow_drop_down
+          ? Icons.arrow_drop_down_outlined
           : Icons.bug_report);
 
   List<Marker> _getPointsToDraw({bool hitButton = false}) {

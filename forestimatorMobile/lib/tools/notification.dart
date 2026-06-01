@@ -2876,13 +2876,15 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 height: gl.eqPx * gl.iconSizeS,
                                                 child: IconButton(
                                                   style: lt.trNoPadButtonstyle,
-                                                  onPressed: () async {
+                                                  onPressed: gl.selLay.geometries[index].area < 2000000.0 ? () async {
                                                     if (await gl.selLay.geometries[index].onlineSurfaceAnalysis()) {
                                                       gl.refreshStack(() {
                                                         popupForestimatorWindow(
                                                           id: "anaSurfResult",
                                                           title: "Resultats de l'analyse",
                                                           child: AnaSurfResultsMenu(
+                                                            gl.selLay.geometries[index].name,
+                                                            (((gl.selLay.geometries[index].area)/100).round()/100).toString(),
                                                             gl.selLay.geometries[index].decodedJson,
                                                             () {
                                                               gl.refreshStack(() {
@@ -2898,7 +2900,9 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                         );
                                                       });
                                                     }
-                                                  },
+                                                  }:(){gl.refreshStack((){
+                                                    popupForestimatorMessage(title: "Attention",message: "La surface doit être inférieure à 200 ha pour effectuer l'analyse.",);
+                                                  });},
                                                   icon: Icon(
                                                     Icons.analytics,
                                                     color: Colors.black,
@@ -8328,7 +8332,9 @@ class AnaSurfResultsMenu extends StatefulWidget {
   final Map<String, dynamic> json;
   final VoidCallback state;
   final VoidCallback after;
-  const AnaSurfResultsMenu(this.json, this.after, this.state, {super.key});
+  final String name;
+  final String area;
+  const AnaSurfResultsMenu(this.name, this.area, this.json, this.after, this.state, {super.key});
 
   @override
   State<StatefulWidget> createState() => _AnaSurfResultsMenu();
@@ -8365,7 +8371,97 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
                         shadowColor: Colors.transparent,
                         color: Colors.white.withAlpha(200),
                         child: ListBody(
-                          children: _injectLayerResults(
+                          children: <Widget>[TextButton(
+                              style: ButtonStyle(
+                                minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                  WidgetState.any: Size(
+                                    gl.eqPx * gl.onCatalogueWidth * .7,
+                                    gl.eqPx * gl.onCatalogueCategoryHeight,
+                                  ),
+                                }),
+                              ),
+                              key: Key('hahaha+454lspoe'),
+                              onPressed: () {},
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: gl.eqPx * gl.iconSizeS,
+                                          height: gl.eqPx * gl.iconSizeS,
+                                          child: Stack(
+                                            children: [
+                                              Icon(
+                                                 CustomIcons.mountain,
+                                                color: Colors.black,
+                                                size: gl.eqPx * gl.iconSizeS,
+                                              ),
+                                            
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
+                                        SizedBox(
+                                          width: gl.eqPx * gl.onCatalogueWidth * .65,
+                                          child: Text(
+                                            widget.name,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: gl.eqPx * gl.fontSizeS,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
+                                   Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            color: Colors.transparent,
+            padding: EdgeInsets.all(1),
+            constraints: BoxConstraints(minHeight: gl.eqPx * 5, minWidth: gl.eqPx * 5),
+            child: Icon(
+                                                 Icons.square_foot_outlined,
+                                                color: Colors.black,
+                                                size: gl.eqPx * gl.iconSizeXS,
+                                              ),
+          ),
+          Container(
+            padding: EdgeInsets.only(left: 10),
+            constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .5),
+            child: Text(
+              "Surface totale [ha]",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.start,
+              style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS * .9, fontWeight: FontWeight.w300),
+            ),
+          ),
+        ],
+      ),
+      Container(
+        padding: EdgeInsets.all(5),
+        constraints: BoxConstraints(minWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .25),
+        child: Text(
+          widget.area,
+          overflow: TextOverflow.clip,
+          textAlign: TextAlign.justify,
+          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS * .9, fontWeight: FontWeight.w500),
+        ),
+      ),
+    ],
+  ),lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                                    //,
+                                  ],
+                                ),
+                              ),
+                            ),] + _injectLayerResults(
                             (int i, Item item, String mCode, int mRastValue) => TextButton(
                               style: ButtonStyle(
                                 minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
