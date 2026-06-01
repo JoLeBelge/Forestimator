@@ -2103,7 +2103,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       "Attention",
       "Si vous terminez l'édition vous ne pourrez plus ajouter des points à cette piste.",
     );
-    ;
   }
 
   void _addPistesInterNode(LatLng coordinates) {
@@ -2611,14 +2610,17 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         if (geometry.visibleOnMap && geometry.numPoints > 0 && geometry.type.contains("MP")) {
           int j = 0;
           List<String> ess = geometry.attributes[0].value.split(',');
-          List<String> type = geometry.attributes[1].value.split(',');
-          List<String> remarque = geometry.attributes[2].value.split(',');
-          List<String> date = geometry.attributes[3].value.split(',');
           for (LatLng poi in geometry.points) {
             that.add(
               Marker(
-                width: geometry.iconSize * gl.eqPx,
-                height: geometry.iconSize * gl.eqPx,
+                width:
+                    layer.subtype == "dfcl" && [ess[j]].contains("Point")
+                        ? geometry.iconSize * gl.eqPx * 2
+                        : geometry.iconSize * gl.eqPx,
+                height:
+                    layer.subtype == "dfcl" && [ess[j]].contains("Point")
+                        ? geometry.iconSize * gl.eqPx * 2
+                        : geometry.iconSize * gl.eqPx,
                 point: poi,
                 child:
                     hitButton && gl.selectedGeoLayer != index
@@ -2651,40 +2653,24 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           },
                           icon: Icon(
                             layer.subtype == "dfcl"
-                                ? gl.obstacleChoice[ess[j]]?.icon ??
-                                    (ess[j].contains("FIN")
-                                        ? FontAwesomeIcons.hand
-                                        : ess[j].contains("Categorie")
-                                        ? FontAwesomeIcons.road
-                                        : ess[j].contains("access à une piste")
-                                        ? FontAwesomeIcons.roadCircleCheck
-                                        : ess[j].contains("Impasse non amena")
-                                        ? FontAwesomeIcons.roadLock
-                                        : ess[j].contains("Point")
-                                        ? FontAwesomeIcons.mapPin
-                                        : Icons.bug_report)
+                                ? gl.obstacleChoice[ess[j]]?.icon ?? getIconForPiste(ess[j])
                                 : gl.selectableIcons[geometry.selectedPointIcon],
-                            size: geometry.iconSize * gl.eqPx,
+                            size:
+                                layer.subtype == "dfcl" && [ess[j]].contains("Point")
+                                    ? geometry.iconSize * gl.eqPx * 2
+                                    : geometry.iconSize * gl.eqPx,
                             shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 10)],
                             color: geometry.colorLine,
                           ),
                         )
                         : Icon(
                           layer.subtype == "dfcl"
-                              ? gl.obstacleChoice[ess[j]]?.icon ??
-                                  (ess[j].contains("FIN")
-                                      ? FontAwesomeIcons.hand
-                                      : ess[j].contains("Categorie")
-                                      ? FontAwesomeIcons.road
-                                      : ess[j].contains("access à une piste")
-                                      ? FontAwesomeIcons.roadCircleCheck
-                                      : ess[j].contains("Impasse non amena")
-                                      ? FontAwesomeIcons.roadLock
-                                      : ess[j].contains("Point")
-                                      ? FontAwesomeIcons.mapPin
-                                      : Icons.bug_report)
+                              ? gl.obstacleChoice[ess[j]]?.icon ?? getIconForPiste(ess[j])
                               : gl.selectableIcons[geometry.selectedPointIcon],
-                          size: geometry.iconSize * gl.eqPx,
+                          size:
+                              layer.subtype == "dfcl" && [ess[j]].contains("Point")
+                                  ? geometry.iconSize * gl.eqPx * 2
+                                  : geometry.iconSize * gl.eqPx,
                           shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 10)],
                           color: geometry.colorLine,
                         ),
@@ -2698,6 +2684,19 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     }
     return that;
   }
+
+  IconData getIconForPiste(String name) =>
+      (name.contains("FIN")
+          ? Icons.circle
+          : name.contains("Categorie")
+          ? Icons.square
+          : name.contains("access à une piste")
+          ? Icons.square
+          : name.contains("Impasse non amena")
+          ? Icons.square
+          : name.contains("Point")
+          ? Icons.arrow_drop_down
+          : Icons.bug_report);
 
   List<Marker> _getPointsToDraw({bool hitButton = false}) {
     List<Marker> that = [];
@@ -2916,7 +2915,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   }
 
   List<Marker> _placeAnaPtMarker() {
-    if (_pt == null || !_modeAnaPtPreview) {
+    if (_pt == null || !_modeAnaPtPreview || gl.getInterfaceSelectedLCode().first == "IGN") {
       return [];
     }
     return <Marker>[
@@ -2969,7 +2968,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                     AnaPtPreview(
                       position: _pt!,
                       after: () {
-                        setState(() {});
+                        if (mounted) setState(() {});
                       },
                     ),
                   ],
@@ -3994,6 +3993,9 @@ class _AnaPtPreview extends State<AnaPtPreview> {
 
   @override
   Widget build(BuildContext context) {
+    if (gl.getInterfaceSelectedLCode().first == "IGN") {
+      return SizedBox();
+    }
     if (lastRequested == null || lastRequested != widget.position) {
       lastRequested = widget.position;
       _runAnaPtPreview(
