@@ -593,6 +593,12 @@ void removeLayerFromList({bool offline = false, int index = -1, String key = ""}
     print("Error in removeLayerFromList(): key != '' && index > -1");
     return;
   }
+  if (Mode.recordPath && switcherMaps.isNotEmpty) {
+    while (switcherMaps.length > 1) {
+      switcherMaps.removeLast();
+    }
+    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: offline));
+  }
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in switcherMaps) {
@@ -613,6 +619,12 @@ void removeLayerFromList({bool offline = false, int index = -1, String key = ""}
 }
 
 void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
+  if (Mode.recordPath && switcherMaps.isNotEmpty) {
+    while (switcherMaps.length > 1) {
+      switcherMaps.removeLast();
+    }
+    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: offline));
+  }
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in switcherMaps) {
@@ -755,6 +767,12 @@ void changeSelectedLayerModeOffline() {
   }
   savePrefSelLayOnline();
   loadPrefSelLayOffline();
+  if (Mode.recordPath && switcherMaps.isNotEmpty) {
+    while (switcherMaps.length > 1) {
+      switcherMaps.removeLast();
+    }
+    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: true));
+  }
   switcherMaps.removeWhere((element) => element.offline == false);
   if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty && switcherMaps.isEmpty) {
     switcherMaps.insert(
@@ -773,7 +791,14 @@ void changeSelectedLayerModeOffline() {
 
 void changeSelectedLayerModeOnline() {
   savePrefSelLayOffline();
-  loadPrefSelLayOnline();
+  if (Mode.recordPath && switcherMaps.isNotEmpty) {
+    while (switcherMaps.length > 1) {
+      switcherMaps.removeLast();
+    }
+    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: false));
+  } else {
+    loadPrefSelLayOnline();
+  }
 }
 
 bool isSelectedLayer(String key, {offline = false}) {

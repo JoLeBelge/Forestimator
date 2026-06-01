@@ -151,7 +151,12 @@ class LayerBase {
       mDicoCol = {},
       mOffline = false,
       mInDownload = false,
-      mBits = map['Bits'] ?? 8,
+      mBits =
+          map['Bits'] == null
+              ? 8
+              : map['Bits'] is String
+              ? int.tryParse(map['Bits'])
+              : map['Bits'],
       mUsedForAnalysis = false {
     mIsDownloadableRW = mRes >= 10 ? true : false;
     mLogoAttributionFile = logoAttributionFile(mWMSattribution);
