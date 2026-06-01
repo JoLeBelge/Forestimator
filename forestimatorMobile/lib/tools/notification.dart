@@ -296,73 +296,6 @@ class PopupOnlineMapMenu {
   }
 }
 
-Widget popupPDFSaved(String pdfName, VoidCallback after) {
-  return Card(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadiusGeometry.circular(12.0),
-      side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
-    ),
-    color: gl.backgroundTransparentBlackBox,
-    child: Container(
-      alignment: AlignmentGeometry.center,
-      height: gl.eqPx * 60,
-      width: gl.eqPx * 70,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                alignment: AlignmentGeometry.center,
-                height: gl.eqPx * 15,
-                width: gl.eqPx * 15,
-                child: forestimatorIcon(width: gl.eqPx * 15, height: gl.eqPx * 15),
-              ),
-              Container(
-                alignment: AlignmentGeometry.center,
-                height: gl.eqPx * 10,
-                width: gl.eqPx * 40,
-                child: Text(
-                  "Export du pdf",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: gl.eqPx * gl.fontSizeM),
-                ),
-              ),
-              SizedBox(
-                height: gl.eqPx * 15,
-                width: gl.eqPx * 15,
-                child: lt.forestimatorButton(after, Icons.arrow_drop_up_outlined),
-              ),
-            ],
-          ),
-          lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    alignment: AlignmentGeometry.center,
-                    height: gl.eqPx * 40,
-                    width: gl.eqPx * 60,
-                    child: Text(
-                      "$pdfName a été enregistré!",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400,
-                        fontSize: gl.eqPx * gl.fontSizeM,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
 int messageCount = 0;
 
 void popupForestimatorMessage({
@@ -7853,16 +7786,10 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                               }
                               makePdf(widget.requestedLayers, pdf, dir, locationName);
                               // confirmation que le pdf a été créé
-                              gl.stack.add(
-                                "popPDF",
-                                popupPDFSaved(pdf, () {
-                                  gl.stack.pop("popPDF");
-                                }),
-                                Duration(milliseconds: 400),
-                                gl.Anim.onScreenPosCenter,
-                                Offset(0, -250),
-                              );
-                              gl.refreshStack(() {});
+                              gl.refreshStack(() {popupForestimatorMessage(
+                                title: "PDF créé",
+                                message: "Le PDF a été créé et enregistré dans le dossier $dir ${Platform.isAndroid ? "Téléchargements" : "Documents de l'application"} avec le nom $pdf.",
+                              );});
                             });
                             gl.refreshStack(() {});
                           }, Icons.save_alt),

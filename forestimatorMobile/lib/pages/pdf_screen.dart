@@ -39,7 +39,7 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
                     autoSpacing: false,
                     pageFling: true,
                     pageSnap: true,
-                    defaultPage: widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
+                    defaultPage: 0,// widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
                     fitPolicy: FitPolicy.BOTH,
                     preventLinkNavigation: false, // if set to true the link is handled in flutter
                     onRender: (xpages) {
