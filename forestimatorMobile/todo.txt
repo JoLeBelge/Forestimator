@@ -1,16 +1,17 @@
 To do list forestimator Mobile
 ------------------------------
 
--Forestimator Web: -> formulaire modification email pour utilisateur : il faut alors une page "mon compte"
--> vitesse de chargement de la page d'acceuil. C'est trop lent. Voir comment accélérer.
+-Forestimator Web: -> formulaire consultation/modification email pour utilisateur : il faut alors une page "mon compte"
 
 -affichage de la cnsw 16 bits? en ayant un raster au format png et un autre au format tiff-> combo gagnant pour gagner en rapidité d'affichage.
 
-ROBUSTESSE - Forestimator Web
+Forestimator Monitor
+--------------------
 
 -système de vérification de la disponibilité des couches WMSs
 -système de vérification de la dispo de nominatim
--système de vérification de la dispo du serveur collect
+
+
 -cookies manager/ cookiesconsent in forestimator web
 
 CONSOLIDATION 
@@ -41,10 +42,6 @@ Debug suite à la formation SFRSB
 -dans les logs de l'appli, trouver d'ou viens le message "oops no layerBase 2" et résoudre.
 -si une couche en mode offline dans le sélecteur et que je clique dessus : ouvre le catalogue online!
 -si une couche ne mode offline numéro 1 dans sélecteur et que je fait un appui court sur la carte ; envoie la demande de légende au serveur (devrais faire l'analyse en offline pour cette couche)
-
-CARTO ROUTES
-
-Les points routes (pas les points obstacles) doivent s'encoder obligatoirement dans une séquence de DEBUT de rout (symbole du point : un carré), INTERMEDIAIRE (symbole triangle) et FIN (symbole rond). Tant que l'utilisateur n'as pas encodé la fin d'une route, il ne peux pas encoder un nouveau début.
 
 TODO avant prochaine release:
 -bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli! TODO

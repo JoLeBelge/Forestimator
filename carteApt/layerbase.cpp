@@ -1102,7 +1102,7 @@ bool layerBase::cropIm(std::string aOut, OGREnvelope ext)
         {
             if (getArea(&ext) / getArea(&extGlob) > 0.65)
             {
-                std::cout << "copie de toute l'image" << std::endl;
+                //std::cout << "copie de toute l'image" << std::endl;
                 pDriver->CopyFiles(cropPath, inputPath);
                 aRes = 1;
             }

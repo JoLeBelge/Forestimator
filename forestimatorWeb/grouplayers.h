@@ -100,7 +100,7 @@ private:
         mMapExtent.MaxY = topY;
         mMapExtent.MinX = bottomX;
         mMapExtent.MinY = bottomY;
-        std::cout << "updateMapExtent grouplayer" << std::endl;
+        //std::cout << "updateMapExtent grouplayer" << std::endl;
     }
 
     /*  Signal pour sauver l'extent de la map dans la DB pour un user connecté     */

@@ -117,7 +117,7 @@ class Analytics
 public:
     Analytics(std::string aFileDB);
     bool logExist(const Wt::WEnvironment &env, std::string page, typeLog cat);
-    void addLogApache(const Wt::WEnvironment &env, std::string page);
+    //void addLogApache(const Wt::WEnvironment &env, std::string page);
     void addLog(const Wt::WEnvironment &env, std::string page,int cat=1);
     void addLog(const Wt::WEnvironment &env){addLog(env,env.internalPath());}
     dbo::Session session;
