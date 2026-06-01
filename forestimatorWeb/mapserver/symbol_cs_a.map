@@ -62,7 +62,7 @@
        END
    END
    CLASS 
-      NAME "A10 Versant chauds au sol superficiel"
+      NAME "A10 Versant chaud au sol superficiel"
       EXPRESSION "10"
       STYLE 
           COLOR 254 47 3
@@ -111,7 +111,7 @@
        END
    END
    CLASS 
-      NAME "A17 Affleurements rocheux"
+      NAME "A17 Affleurement rocheux"
       EXPRESSION "17"
       STYLE 
           COLOR 205 191 188
