@@ -80,7 +80,7 @@ class Geometry {
   }
 
   Geometry.path({String polygonName = ""}) {
-    type = "Path";
+    type = "MP";
     name = polygonName;
     Random randomColor = Random();
     setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
@@ -90,7 +90,7 @@ class Geometry {
   }
 
   Geometry.firePath({String polygonName = ""}) {
-    type = "Point";
+    type = "MP";
     name = polygonName;
     visibleOnMap = true;
     selectedPointIcon = 4;
@@ -556,7 +556,7 @@ class Geometry {
     bool allFinished = true;
     GeometricLayer path = GeometricLayer.getPisteDFCLLayer();
     for (int i = 0; i < path.geometries.length; i++) {
-      if (!path.geometries[i].sentToServer) {
+      if (!path.geometries[i].sentToServer && path.geometries[i].finished) {
         if (!await path.geometries[i].sendPathToServer()) {
           allFinished = false;
         }
@@ -568,7 +568,7 @@ class Geometry {
 
   Future<bool> sendPathToServer() async {
     if (sentToServer) {
-      gl.print("Pathpoint $name already sent once!");
+      gl.print("Multipoint $name already sent once!");
       return false;
     }
     bool internet = await InternetConnection().hasInternetAccess;
@@ -576,27 +576,38 @@ class Geometry {
       String coordinates = "";
       for (LatLng point in points) {
         proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
-        coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
+        coordinates = "[${tLb72.x}, ${tLb72.y}],$coordinates";
       }
       if (coordinates.length > 1) {
-        coordinates = coordinates.substring(0, coordinates.length - 1);
+        coordinates = "[${coordinates.substring(0, coordinates.length - 1)}]";
       }
       String properties = "";
       properties = "$properties\"name\":\"$name\",";
       properties = "$properties\"nom_contact\":\"${gl.UserData.name} ${gl.UserData.forename}\",";
       properties = "$properties\"contact\":\"${gl.UserData.mail}\",";
-      for (Attribute attribute in attributes) {
-        properties = "$properties\"${attribute.name}\":\"${attribute.value.toString()}\",";
+      properties =
+          "$properties\"categorie\":\"${attributes[0].value.split(',')[attributes[0].value.split(',').length - 1]}\",";
+
+      String ppoints = "";
+      for (int i = attributes[0].value.split(',').length - 2; i > 0; i--) {
+        String pprop = "";
+        for (int j = 1; j < 4; j++) {
+          pprop = "$pprop\"${attributes[j].name}\":\"${attributes[j].value.split(',')[i].toString()}\",";
+        }
+        ppoints =
+            "$ppoints{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[attributes[0].value.split(',').length - 1 - i]}]},\"properties\":{$pprop}},";
       }
-      properties = properties.substring(0, properties.length - 1);
+      if (ppoints.length > 1) {
+        ppoints = ppoints.substring(0, ppoints.length - 1);
+      }
       String path =
-          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
+          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}},$ppoints]}";
       String request = "https://forestimator.gembloux.ulg.ac.be/api/voirieFromMobile/$path";
 
-      gl.print(request);
+      gl.print(path.replaceAll("'", ""));
       http.Response? response;
       try {
-        response = await http.get(Uri.parse(request));
+        response = await http.get(Uri.parse(request.replaceAll("'", "")));
         if (response.statusCode != 200) {
           throw HttpException('${response.statusCode}');
         }
@@ -610,7 +621,7 @@ class Geometry {
           throw Exception("server said not OK to geometry");
         }
       } catch (e) {
-        gl.print("Error with answer after sending geometry to server");
+        gl.print(response.bodyBytes);
         gl.print("$e");
         return false;
       }
@@ -625,6 +636,7 @@ class Geometry {
   }
 
   String getProperTypeForCarto(String s) {
+    if (s.contains("MP")) return "MultiPoint";
     if (s.contains("Point")) return "Point";
     return s;
   }

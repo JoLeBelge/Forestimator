@@ -695,7 +695,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           "POLY",
                                           style: TextStyle(color: Colors.green, fontSize: gl.eqPx * gl.fontSizeXS * .9),
                                         )
-                                        : gl.selLay.type == "Path"
+                                        : gl.selLay.type == "MP"
                                         ? Text(
                                           "CHEMIN",
                                           style: TextStyle(color: Colors.blue, fontSize: gl.eqPx * gl.fontSizeXS * .9),
@@ -790,7 +790,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                   fontSize: gl.eqPx * gl.fontSizeXS * .9,
                                                 ),
                                               )
-                                              : gl.selLay.type == "Path"
+                                              : gl.selLay.type == "MP"
                                               ? Text(
                                                 "CHEMIN",
                                                 style: TextStyle(
@@ -856,6 +856,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             children: [
                               lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(
                                     height: gl.eqPx * gl.iconSizeM * .9,
@@ -867,6 +868,18 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                     ),
                                   ),
+                                  if (gl.selLay.subtype == "dfci")
+                                    Container(
+                                      alignment: Alignment.center,
+                                      width: gl.eqPx * 70,
+                                      child: Text(
+                                        gl.selGeo.attributes[0].value.split(",")[gl.selGeo.selectedVertex > -1
+                                            ? gl.selGeo.selectedVertex
+                                            : 0],
+                                        style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeS),
+                                      ),
+                                    ),
+                                  SizedBox(width: gl.eqPx * gl.iconSizeM * .9),
                                 ],
                               ),
                               lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
@@ -935,7 +948,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         ),
                                       ),
                                   (gl.selGeo.type == "Polygon" ||
-                                              gl.selGeo.type == "Path" ||
+                                              gl.selGeo.type == "MP" ||
                                               (gl.selGeo.type.contains("Point") && gl.selGeo.numPoints < 1)) &&
                                           gl.Mode.showButtonAddVertexesPolygon
                                       ? CircleAvatar(
@@ -946,16 +959,22 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           child: IconButton(
                                             style: lt.borderlessStyle,
                                             iconSize: gl.eqPx * gl.iconSizeS,
-                                            color: gl.Mode.addVertexesPolygon ? Colors.white : Colors.lightGreenAccent,
+                                            color:
+                                                gl.Mode.addVertexesPolygon || gl.selGeo.type == "MP"
+                                                    ? Colors.white
+                                                    : Colors.lightGreenAccent,
                                             onPressed: () async {
                                               refreshView(() {
                                                 gl.Mode.addVertexesPolygon = !gl.Mode.addVertexesPolygon;
-                                                if (gl.selGeo.type == "Path") {
+                                                if (gl.selGeo.type == "MP") {
                                                   gl.Mode.recordPath = gl.Mode.addVertexesPolygon;
                                                   gl.selectedPathLayer = gl.selectedGeoLayer;
                                                   gl.selectedPath = gl.selPathLay.selectedGeometry;
-                                                  if (gl.Mode.recordPath) {
-                                                    gl.selPath.addPoint(_mapController.camera.center);
+                                                  if (true) {
+                                                    gl.selPath.selectedVertex > 0
+                                                        ? gl.selPath.selectedVertex--
+                                                        : gl.selPath.selectedVertex = gl.selPath.points.length - 1;
+                                                    centerOnLatLng(gl.selPath.points[gl.selPath.selectedVertex]);
                                                   }
                                                 }
                                               });
@@ -967,13 +986,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                 });
                                               }
                                             },
-                                            icon: Icon(
-                                              gl.selGeo.type == "Path" && gl.Mode.addVertexesPolygon
-                                                  ? Icons.pause_circle
-                                                  : gl.selGeo.type == "Path"
-                                                  ? Icons.play_circle
-                                                  : Icons.add_circle,
-                                            ),
+                                            icon: Icon(gl.selGeo.type == "MP" ? Icons.next_plan : Icons.add_circle),
                                           ),
                                         ),
                                       )
@@ -1787,7 +1800,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                     ? gl.selLay.geometries[index].attributes[1].value == "Categorie"
                                                         ? FontAwesomeIcons.road
                                                         : gl
-                                                            .roadObstacleChoice[gl
+                                                            .obstacleChoice[gl
                                                                 .selLay
                                                                 .geometries[index]
                                                                 .attributes[0]
@@ -1824,37 +1837,36 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   }),
                                 ),
                               ),
-                              Container(
-                                alignment: Alignment.center,
-                                height: gl.eqPx * gl.iconSizeM,
-                                width: gl.eqPx * gl.iconSizeM,
-                                child: IconButton(
-                                  style: lt.borderlessStyle,
-                                  onPressed: () {
-                                    setState(() {
-                                      if (gl.selLay.subtype != "Essence") {
+                              if (gl.selLay.subtype != "dfci" && gl.selLay.subtype != "Essence")
+                                Container(
+                                  alignment: Alignment.center,
+                                  height: gl.eqPx * gl.iconSizeM,
+                                  width: gl.eqPx * gl.iconSizeM,
+                                  child: IconButton(
+                                    style: lt.borderlessStyle,
+                                    onPressed: () {
+                                      setState(() {
                                         gl.selLay.addGeometry(
                                           name:
                                               gl.selLay.type == "Point"
                                                   ? "Point${gl.selLay.geometries.length + 1}"
                                                   : gl.selLay.type == "Polygon"
                                                   ? "Polygon${gl.selLay.geometries.length + 1}"
-                                                  : gl.selLay.type == "Path"
-                                                  ? "Path${gl.selLay.geometries.length + 1}"
+                                                  : gl.selLay.type == "MP"
+                                                  ? "Chemin${gl.selLay.geometries.length + 1}"
                                                   : "UUUPS${gl.selLay.geometries.length + 1}",
                                         );
-                                      }
-                                      _switchModeEditVertexesOn();
-                                      gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    Icons.add_circle,
-                                    color: gl.colorAgroBioTech,
-                                    size: gl.eqPx * gl.iconSizeS,
+                                        _switchModeEditVertexesOn();
+                                        gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      Icons.add_circle,
+                                      color: gl.colorAgroBioTech,
+                                      size: gl.eqPx * gl.iconSizeS,
+                                    ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                           if (gl.geoReady) lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
@@ -1921,7 +1933,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                             if (gl.selLay.type.contains("Polygon") && gl.selGeo.points.length > 2) {
                                               centerOnPolygon(gl.selGeo);
                                             } else if ((gl.selLay.type.contains("Point") ||
-                                                    gl.selLay.type.contains("Path")) &&
+                                                    gl.selLay.type.contains("MP")) &&
                                                 (gl.selGeo.center.longitude != 0.0 &&
                                                     gl.selGeo.center.latitude != 0.0)) {
                                               centerOnPoint(gl.selGeo);
@@ -2103,7 +2115,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       "Attention",
       "Si vous terminez l'édition vous ne pourrez plus ajouter des points à cette piste.",
     );
-    ;
   }
 
   void _addPistesInterNode(LatLng coordinates) {
@@ -2118,7 +2129,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value =
           "${DateTime.now().toString()},${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value}";
       GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
-      ge.Geometry.sendPathPointsInBackground();
       gl.Mode.serialize();
     });
   }
@@ -2341,7 +2351,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             gl.Mode.essence ||
             (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
             gl.Mode.recordPathPoints ||
-            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfcl") ||
+            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfci") ||
             gl.geoReady && gl.selLay.type.contains("Polygon")) {
           refreshView(() {
             gl.Mode.recordPathPoints
@@ -2609,17 +2619,20 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     for (GeometricLayer layer in gl.geoLayers) {
       for (ge.Geometry geometry in layer.geometries) {
         gl.selectableIcons[geometry.selectedPointIcon];
-        if (geometry.visibleOnMap && geometry.numPoints > 0 && geometry.type.contains("Path")) {
+        if (geometry.visibleOnMap && geometry.numPoints > 0 && geometry.type.contains("MP")) {
           int j = 0;
           List<String> ess = geometry.attributes[0].value.split(',');
-          List<String> type = geometry.attributes[1].value.split(',');
-          List<String> remarque = geometry.attributes[2].value.split(',');
-          List<String> date = geometry.attributes[3].value.split(',');
           for (LatLng poi in geometry.points) {
             that.add(
               Marker(
-                width: geometry.iconSize * gl.eqPx,
-                height: geometry.iconSize * gl.eqPx,
+                width:
+                    layer.subtype == "dfci" && [ess[j]].contains("Point")
+                        ? geometry.iconSize * gl.eqPx * 2
+                        : geometry.iconSize * gl.eqPx,
+                height:
+                    layer.subtype == "dfci" && [ess[j]].contains("Point")
+                        ? geometry.iconSize * gl.eqPx * 2
+                        : geometry.iconSize * gl.eqPx,
                 point: poi,
                 child:
                     hitButton && gl.selectedGeoLayer != index
@@ -2651,22 +2664,26 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             }
                           },
                           icon: Icon(
-                            layer.subtype == "dfcl"
-                                ? gl.roadObstacleChoice[ess[j]]?.icon ?? Icons.bug_report
+                            layer.subtype == "dfci"
+                                ? gl.obstacleChoice[ess[j]]?.icon ?? getIconForPiste(ess[j])
                                 : gl.selectableIcons[geometry.selectedPointIcon],
-                            size: geometry.iconSize * gl.eqPx,
+                            size:
+                                layer.subtype == "dfci" && [ess[j]].contains("Point")
+                                    ? geometry.iconSize * gl.eqPx * 2
+                                    : geometry.iconSize * gl.eqPx,
                             shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 10)],
-                            weight: 8954.91,
                             color: geometry.colorLine,
                           ),
                         )
                         : Icon(
-                          layer.subtype == "dfcl"
-                              ? gl.roadObstacleChoice[ess[j]]?.icon ?? Icons.bug_report
+                          layer.subtype == "dfci"
+                              ? gl.obstacleChoice[ess[j]]?.icon ?? getIconForPiste(ess[j])
                               : gl.selectableIcons[geometry.selectedPointIcon],
-                          size: geometry.iconSize * gl.eqPx,
+                          size:
+                              layer.subtype == "dfci" && [ess[j]].contains("Point")
+                                  ? geometry.iconSize * gl.eqPx * 2
+                                  : geometry.iconSize * gl.eqPx,
                           shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 10)],
-                          weight: 8954.91,
                           color: geometry.colorLine,
                         ),
               ),
@@ -2680,13 +2697,29 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     return that;
   }
 
+  IconData getIconForPiste(String name) =>
+      (name.contains("FIN")
+          ? Icons.circle_outlined
+          : name.contains("Categorie")
+          ? Icons.square_outlined
+          : name.contains("access à une piste")
+          ? Icons.square_outlined
+          : name.contains("Impasse non amena")
+          ? Icons.square_outlined
+          : name.contains("Point")
+          ? Icons.arrow_drop_down_outlined
+          : Icons.bug_report);
+
   List<Marker> _getPointsToDraw({bool hitButton = false}) {
     List<Marker> that = [];
     int index = 0;
     for (GeometricLayer layer in gl.geoLayers) {
       for (ge.Geometry geometry in layer.geometries) {
         gl.selectableIcons[geometry.selectedPointIcon];
-        if (geometry.visibleOnMap && geometry.numPoints > 0 && geometry.type.contains("Point")) {
+        if (geometry.visibleOnMap &&
+            geometry.numPoints > 0 &&
+            geometry.type.contains("Point") &&
+            !geometry.type.contains("MP")) {
           that.add(
             Marker(
               width: geometry.iconSize * gl.eqPx,
@@ -2723,7 +2756,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                         },
                         icon: Icon(
                           layer.subtype == "PathPoint" && geometry.attributes[1].value == "Obstacle"
-                              ? gl.roadObstacleChoice[geometry.attributes[0].value]!.icon
+                              ? gl.obstacleChoice[geometry.attributes[0].value]!.icon
                               : gl.selectableIcons[geometry.selectedPointIcon],
                           size: geometry.iconSize * gl.eqPx,
                           color: geometry.colorLine,
@@ -2731,7 +2764,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                       )
                       : Icon(
                         layer.subtype == "PathPoint" && geometry.attributes[1].value == "Obstacle"
-                            ? gl.roadObstacleChoice[geometry.attributes[0].value]!.icon
+                            ? gl.obstacleChoice[geometry.attributes[0].value]!.icon
                             : gl.selectableIcons[geometry.selectedPointIcon],
                         size: geometry.iconSize * gl.eqPx,
                         color: geometry.colorLine,
@@ -2894,7 +2927,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   }
 
   List<Marker> _placeAnaPtMarker() {
-    if (_pt == null || !_modeAnaPtPreview) {
+    if (_pt == null || !_modeAnaPtPreview || gl.getInterfaceSelectedLCode().first == "IGN") {
       return [];
     }
     return <Marker>[
@@ -2947,7 +2980,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                     AnaPtPreview(
                       position: _pt!,
                       after: () {
-                        setState(() {});
+                        if (mounted) setState(() {});
                       },
                     ),
                   ],
@@ -3130,7 +3163,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             },
             child: Text(
               overflow: TextOverflow.visible,
-              gl.selGeo.type.contains("Path")
+              gl.selGeo.type.contains("MP")
                   ? "${gl.selGeo.numPoints - count}"
                   : count == gl.selGeo.numPoints - 1
                   ? "1"
@@ -3805,7 +3838,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                   ),
                 ),
               )
-              : gl.selLay.geometries[i].type.contains("Path")
+              : gl.selLay.geometries[i].type.contains("MP")
               ? Marker(
                 alignment: Alignment.center,
                 width:
@@ -3972,6 +4005,9 @@ class _AnaPtPreview extends State<AnaPtPreview> {
 
   @override
   Widget build(BuildContext context) {
+    if (gl.getInterfaceSelectedLCode().first == "IGN") {
+      return SizedBox();
+    }
     if (lastRequested == null || lastRequested != widget.position) {
       lastRequested = widget.position;
       _runAnaPtPreview(

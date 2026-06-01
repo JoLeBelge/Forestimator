@@ -56,7 +56,7 @@ class GeometricLayer {
   }
 
   GeometricLayer.path() {
-    type = "Path";
+    type = "MP";
     subtype = "";
     Random rand = Random();
     defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), .5);
@@ -64,10 +64,10 @@ class GeometricLayer {
   }
 
   GeometricLayer.pisteDFCL() {
-    type = "Path";
-    subtype = "dfcl";
+    type = "MP";
+    subtype = "dfci";
     defaultColor = gl.colorPathPoints.withAlpha(150);
-    defaultPointIcon = 5;
+    defaultPointIcon = 1;
     defaultIconSize = 7.5;
     defaultAttributes.addAll([
       Attribute(name: "categorie", type: "string", value: "Choisissez"),
@@ -75,10 +75,8 @@ class GeometricLayer {
       Attribute(name: "rmq", type: "string", value: ""),
       Attribute(name: "date", type: "string", value: ""),
     ]);
-    for (int i = 0; i < 2; i++) {
-      defaultAttributes[i].visibleOnMapLabel = true;
-    }
-    name = "Catégories des pistes DFCL";
+    defaultAttributes[0].visibleOnMapLabel = true;
+    name = "Catégories des pistes DFCI";
   }
 
   static void deleteLayer(int index) {
@@ -100,7 +98,7 @@ class GeometricLayer {
       case 'Polygon':
         geometries.add(Geometry.polygon(polygonName: name));
         break;
-      case 'Path':
+      case 'MP':
         geometries.add(Geometry.path(polygonName: name));
         break;
       default:
@@ -333,7 +331,7 @@ class GeometricLayer {
   static bool pathPisteDFCLLayerExists() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
-      if (g.type == "Path" && g.subtype == "dfcl") {
+      if (g.type == "MP" && g.subtype == "dfci") {
         gl.selectedGeoLayer = index;
         return true;
       }
@@ -345,7 +343,7 @@ class GeometricLayer {
   static GeometricLayer getPisteDFCLLayer() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
-      if (g.type == "Path" && g.subtype == "dfcl") {
+      if (g.type == "MP" && g.subtype == "dfci") {
         gl.selectedGeoLayer = index;
         return g;
       }

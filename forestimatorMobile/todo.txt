@@ -43,9 +43,8 @@ Debug suite à la formation SFRSB
 -si une couche en mode offline dans le sélecteur et que je clique dessus : ouvre le catalogue online!
 -si une couche ne mode offline numéro 1 dans sélecteur et que je fait un appui court sur la carte ; envoie la demande de légende au serveur (devrais faire l'analyse en offline pour cette couche)
 
+
 TODO avant prochaine release:
 -bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli! TODO
 -Ios : export d'un pdf analyse surfacique : doit se faire dans le document "Download" de IOS! -> préciser dans un popup ou a été exporté le pdf. TODO
--message erreur si ana Surfacique sur surface trop importante (affichage dans une fenetre le message d'erreur renvoyé par le serveur) TODO
--ouverture de pdf (ex fiche essences) ne se fait pas à la bonne page.. TODO
--analyse surfacique : ajouter dans le rapport d'analyse , tout en haut, le nom du polygone et sa surface. TODO
+
