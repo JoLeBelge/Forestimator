@@ -515,7 +515,7 @@ class Geometry {
           "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
 
       String request = "https://forestimator.gembloux.ulg.ac.be/api/polygFromMobile/$geometry";
-      print(request);
+      gl.print(request);
       http.Response? response;
       try {
         response = await http.get(Uri.parse(request));
@@ -591,20 +591,19 @@ class Geometry {
 
       String ppoints = "";
       for (int i = attributes[0].value.split(',').length - 2; i > 0; i--) {
-        //ppoints = "$ppoints{";
+        String pprop = "";
         for (int j = 1; j < 4; j++) {
-          ppoints = "$ppoints\"${attributes[j].name}\":\"${attributes[j].value.split(',')[i].toString()}\",";
+          pprop = "$pprop\"${attributes[j].name}\":\"${attributes[j].value.split(',')[i].toString()}\",";
         }
         ppoints =
-            "$ppoints\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[attributes[0].value.split(',').length - 2 - i]}],";
+            "$ppoints{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[attributes[0].value.split(',').length - 2 - i]}]},\"properties\":{$pprop}},";
       }
       ppoints = ppoints.substring(0, ppoints.length - 1);
-      properties = "$properties$ppoints";
       String path =
-          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
+          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}},$ppoints]}";
       String request = "https://forestimator.gembloux.ulg.ac.be/api/voirieFromMobile/$path";
 
-      gl.print(path.replaceAll("'", ""));
+      print(path.replaceAll("'", ""));
       http.Response? response;
       try {
         response = await http.get(Uri.parse(request.replaceAll("'", "")));

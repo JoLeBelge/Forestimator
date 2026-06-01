@@ -1702,7 +1702,7 @@ class _DefinePOI extends State<DefinePOI> {
                             child: TextButton(
                               style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
                               onPressed: () {
-                                widget.onAccept(_custom, _color, "POI", _rmq);
+                                widget.onAccept(_custom, _color, _custom, _rmq);
                               },
                               child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
                             ),
