@@ -856,6 +856,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             children: [
                               lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(
                                     height: gl.eqPx * gl.iconSizeM * .9,
@@ -867,6 +868,18 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                     ),
                                   ),
+                                  if (gl.selLay.subtype == "dfcl")
+                                    Container(
+                                      alignment: Alignment.center,
+                                      width: gl.eqPx * 70,
+                                      child: Text(
+                                        gl.selGeo.attributes[0].value.split(",")[gl.selGeo.selectedVertex > -1
+                                            ? gl.selGeo.selectedVertex
+                                            : 0],
+                                        style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeS),
+                                      ),
+                                    ),
+                                  SizedBox(width: gl.eqPx * gl.iconSizeM * .9),
                                 ],
                               ),
                               lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
@@ -946,7 +959,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           child: IconButton(
                                             style: lt.borderlessStyle,
                                             iconSize: gl.eqPx * gl.iconSizeS,
-                                            color: gl.Mode.addVertexesPolygon ? Colors.white : Colors.lightGreenAccent,
+                                            color:
+                                                gl.Mode.addVertexesPolygon || gl.selGeo.type == "MP"
+                                                    ? Colors.white
+                                                    : Colors.lightGreenAccent,
                                             onPressed: () async {
                                               refreshView(() {
                                                 gl.Mode.addVertexesPolygon = !gl.Mode.addVertexesPolygon;
@@ -954,8 +970,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                   gl.Mode.recordPath = gl.Mode.addVertexesPolygon;
                                                   gl.selectedPathLayer = gl.selectedGeoLayer;
                                                   gl.selectedPath = gl.selPathLay.selectedGeometry;
-                                                  if (gl.Mode.recordPath) {
-                                                    gl.selPath.addPoint(_mapController.camera.center);
+                                                  if (true) {
+                                                    gl.selPath.selectedVertex > 0
+                                                        ? gl.selPath.selectedVertex--
+                                                        : gl.selPath.selectedVertex = gl.selPath.points.length - 1;
+                                                    centerOnLatLng(gl.selPath.points[gl.selPath.selectedVertex]);
                                                   }
                                                 }
                                               });
@@ -967,13 +986,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                 });
                                               }
                                             },
-                                            icon: Icon(
-                                              gl.selGeo.type == "MP" && gl.Mode.addVertexesPolygon
-                                                  ? Icons.pause_circle
-                                                  : gl.selGeo.type == "MP"
-                                                  ? Icons.play_circle
-                                                  : Icons.add_circle,
-                                            ),
+                                            icon: Icon(gl.selGeo.type == "MP" ? Icons.next_plan : Icons.add_circle),
                                           ),
                                         ),
                                       )
@@ -1824,15 +1837,15 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   }),
                                 ),
                               ),
-                              Container(
-                                alignment: Alignment.center,
-                                height: gl.eqPx * gl.iconSizeM,
-                                width: gl.eqPx * gl.iconSizeM,
-                                child: IconButton(
-                                  style: lt.borderlessStyle,
-                                  onPressed: () {
-                                    setState(() {
-                                      if (gl.selLay.subtype != "Essence") {
+                              if (gl.selLay.subtype != "dfcl" && gl.selLay.subtype != "Essence")
+                                Container(
+                                  alignment: Alignment.center,
+                                  height: gl.eqPx * gl.iconSizeM,
+                                  width: gl.eqPx * gl.iconSizeM,
+                                  child: IconButton(
+                                    style: lt.borderlessStyle,
+                                    onPressed: () {
+                                      setState(() {
                                         gl.selLay.addGeometry(
                                           name:
                                               gl.selLay.type == "Point"
@@ -1843,18 +1856,17 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                   ? "Chemin${gl.selLay.geometries.length + 1}"
                                                   : "UUUPS${gl.selLay.geometries.length + 1}",
                                         );
-                                      }
-                                      _switchModeEditVertexesOn();
-                                      gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    Icons.add_circle,
-                                    color: gl.colorAgroBioTech,
-                                    size: gl.eqPx * gl.iconSizeS,
+                                        _switchModeEditVertexesOn();
+                                        gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      Icons.add_circle,
+                                      color: gl.colorAgroBioTech,
+                                      size: gl.eqPx * gl.iconSizeS,
+                                    ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                           if (gl.geoReady) lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),

@@ -44,7 +44,7 @@ Debug suite à la formation SFRSB
 
 CARTO ROUTES
 
-Les points routes (pas les points obstacles) doivent s'encoder obligatoirement dans une séquence de DEBUT de rout (symbole du point : un carré), INTERMEDIAIRE (symbole triangle) et FIN (symbole rond). Tant que l'utilisateur n'as pas encodé la fin d'une route, il ne peux pas encoder un nouveau début.
+v Les points routes (pas les points obstacles) doivent s'encoder obligatoirement dans une séquence de DEBUT de rout (symbole du point : un carré), INTERMEDIAIRE (symbole triangle) et FIN (symbole rond). Tant que l'utilisateur n'as pas encodé la fin d'une route, il ne peux pas encoder un nouveau début.
 
 TODO avant prochaine release:
 -bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli! TODO

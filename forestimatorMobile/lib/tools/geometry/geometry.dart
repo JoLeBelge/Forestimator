@@ -586,17 +586,20 @@ class Geometry {
       properties = "$properties\"name\":\"$name\",";
       properties = "$properties\"nom_contact\":\"${gl.UserData.name} ${gl.UserData.forename}\",";
       properties = "$properties\"contact\":\"${gl.UserData.mail}\",";
+      properties =
+          "$properties\"categorie\":\"${attributes[0].value.split(',')[attributes[0].value.split(',').length - 1]}\",";
 
-      String ppoints = "[";
-      for (int i = 0; i < attributes[0].value.split(',').length; i++) {
-        ppoints = "$ppoints{";
-        for (int j = 0; j < 4; j++) {
+      String ppoints = "";
+      for (int i = attributes[0].value.split(',').length - 2; i > 0; i--) {
+        //ppoints = "$ppoints{";
+        for (int j = 1; j < 4; j++) {
           ppoints = "$ppoints\"${attributes[j].name}\":\"${attributes[j].value.split(',')[i].toString()}\",";
         }
-        ppoints = "${ppoints.substring(0, ppoints.length - 1)}},";
+        ppoints =
+            "$ppoints\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[attributes[0].value.split(',').length - 2 - i]}],";
       }
-      ppoints = "${ppoints.substring(0, ppoints.length - 1)}]";
-      properties = "$properties\"points\":$ppoints";
+      ppoints = ppoints.substring(0, ppoints.length - 1);
+      properties = "$properties$ppoints";
       String path =
           "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
       String request = "https://forestimator.gembloux.ulg.ac.be/api/voirieFromMobile/$path";
