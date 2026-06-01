@@ -868,7 +868,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                     ),
                                   ),
-                                  if (gl.selLay.subtype == "dfcl")
+                                  if (gl.selLay.subtype == "dfci")
                                     Container(
                                       alignment: Alignment.center,
                                       width: gl.eqPx * 70,
@@ -1837,7 +1837,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   }),
                                 ),
                               ),
-                              if (gl.selLay.subtype != "dfcl" && gl.selLay.subtype != "Essence")
+                              if (gl.selLay.subtype != "dfci" && gl.selLay.subtype != "Essence")
                                 Container(
                                   alignment: Alignment.center,
                                   height: gl.eqPx * gl.iconSizeM,
@@ -2351,7 +2351,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             gl.Mode.essence ||
             (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
             gl.Mode.recordPathPoints ||
-            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfcl") ||
+            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfci") ||
             gl.geoReady && gl.selLay.type.contains("Polygon")) {
           refreshView(() {
             gl.Mode.recordPathPoints
@@ -2626,11 +2626,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             that.add(
               Marker(
                 width:
-                    layer.subtype == "dfcl" && [ess[j]].contains("Point")
+                    layer.subtype == "dfci" && [ess[j]].contains("Point")
                         ? geometry.iconSize * gl.eqPx * 2
                         : geometry.iconSize * gl.eqPx,
                 height:
-                    layer.subtype == "dfcl" && [ess[j]].contains("Point")
+                    layer.subtype == "dfci" && [ess[j]].contains("Point")
                         ? geometry.iconSize * gl.eqPx * 2
                         : geometry.iconSize * gl.eqPx,
                 point: poi,
@@ -2664,11 +2664,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             }
                           },
                           icon: Icon(
-                            layer.subtype == "dfcl"
+                            layer.subtype == "dfci"
                                 ? gl.obstacleChoice[ess[j]]?.icon ?? getIconForPiste(ess[j])
                                 : gl.selectableIcons[geometry.selectedPointIcon],
                             size:
-                                layer.subtype == "dfcl" && [ess[j]].contains("Point")
+                                layer.subtype == "dfci" && [ess[j]].contains("Point")
                                     ? geometry.iconSize * gl.eqPx * 2
                                     : geometry.iconSize * gl.eqPx,
                             shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 10)],
@@ -2676,11 +2676,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           ),
                         )
                         : Icon(
-                          layer.subtype == "dfcl"
+                          layer.subtype == "dfci"
                               ? gl.obstacleChoice[ess[j]]?.icon ?? getIconForPiste(ess[j])
                               : gl.selectableIcons[geometry.selectedPointIcon],
                           size:
-                              layer.subtype == "dfcl" && [ess[j]].contains("Point")
+                              layer.subtype == "dfci" && [ess[j]].contains("Point")
                                   ? geometry.iconSize * gl.eqPx * 2
                                   : geometry.iconSize * gl.eqPx,
                           shadows: [Shadow(color: Colors.black, blurRadius: gl.eqPx * 10)],

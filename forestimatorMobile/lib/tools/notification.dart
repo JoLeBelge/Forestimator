@@ -1431,7 +1431,7 @@ class PopupPoiOnPiste {
       String id = "poiPiste";
       popupForestimatorWindow(
         id: id,
-        title: "Nouveau Point DFCL",
+        title: "Nouveau Point DFCI",
         onDiscard: () {
           gl.refreshStack(() {
             gl.stack.pop(id);
@@ -1494,7 +1494,6 @@ class PopupNewCatPiste {
               GeometricLayer.getPisteDFCLLayer().addGeometry(
                 name: "Piste - ${GeometricLayer.getPisteDFCLLayer().geometries.length + 1}",
               );
-              print(GeometricLayer.getPisteDFCLLayer().geometries.length);
               GeometricLayer.getPisteDFCLLayer().geometries.last.points.add(coordinates);
               GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value = object;
               GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value = type;
@@ -1541,10 +1540,11 @@ class DefinePOI extends StatefulWidget {
 }
 
 class _DefinePOI extends State<DefinePOI> {
+  final TextEditingController _controllerRmq = TextEditingController();
   static int _selected = -1;
   static String _custom = "";
   static Color _color = Colors.transparent;
-  static String _rmq = "";
+  String _rmq = "";
 
   @override
   Widget build(BuildContext context) {
@@ -1600,30 +1600,9 @@ class _DefinePOI extends State<DefinePOI> {
               ),
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
-                height: _selected == gl.obstacleChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
+                height: 40 * gl.eqPx,
                 child: Column(
                   children: [
-                    if (_selected == gl.obstacleChoice.length - 1)
-                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                    if (_selected == gl.obstacleChoice.length - 1)
-                      AnimatedOpacity(
-                        opacity: _selected == gl.obstacleChoice.length - 1 ? 1 : 0,
-                        duration: Duration(milliseconds: 200),
-                        child: TextFormField(
-                          cursorColor: Colors.white,
-                          maxLength: 256,
-                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                          onChanged: (value) {
-                            setState(() {
-                              _custom = "Autre";
-                              _rmq = value;
-                            });
-                          },
-                          onTap: () => widget.callbackOnStartTyping ?? () {},
-                          onTapOutside: (pointer) {},
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
                     lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1650,6 +1629,40 @@ class _DefinePOI extends State<DefinePOI> {
                         ),
                       ],
                     ),
+                    lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                    SizedBox(
+                      width: gl.eqPx * 90,
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                "Remarque eventuelle",
+                                style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
+                              ),
+                            ],
+                          ),
+                          lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.grey),
+                          TextFormField(
+                            cursorColor: Colors.white,
+                            controller: _controllerRmq,
+                            onChanged: (value) {
+                              if (value.contains(',')) {
+                                value = value.replaceAll(',', ';');
+                              }
+                              _controllerRmq.text = value.replaceAll("'", '*');
+                              setState(() {
+                                _rmq = _controllerRmq.text;
+                              });
+                            },
+                            onTap: () => widget.callbackOnStartTyping ?? () {},
+                            onTapOutside: (pointer) {},
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                    lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                   ],
                 ),
               ),
@@ -1687,7 +1700,7 @@ class _DefineCategory extends State<DefineCategory> {
   static int _selected = -1;
   static String _custom = "";
   static Color _color = Colors.transparent;
-  static String _rmq = "";
+  final String _rmq = "";
 
   @override
   Widget build(BuildContext context) {
@@ -2809,33 +2822,46 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 height: gl.eqPx * gl.iconSizeS,
                                                 child: IconButton(
                                                   style: lt.trNoPadButtonstyle,
-                                                  onPressed: gl.selLay.geometries[index].area < 2000000.0 ? () async {
-                                                    if (await gl.selLay.geometries[index].onlineSurfaceAnalysis()) {
-                                                      gl.refreshStack(() {
-                                                        popupForestimatorWindow(
-                                                          id: "anaSurfResult",
-                                                          title: "Resultats de l'analyse",
-                                                          child: AnaSurfResultsMenu(
-                                                            gl.selLay.geometries[index].name,
-                                                            (((gl.selLay.geometries[index].area)/100).round()/100).toString(),
-                                                            gl.selLay.geometries[index].decodedJson,
-                                                            () {
+                                                  onPressed:
+                                                      gl.selLay.geometries[index].area < 2000000.0
+                                                          ? () async {
+                                                            if (await gl.selLay.geometries[index]
+                                                                .onlineSurfaceAnalysis()) {
                                                               gl.refreshStack(() {
-                                                                gl.stack.pop("anaSurfResult");
+                                                                popupForestimatorWindow(
+                                                                  id: "anaSurfResult",
+                                                                  title: "Resultats de l'analyse",
+                                                                  child: AnaSurfResultsMenu(
+                                                                    gl.selLay.geometries[index].name,
+                                                                    (((gl.selLay.geometries[index].area) / 100)
+                                                                                .round() /
+                                                                            100)
+                                                                        .toString(),
+                                                                    gl.selLay.geometries[index].decodedJson,
+                                                                    () {
+                                                                      gl.refreshStack(() {
+                                                                        gl.stack.pop("anaSurfResult");
+                                                                      });
+                                                                    },
+                                                                    () {
+                                                                      gl.refreshStack(() {
+                                                                        gl.stack.pop("anaSurfResult");
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                );
                                                               });
-                                                            },
-                                                            () {
-                                                              gl.refreshStack(() {
-                                                                gl.stack.pop("anaSurfResult");
-                                                              });
-                                                            },
-                                                          ),
-                                                        );
-                                                      });
-                                                    }
-                                                  }:(){gl.refreshStack((){
-                                                    popupForestimatorMessage(title: "Attention",message: "La surface doit être inférieure à 200 ha pour effectuer l'analyse.",);
-                                                  });},
+                                                            }
+                                                          }
+                                                          : () {
+                                                            gl.refreshStack(() {
+                                                              popupForestimatorMessage(
+                                                                title: "Attention",
+                                                                message:
+                                                                    "La surface doit être inférieure à 200 ha pour effectuer l'analyse.",
+                                                              );
+                                                            });
+                                                          },
                                                   icon: Icon(
                                                     Icons.analytics,
                                                     color: Colors.black,
@@ -7786,10 +7812,13 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                               }
                               makePdf(widget.requestedLayers, pdf, dir, locationName);
                               // confirmation que le pdf a été créé
-                              gl.refreshStack(() {popupForestimatorMessage(
-                                title: "PDF créé",
-                                message: "Le PDF a été créé et enregistré dans le dossier $dir ${Platform.isAndroid ? "Téléchargements" : "Documents de l'application"} avec le nom $pdf.",
-                              );});
+                              gl.refreshStack(() {
+                                popupForestimatorMessage(
+                                  title: "PDF créé",
+                                  message:
+                                      "Le PDF a été créé et enregistré dans le dossier $dir ${Platform.isAndroid ? "Téléchargements" : "Documents de l'application"} avec le nom $pdf.",
+                                );
+                              });
                             });
                             gl.refreshStack(() {});
                           }, Icons.save_alt),
@@ -8298,178 +8327,198 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
                         shadowColor: Colors.transparent,
                         color: Colors.white.withAlpha(200),
                         child: ListBody(
-                          children: <Widget>[TextButton(
-                              style: ButtonStyle(
-                                minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                  WidgetState.any: Size(
-                                    gl.eqPx * gl.onCatalogueWidth * .7,
-                                    gl.eqPx * gl.onCatalogueCategoryHeight,
+                          children:
+                              <Widget>[
+                                TextButton(
+                                  style: ButtonStyle(
+                                    minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                      WidgetState.any: Size(
+                                        gl.eqPx * gl.onCatalogueWidth * .7,
+                                        gl.eqPx * gl.onCatalogueCategoryHeight,
+                                      ),
+                                    }),
                                   ),
-                                }),
-                              ),
-                              key: Key('hahaha+454lspoe'),
-                              onPressed: () {},
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: Column(
-                                  children: [
-                                    Row(
+                                  key: Key('hahaha+454lspoe'),
+                                  onPressed: () {},
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    child: Column(
                                       children: [
-                                        SizedBox(
-                                          width: gl.eqPx * gl.iconSizeS,
-                                          height: gl.eqPx * gl.iconSizeS,
-                                          child: Stack(
-                                            children: [
-                                              Icon(
-                                                 CustomIcons.mountain,
-                                                color: Colors.black,
-                                                size: gl.eqPx * gl.iconSizeS,
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: gl.eqPx * gl.iconSizeS,
+                                              height: gl.eqPx * gl.iconSizeS,
+                                              child: Stack(
+                                                children: [
+                                                  Icon(
+                                                    CustomIcons.mountain,
+                                                    color: Colors.black,
+                                                    size: gl.eqPx * gl.iconSizeS,
+                                                  ),
+                                                ],
                                               ),
-                                            
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
-                                        SizedBox(
-                                          width: gl.eqPx * gl.onCatalogueWidth * .65,
-                                          child: Text(
-                                            widget.name,
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: gl.eqPx * gl.fontSizeS,
-                                              fontWeight: FontWeight.w400,
                                             ),
-                                          ),
+                                            SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
+                                            SizedBox(
+                                              width: gl.eqPx * gl.onCatalogueWidth * .65,
+                                              child: Text(
+                                                widget.name,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: gl.eqPx * gl.fontSizeS,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
-                                   Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            color: Colors.transparent,
-            padding: EdgeInsets.all(1),
-            constraints: BoxConstraints(minHeight: gl.eqPx * 5, minWidth: gl.eqPx * 5),
-            child: Icon(
-                                                 Icons.square_foot_outlined,
-                                                color: Colors.black,
-                                                size: gl.eqPx * gl.iconSizeXS,
-                                              ),
-          ),
-          Container(
-            padding: EdgeInsets.only(left: 10),
-            constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .5),
-            child: Text(
-              "Surface totale [ha]",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.start,
-              style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS * .9, fontWeight: FontWeight.w300),
-            ),
-          ),
-        ],
-      ),
-      Container(
-        padding: EdgeInsets.all(5),
-        constraints: BoxConstraints(minWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .25),
-        child: Text(
-          widget.area,
-          overflow: TextOverflow.clip,
-          textAlign: TextAlign.justify,
-          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeS * .9, fontWeight: FontWeight.w500),
-        ),
-      ),
-    ],
-  ),lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                                    //,
-                                  ],
-                                ),
-                              ),
-                            ),] + _injectLayerResults(
-                            (int i, Item item, String mCode, int mRastValue) => TextButton(
-                              style: ButtonStyle(
-                                minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                  WidgetState.any: Size(
-                                    gl.eqPx * gl.onCatalogueWidth * .7,
-                                    gl.eqPx * gl.onCatalogueCategoryHeight,
-                                  ),
-                                }),
-                              ),
-                              key: Key('$i'),
-                              onPressed: () {
-                                if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A")) {
-                                  PopupPdfMenu(mCode);
-                                }
-                                if (gl.dico.getLayerBase(mCode).hasDoc() && mCode == "CS_A" && mRastValue < 99) {
-                                  PopupPdfMenu(
-                                    "",
-                                    path: '${gl.docDir}/${gl.dico.getLayerBase(mCode).getFicheRoute(us: mRastValue)}',
-                                  );
-                                }
-                              },
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        SizedBox(
-                                          width: gl.eqPx * gl.iconSizeS,
-                                          height: gl.eqPx * gl.iconSizeS,
-                                          child: Stack(
-                                            children: [
-                                              Icon(
-                                                switch (gl.dico.getLayerBase(mCode).mGroupe) {
-                                                  "ST" => CustomIcons.mountain,
-                                                  "PEUP" => CustomIcons.forest,
-                                                  "CS" => CustomIcons.mountains,
-                                                  "REF" => CustomIcons.map,
-                                                  _ => CustomIcons.soil,
-                                                },
-                                                color: Colors.black,
-                                                size: gl.eqPx * gl.iconSizeS,
-                                              ),
-                                              if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A") ||
-                                                  (gl.dico.getLayerBase(mCode).hasDoc() &&
-                                                      mCode == "CS_A" &&
-                                                      mRastValue < 99))
+                                        lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
                                                 Container(
-                                                  alignment: Alignment.topRight,
-                                                  width: gl.eqPx * gl.iconSizeM,
-                                                  height: gl.eqPx * gl.iconSizeM,
+                                                  color: Colors.transparent,
+                                                  padding: EdgeInsets.all(1),
+                                                  constraints: BoxConstraints(
+                                                    minHeight: gl.eqPx * 5,
+                                                    minWidth: gl.eqPx * 5,
+                                                  ),
                                                   child: Icon(
-                                                    Icons.picture_as_pdf_sharp,
-                                                    size: gl.eqPx * gl.iconSizeXS * .7,
-                                                    color: Colors.red,
+                                                    Icons.square_foot_outlined,
+                                                    color: Colors.black,
+                                                    size: gl.eqPx * gl.iconSizeXS,
                                                   ),
                                                 ),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
-                                        SizedBox(
-                                          width: gl.eqPx * gl.onCatalogueWidth * .65,
-                                          child: Text(
-                                            item.name,
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: gl.eqPx * gl.fontSizeS,
-                                              fontWeight: FontWeight.w400,
+                                                Container(
+                                                  padding: EdgeInsets.only(left: 10),
+                                                  constraints: BoxConstraints(
+                                                    maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .5,
+                                                  ),
+                                                  child: Text(
+                                                    "Surface totale [ha]",
+                                                    overflow: TextOverflow.clip,
+                                                    textAlign: TextAlign.start,
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: gl.eqPx * gl.fontSizeS * .9,
+                                                      fontWeight: FontWeight.w300,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                            Container(
+                                              padding: EdgeInsets.all(5),
+                                              constraints: BoxConstraints(
+                                                minWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .25,
+                                              ),
+                                              child: Text(
+                                                widget.area,
+                                                overflow: TextOverflow.clip,
+                                                textAlign: TextAlign.justify,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: gl.eqPx * gl.fontSizeS * .9,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
+                                        lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                                        //,
                                       ],
                                     ),
-                                    lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
-                                    item.entry,
-                                  ],
+                                  ),
+                                ),
+                              ] +
+                              _injectLayerResults(
+                                (int i, Item item, String mCode, int mRastValue) => TextButton(
+                                  style: ButtonStyle(
+                                    minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                                      WidgetState.any: Size(
+                                        gl.eqPx * gl.onCatalogueWidth * .7,
+                                        gl.eqPx * gl.onCatalogueCategoryHeight,
+                                      ),
+                                    }),
+                                  ),
+                                  key: Key('$i'),
+                                  onPressed: () {
+                                    if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A")) {
+                                      PopupPdfMenu(mCode);
+                                    }
+                                    if (gl.dico.getLayerBase(mCode).hasDoc() && mCode == "CS_A" && mRastValue < 99) {
+                                      PopupPdfMenu(
+                                        "",
+                                        path:
+                                            '${gl.docDir}/${gl.dico.getLayerBase(mCode).getFicheRoute(us: mRastValue)}',
+                                      );
+                                    }
+                                  },
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: gl.eqPx * gl.iconSizeS,
+                                              height: gl.eqPx * gl.iconSizeS,
+                                              child: Stack(
+                                                children: [
+                                                  Icon(
+                                                    switch (gl.dico.getLayerBase(mCode).mGroupe) {
+                                                      "ST" => CustomIcons.mountain,
+                                                      "PEUP" => CustomIcons.forest,
+                                                      "CS" => CustomIcons.mountains,
+                                                      "REF" => CustomIcons.map,
+                                                      _ => CustomIcons.soil,
+                                                    },
+                                                    color: Colors.black,
+                                                    size: gl.eqPx * gl.iconSizeS,
+                                                  ),
+                                                  if ((gl.dico.getLayerBase(mCode).hasDoc() && mCode != "CS_A") ||
+                                                      (gl.dico.getLayerBase(mCode).hasDoc() &&
+                                                          mCode == "CS_A" &&
+                                                          mRastValue < 99))
+                                                    Container(
+                                                      alignment: Alignment.topRight,
+                                                      width: gl.eqPx * gl.iconSizeM,
+                                                      height: gl.eqPx * gl.iconSizeM,
+                                                      child: Icon(
+                                                        Icons.picture_as_pdf_sharp,
+                                                        size: gl.eqPx * gl.iconSizeXS * .7,
+                                                        color: Colors.red,
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(width: gl.eqPx * gl.iconSizeXS, height: gl.eqPx * gl.iconSizeXS),
+                                            SizedBox(
+                                              width: gl.eqPx * gl.onCatalogueWidth * .65,
+                                              child: Text(
+                                                item.name,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: gl.eqPx * gl.fontSizeS,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.black.withAlpha(50)),
+                                        item.entry,
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
                         ),
                       ),
                     ],

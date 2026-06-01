@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:async';
 import 'package:area_polygon/area_polygon.dart';
-import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/anaPt/requested_layer.dart';
@@ -596,7 +595,7 @@ class Geometry {
           pprop = "$pprop\"${attributes[j].name}\":\"${attributes[j].value.split(',')[i].toString()}\",";
         }
         ppoints =
-            "$ppoints{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[ attributes[0].value.split(',').length - 1 -i]}]},\"properties\":{$pprop}},";
+            "$ppoints{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[attributes[0].value.split(',').length - 1 - i]}]},\"properties\":{$pprop}},";
       }
       if (ppoints.length > 1) {
         ppoints = ppoints.substring(0, ppoints.length - 1);
