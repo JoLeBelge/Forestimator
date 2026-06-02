@@ -14,6 +14,7 @@ dependencies:
   sqflite_common_ffi: ^2.3.2
   flutter_map: ^8.0.0
   path_provider: ^2.1.2
+  share_plus: ^12.0.2
   http: ^1.0.0
   tuple: ^2.0.2
   flutter_downloader: ^1.12.0

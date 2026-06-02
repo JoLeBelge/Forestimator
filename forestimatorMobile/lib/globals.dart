@@ -621,7 +621,7 @@ void forceDFCIMode(bool offline) {
     }
     switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: offline));
     if (!offlineMode) {
-      switcherMaps.insert(1, SelectedLayer(mCode: '2', offline: offline));
+      switcherMaps.insert(1, SelectedLayer(mCode: 'IGN', offline: offline));
       switcherMaps.insert(2, SelectedLayer(mCode: '3', offline: offline));
     }
   }

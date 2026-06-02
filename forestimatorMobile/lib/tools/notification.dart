@@ -27,6 +27,7 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
@@ -7865,6 +7866,15 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                   ),
                 ),
               ),
+              Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(3),
+                constraints: BoxConstraints(
+                  maxWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                  minWidth: gl.eqPx * gl.onCatalogueWidth * .97,
+                  minHeight: gl.eqPx * gl.onCatalogueMapHeight * .97,
+                ),
+              ),
             ],
           ),
         );
@@ -8127,7 +8137,10 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
         },
       ),
     );
-
+    XFile file = XFile.fromData(await pdf.save(), name: "file.pdf", mimeType: "pdf");
+    ShareParams params = ShareParams(text: "file.pdf", files: [file]);
+    final result = await SharePlus.instance.share(params);
+    /*
     File out = File("$dir/$fileName");
     if (await out.exists()) {
       // on renomme le pdf
@@ -8139,7 +8152,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
       } while (await out.exists());
     }
     out.writeAsBytes(await pdf.save(), flush: true);
-    // FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");
+    // FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");*/
   }
 }
 
