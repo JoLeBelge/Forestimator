@@ -978,7 +978,7 @@ class _SelectPolyType extends State<SelectPolyType> {
             ),
           ),
         ),
-        if (gl.Mode.recordPathPoints)
+        if (gl.Mode.dfci)
           Container(
             width: gl.eqPx * gl.iconSizeM * 1.65,
             height: gl.eqPx * gl.iconSizeM * 1.35,
@@ -4802,7 +4802,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   if (gl.Mode.userDataFilled) {
                     setState(() {
                       gl.Mode.essence = it;
-                      gl.Mode.recordPathPoints = false;
+                      gl.Mode.dfci = false;
                     });
                   } else {
                     PopupUserData(
@@ -4811,7 +4811,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                       () {
                         setState(() {
                           gl.Mode.essence = it;
-                          gl.Mode.recordPathPoints = false;
+                          gl.Mode.dfci = false;
                         });
                       },
                       oldForename: gl.UserData.forename,
@@ -4840,13 +4840,10 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   },
                   icon: Icon(Icons.info_outline, size: gl.eqPx * gl.iconSizeXS, color: gl.colorBack),
                 ),
-
-                variableBooleanSlider("Observation des équipements contre les incendies.", gl.Mode.recordPathPoints, (
-                  bool it,
-                ) {
+                variableBooleanSlider("Observation des équipements contre les incendies.", gl.Mode.dfci, (bool it) {
                   if (gl.Mode.userDataFilled) {
                     setState(() {
-                      gl.Mode.recordPathPoints = it;
+                      gl.Mode.dfci = it;
                       gl.Mode.essence = false;
                     });
                   } else {
@@ -4855,7 +4852,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                       () {},
                       () {
                         setState(() {
-                          gl.Mode.recordPathPoints = it;
+                          gl.Mode.dfci = it;
                           gl.Mode.essence = false;
                         });
                       },
@@ -4865,6 +4862,23 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                     );
                   }
                   gl.refreshStack(() {});
+                  gl.rebuildLayerSwitcher(() {
+                    if (gl.Mode.dfci) {
+                      if (gl.offlineMode) {
+                        gl.savePrefSelLayOffline();
+                        gl.changeSelectedLayerModeOffline();
+                      } else {
+                        gl.savePrefSelLayOnline();
+                        gl.changeSelectedLayerModeOnline();
+                      }
+                    } else {
+                      if (gl.offlineMode) {
+                        gl.loadPrefSelLayOffline();
+                      } else {
+                        gl.loadPrefSelLayOnline();
+                      }
+                    }
+                  });
                   gl.Mode.serialize();
                 }, false),
               ],

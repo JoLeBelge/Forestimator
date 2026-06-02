@@ -103,7 +103,7 @@ class LayerBase {
   Map<int, String> mDicoVal; // valeur raster vers signification
   Map<int, Color> mDicoCol; // valeur raster vers couleur
   late bool mUsedForAnalysis;
-  late int mBits;
+  int mBits = 8;
 
   // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
   LayerBase.fromMap(final Map<String, dynamic> map)
@@ -151,12 +151,7 @@ class LayerBase {
       mDicoCol = {},
       mOffline = false,
       mInDownload = false,
-      mBits =
-          map['Bits'] == null
-              ? 8
-              : map['Bits'] is String
-              ? int.tryParse(map['Bits'])
-              : map['Bits'],
+      mBits = (map['Bits'] is String ? int.tryParse(map['Bits']) : map['Bits']) ?? 8,
       mUsedForAnalysis = false {
     mIsDownloadableRW = mRes >= 10 ? true : false;
     mLogoAttributionFile = logoAttributionFile(mWMSattribution);

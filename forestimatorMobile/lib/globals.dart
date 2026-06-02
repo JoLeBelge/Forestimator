@@ -106,7 +106,7 @@ class Anim {
 
 class Mode {
   static bool userDataFilled = false;
-  static bool recordPathPoints = false;
+  static bool dfci = false;
   static bool essence = false;
   static bool labelCross = false;
   static bool debugLabel = false;
@@ -115,7 +115,6 @@ class Mode {
 
   static bool debugScanlines = false;
   static bool debugInfo = false;
-  static bool recordPath = false;
   static bool gpsTimoutException = false;
   static bool keyboardExpanded = false;
   static bool square = false;
@@ -155,7 +154,7 @@ class Mode {
   }
 
   static void serialize() async {
-    await shared!.setBool('Modes.firePath', recordPathPoints);
+    await shared!.setBool('Modes.firePath', dfci);
     await shared!.setBool('Modes.essence', essence);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.labelCross', labelCross);
@@ -163,7 +162,7 @@ class Mode {
   }
 
   static void deserialize() {
-    recordPathPoints = shared!.getBool('Modes.firePath') ?? false;
+    dfci = shared!.getBool('Modes.firePath') ?? false;
     essence = shared!.getBool('Modes.essence') ?? false;
     userDataFilled = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
@@ -474,6 +473,7 @@ String getFirstSelLayOffline() {
 }
 
 void initializeSelectedLayerForFlutterMap() {
+  forceDFCIMode(offlineMode);
   if (!firstTimeUse) {
     for (int i = 0; i < interfaceSelectedLCode.length; i++) {
       replaceLayerFromList(interfaceSelectedLCode.elementAt(i), index: i, offline: false);
@@ -589,15 +589,11 @@ LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
 void removeLayerFromList({bool offline = false, int index = -1, String key = ""}) {
+  forceDFCIMode(offline);
+  if (Mode.dfci) return;
   if (key != "" && index > -1) {
     print("Error in removeLayerFromList(): key != '' && index > -1");
     return;
-  }
-  if (Mode.recordPath && switcherMaps.isNotEmpty) {
-    while (switcherMaps.length > 1) {
-      switcherMaps.removeLast();
-    }
-    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: offline));
   }
   if (key != "") {
     SelectedLayer? sL;
@@ -618,13 +614,22 @@ void removeLayerFromList({bool offline = false, int index = -1, String key = ""}
   }
 }
 
-void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
-  if (Mode.recordPath && switcherMaps.isNotEmpty) {
-    while (switcherMaps.length > 1) {
+void forceDFCIMode(bool offline) {
+  if (Mode.dfci && switcherMaps.first.mCode != "routes") {
+    while (switcherMaps.isNotEmpty) {
       switcherMaps.removeLast();
     }
     switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: offline));
+    if (!offlineMode) {
+      switcherMaps.insert(1, SelectedLayer(mCode: '2', offline: offline));
+      switcherMaps.insert(2, SelectedLayer(mCode: '3', offline: offline));
+    }
   }
+}
+
+void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
+  forceDFCIMode(offline);
+  if (Mode.dfci) return;
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in switcherMaps) {
@@ -761,18 +766,16 @@ void loadPrefSelLayOffline() async {
 }
 
 void changeSelectedLayerModeOffline() {
+  forceDFCIMode(true);
+  if (Mode.dfci) return;
   if (dico.getLayersOffline().isEmpty) {
     offlineMode = false;
     return;
+  } else {
+    savePrefSelLayOnline();
+    loadPrefSelLayOffline();
   }
-  savePrefSelLayOnline();
-  loadPrefSelLayOffline();
-  if (Mode.recordPath && switcherMaps.isNotEmpty) {
-    while (switcherMaps.length > 1) {
-      switcherMaps.removeLast();
-    }
-    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: true));
-  }
+
   switcherMaps.removeWhere((element) => element.offline == false);
   if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty && switcherMaps.isEmpty) {
     switcherMaps.insert(
@@ -790,15 +793,10 @@ void changeSelectedLayerModeOffline() {
 }
 
 void changeSelectedLayerModeOnline() {
+  forceDFCIMode(false);
+  if (Mode.dfci) return;
   savePrefSelLayOffline();
-  if (Mode.recordPath && switcherMaps.isNotEmpty) {
-    while (switcherMaps.length > 1) {
-      switcherMaps.removeLast();
-    }
-    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: false));
-  } else {
-    loadPrefSelLayOnline();
-  }
+  loadPrefSelLayOnline();
 }
 
 bool isSelectedLayer(String key, {offline = false}) {

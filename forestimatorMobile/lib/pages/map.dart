@@ -967,7 +967,6 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               refreshView(() {
                                                 gl.Mode.addVertexesPolygon = !gl.Mode.addVertexesPolygon;
                                                 if (gl.selGeo.type == "MP") {
-                                                  gl.Mode.recordPath = gl.Mode.addVertexesPolygon;
                                                   gl.selectedPathLayer = gl.selectedGeoLayer;
                                                   gl.selectedPath = gl.selPathLay.selectedGeometry;
                                                   if (true) {
@@ -2179,10 +2178,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
-                ? gl.Mode.essence || gl.Mode.addVertexesPolygon || gl.Mode.recordPathPoints
+                ? gl.Mode.essence || gl.Mode.addVertexesPolygon || gl.Mode.dfci
                     ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
                     : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
-                : gl.Mode.essence || gl.Mode.addVertexesPolygon || gl.Mode.recordPathPoints
+                : gl.Mode.essence || gl.Mode.addVertexesPolygon || gl.Mode.dfci
                 ? AlignmentGeometry.xy(_mainMenuEssenceAnimOnScreenPos.dx, _mainMenuEssenceAnimOnScreenPos.dy)
                 : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
@@ -2192,7 +2191,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
-                ? (gl.Mode.recordPathPoints &&
+                ? (gl.Mode.dfci &&
                         (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
                             !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                     ? AlignmentGeometry.xy(_mainMenuPisteInterAnimOnScreenPos.dx, _mainMenuPisteInterAnimOnScreenPos.dy)
@@ -2200,7 +2199,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                       _mainMenuPisteInterAnimOffScreenPos.dx,
                       _mainMenuPisteInterAnimOffScreenPos.dy,
                     )
-                : (gl.Mode.recordPathPoints &&
+                : (gl.Mode.dfci &&
                     (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
                         !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                 ? AlignmentGeometry.xy(_mainMenuPisteInterAnimOnScreenPos.dx, _mainMenuPisteInterAnimOnScreenPos.dy)
@@ -2212,12 +2211,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
-                ? (gl.Mode.recordPathPoints &&
+                ? (gl.Mode.dfci &&
                         (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
                             !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                     ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
                     : AlignmentGeometry.xy(_mainMenuFinishAnimOffScreenPos.dx, _mainMenuFinishAnimOffScreenPos.dy)
-                : (gl.Mode.recordPathPoints &&
+                : (gl.Mode.dfci &&
                     (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
                         !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                 ? AlignmentGeometry.xy(_mainMenuFinishAnimOnScreenPos.dx, _mainMenuFinishAnimOnScreenPos.dy)
@@ -2242,10 +2241,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       AnimatedContainer(
         alignment:
             gl.dsp.orientation.name == "Portrait"
-                ? gl.Mode.essence || gl.Mode.addVertexesPolygon || gl.Mode.recordPathPoints
+                ? gl.Mode.essence || gl.Mode.addVertexesPolygon || gl.Mode.dfci
                     ? AlignmentGeometry.center
                     : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy)
-                : gl.Mode.essence || gl.Mode.addVertexesPolygon || gl.Mode.recordPathPoints
+                : gl.Mode.essence || gl.Mode.addVertexesPolygon || gl.Mode.dfci
                 ? AlignmentGeometry.center
                 : AlignmentGeometry.xy(_mainMenuEssenceAnimOffScreenPos.dx, _mainMenuEssenceAnimOffScreenPos.dy),
         curve: Curves.easeInOutBack,
@@ -2341,8 +2340,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           (!(gl.geoReady && gl.selLay.type.contains("Point") && gl.selGeo.points.isNotEmpty)) ||
                   gl.Mode.essence ||
                   (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
-                  gl.Mode.recordPathPoints ||
-                  (!gl.Mode.recordPathPoints && gl.selLay.subtype == "PathPoint") ||
+                  gl.Mode.dfci ||
+                  (!gl.Mode.dfci && gl.selLay.subtype == "PathPoint") ||
                   gl.geoReady && gl.selLay.type.contains("Polygon")
               ? gl.colorAgroBioTech
               : Colors.grey,
@@ -2350,11 +2349,11 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         if ((!(gl.geoReady && gl.selLay.type.contains("Point") && gl.selGeo.points.isNotEmpty)) ||
             gl.Mode.essence ||
             (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
-            gl.Mode.recordPathPoints ||
-            (!gl.Mode.recordPathPoints && gl.selLay.subtype == "dfci") ||
+            gl.Mode.dfci ||
+            (!gl.Mode.dfci && gl.selLay.subtype == "dfci") ||
             gl.geoReady && gl.selLay.type.contains("Polygon")) {
           refreshView(() {
-            gl.Mode.recordPathPoints
+            gl.Mode.dfci
                 ? (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
                         !GeometricLayer.getPisteDFCLLayer().geometries.last.finished)
                     ? PopupPoiOnPiste(context, _mapController.camera.center)
@@ -2407,12 +2406,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                 alignment: Alignment.bottomRight,
                 child: Icon(CustomIcons.tree, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
               )
-            else if (gl.Mode.recordPathPoints)
+            else if (gl.Mode.dfci)
               Container(
                 alignment: Alignment.bottomRight,
                 child: Icon(FontAwesomeIcons.road, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
               ),
-            (gl.Mode.recordPathPoints &&
+            (gl.Mode.dfci &&
                     (GeometricLayer.getPisteDFCLLayer().geometries.isNotEmpty &&
                         !GeometricLayer.getPisteDFCLLayer().geometries.last.finished))
                 ? Icon(Icons.adjust_rounded, color: Colors.white, size: gl.eqPx * gl.iconSizeS)
@@ -2546,8 +2545,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         setState(() {
           gl.offlineMode = !gl.offlineMode;
           if (gl.offlineMode) {
+            print("ofline");
             gl.changeSelectedLayerModeOffline();
           } else {
+            print("online");
             gl.changeSelectedLayerModeOnline();
           }
         });
