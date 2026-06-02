@@ -289,7 +289,7 @@ bool groupLayers::getExpertModeForUser(std::string id)
 {
 
     openConnection();
-    printf("get Expert Mode For User...");
+    //printf("get Expert Mode For User...");
     bool aRes(0);
     sqlite3_stmt *stmt;
     const char *query = "SELECT ModeExpert FROM user_expert WHERE id_user=?;";
@@ -311,7 +311,7 @@ bool groupLayers::getExpertModeForUser(std::string id)
     }
 
     closeConnection();
-    std::cout << "mode expert est à " << aRes << std::endl;
+    //std::cout << "mode expert est à " << aRes << std::endl;
     return aRes;
 }
 
@@ -322,7 +322,7 @@ bool groupLayers::getExpertModeForUser(std::string id)
 void groupLayers::loadExtents(std::string id)
 {
     openConnection();
-    printf("loadextents...");
+    //printf("loadextents...");
     mExtentDiv->clear();
 
     sqlite3_stmt *stmt;
@@ -376,7 +376,7 @@ void groupLayers::loadExtents(std::string id)
         button_s->addStyleClass("extent_button");
         button_s->clicked().connect(this->slotMapCenter);
 
-        std::cout << "done" << std::endl;
+        //std::cout << "done" << std::endl;
     }
 }
 

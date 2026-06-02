@@ -23,8 +23,10 @@ Auth::PasswordService myPasswordService(myAuthService);
 void Session::configureAuth()
 {
     myAuthService.setAuthTokensEnabled(true, "logincookie");
-    myAuthService.setEmailVerificationEnabled(true);
-    //myAuthService.setEmailVerificationRequired(true);
+    //myAuthService.setEmailVerificationEnabled(true);
+
+    myAuthService.setEmailVerificationRequired(true);
+    //myAuthService.setIdentityPolicy(Auth::IdentityPolicy::EmailAddress); // si je choisi cette identityPolicy, qui convient bien pour les sites non-sociaux comme foerstimator, Wt ne demande plus de nom de user. Et les anciens comptes ne fonctionne plus, sauf si je bidouille la bd auth.db
 
     std::unique_ptr<Auth::PasswordVerifier> verifier
             = std::make_unique<Auth::PasswordVerifier>();

@@ -7,7 +7,7 @@
 
 void rasterClipResource::handleRequest(const Http::Request &request, Http::Response &response)
 {
-    std::cout << "rasterClipResource:: handle request" << std::endl;
+    //std::cout << "rasterClipResource:: handle request" << std::endl;
     char **papszOptions = nullptr;
     auto params = request.urlParams();
     std::string lCode;

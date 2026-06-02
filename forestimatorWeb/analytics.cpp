@@ -26,28 +26,28 @@ void Analytics::addLog(const Wt::WEnvironment &env, std::string page, int cat){
 
     if(env.agentIsSpiderBot())return;
 
+    const std::string * co =env.getCookie(cookies_clientIDName);
+    if (co){
+
     dbo::Transaction transaction{session};
 
     std::unique_ptr<Log> log{new Log()};
+    log->client_id = std::stoi(*co);
     log->datum = time(0);
     log->date = Wt::WDate::currentDate();
     log->ip = env.clientAddress();
     log->client = env.userAgent();
     log->ipath = page;
-    //log->id_user = user_id;
     log->categorie = cat;
     log->client_id=0;
-    const std::string * co =env.getCookie(cookies_clientIDName);
-    if (co){
-        log->client_id = std::stoi(*co);
-    }
-    //std::cout << log->datum << log->client << log->ipath << std::endl;
 
-    addLogApache(env,page);
+    //addLogApache(env,page);
 
     session.add(std::move(log));
+    }
 }
 
+/*
 void Analytics::addLogApache(const Wt::WEnvironment &env, std::string page){
     time_t timestamp=time(0);
     struct tm * timeinfo = localtime(&timestamp);
@@ -62,6 +62,7 @@ void Analytics::addLogApache(const Wt::WEnvironment &env, std::string page){
     out << " +0100] \"GET " << page ;
     out << " HTTP/1.1\" 200 1000 \"-\" \"" << env.userAgent() << "\"\n";
 }
+*/
 
 bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog cat){
     bool aRes(1);
@@ -75,11 +76,12 @@ bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog 
     int c=session.query<int>("select count(1) from Log").where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("client_id = ?").bind(client_id).where("cat = ?").bind((int (cat)));
     if (c==0){
         aRes=0;
-    } else{
+    }
+    /*} else{
         // log brut data anyway
         addLogApache(env,page);
         //if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
-    }
+    }*/
     return aRes;
 }
 
