@@ -322,9 +322,7 @@ bool groupLayers::getExpertModeForUser(std::string id)
 void groupLayers::loadExtents(std::string id)
 {
     openConnection();
-    //printf("loadextents...");
     mExtentDiv->clear();
-
     sqlite3_stmt *stmt;
     const char *query = "SELECT centre_x,centre_y,zoom,name,id FROM user_extent WHERE id_user=?";
     if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
@@ -376,7 +374,6 @@ void groupLayers::loadExtents(std::string id)
         button_s->addStyleClass("extent_button");
         button_s->clicked().connect(this->slotMapCenter);
 
-        //std::cout << "done" << std::endl;
     }
 }
 
