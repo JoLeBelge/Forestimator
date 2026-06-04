@@ -1423,53 +1423,6 @@ class _AddEssence extends State<AddEssence> {
   static void reset() => {_custom = "", _selected = -1};
 }
 
-class PopupPoiOnPiste {
-  VoidCallback? callbackOnStartTyping;
-  VoidCallback? onTapOutside;
-
-  PopupPoiOnPiste(BuildContext context, LatLng coordinates, {this.onTapOutside, this.callbackOnStartTyping}) {
-    gl.refreshStack(() {
-      String id = "poiPiste";
-      popupForestimatorWindow(
-        id: id,
-        title: "Nouveau Point DFCI",
-        onDiscard: () {
-          gl.refreshStack(() {
-            gl.stack.pop(id);
-          });
-        },
-        child: DefinePOI(
-          height: 160 * gl.eqPx,
-          messageAccept: "Placer",
-          messageDecline: "Annuler",
-          onAccept: (String object, Color col, String type, String rmq) {
-            gl.refreshStack(() {
-              GeometricLayer.getPisteDFCLLayer().geometries.last.points.insert(0, coordinates);
-              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value =
-                  "$object,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value}";
-              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value =
-                  "$type,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value}";
-              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value =
-                  "$rmq,${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value}";
-              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value =
-                  "${DateTime.now().toString()},${GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value}";
-              gl.lastUsedCategory = col;
-              GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
-              gl.Mode.serialize();
-              gl.stack.pop(id);
-            });
-          },
-          onDecline: () {
-            gl.refreshStack(() {
-              gl.stack.pop(id);
-            });
-          },
-        ),
-      );
-    });
-  }
-}
-
 class PopupNewCatPiste {
   VoidCallback? callbackOnStartTyping;
   VoidCallback? onTapOutside;
@@ -1477,10 +1430,9 @@ class PopupNewCatPiste {
   PopupNewCatPiste(BuildContext context, LatLng coordinates, {this.onTapOutside, this.callbackOnStartTyping}) {
     gl.refreshStack(() {
       String id = "pdpci";
-      _DefineCategory.reset();
       popupForestimatorWindow(
         id: id,
-        title: "Nouvelle piste DPCL",
+        title: "Equipements DFCI",
         onDiscard: () {
           gl.refreshStack(() {
             gl.stack.pop(id);
@@ -1490,22 +1442,84 @@ class PopupNewCatPiste {
           height: 150 * gl.eqPx,
           messageAccept: "Placer",
           messageDecline: "Annuler",
-          onAccept: (String object, Color col, String type, String rmq) {
-            gl.refreshStack(() {
-              GeometricLayer.getPisteDFCLLayer().addGeometry(
-                name: "Piste - ${GeometricLayer.getPisteDFCLLayer().geometries.length + 1}",
-              );
-              GeometricLayer.getPisteDFCLLayer().geometries.last.points.add(coordinates);
-              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[0].value = object;
-              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[1].value = type;
-              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[2].value = rmq;
-              GeometricLayer.getPisteDFCLLayer().geometries.last.attributes[3].value = DateTime.now().toString();
-              GeometricLayer.getPisteDFCLLayer().geometries.last.colorLine = col;
-              gl.lastUsedCategory = col;
-              GeometricLayer.getPisteDFCLLayer().geometries.last.serialize();
-              gl.Mode.serialize();
-              gl.stack.pop(id);
-            });
+          onAccept: (String object, Color col, String type, String rmq, int choice) {
+            switch (choice) {
+              case 0:
+                gl.refreshStack(() {
+                  GeometricLayer.getDFCILayer().addGeometry(
+                    name: "Piste - ${GeometricLayer.getDFCILayer().geometries.length + 1}",
+                  );
+                  GeometricLayer.getDFCILayer().geometries.last.points.add(coordinates);
+                  GeometricLayer.getDFCILayer().geometries.last.attributes[0].value = object;
+                  GeometricLayer.getDFCILayer().geometries.last.attributes[1].value = "Categorie";
+                  GeometricLayer.getDFCILayer().geometries.last.attributes[2].value = rmq;
+                  GeometricLayer.getDFCILayer().geometries.last.attributes[3].value = DateTime.now().toString();
+                  GeometricLayer.getDFCILayer().geometries.last.colorLine = col;
+                  gl.lastUsedCategory = col;
+                  GeometricLayer.getDFCILayer().geometries.last.serialize();
+                  gl.Mode.serialize();
+                  gl.stack.pop(id);
+                });
+                break;
+              case 1:
+                gl.refreshStack(() {
+                  GeometricLayer.getDFCILayer().addGeometry(
+                    mpo: true,
+                    name: "Object - ${GeometricLayer.getDFCILayer().geometries.length + 1}",
+                  );
+                  GeometricLayer.getDFCILayer().geometries.last.points.add(coordinates);
+                  GeometricLayer.getDFCILayer().geometries.last.attributes[0].value = object;
+                  GeometricLayer.getDFCILayer().geometries.last.attributes[1].value = "Objet";
+                  GeometricLayer.getDFCILayer().geometries.last.attributes[2].value = rmq;
+                  GeometricLayer.getDFCILayer().geometries.last.attributes[3].value = DateTime.now().toString();
+                  GeometricLayer.getDFCILayer().geometries.last.colorLine = gl.obstacleChoice[object]!.color;
+                  GeometricLayer.getDFCILayer().geometries.last.finished = true;
+                  GeometricLayer.getDFCILayer().geometries.last.serialize();
+                  gl.Mode.serialize();
+                  Geometry.sendPisteDfciInBackground();
+                  gl.stack.pop(id);
+                });
+                break;
+              case 2:
+                gl.refreshStack(() {
+                  gl.stack.pop(id);
+                });
+                break;
+              case 3:
+                object.contains("intermédiaire")
+                    ? gl.refreshStack(() {
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.points.insert(0, coordinates);
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[0].value =
+                          "Point,${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[0].value}";
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[1].value =
+                          "Point,${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[1].value}";
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value =
+                          ",${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value}";
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[3].value =
+                          "${DateTime.now().toString()},${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[3].value}";
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.serialize();
+                      gl.Mode.serialize();
+                      gl.stack.pop(id);
+                    })
+                    : gl.refreshStack(() {
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.points.insert(0, coordinates);
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[0].value =
+                          "FIN,${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[0].value}";
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[1].value =
+                          "FIN,${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[1].value}";
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value =
+                          ",${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value}";
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[3].value =
+                          "${DateTime.now().toString()},${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[3].value}";
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.serialize();
+                      GeometricLayer.getDFCILayer().lastUnfinishedGeometry.finished = true;
+                      Geometry.sendPisteDfciInBackground();
+                      gl.Mode.serialize();
+                      gl.stack.pop(id);
+                    });
+                break;
+              default:
+            }
           },
           onDecline: () {
             gl.refreshStack(() {
@@ -1518,15 +1532,15 @@ class PopupNewCatPiste {
   }
 }
 
-class DefinePOI extends StatefulWidget {
+class DefineCategory extends StatefulWidget {
   final VoidCallback? callbackOnStartTyping;
-  final Function(String, Color, String, String) onAccept;
+  final Function(String, Color, String, String, int) onAccept;
   final VoidCallback onDecline;
   final String messageAccept;
   final String messageDecline;
   final double height;
 
-  const DefinePOI({
+  const DefineCategory({
     super.key,
     this.callbackOnStartTyping,
     required this.onAccept,
@@ -1537,41 +1551,200 @@ class DefinePOI extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _DefinePOI();
+  State<StatefulWidget> createState() => _DefineCategory();
 }
 
-class _DefinePOI extends State<DefinePOI> {
-  final TextEditingController _controllerRmq = TextEditingController();
-  static int _selected = -1;
+class _DefineCategory extends State<DefineCategory> {
+  int _selectedCat = -1;
+  int _selectedObj = -1;
+  int _selectedUndo = -1;
+  int _selectedPiste = -1;
+
   static String _custom = "";
   static Color _color = Colors.transparent;
-  String _rmq = "";
+  static String _rmq = "";
+  static int _choice = 0;
+
+  bool _expandCategories = false;
+  bool _expandObjects = false;
+  bool _expandUndo = false;
+  bool _expandPiste = false;
+  final ExpansibleController _expansionCatController = ExpansibleController();
+  final ExpansibleController _expansionObjController = ExpansibleController();
+  final ExpansibleController _expansionUndoController = ExpansibleController();
+  final ExpansibleController _expansionPisteController = ExpansibleController();
 
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (c, o) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
-              AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                height: widget.height - 40 * gl.eqPx,
-                width: 98 * gl.eqPx,
-                child: lt.ForestimatorScrollView(
-                  height: widget.height - 40 * gl.eqPx,
-                  child: Column(
+        return switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
+          lt.ForestimatorScrollView(
+            height: gl.dsp.orientation == Orientation.portrait ? 150 * gl.eqPx : 65 * gl.eqPx,
+            width: gl.dsp.orientation == Orientation.portrait ? 98 * gl.eqPx : 95 * gl.eqPx,
+            child: Column(
+              children: [
+                GeometricLayer.getDFCILayer().geometries.isEmpty ||
+                        GeometricLayer.getDFCILayer().lastUnfinishedGeometry.finished
+                    ? AnimatedContainer(
+                      duration: Duration(milliseconds: 200),
+                      height: _expandCategories ? 80 * gl.eqPx : 20 * gl.eqPx,
+                      width: 95 * gl.eqPx,
+                      child: ExpansionTile(
+                        controller: _expansionCatController,
+                        onExpansionChanged: (bool value) {
+                          gl.refreshStack(() {});
+                          setState(() {
+                            if (_expandObjects) _expansionObjController.collapse();
+                            if (_expandUndo) _expansionUndoController.collapse();
+                            if (_expandPiste) _expansionPisteController.collapse();
+                            _expandCategories = value;
+                          });
+                        },
+                        iconColor: Colors.white,
+                        collapsedIconColor: Colors.white,
+                        title: Text(
+                          "Pistes",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: gl.eqPx * gl.fontSizeM,
+                            color: Colors.white,
+                          ),
+                        ),
+                        children: [
+                          Column(
+                            children: List<Widget>.generate(gl.roadCategoryChoice.length, (index) {
+                              return AnimatedContainer(
+                                color: _selectedCat == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                                duration: Duration(milliseconds: 500),
+                                child: TextButton(
+                                  style: lt.borderlessStyle,
+                                  onPressed: () {
+                                    _selectedCat = index;
+                                    setState(() {
+                                      _custom = gl.roadCategoryChoice.keys.toList()[index];
+                                      _choice = 0;
+                                      _color = gl.roadCategoryChoice.values.toList()[index];
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        gl.roadCategoryChoice.keys.toList()[index],
+                                        style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                      ),
+                                      CircleAvatar(
+                                        backgroundColor: gl.roadCategoryChoice.values.toList()[index],
+                                        radius: gl.iconSizeXS * gl.eqPx * .75,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        ],
+                      ),
+                    )
+                    : AnimatedContainer(
+                      duration: Duration(milliseconds: 200),
+                      height: _expandPiste ? 80 * gl.eqPx : 20 * gl.eqPx,
+                      width: 95 * gl.eqPx,
+                      child: ExpansionTile(
+                        controller: _expansionPisteController,
+                        onExpansionChanged: (bool value) {
+                          gl.refreshStack(() {});
+                          setState(() {
+                            if (_expandObjects) _expansionObjController.collapse();
+                            if (_expandUndo) _expansionUndoController.collapse();
+                            if (_expandCategories) _expansionCatController.collapse();
+                            _expandPiste = value;
+                          });
+                        },
+                        iconColor: Colors.white,
+                        collapsedIconColor: Colors.white,
+                        title: Text(
+                          "Pistes",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: gl.eqPx * gl.fontSizeM,
+                            color: Colors.white,
+                          ),
+                        ),
+                        children: [
+                          Column(
+                            children: List<Widget>.generate(gl.pistesChoices.length, (index) {
+                              return AnimatedContainer(
+                                color:
+                                    _selectedPiste == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                                duration: Duration(milliseconds: 500),
+                                child: TextButton(
+                                  style: lt.borderlessStyle,
+                                  onPressed: () {
+                                    _selectedPiste = index;
+                                    setState(() {
+                                      _custom = gl.pistesChoices.keys.toList()[index];
+                                      _choice = 3;
+                                      _color = gl.pistesChoices.values.toList()[index];
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        gl.pistesChoices.keys.toList()[index],
+                                        style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                      ),
+                                      CircleAvatar(
+                                        backgroundColor: gl.pistesChoices.values.toList()[index],
+                                        radius: gl.iconSizeXS * gl.eqPx * .75,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        ],
+                      ),
+                    ),
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  height: _expandObjects ? 180 * gl.eqPx : 20 * gl.eqPx,
+                  width: 95 * gl.eqPx,
+                  child: ExpansionTile(
+                    controller: _expansionObjController,
+                    initiallyExpanded: _expandObjects,
+                    onExpansionChanged: (bool value) {
+                      setState(() {
+                        if (_expandCategories) _expansionCatController.collapse();
+                        if (_expandUndo) _expansionUndoController.collapse();
+                        if (_expandPiste) _expansionPisteController.collapse();
+                        _expandObjects = value;
+                      });
+                    },
+                    iconColor: Colors.white,
+                    collapsedIconColor: Colors.white,
+                    title: Text(
+                      "Autre équipements",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: gl.eqPx * gl.fontSizeM,
+                        color: Colors.white,
+                      ),
+                    ),
                     children: List<Widget>.generate(gl.obstacleChoice.length, (index) {
                       return AnimatedContainer(
-                        color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                        color: _selectedObj == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
                         duration: Duration(milliseconds: 500),
                         child: TextButton(
                           style: lt.borderlessStyle,
                           onPressed: () {
-                            _selected = index;
+                            _selectedObj = index;
                             setState(() {
                               _custom = gl.obstacleChoice.keys.toList()[index];
+                              _choice = 1;
                               _color = gl.lastUsedCategory;
                             });
                           },
@@ -1598,174 +1771,93 @@ class _DefinePOI extends State<DefinePOI> {
                     }),
                   ),
                 ),
-              ),
-              AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                height: 40 * gl.eqPx,
-                child: Column(
-                  children: [
-                    lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        if (_selected > -1 && _selected < gl.obstacleChoice.length && _custom.isNotEmpty ||
-                            _selected == gl.obstacleChoice.length - 1 && _custom.isNotEmpty)
-                          SizedBox(
-                            width: gl.menuBarLength * .5 * gl.eqPx,
-                            child: TextButton(
-                              style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
-                              onPressed: () {
-                                widget.onAccept(_custom, _color, _custom, _rmq);
-                              },
-                              child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
-                            ),
-                          ),
-                        SizedBox(
-                          width: gl.menuBarLength * .5 * gl.eqPx,
-                          child: TextButton(
-                            style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Retour".length),
-                            onPressed: widget.onDecline,
-                            child: Text(widget.messageDecline, style: dialogTextButtonStyle()),
-                          ),
-                        ),
-                      ],
-                    ),
-                    lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                    SizedBox(
-                      width: gl.eqPx * 90,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                "Remarque eventuelle",
-                                style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
-                              ),
-                            ],
-                          ),
-                          lt.stroke(gl.eqPx, gl.eqPx * .5, Colors.grey),
-                          TextFormField(
-                            cursorColor: Colors.white,
-                            controller: _controllerRmq,
-                            onChanged: (value) {
-                              if (value.contains(',')) {
-                                value = value.replaceAll(',', ';');
-                              }
-                              _controllerRmq.text = value.replaceAll("'", '*');
-                              setState(() {
-                                _rmq = _controllerRmq.text;
-                              });
-                            },
-                            onTap: () => widget.callbackOnStartTyping ?? () {},
-                            onTapOutside: (pointer) {},
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  height: _expandUndo ? 50 * gl.eqPx : 20 * gl.eqPx,
+                  width: 95 * gl.eqPx,
+                  child: ExpansionTile(
+                    controller: _expansionUndoController,
+                    onExpansionChanged: (bool value) {
+                      gl.refreshStack(() {});
+                      setState(() {
+                        if (_expandObjects) _expansionObjController.collapse();
+                        if (_expandCategories) _expansionCatController.collapse();
+                        if (_expandPiste) _expansionPisteController.collapse();
+                        _expandUndo = value;
+                      });
+                    },
+                    iconColor: Colors.white,
+                    collapsedIconColor: Colors.white,
+                    title: Text(
+                      "Supprimer la dernière action",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: gl.eqPx * gl.fontSizeM,
+                        color: Colors.white,
                       ),
                     ),
-                    lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                  ],
-                ),
-              ),
-            ]),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class DefineCategory extends StatefulWidget {
-  final VoidCallback? callbackOnStartTyping;
-  final Function(String, Color, String, String) onAccept;
-  final VoidCallback onDecline;
-  final String messageAccept;
-  final String messageDecline;
-  final double height;
-
-  const DefineCategory({
-    super.key,
-    this.callbackOnStartTyping,
-    required this.onAccept,
-    required this.onDecline,
-    required this.messageAccept,
-    required this.messageDecline,
-    required this.height,
-  });
-
-  @override
-  State<StatefulWidget> createState() => _DefineCategory();
-}
-
-class _DefineCategory extends State<DefineCategory> {
-  static int _selected = -1;
-  static String _custom = "";
-  static Color _color = Colors.transparent;
-  final String _rmq = "";
-
-  @override
-  Widget build(BuildContext context) {
-    return OrientationBuilder(
-      builder: (c, o) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
-              AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                height: widget.height - 40 * gl.eqPx,
-                width: 85 * gl.eqPx,
-                child: lt.ForestimatorScrollView(
-                  height: widget.height - 40 * gl.eqPx,
-                  child: Column(
-                    children: List<Widget>.generate(gl.roadCategoryChoice.length, (index) {
-                      return AnimatedContainer(
-                        color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
-                        duration: Duration(milliseconds: 500),
-                        child: TextButton(
-                          style: lt.borderlessStyle,
-                          onPressed: () {
-                            _selected = index;
-                            setState(() {
-                              _custom = gl.roadCategoryChoice.keys.toList()[index];
-                              _color = gl.roadCategoryChoice.values.toList()[index];
-                            });
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                gl.roadCategoryChoice.keys.toList()[index],
-                                style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                    children: [
+                      Column(
+                        children: List<Widget>.generate(gl.undoPistesChoices.length, (index) {
+                          return AnimatedContainer(
+                            color: _selectedUndo == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                            duration: Duration(milliseconds: 500),
+                            child: TextButton(
+                              style: lt.borderlessStyle,
+                              onPressed: () {
+                                _selectedUndo = index;
+                                setState(() {
+                                  _custom = gl.undoPistesChoices.keys.toList()[index];
+                                  _choice = 2;
+                                  _color = gl.undoPistesChoices.values.toList()[index];
+                                });
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: gl.eqPx * 75,
+                                    child: Text(
+                                      gl.undoPistesChoices.keys.toList()[index],
+                                      style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                    ),
+                                  ),
+                                  CircleAvatar(
+                                    backgroundColor: gl.undoPistesChoices.values.toList()[index],
+                                    radius: gl.iconSizeXS * gl.eqPx * .75,
+                                  ),
+                                ],
                               ),
-                              CircleAvatar(
-                                backgroundColor: gl.roadCategoryChoice.values.toList()[index],
-                                radius: gl.iconSizeXS * gl.eqPx * .75,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+              ],
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
                 height: 20 * gl.eqPx,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        if (_selected > -1 && _selected < gl.roadCategoryChoice.length && _custom.isNotEmpty)
+                        if (_custom.isNotEmpty)
                           SizedBox(
                             width: gl.menuBarLength * .5 * gl.eqPx,
                             child: TextButton(
                               style: dialogButtonStyle(height: gl.eqPx * 12, width: gl.eqPx * 10 * "Ok".length),
                               onPressed: () {
-                                widget.onAccept(_custom, _color, "Categorie", _rmq);
+                                widget.onAccept(_custom, _color, "Categorie", _rmq, _choice);
                               },
                               child: Text(widget.messageAccept, style: dialogTextButtonStyle()),
                             ),
@@ -1783,14 +1875,12 @@ class _DefineCategory extends State<DefineCategory> {
                   ],
                 ),
               ),
-            ]),
-          ],
-        );
+            ],
+          ),
+        ]);
       },
     );
   }
-
-  static void reset() => {_custom = "", _selected = -1};
 }
 
 class PopupValueChange {
@@ -2732,7 +2822,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 );
                                               },
                                               icon: Icon(
-                                                gl.selLay.geometries[index].type.contains("Point")
+                                                gl.selLay.geometries[index].subsubtype.contains("Point")
                                                     ? gl.selectableIcons[gl.selLay.geometries[index].selectedPointIcon]
                                                     : gl.selectableIconGeo[gl
                                                         .selLay
@@ -2815,7 +2905,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 ),
                                               )
                                               : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
-                                          (gl.selLay.geometries[index].type == "Polygon" &&
+                                          (gl.selLay.geometries[index].subsubtype == "Polygon" &&
                                                   gl.selLay.geometries[index].points.length > 2)
                                               ? Container(
                                                 alignment: Alignment.center,
@@ -3118,15 +3208,15 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                             controller: propertiesTableScrollController,
                             children:
                                 <Widget>[
-                                  _getFixedAttribute("type", gl.selGeo.type),
+                                  _getFixedAttribute("type", gl.selGeo.subsubtype),
                                   _getFixedAttribute("nom", gl.selGeo.name, checked: true),
-                                  if (gl.selGeo.type == "Polygon")
+                                  if (gl.selGeo.subsubtype == "Polygon")
                                     _getFixedAttribute("surface", "${(gl.selGeo.area / 100).round() / 100}"),
-                                  if (gl.selGeo.type == "Polygon")
+                                  if (gl.selGeo.subsubtype == "Polygon")
                                     _getFixedAttribute("circonference", "${(gl.selGeo.perimeter).round() / 1000}"),
 
                                   _getFixedAttribute("coordinates", gl.selGeo.getPolyPointsString()),
-                                  if (gl.selGeo.type == "Polygon")
+                                  if (gl.selGeo.subsubtype == "Polygon")
                                     _getFixedAttribute("bounding_box", gl.selGeo.boundingBox.toString()),
                                 ] +
                                 List<Widget>.generate(gl.selGeo.attributes.length, (i) {
@@ -7826,17 +7916,9 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                                 dir = (await getApplicationDocumentsDirectory()).path;
                               }
                               makePdf(widget.requestedLayers, pdf, dir, locationName);
-                              // confirmation que le pdf a été créé
-                              gl.refreshStack(() {
-                                popupForestimatorMessage(
-                                  title: "PDF créé",
-                                  message:
-                                      "Le PDF a été créé et enregistré dans le dossier $dir ${Platform.isAndroid ? "Téléchargements" : "Documents de l'application"} avec le nom $pdf.",
-                                );
-                              });
                             });
                             gl.refreshStack(() {});
-                          }, Icons.save_alt),
+                          }, Icons.share),
                           Container(
                             alignment: Alignment.topRight,
                             width: gl.eqPx * gl.iconSizeM,
@@ -7849,12 +7931,11 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                           ),
                         ],
                       ),
-
-                      SizedBox(
+                      Container(
+                        alignment: Alignment.centerLeft,
                         width: gl.eqPx * 80,
                         child: Text(
-                          "Sauvegardez l'analyse comme pdf",
-                          textAlign: TextAlign.center,
+                          "Partagez l'analyse",
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w400,
@@ -8025,8 +8106,8 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
   void popupPdfSaveDialog(void Function(String, String) onAccept) {
     popupForestimatorMessage(
       id: "davepdf",
-      title: "Sauvegardez un pdf",
-      messageAccept: "Enregistrer",
+      title: "Nommez le pdf",
+      messageAccept: "Partager",
       messageDecline: "Annuler",
       onAccept: () {
         onAccept(controllerPdfName!.text, controllerLocationName!.text);
@@ -8045,14 +8126,16 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                       style: TextStyle(color: Colors.white),
                       controller: controllerPdfName,
                       autofocus: true,
+                      cursorColor: Colors.white,
                       decoration: InputDecoration(
+                        hintStyle: TextStyle(color: Colors.grey),
                         hintText:
                             "forestimatorAnalyse${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf",
                       ),
                     ),
                     TextField(
                       controller: controllerLocationName,
-                      decoration: InputDecoration(hintText: "Point 5"),
+                      decoration: InputDecoration(hintText: "Point 5", hintStyle: TextStyle(color: Colors.grey)),
                       style: TextStyle(color: Colors.white),
                     ),
                   ],
@@ -8137,22 +8220,14 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
         },
       ),
     );
-    XFile file = XFile.fromData(await pdf.save(), name: "file.pdf", mimeType: "pdf");
-    ShareParams params = ShareParams(text: "file.pdf", files: [file]);
-    final result = await SharePlus.instance.share(params);
-    /*
-    File out = File("$dir/$fileName");
-    if (await out.exists()) {
-      // on renomme le pdf
-      int nb = 2;
-      do {
-        out = File("$dir/${fileName.substring(0, fileName.length - 4)}$nb.pdf");
-        nb++;
-        //print(out.path);
-      } while (await out.exists());
+    try {
+      File tmp = File("$dir/$fileName");
+      await tmp.writeAsBytes(await pdf.save(), flush: true);
+      await SharePlus.instance.share(ShareParams(text: "Analyse Ponctuelle Forestimator", files: [XFile(tmp.path)]));
+      await tmp.delete();
+    } catch (e) {
+      gl.print("Error: Sharing of anaPt pdf failed: ${e.toString()})");
     }
-    out.writeAsBytes(await pdf.save(), flush: true);
-    // FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");*/
   }
 }
 

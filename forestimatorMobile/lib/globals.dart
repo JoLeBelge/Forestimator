@@ -558,7 +558,7 @@ bool get positionInit => _positionInit;
 late proj4.Point pt;
 
 const Color colorAgroBioTech = Color.fromRGBO(185, 205, 118, 1.0);
-const Color colorPathPoints = Color.from(alpha: 1, red: 0.894, green: 0.298, blue: 0.063);
+const Color colorDfci = Color.from(alpha: 1, red: 0.894, green: 0.298, blue: 0.063);
 const Color colorDeselected = Color.fromARGB(255, 46, 46, 46);
 const Color colorUliege = Color.fromRGBO(00, 112, 127, 1.0);
 const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
@@ -745,8 +745,8 @@ void savePrefSelLayOffline() async {
 }
 
 void loadPrefSelLayOnline() async {
-  interfaceSelectedLCode = shared!.getStringList('interfaceSelectedLCode')!;
-  List<String> offlineLayer = shared!.getStringList('interfaceSelectedLCodeOfflineFlag')!;
+  interfaceSelectedLCode = shared!.getStringList('interfaceSelectedLCode') ?? [defaultLayer];
+  List<String> offlineLayer = shared!.getStringList('interfaceSelectedLCodeOfflineFlag') ?? ["f"];
   switcherMaps.clear();
   int index = 0;
   for (String key in interfaceSelectedLCode) {
@@ -937,6 +937,16 @@ Map<String, Color> roadCategoryChoice = {
   "Categorie 3": Colors.yellow,
   "Voie d'access à une piste": Colors.green,
   "Impasse non amenagée": Colors.blue,
+};
+
+Map<String, Color> undoPistesChoices = {
+  "Supprimez le dernier point d'une piste.": Colors.blue,
+  "Supprimez la dernière observation.": Colors.lightBlue,
+};
+
+Map<String, Color> pistesChoices = {
+  "Ajoutez un point intermédiaire.": Colors.orange,
+  "Ajoutez un dernier point terminal.": Colors.red,
 };
 
 Color lastUsedCategory = Colors.red;

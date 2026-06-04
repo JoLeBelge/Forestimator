@@ -30,7 +30,7 @@ class Geometry {
   String identifier = Uuid().v4();
   bool sentToServer = false;
   String hitValue = Uuid().v4();
-  String type = "Point";
+  String subsubtype = "Point";
   String name = "";
   bool visibleOnMap = true;
   bool labelsVisibleOnMap = true;
@@ -70,7 +70,7 @@ class Geometry {
   }
 
   Geometry.polygon({String polygonName = ""}) {
-    type = "Polygon";
+    subsubtype = "Polygon";
     name = polygonName;
     Random randomColor = Random();
     setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
@@ -80,7 +80,7 @@ class Geometry {
   }
 
   Geometry.path({String polygonName = ""}) {
-    type = "MP";
+    subsubtype = "MP";
     name = polygonName;
     Random randomColor = Random();
     setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
@@ -89,11 +89,11 @@ class Geometry {
     );
   }
 
-  Geometry.firePath({String polygonName = ""}) {
-    type = "MP";
+  Geometry.dfciPoint({String polygonName = ""}) {
+    subsubtype = "MPO";
     name = polygonName;
-    visibleOnMap = true;
     selectedPointIcon = 4;
+    iconSize = 5;
     Random randomColor = Random();
     setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
     setColorLine(
@@ -102,7 +102,7 @@ class Geometry {
   }
 
   Geometry.essencePoint({String polygonName = ""}) {
-    type = "Point-essence";
+    subsubtype = "Point-essence";
     visibleOnMap = true;
     name = polygonName;
     selectedPointIcon = 4;
@@ -326,7 +326,7 @@ class Geometry {
       proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
       coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
     }
-    if (type == "Polygon" && points.isNotEmpty) {
+    if (subsubtype == "Polygon" && points.isNotEmpty) {
       proj4.Point tLb72 = gl.epsg4326.transform(
         gl.epsg31370,
         proj4.Point(x: points.first.longitude, y: points.first.latitude),
@@ -489,7 +489,7 @@ class Geometry {
         proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
         coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
       }
-      if (type == "Polygon") {
+      if (subsubtype == "Polygon") {
         proj4.Point tLb72 = gl.epsg4326.transform(
           gl.epsg31370,
           proj4.Point(x: points.first.longitude, y: points.first.latitude),
@@ -511,7 +511,7 @@ class Geometry {
       }
       properties = properties.substring(0, properties.length - 1);
       String geometry =
-          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
+          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(subsubtype)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
 
       String request = "https://forestimator.gembloux.ulg.ac.be/api/polygFromMobile/$geometry";
       gl.print(request);
@@ -545,7 +545,7 @@ class Geometry {
     return true;
   }
 
-  static void sendPathPointsInBackground() async {
+  static void sendPisteDfciInBackground() async {
     if (!gl.Mode.pathsToSync) {
       gl.Mode.pathsToSync = true;
       gl.startTimer(sendPathBackground, () => !gl.Mode.pathsToSync, 1, 300);
@@ -554,7 +554,7 @@ class Geometry {
 
   static Future<bool> sendPathBackground() async {
     bool allFinished = true;
-    GeometricLayer path = GeometricLayer.getPisteDFCLLayer();
+    GeometricLayer path = GeometricLayer.getDFCILayer();
     for (int i = 0; i < path.geometries.length; i++) {
       if (!path.geometries[i].sentToServer && path.geometries[i].finished) {
         if (!await path.geometries[i].sendPathToServer()) {
@@ -567,10 +567,6 @@ class Geometry {
   }
 
   Future<bool> sendPathToServer() async {
-    if (sentToServer) {
-      gl.print("Multipoint $name already sent once!");
-      return false;
-    }
     bool internet = await InternetConnection().hasInternetAccess;
     if (internet) {
       String coordinates = "";
@@ -578,30 +574,20 @@ class Geometry {
         proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
         coordinates = "[${tLb72.x}, ${tLb72.y}],$coordinates";
       }
-      if (coordinates.length > 1) {
+      if (points.length > 1) {
         coordinates = "[${coordinates.substring(0, coordinates.length - 1)}]";
+      } else {
+        coordinates = coordinates.substring(0, coordinates.length - 1);
       }
       String properties = "";
       properties = "$properties\"name\":\"$name\",";
       properties = "$properties\"nom_contact\":\"${gl.UserData.name} ${gl.UserData.forename}\",";
       properties = "$properties\"contact\":\"${gl.UserData.mail}\",";
       properties =
-          "$properties\"categorie\":\"${attributes[0].value.split(',')[attributes[0].value.split(',').length - 1]}\",";
+          "$properties\"type\":\"${attributes[0].value.split(',')[attributes[0].value.split(',').length - 1]}\",";
 
-      String ppoints = "";
-      for (int i = attributes[0].value.split(',').length - 2; i > 0; i--) {
-        String pprop = "";
-        for (int j = 1; j < 4; j++) {
-          pprop = "$pprop\"${attributes[j].name}\":\"${attributes[j].value.split(',')[i].toString()}\",";
-        }
-        ppoints =
-            "$ppoints{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${coordinates.substring(2, coordinates.length - 2).split("],[")[attributes[0].value.split(',').length - 1 - i]}]},\"properties\":{$pprop}},";
-      }
-      if (ppoints.length > 1) {
-        ppoints = ppoints.substring(0, ppoints.length - 1);
-      }
       String path =
-          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}},$ppoints]}";
+          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(subsubtype)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
       String request = "https://forestimator.gembloux.ulg.ac.be/api/voirieFromMobile/$path";
 
       gl.print(path.replaceAll("'", ""));
@@ -636,6 +622,7 @@ class Geometry {
   }
 
   String getProperTypeForCarto(String s) {
+    if (s.contains("MPO")) return "Point";
     if (s.contains("MP")) return "MultiPoint";
     if (s.contains("Point")) return "Point";
     return s;
@@ -664,7 +651,7 @@ class Geometry {
     String prefix = identifier;
     await gl.shared!.setBool('$prefix.sent', sentToServer);
     await gl.shared!.setString('$prefix.name', name);
-    await gl.shared!.setString('$prefix.type', type);
+    await gl.shared!.setString('$prefix.type', subsubtype);
     await gl.shared!.setBool('$prefix.visibleOnMap', visibleOnMap);
     await gl.shared!.setBool('$prefix.finished', finished);
     await gl.shared!.setBool('$prefix.labelsVisibleOnMap', labelsVisibleOnMap);
@@ -727,7 +714,7 @@ class Geometry {
   void deserialze(String id) async {
     name = gl.shared!.getString('$id.name')!;
     identifier = id;
-    type = gl.shared!.getString('$id.type') ?? "Polygon";
+    subsubtype = gl.shared!.getString('$id.type') ?? "Polygon";
     sentToServer = gl.shared!.getBool('$id.sent') ?? false;
     visibleOnMap = gl.shared!.getBool('$id.visibleOnMap') ?? true;
     labelsVisibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap') ?? true;
@@ -806,7 +793,7 @@ class Geometry {
   static int countEssenceObservations() {
     int count = 0;
     for (Geometry form in gl.selLay.geometries) {
-      if (form.type.contains("essence")) count++;
+      if (form.subsubtype.contains("essence")) count++;
     }
     return count;
   }

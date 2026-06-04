@@ -227,8 +227,8 @@ class _MyApp extends State<MyApp> {
     if (GeometricLayer.essenceLayerExists()) {
       Geometry.sendEssencePointsInBackground();
     }
-    if (GeometricLayer.pathPisteDFCLLayerExists()) {
-      Geometry.sendPathPointsInBackground();
+    if (GeometricLayer.dFCILayerExists()) {
+      Geometry.sendPisteDfciInBackground();
     }
   }
 

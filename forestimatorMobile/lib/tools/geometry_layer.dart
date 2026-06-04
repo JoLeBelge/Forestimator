@@ -63,10 +63,10 @@ class GeometricLayer {
     defaultPointIcon = 4;
   }
 
-  GeometricLayer.pisteDFCL() {
+  GeometricLayer.pisteDFCI() {
     type = "MP";
     subtype = "dfci";
-    defaultColor = gl.colorPathPoints.withAlpha(150);
+    defaultColor = gl.colorDfci.withAlpha(150);
     defaultPointIcon = 1;
     defaultIconSize = 7.5;
     defaultAttributes.addAll([
@@ -88,7 +88,7 @@ class GeometricLayer {
     gl.geoLayers.removeAt(index);
   }
 
-  void addGeometry({String name = ""}) {
+  void addGeometry({String name = "", bool mpo = false}) {
     switch (type) {
       case 'Point':
         subtype == 'Essence'
@@ -99,16 +99,22 @@ class GeometricLayer {
         geometries.add(Geometry.polygon(polygonName: name));
         break;
       case 'MP':
-        geometries.add(Geometry.path(polygonName: name));
+        if (mpo) {
+          geometries.add(Geometry.dfciPoint(polygonName: name));
+        } else {
+          geometries.add(Geometry.path(polygonName: name));
+        }
         break;
       default:
         gl.print("error: unknown type $type to create new geometry on layer $name");
         return;
     }
-    geometries.last.setColorInside(defaultColor.withAlpha(100));
-    geometries.last.setColorLine(defaultColor);
-    geometries.last.selectedPointIcon = defaultPointIcon;
-    geometries.last.iconSize = defaultIconSize;
+    if (!mpo) {
+      geometries.last.setColorInside(defaultColor.withAlpha(100));
+      geometries.last.setColorLine(defaultColor);
+      geometries.last.selectedPointIcon = defaultPointIcon;
+      geometries.last.iconSize = defaultIconSize;
+    }
     for (Attribute a in defaultAttributes) {
       geometries.last.attributes.add(a.clone);
     }
@@ -142,6 +148,10 @@ class GeometricLayer {
       selectedGeometry--;
     }
   }
+
+  Geometry get lastUnfinishedGeometry => geometries.lastWhere((Geometry g) {
+    return !g.finished;
+  }, orElse: () => geometries.last);
 
   void visible(bool visibility) {
     visibleOnMap = visibility;
@@ -328,7 +338,7 @@ class GeometricLayer {
     return gl.geoLayers.last;
   }
 
-  static bool pathPisteDFCLLayerExists() {
+  static bool dFCILayerExists() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
       if (g.type == "MP" && g.subtype == "dfci") {
@@ -340,7 +350,7 @@ class GeometricLayer {
     return false;
   }
 
-  static GeometricLayer getPisteDFCLLayer() {
+  static GeometricLayer getDFCILayer() {
     int index = 0;
     for (GeometricLayer g in gl.geoLayers) {
       if (g.type == "MP" && g.subtype == "dfci") {
@@ -349,7 +359,7 @@ class GeometricLayer {
       }
       index++;
     }
-    gl.geoLayers.add(GeometricLayer.pisteDFCL());
+    gl.geoLayers.add(GeometricLayer.pisteDFCI());
     gl.selectedGeoLayer = gl.geoLayers.length - 1;
     gl.geoLayers.last.serialize();
     return gl.geoLayers.last;
