@@ -14,6 +14,8 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const double dbVersion = 1.0;
+
 // TODO: Add state to SENT status with callback in timer.
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
 

@@ -189,8 +189,8 @@ class _MyApp extends State<MyApp> {
         await fromAsset(f, path.basename(f));
       }
       return;
-    } catch (_) {
-      // fall through to try binary manifest
+    } catch (e) {
+      gl.print("Warning: Could not load AssetManifest (json): $e");
     }
 
     // Newer Flutter toolchains may produce a binary asset manifest
@@ -208,7 +208,7 @@ class _MyApp extends State<MyApp> {
       }
       return;
     } catch (e) {
-      gl.print('Could not load any AssetManifest (json or bin): $e');
+      gl.print("Error: Could not load any AssetManifest (bin): $e");
       return;
     }
   }
