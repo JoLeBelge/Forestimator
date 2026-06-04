@@ -98,7 +98,7 @@ class AptsFEE {
   }
 }
 
-// listing des propositions d'essences du Guide des stations
+// listing des propositions/ recommandations d'essences du Guide des stations
 class PropositionGS {
   // key=code essence. val = code proposition
   Map<String, int> mApts = {};
@@ -126,8 +126,8 @@ class PropositionGS {
         }
       }
       if (l.mCode == "CS_A" && l.mFoundRastFile) {
-        us = l.mRastValue;
-        if (gl.dico.getLayerBase("CS_A").mDicoVal.containsKey(us)) {
+        us = gl.dico.stationNum2StationID(l.mRastValue);
+        if (gl.dico.getLayerBase("CS_A").mDicoVal.containsKey(l.mRastValue)) {
           ++test;
         }
       }

@@ -895,19 +895,6 @@ List<Color> predefinedPointSymbPalette = [
   Colors.white,
 ];
 
-Map<String, String> essenceChoice = {
-  "Bouleaux": "BO - Birchs",
-  "Chênes": "CH - Oaks",
-  "Douglas": "DO - Douglas_fir",
-  "Epicéa": "EP - Spruces",
-  "Hêtre": "HE - Beech",
-  "Mélèzes": "MZ - Larchs",
-  "Peupliers": "PE - Poplars",
-  "Pins": "PI - Pines",
-  "Autres conifères": "AUc - Others coniferous",
-  "Entrer du texte": "",
-};
-
 class DfclI {
   IconData icon;
   Color color;

@@ -49,6 +49,7 @@ class Vulnerabilite {
 
 class Station {
   late int mStationId;
+  late int mStationNum;
   late int mZbio;
   late String mNomStationCarto;
   late String mNomVar;
@@ -57,6 +58,7 @@ class Station {
 
   Station.fromMap(final Map<String, dynamic> map)
     : mStationId = map['stat_id'],
+      mStationNum = map['stat_num'],
       mZbio = map['ZBIO'],
       mNomStationCarto = map['Station_carto'],
       mNomVar = map['nom_var'] ?? '',
@@ -67,12 +69,12 @@ class Station {
 class Zbio {
   late int mCode;
   String? mNom;
-  String? mCSLay;
+  String? mPrefixCS;
   int? mCSid;
   Zbio.fromMap(final Map<String, dynamic> map)
     : mCode = map['Zbio'],
       mNom = map['Nom'],
-      mCSLay = map['CS_lay'],
+      mPrefixCS = map['PrefixCS'],
       mCSid = map['CSid'];
 }
 
@@ -339,6 +341,8 @@ class DicoAptProvider {
   Map<int, String> dicoCode2NTNH = {};
   //late Directory docDir;
 
+  Map<String, Color> essenceChoice = {};
+
   Future<String> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
 
@@ -422,7 +426,7 @@ class DicoAptProvider {
     for (var row in result) {
       mGrCouches.add(GroupeCouche.fromMap(row));
     }
-    result = await db.query('dico_station', where: 'stat_id=stat_num');
+    result = await db.query('dico_station');
     for (var row in result) {
       mStations.add(Station.fromMap(row));
     }
@@ -432,6 +436,11 @@ class DicoAptProvider {
     for (var row in result) {
       mEssences[row['Code_FR']] = Ess.fromMap(row);
       await mEssences[row['Code_FR']]?.fillApt(this);
+    }
+
+    result = await db.rawQuery('SELECT val,col FROM dico_observation_essence;');
+    for (var row in result) {
+      essenceChoice[row['val']] = HexColor(row['col']);
     }
 
     db.close();
@@ -499,6 +508,17 @@ class DicoAptProvider {
         aRes = v;
       }
     });
+    return aRes;
+  }
+
+  int stationNum2StationID(int aCode) {
+    int aRes = 0;
+    for (Station st in mStations) {
+      if (st.mStationNum == aCode) {
+        aRes = st.mStationId;
+        break;
+      }
+    }
     return aRes;
   }
 
@@ -589,6 +609,17 @@ class DicoAptProvider {
     return aRes;
   }
 
+  String zbio2CSPrefix(int aCode) {
+    String aRes = "";
+    for (Zbio z in mZbio) {
+      if (z.mCode == aCode) {
+        aRes = z.mPrefixCS!;
+        break;
+      }
+    }
+    return aRes;
+  }
+
   String getStationMaj(int zBio, int us) {
     String aRes = "";
     int zbioKey = zbio2CSid(zBio);
@@ -603,13 +634,20 @@ class DicoAptProvider {
 
   List<String> getAllStationFiches() {
     // en l'état, uniquement fonctionnel pour l'Ardenne
-    List<Station> that = mStations.where((i) => i.mVarMaj & (i.mZbio == 1)).toList();
-    List<String> aRes = that.map((item) => getStationPdf(item.mStationId)).toList();
+    List<Station> that = mStations.where((i) => i.mVarMaj & (i.mZbio == 1 || i.mZbio == 4)).toList();
+    List<String> aRes = that.map((item) => getStationPdf(item.mStationNum)).toList();
     return aRes;
   }
 
-  String getStationPdf(int us) {
-    return "US-A$us.pdf";
+  String getStationPdf(int usRastVal) {
+    String aRes = "";
+    for (Station st in mStations) {
+      if (st.mStationNum == usRastVal) {
+        aRes = "US-${zbio2CSPrefix(st.mZbio)}-${st.mStationId}.pdf";
+        break;
+      }
+    }
+    return aRes;
   }
 
   Future<int> checkLayerBaseOfflineRessource() async {

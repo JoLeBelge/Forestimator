@@ -1316,12 +1316,16 @@ class _AddEssence extends State<AddEssence> {
         AnimatedContainer(
           duration: Duration(milliseconds: 200),
           height:
-              _selected == gl.essenceChoice.length - 1 ? widget.height - 65 * gl.eqPx : widget.height - 50 * gl.eqPx,
+              _selected == gl.dico.essenceChoice.length - 1
+                  ? widget.height - 65 * gl.eqPx
+                  : widget.height - 50 * gl.eqPx,
           child: lt.ForestimatorScrollView(
             height:
-                _selected == gl.essenceChoice.length - 1 ? widget.height - 65 * gl.eqPx : widget.height - 50 * gl.eqPx,
+                _selected == gl.dico.essenceChoice.length - 1
+                    ? widget.height - 65 * gl.eqPx
+                    : widget.height - 50 * gl.eqPx,
             child: Column(
-              children: List<Widget>.generate(gl.essenceChoice.length, (index) {
+              children: List<Widget>.generate(gl.dico.essenceChoice.length, (index) {
                 return AnimatedContainer(
                   color: _selected == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
                   duration: Duration(milliseconds: 500),
@@ -1330,19 +1334,19 @@ class _AddEssence extends State<AddEssence> {
                     onPressed: () {
                       _selected = index;
                       setState(() {
-                        _custom = gl.essenceChoice.keys.toList()[index];
-                        _color = _getColorPointForEssence(gl.essenceChoice.keys.toList()[index]);
+                        _custom = gl.dico.essenceChoice.keys.toList()[index];
+                        _color = gl.dico.essenceChoice.values.toList()[index];
                       });
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          gl.essenceChoice.keys.toList()[index],
+                          gl.dico.essenceChoice.keys.toList()[index],
                           style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
                         ),
                         CircleAvatar(
-                          backgroundColor: _getColorPointForEssence(gl.essenceChoice.keys.toList()[index]),
+                          backgroundColor: gl.dico.essenceChoice.values.toList()[index],
                           radius: gl.iconSizeXS * gl.eqPx * .75,
                         ),
                       ],
@@ -1355,14 +1359,14 @@ class _AddEssence extends State<AddEssence> {
         ),
         AnimatedContainer(
           duration: Duration(milliseconds: 200),
-          height: _selected == gl.essenceChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
+          height: _selected == gl.dico.essenceChoice.length - 1 ? 40 * gl.eqPx : 20 * gl.eqPx,
           width: gl.menuBarLength * gl.eqPx,
           child: Column(
             children: [
-              if (_selected == gl.essenceChoice.length - 1) lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-              if (_selected == gl.essenceChoice.length - 1)
+              if (_selected == gl.dico.essenceChoice.length - 1) lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+              if (_selected == gl.dico.essenceChoice.length - 1)
                 AnimatedOpacity(
-                  opacity: _selected == gl.essenceChoice.length - 1 ? 1 : 0,
+                  opacity: _selected == gl.dico.essenceChoice.length - 1 ? 1 : 0,
                   duration: Duration(milliseconds: 200),
                   child: TextFormField(
                     cursorColor: Colors.white,
@@ -1382,8 +1386,8 @@ class _AddEssence extends State<AddEssence> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  if (_selected > -1 && _selected < gl.essenceChoice.length - 1 && _custom.isNotEmpty ||
-                      _selected == gl.essenceChoice.length - 1 && _custom.isNotEmpty)
+                  if (_selected > -1 && _selected < gl.dico.essenceChoice.length - 1 && _custom.isNotEmpty ||
+                      _selected == gl.dico.essenceChoice.length - 1 && _custom.isNotEmpty)
                     SizedBox(
                       width: gl.menuBarLength * .5 * gl.eqPx,
                       child: TextButton(
@@ -1409,15 +1413,6 @@ class _AddEssence extends State<AddEssence> {
         ),
       ],
     );
-  }
-
-  Color _getColorPointForEssence(String ess) {
-    for (int index in gl.dico.mLayerBases['COMPOALL']!.mDicoVal.keys) {
-      if (gl.dico.mLayerBases['COMPOALL']!.mDicoVal[index] == gl.essenceChoice[ess]) {
-        return gl.dico.mLayerBases['COMPOALL']!.mDicoCol[index] ?? Colors.tealAccent;
-      }
-    }
-    return Colors.tealAccent;
   }
 
   static void reset() => {_custom = "", _selected = -1};
