@@ -356,6 +356,8 @@ class DicoAptProvider {
   Map<int, String> dicoCode2NTNH = {};
   //late Directory docDir;
 
+  Map<String, Color> essenceChoice = {};
+
   Future<String> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
 
@@ -454,6 +456,11 @@ class DicoAptProvider {
     for (var row in result) {
       mEssences[row['Code_FR']] = Ess.fromMap(row);
       await mEssences[row['Code_FR']]?.fillApt(this);
+    }
+
+    result = await db.rawQuery('SELECT val,col FROM dico_observation_essence;');
+    for (var row in result) {
+      essenceChoice[row['val']] = HexColor(row['col']);
     }
 
     db.close();
