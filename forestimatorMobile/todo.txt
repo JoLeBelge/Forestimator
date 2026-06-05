@@ -45,6 +45,6 @@ Debug suite à la formation SFRSB
 
 
 TODO avant prochaine release:
--bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli! TODO
--Ios : export d'un pdf analyse surfacique : doit se faire dans le document "Download" de IOS! -> préciser dans un popup ou a été exporté le pdf. TODO
+V -bd sqlite dans asset de IOS : n'est pas mise à jours avec l'appli! TODO
+V -Ios : export d'un pdf analyse surfacique : doit se faire dans le document "Download" de IOS! -> préciser dans un popup ou a été exporté le pdf. TODO
 

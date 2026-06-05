@@ -1451,6 +1451,7 @@ class PopupNewCatPiste {
                   GeometricLayer.getDFCILayer().geometries.last.attributes[3].value = DateTime.now().toString();
                   GeometricLayer.getDFCILayer().geometries.last.colorLine = col;
                   gl.lastUsedCategory = col;
+                  _DefineCategory.reset();
                   GeometricLayer.getDFCILayer().geometries.last.serialize();
                   gl.Mode.serialize();
                   gl.stack.pop(id);
@@ -1470,6 +1471,7 @@ class PopupNewCatPiste {
                   GeometricLayer.getDFCILayer().geometries.last.colorLine = gl.obstacleChoice[object]!.color;
                   GeometricLayer.getDFCILayer().geometries.last.finished = true;
                   GeometricLayer.getDFCILayer().geometries.last.serialize();
+                  _DefineCategory.reset();
                   gl.Mode.serialize();
                   Geometry.sendPisteDfciInBackground();
                   gl.stack.pop(id);
@@ -1489,7 +1491,7 @@ class PopupNewCatPiste {
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[1].value =
                           "Point,${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[1].value}";
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value =
-                          ",${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value}";
+                          "$rmq,${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value}";
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[3].value =
                           "${DateTime.now().toString()},${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[3].value}";
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.serialize();
@@ -1503,13 +1505,14 @@ class PopupNewCatPiste {
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[1].value =
                           "FIN,${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[1].value}";
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value =
-                          ",${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value}";
+                          "$rmq,${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[2].value}";
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[3].value =
                           "${DateTime.now().toString()},${GeometricLayer.getDFCILayer().lastUnfinishedGeometry.attributes[3].value}";
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.serialize();
                       GeometricLayer.getDFCILayer().lastUnfinishedGeometry.finished = true;
                       Geometry.sendPisteDfciInBackground();
                       gl.Mode.serialize();
+                      _DefineCategory.reset();
                       gl.stack.pop(id);
                     });
                 break;
@@ -1553,17 +1556,17 @@ class _DefineCategory extends State<DefineCategory> {
   int _selectedCat = -1;
   int _selectedObj = -1;
   int _selectedUndo = -1;
-  int _selectedPiste = -1;
+  static int _selectedPiste = -1;
 
   static String _custom = "";
   static Color _color = Colors.transparent;
-  static String _rmq = "";
+  String _rmq = "";
   static int _choice = 0;
 
   bool _expandCategories = false;
   bool _expandObjects = false;
   bool _expandUndo = false;
-  bool _expandPiste = false;
+  bool _expandPiste = true;
   final ExpansibleController _expansionCatController = ExpansibleController();
   final ExpansibleController _expansionObjController = ExpansibleController();
   final ExpansibleController _expansionUndoController = ExpansibleController();
@@ -1575,7 +1578,7 @@ class _DefineCategory extends State<DefineCategory> {
       builder: (c, o) {
         return switchRowColWithOrientation(alignment: MainAxisAlignment.spaceAround, [
           lt.ForestimatorScrollView(
-            height: gl.dsp.orientation == Orientation.portrait ? 150 * gl.eqPx : 65 * gl.eqPx,
+            height: gl.dsp.orientation == Orientation.portrait ? 130 * gl.eqPx : 65 * gl.eqPx,
             width: gl.dsp.orientation == Orientation.portrait ? 98 * gl.eqPx : 95 * gl.eqPx,
             child: Column(
               children: [
@@ -1610,7 +1613,12 @@ class _DefineCategory extends State<DefineCategory> {
                           Column(
                             children: List<Widget>.generate(gl.roadCategoryChoice.length, (index) {
                               return AnimatedContainer(
-                                color: _selectedCat == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                                width: gl.eqPx * 95,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                                  color:
+                                      _selectedCat == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                                ),
                                 duration: Duration(milliseconds: 500),
                                 child: TextButton(
                                   style: lt.borderlessStyle,
@@ -1622,18 +1630,24 @@ class _DefineCategory extends State<DefineCategory> {
                                       _color = gl.roadCategoryChoice.values.toList()[index];
                                     });
                                   },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        gl.roadCategoryChoice.keys.toList()[index],
-                                        style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
-                                      ),
-                                      CircleAvatar(
-                                        backgroundColor: gl.roadCategoryChoice.values.toList()[index],
-                                        radius: gl.iconSizeXS * gl.eqPx * .75,
-                                      ),
-                                    ],
+                                  child: SizedBox(
+                                    width: gl.eqPx * 90,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: gl.eqPx * 80,
+                                          child: Text(
+                                            gl.roadCategoryChoice.keys.toList()[index],
+                                            style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                          ),
+                                        ),
+                                        CircleAvatar(
+                                          backgroundColor: gl.roadCategoryChoice.values.toList()[index],
+                                          radius: gl.iconSizeXS * gl.eqPx * .75,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
@@ -1644,9 +1658,10 @@ class _DefineCategory extends State<DefineCategory> {
                     )
                     : AnimatedContainer(
                       duration: Duration(milliseconds: 200),
-                      height: _expandPiste ? 80 * gl.eqPx : 20 * gl.eqPx,
+                      height: _expandPiste ? 45 * gl.eqPx : 20 * gl.eqPx,
                       width: 95 * gl.eqPx,
                       child: ExpansionTile(
+                        initiallyExpanded: true,
                         controller: _expansionPisteController,
                         onExpansionChanged: (bool value) {
                           gl.refreshStack(() {});
@@ -1671,8 +1686,12 @@ class _DefineCategory extends State<DefineCategory> {
                           Column(
                             children: List<Widget>.generate(gl.pistesChoices.length, (index) {
                               return AnimatedContainer(
-                                color:
-                                    _selectedPiste == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                                width: gl.eqPx * 95,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                                  color:
+                                      _selectedPiste == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                                ),
                                 duration: Duration(milliseconds: 500),
                                 child: TextButton(
                                   style: lt.borderlessStyle,
@@ -1684,18 +1703,24 @@ class _DefineCategory extends State<DefineCategory> {
                                       _color = gl.pistesChoices.values.toList()[index];
                                     });
                                   },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        gl.pistesChoices.keys.toList()[index],
-                                        style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
-                                      ),
-                                      CircleAvatar(
-                                        backgroundColor: gl.pistesChoices.values.toList()[index],
-                                        radius: gl.iconSizeXS * gl.eqPx * .75,
-                                      ),
-                                    ],
+                                  child: SizedBox(
+                                    width: gl.eqPx * 90,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: gl.eqPx * 80,
+                                          child: Text(
+                                            gl.pistesChoices.keys.toList()[index],
+                                            style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                          ),
+                                        ),
+                                        CircleAvatar(
+                                          backgroundColor: gl.pistesChoices.values.toList()[index],
+                                          radius: gl.iconSizeXS * gl.eqPx * .75,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
@@ -1731,7 +1756,11 @@ class _DefineCategory extends State<DefineCategory> {
                     ),
                     children: List<Widget>.generate(gl.obstacleChoice.length, (index) {
                       return AnimatedContainer(
-                        color: _selectedObj == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                        width: gl.eqPx * 95,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          color: _selectedObj == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                        ),
                         duration: Duration(milliseconds: 500),
                         child: TextButton(
                           style: lt.borderlessStyle,
@@ -1743,23 +1772,26 @@ class _DefineCategory extends State<DefineCategory> {
                               _color = gl.lastUsedCategory;
                             });
                           },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: gl.eqPx * 75,
-                                child: Text(
-                                  gl.obstacleChoice.keys.toList()[index],
-                                  style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                          child: SizedBox(
+                            width: gl.eqPx * 90,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: gl.eqPx * 80,
+                                  child: Text(
+                                    gl.obstacleChoice.keys.toList()[index],
+                                    style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                  ),
                                 ),
-                              ),
-                              Icon(
-                                gl.obstacleChoice.values.toList()[index].icon,
-                                color: gl.obstacleChoice.values.toList()[index].color,
-                                shadows: [Shadow(color: Colors.white, blurRadius: gl.eqPx * 4)],
-                                size: gl.dsp.equipixel * gl.iconSizeS,
-                              ),
-                            ],
+                                Icon(
+                                  gl.obstacleChoice.values.toList()[index].icon,
+                                  color: gl.obstacleChoice.values.toList()[index].color,
+                                  shadows: [Shadow(color: Colors.white, blurRadius: gl.eqPx * 4)],
+                                  size: gl.dsp.equipixel * gl.iconSizeS,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -1795,7 +1827,11 @@ class _DefineCategory extends State<DefineCategory> {
                       Column(
                         children: List<Widget>.generate(gl.undoPistesChoices.length, (index) {
                           return AnimatedContainer(
-                            color: _selectedUndo == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                            width: gl.eqPx * 95,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(30)),
+                              color: _selectedUndo == index ? gl.colorAgroBioTech.withAlpha(150) : Colors.transparent,
+                            ),
                             duration: Duration(milliseconds: 500),
                             child: TextButton(
                               style: lt.borderlessStyle,
@@ -1807,21 +1843,24 @@ class _DefineCategory extends State<DefineCategory> {
                                   _color = gl.undoPistesChoices.values.toList()[index];
                                 });
                               },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    width: gl.eqPx * 75,
-                                    child: Text(
-                                      gl.undoPistesChoices.keys.toList()[index],
-                                      style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                              child: SizedBox(
+                                width: gl.eqPx * 90,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: gl.eqPx * 80,
+                                      child: Text(
+                                        gl.undoPistesChoices.keys.toList()[index],
+                                        style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
+                                      ),
                                     ),
-                                  ),
-                                  CircleAvatar(
-                                    backgroundColor: gl.undoPistesChoices.values.toList()[index],
-                                    radius: gl.iconSizeXS * gl.eqPx * .75,
-                                  ),
-                                ],
+                                    CircleAvatar(
+                                      backgroundColor: gl.undoPistesChoices.values.toList()[index],
+                                      radius: gl.iconSizeXS * gl.eqPx * .75,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -1836,13 +1875,30 @@ class _DefineCategory extends State<DefineCategory> {
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
               AnimatedContainer(
                 duration: Duration(milliseconds: 200),
+                width: gl.eqPx * 95,
+                height: gl.eqPx * 15,
+                child: TextFormField(
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                  onChanged: (value) => _rmq = value,
+                  cursorColor: Colors.white,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                    hintText: "Remarque eventuelle",
+                    hintStyle: TextStyle(color: Colors.grey, fontSize: gl.eqPx * gl.fontSizeXS),
+                  ),
+                ),
+              ),
+              lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                width: gl.eqPx * 95,
                 height: 20 * gl.eqPx,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -1876,6 +1932,8 @@ class _DefineCategory extends State<DefineCategory> {
       },
     );
   }
+
+  static void reset() => {_custom = "", _color = Colors.transparent, _choice = 0, _selectedPiste = -1};
 }
 
 class PopupValueChange {

@@ -1,5 +1,4 @@
 import 'package:downloadsfolder/downloadsfolder.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
@@ -35,7 +34,10 @@ class Risque {
   late int mCode;
   String? mRisque;
   late int mCategorie;
-  Risque.fromMap(final Map<String, dynamic> map) : mCode = map['code'], mRisque = map['risque'], mCategorie = map['categorie'];
+  Risque.fromMap(final Map<String, dynamic> map)
+    : mCode = map['code'],
+      mRisque = map['risque'],
+      mCategorie = map['categorie'];
 }
 
 class Vulnerabilite {
@@ -69,14 +71,21 @@ class Zbio {
   String? mNom;
   String? mPrefixCS;
   int? mCSid;
-  Zbio.fromMap(final Map<String, dynamic> map) : mCode = map['Zbio'], mNom = map['Nom'], mPrefixCS = map['PrefixCS'], mCSid = map['CSid'];
+  Zbio.fromMap(final Map<String, dynamic> map)
+    : mCode = map['Zbio'],
+      mNom = map['Nom'],
+      mPrefixCS = map['PrefixCS'],
+      mCSid = map['CSid'];
 }
 
 class GroupeCouche {
   late String mCode;
   late String mLabel;
   late bool mExpert;
-  GroupeCouche.fromMap(final Map<String, dynamic> map) : mCode = map['code'], mLabel = map['label'], mExpert = map['expert'] == 0 ? false : true;
+  GroupeCouche.fromMap(final Map<String, dynamic> map)
+    : mCode = map['code'],
+      mLabel = map['label'],
+      mExpert = map['expert'] == 0 ? false : true;
 }
 
 class LayerBase {
@@ -339,20 +348,28 @@ class DicoAptProvider {
 
     //docDir = await getApplicationDocumentsDirectory();
 
-    final path = join(gl.docDir, "db/fforestimator.db");
+    final String path = join(gl.docDir, "db/fforestimator.db");
     gl.print("db path: $path");
     var exists = await databaseExists(path);
     if (exists) {
-      db = await openDatabase(path);
-      List<Map<String, dynamic>> result = await db.query('Info');
-      if (result.first['Version'] != gl.dbVersion) {
-        gl.print("database version ${result.first['Version']} is different from app db version ${gl.dbVersion}, deleting old database");
+      List<Map<String, dynamic>> result;
+      try {
+        db = await openDatabase(path);
+        result = await db.query('Info');
+        if (result.first['Version'] != gl.dbVersion) {
+          gl.print(
+            "database version ${result.first['Version']} is different from app db version ${gl.dbVersion}, deleting old database",
+          );
+          db.close();
+          await File(path).delete();
+          exists = false;
+        } else {
+          gl.print("database version ${result.first['Version']} is up to date with app db version ${gl.dbVersion}");
+        }
+      } catch (e) {
         db.close();
-        CacheManager cacheManager = DefaultCacheManager();
-        cacheManager.removeFile(path);
+        await File(path).delete();
         exists = false;
-      } else {
-        gl.print("database version ${result.first['Version']} is up to date with app db version ${gl.dbVersion}");
       }
     }
 

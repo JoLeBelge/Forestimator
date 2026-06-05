@@ -536,11 +536,37 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   ),
                                   MarkerLayer(markers: _getPointsToDraw(hitButton: true)),
                                   MarkerLayer(markers: _getPathsToDraw(hitButton: true)),
+                                  if (gl.Mode.dfci && !GeometricLayer.getDFCILayer().lastUnfinishedGeometry.finished)
+                                    PolylineLayer(
+                                      polylines: [
+                                        Polyline(
+                                          points: [
+                                            GeometricLayer.getDFCILayer().lastUnfinishedGeometry.points.last,
+                                            _mapController.camera.center,
+                                          ],
+                                          color: GeometricLayer.getDFCILayer().lastUnfinishedGeometry.colorLine,
+                                          strokeWidth: gl.eqPx,
+                                        ),
+                                      ],
+                                    ),
                                 ]
                                 : gl.modeMapShowPolygons
                                 ? <Widget>[
                                   PolygonLayer<String>(polygons: _getPolygonesToDraw()),
                                   MarkerLayer(markers: _getPathsToDraw(hitButton: false)),
+                                  if (gl.Mode.dfci && !GeometricLayer.getDFCILayer().lastUnfinishedGeometry.finished)
+                                    PolylineLayer(
+                                      polylines: [
+                                        Polyline(
+                                          points: [
+                                            GeometricLayer.getDFCILayer().lastUnfinishedGeometry.points.first,
+                                            (_mapControllerInit ? _mapController.camera.center : gl.latlonCenter),
+                                          ],
+                                          color: GeometricLayer.getDFCILayer().lastUnfinishedGeometry.colorLine,
+                                          strokeWidth: gl.eqPx,
+                                        ),
+                                      ],
+                                    ),
                                   MarkerLayer(markers: _getPointsToDraw(hitButton: false)),
                                 ]
                                 : <Widget>[]) +
@@ -2609,7 +2635,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
 
   IconData getIconForPiste(String name) =>
       (name.contains("FIN")
-          ? Icons.circle_outlined
+          ? DFCLIcons.fin
           : name.contains("Categorie")
           ? Icons.square_outlined
           : name.contains("access à une piste")
@@ -3500,25 +3526,26 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                     ),
                                   ),
                                 ),
-                              Container(
-                                padding: EdgeInsets.all(2),
-                                alignment: Alignment.center,
-                                color: Colors.transparent,
-                                height: gl.eqPx * gl.iconSizeXS,
-                                width: gl.eqPx * gl.infoBoxPolygon / 2,
+                              if (!gl.Mode.essence && !gl.Mode.debugLabel)
+                                Container(
+                                  padding: EdgeInsets.all(2),
+                                  alignment: Alignment.center,
+                                  color: Colors.transparent,
+                                  height: gl.eqPx * gl.iconSizeXS,
+                                  width: gl.eqPx * gl.infoBoxPolygon / 2,
 
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Text(
-                                    gl.selLay.geometries[i].name,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
-                                      fontSize: gl.eqPx * gl.fontSizeXS,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Text(
+                                      gl.selLay.geometries[i].name,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
+                                        fontSize: gl.eqPx * gl.fontSizeXS,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
                               if (gl.Mode.labelCross)
                                 Container(
                                   padding: EdgeInsets.zero,
@@ -3548,7 +3575,9 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                 ),
                             ],
                           ),
-                          if (gl.Mode.debugLabel && gl.selLay.geometries[i].getNCheckedAttributes() > 1)
+                          if (gl.Mode.debugLabel &&
+                              gl.selLay.geometries[i].getNCheckedAttributes() > 1 &&
+                              (!gl.Mode.essence && !gl.Mode.debugLabel))
                             lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                         ] +
                         List<Widget>.generate(gl.selLay.geometries[i].attributes.length, (j) {
