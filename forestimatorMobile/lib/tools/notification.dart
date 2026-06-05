@@ -1700,7 +1700,7 @@ class _DefineCategory extends State<DefineCategory> {
                                     setState(() {
                                       _custom = gl.pistesChoices.keys.toList()[index];
                                       _choice = 3;
-                                      _color = gl.pistesChoices.values.toList()[index];
+                                      _color = gl.lastUsedCategory;
                                     });
                                   },
                                   child: SizedBox(
@@ -1709,15 +1709,21 @@ class _DefineCategory extends State<DefineCategory> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         SizedBox(
-                                          width: gl.eqPx * 80,
+                                          width: gl.eqPx * 75,
                                           child: Text(
                                             gl.pistesChoices.keys.toList()[index],
                                             style: TextStyle(color: Colors.white, fontSize: gl.fontSizeM * gl.eqPx),
                                           ),
                                         ),
-                                        CircleAvatar(
-                                          backgroundColor: gl.pistesChoices.values.toList()[index],
-                                          radius: gl.iconSizeXS * gl.eqPx * .75,
+                                        Container(
+                                          alignment: Alignment.center,
+                                          width: gl.eqPx * 15,
+                                          child: Icon(
+                                            index == 0 ? Icons.arrow_drop_down : DFCLIcons.fin,
+                                            color: gl.lastUsedCategory,
+                                            shadows: [Shadow(color: Colors.white, blurRadius: gl.eqPx * 4)],
+                                            size: index == 0 ? gl.iconSizeS * gl.eqPx * 1.5 : gl.iconSizeS * gl.eqPx,
+                                          ),
                                         ),
                                       ],
                                     ),

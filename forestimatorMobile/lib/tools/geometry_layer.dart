@@ -149,9 +149,15 @@ class GeometricLayer {
     }
   }
 
-  Geometry get lastUnfinishedGeometry => geometries.lastWhere((Geometry g) {
-    return !g.finished;
-  }, orElse: () => geometries.last);
+  Geometry get lastUnfinishedGeometry => geometries.lastWhere(
+    (Geometry g) {
+      return !g.finished;
+    },
+    orElse:
+        () =>
+            geometries.isNotEmpty ? geometries.last : Geometry()
+              ..finished = true,
+  );
 
   void visible(bool visibility) {
     visibleOnMap = visibility;

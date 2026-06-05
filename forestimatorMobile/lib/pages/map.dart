@@ -541,8 +541,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       polylines: [
                                         Polyline(
                                           points: [
-                                            GeometricLayer.getDFCILayer().lastUnfinishedGeometry.points.last,
-                                            _mapController.camera.center,
+                                            GeometricLayer.getDFCILayer().lastUnfinishedGeometry.points.first,
+                                            (_mapControllerInit ? _mapController.camera.center : gl.latlonCenter),
                                           ],
                                           color: GeometricLayer.getDFCILayer().lastUnfinishedGeometry.colorLine,
                                           strokeWidth: gl.eqPx,
