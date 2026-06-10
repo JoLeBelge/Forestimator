@@ -17,7 +17,6 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     }
     zbioSelection_->changed().connect(std::bind(&matAptCS::changeZbio,this));
     zbioSelection_->setCurrentIndex(0);
-    prefixZbio_="A";
 
     addNew<Wt::WBreak>();
     addNew<Wt::WBreak>();
@@ -31,7 +30,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     // création de la liste de toutes les essences
     int r(1);
     int nb(mDicoApt->getAllEss().size());
-    int ncells(nb/2);
+    int ncells(1+(nb/2));
     WContainerWidget * rowCont = contlisteEss->addNew<Wt::WContainerWidget>();
     rowCont->setStyleClass("col-6");
     for (auto & kv : mDicoApt->getAllEss()){
@@ -97,8 +96,7 @@ void matAptCS::updateListeUS(){
     contFicheUS->clear();
     contListeUS->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.US").arg(mDicoApt->ZBIO(zbio_))));
 
-    // pour avoir les couleurs des stations, je dois utiliser la layer.
-    //std::shared_ptr<layerBase> CSlay=mDicoApt->getLayerBase(mDicoApt->ZBIO2CSlay(zbio_));
+    // pour avoir les couleurs des stations
     std::shared_ptr<layerBase> CSlay=mDicoApt->getLayerBase("CS_A");
 
     for (auto & kv : mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_))){
@@ -110,7 +108,7 @@ void matAptCS::updateListeUS(){
             us->addStyleClass("position-relative");
             us->setTextFormat(Wt::TextFormat::XHTML);
             std::shared_ptr<color> col = CSlay->getColor(std::get<0>(kv.first));
-            us->setText(tr("matAptCS.nobadge").arg(prefixZbio_).arg(std::to_string(std::get<0>(kv.first))).arg(stationName).arg(col->getRGB()));
+            us->setText(tr("matAptCS.nobadge").arg(stationName).arg(col->getRGB()));
             us->addStyleClass("us-button");
 
             //if (std::get<1>(kv.first)==""){
@@ -143,7 +141,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
 
     // consultation du pdf - si il existe.
 
-    if (boost::filesystem::exists(mDicoApt->File("docroot")+"/pdf/US-"+prefixZbio_+std::to_string(US_)+".pdf")){
+    if (boost::filesystem::exists(mDicoApt->File("docroot")+"/pdf/US-"+std::to_string(US_)+".pdf")){
         WAnchor * a = cont->addNew<WAnchor>(WLink("pdf/US-A"+std::to_string(US_)+".pdf"));
         a->setImage(std::make_unique<Wt::WImage>(WLink("img/CS/US-A"+std::to_string(US_)+".jpeg"),"illustration de l'unité stationnelle"));
     }
@@ -163,7 +161,6 @@ void matAptCS::showFicheUS(int US, std::string aVar){
         mVEss.push_back(aV);
     }
     // maintenant que les essences sont triées, update table apt
-    //contFicheUS->addWidget(Wt::WText::tr("t"));
 
     cont = tpl->bindWidget("listeEssence", std::make_unique<Wt::WContainerWidget>());
     mAptTable = cont->addWidget(std::make_unique<WTable>());
@@ -264,8 +261,6 @@ void matAptCS::changeZbio(){
     for (auto & kv : *mDicoApt->ZBIO()){
         if (kv.second==zbioSelection_->currentText()){zbio_=kv.first;}
     }
-    if (zbio_==1 || zbio_==2 || zbio_==10){prefixZbio_="A";}
-    if (zbio_==4){prefixZbio_="F";}
 
     graphZbio->selectZbio(zbio_);
     contFicheUS->clear();

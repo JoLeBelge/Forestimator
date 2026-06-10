@@ -115,13 +115,13 @@ Figure 3 : conversion des tableaux d’essences conseillées du guide des stati
 </ol>
 </message>
 
-<message id="matAptCS.badge">  A{1} : {4}
-  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color:{3};">
-    {2}
+<message id="matAptCS.badge">  {3}
+  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color:{2};">
+    {1}
     <span class="visually-hidden">variante</span>
   </span> </message>
- <message id="matAptCS.nobadge">  {1}{2} : {3}
-  <span class="position-absolute top-0 start-100 translate-middle p-2 border border-light rounded-circle" style="background-color:{4};">
+ <message id="matAptCS.nobadge">  {1}
+  <span class="position-absolute top-0 start-100 translate-middle p-2 border border-light rounded-circle" style="background-color:{2};">
     <span class="visually-hidden">hep</span>
   </span>
  </message>

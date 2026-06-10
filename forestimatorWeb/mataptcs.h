@@ -31,7 +31,7 @@ private:
      std::vector<std::vector<cEss*>> mVEss;
      int zbio_;
      int US_;
-     std::string mVar_, prefixZbio_;
+     std::string mVar_;
      zbioPainted * graphZbio;
      std::map<std::tuple<int,std::string>, Wt::WPushButton *> mMapButtonUS;
 };
