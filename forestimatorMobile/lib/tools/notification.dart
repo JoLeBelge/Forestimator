@@ -1488,7 +1488,8 @@ class PopupNewCatPiste {
                   }
                   if (gl.undoPistesChoices.keys.elementAt(1) == object) {
                     if (GeometricLayer.getDFCILayer().geometries.isNotEmpty) {
-                      GeometricLayer.getDFCILayer().removeGeometry(last: true);
+                      GeometricLayer.getDFCILayer().geometries.last.toDelete = true;
+                      Geometry.startDeletionInBackground();
                     }
                   }
                   gl.stack.pop(id);
@@ -2974,7 +2975,8 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                         () {
                                                           PopupDoYouReally(
                                                             () {
-                                                              gl.selLay.geometries[index].sendGeometryToServer();
+                                                              gl.selLay.geometries[index]
+                                                                  .sendFeatureCollectionToServer();
                                                             },
                                                             "Attention !",
                                                             gl.labelSendCompoFeature,
@@ -2989,7 +2991,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                     } else {
                                                       PopupDoYouReally(
                                                         () {
-                                                          gl.selLay.geometries[index].sendGeometryToServer();
+                                                          gl.selLay.geometries[index].sendFeatureCollectionToServer();
                                                         },
                                                         "Attention !",
                                                         gl.labelSendCompoFeature,

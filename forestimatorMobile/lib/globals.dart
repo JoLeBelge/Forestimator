@@ -114,6 +114,7 @@ class Mode {
   static bool debugLabel = false;
   static bool essencePointsToSync = false;
   static bool pathsToSync = false;
+  static bool deleteSync = false;
 
   static bool debugScanlines = false;
   static bool debugInfo = false;

@@ -1797,7 +1797,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                 id: "geoScrollBar",
                                 horizontal: true,
                                 height: gl.eqPx * gl.iconSizeM,
-                                width: gl.Mode.tablet ? gl.eqPx * 120 : gl.eqPx * gl.chosenPolyBarWidth * .75,
+                                width:
+                                    gl.Mode.tablet
+                                        ? (gl.selLay.subtype == "dfci" || gl.selLay.subtype == "Essence")
+                                            ? gl.eqPx * 120
+                                            : gl.eqPx * 140
+                                        : (gl.selLay.subtype == "dfci" || gl.selLay.subtype == "Essence")
+                                        ? gl.eqPx * gl.chosenPolyBarWidth * .95
+                                        : gl.eqPx * gl.chosenPolyBarWidth * .75,
                                 child: Row(
                                   children: List<Widget>.generate(gl.selLay.geometries.length, (int index) {
                                     return Container(
@@ -1869,6 +1876,15 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                 ),
                                               ),
                                             ),
+                                            if (gl.selLay.geometries[index].toDelete)
+                                              Container(
+                                                alignment: AlignmentGeometry.xy(gl.dsp.alignX(0), gl.dsp.alignY(0)),
+                                                child: Icon(
+                                                  Icons.delete_sweep,
+                                                  color: Colors.redAccent,
+                                                  size: gl.eqPx * gl.iconSizeXS,
+                                                ),
+                                              ),
                                           ],
                                         ),
                                       ),
@@ -2303,45 +2319,31 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     height: gl.eqPx * 12,
     child: FloatingActionButton(
       backgroundColor:
-          (!(gl.geoReady && gl.selLay.type.contains("Point") && gl.selGeo.points.isNotEmpty)) ||
+          (gl.Mode.dfci) ||
+                  (gl.Mode.addVertexesPolygon && gl.selLay.subtype == "Essence") ||
                   gl.Mode.essence ||
-                  (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
-                  gl.Mode.dfci ||
-                  (!gl.Mode.dfci && gl.selLay.subtype == "dfci") ||
-                  gl.geoReady && gl.selLay.type.contains("Polygon")
+                  (gl.Mode.addVertexesPolygon && gl.selLay.type.contains("Point")) ||
+                  (gl.Mode.addVertexesPolygon && gl.selLay.type == "Polygon")
               ? gl.colorAgroBioTech
               : Colors.grey,
       onPressed: () {
-        if ((!(gl.geoReady && gl.selLay.type.contains("Point") && gl.selGeo.points.isNotEmpty)) ||
-            gl.Mode.essence ||
-            (!gl.Mode.essence && gl.selLay.subtype == "Essence") ||
-            gl.Mode.dfci ||
-            (!gl.Mode.dfci && gl.selLay.subtype == "dfci") ||
-            gl.geoReady && gl.selLay.type.contains("Polygon")) {
-          refreshView(() {
-            gl.Mode.dfci
-                ? PopupNewCatPiste(context, _mapController.camera.center)
-                : gl.Mode.addVertexesPolygon && gl.selLay.subtype != "Essence"
-                ? {
-                  _isPolygonWellDefined(gl.selGeo.getPolyPlusOneVertex(_mapController.camera.center))
-                      ? {
-                        gl.selGeo.addPoint(_mapController.camera.center),
-                        if (gl.selGeo.subsubtype.contains("Point"))
-                          {
-                            gl.selLay.addGeometry(
-                              name:
-                                  gl.selLay.type == "Point"
-                                      ? "Point${gl.selLay.geometries.length + 1}"
-                                      : "Polygon${gl.selLay.geometries.length + 1}",
-                            ),
-                            gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1,
-                          },
-                      }
-                      : PopupPolygonNotWellDefined(),
-                }
-                : PopupNewEssenceObservationPoint(context, _mapController.camera.center);
-          });
-        }
+        refreshView(() {
+          if (gl.Mode.dfci) {
+            PopupNewCatPiste(context, _mapController.camera.center);
+          } else if (gl.Mode.addVertexesPolygon && gl.selLay.subtype == "Essence" || gl.Mode.essence) {
+            PopupNewEssenceObservationPoint(context, _mapController.camera.center);
+          } else if (gl.Mode.addVertexesPolygon && gl.selLay.type.contains("Point")) {
+            gl.selLay.addGeometry(name: "Point");
+            gl.selLay.geometries.last.addPoint(_mapController.camera.center);
+            gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
+          } else if (gl.Mode.addVertexesPolygon && gl.selLay.type == "Polygon") {
+            if (gl.geoReady && _isPolygonWellDefined(gl.selGeo.getPolyPlusOneVertex(_mapController.camera.center))) {
+              gl.selGeo.addPoint(_mapController.camera.center);
+            } else {
+              PopupPolygonNotWellDefined();
+            }
+          }
+        });
       },
       child: SizedBox(
         width: gl.eqPx * gl.iconSizeL,
