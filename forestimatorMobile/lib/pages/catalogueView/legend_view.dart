@@ -52,7 +52,7 @@ class _LegendView extends State<LegendView> {
                           minWidth: 0,
                           maxWidth: _constraintsLeft.maxWidth * 1.2,
                           minHeight: 0,
-                          maxHeight: _constraintsLeft.maxHeight * 1.65,
+                          maxHeight: _constraintsLeft.maxHeight * 1.8,
                         ),
                         child: Text(
                           gl.dico.mLayerBases[widget.layerKey]!.mDicoVal[key]!,
@@ -70,7 +70,7 @@ class _LegendView extends State<LegendView> {
                         minWidth: 0,
                         maxWidth: _constraintsLeft.maxWidth * 1.2,
                         minHeight: 0,
-                        maxHeight: _constraintsLeft.maxHeight * 1.65,
+                        maxHeight: _constraintsLeft.maxHeight * 1.8,
                       ),
                       child: Text(
                         gl.dico.mLayerBases[widget.layerKey]!.mDicoVal[key]!,
@@ -89,7 +89,7 @@ class _LegendView extends State<LegendView> {
                       minWidth: 0,
                       maxWidth: _constraintsRight.maxWidth * .75,
                       minHeight: 0,
-                      maxHeight: _constraintsRight.maxHeight * 1.65,
+                      maxHeight: _constraintsRight.maxHeight * 1.8,
                     ),
                     color: gl.dico.mLayerBases[widget.layerKey]!.mDicoCol[key]!,
                   );
@@ -121,7 +121,7 @@ class _LegendView extends State<LegendView> {
         widget.constraintsColors.maxWidth * 0.85,
       );
     } else if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 50) {
-      double heightPerColorTile = gl.eqPx * 0.5;
+      double heightPerColorTile = gl.eqPx * .98;
       double graduatedHeight =
           gl.eqPx * gl.dsp.equiheight * gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 11.0 * .005;
       _magicNumber = (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 10).toInt();

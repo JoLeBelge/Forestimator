@@ -21,7 +21,7 @@ const double dbVersion = 1.0;
 
 typedef VoidSetter = void Function(void Function());
 
-const String forestimatorMobileVersion = "3.0.0 - build 30"; //02/2026
+const String forestimatorMobileVersion = "3.1.0 - build 35"; //06/2026
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -121,7 +121,7 @@ class Mode {
   static bool keyboardExpanded = false;
   static bool square = false;
   static bool tablet = false;
-  static bool overrideModeTablet = false;
+  static bool forceTablet = false;
   static bool overrideModeSquare = false;
   static bool overrideWellDefinedCheck = false;
   static bool _expert = false;
@@ -218,50 +218,55 @@ class Display {
     insetBot = MediaQuery.of(context).viewInsets.bottom;
     insetBot > 0 ? showKeyboard = true : showKeyboard = false;
     Mode.keyboardExpanded = showKeyboard;
-    //_tabletMode();
-    //_squareMode();
-    _enforceEquiWidthHeight();
-    if (Mode.square || Mode.overrideModeSquare) {
-      minEquiPixelsDisplayLandscapeHeight = minEquiPixelsDisplayLandscapeWidth * .8;
-      minEquiPixelsDisplayPortraitHeight = minEquiPixelsDisplayPortraitWidth * .8;
-    }
+    _tabletMode();
+    _squareMode();
+    _enforceEquiWidthHeightAndOrientation();
   }
 
   set context(BuildContext context) => dsp = Display(context);
 
-  void tabletMode() {
-    if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
+  void _tabletMode() {
+    if (Mode.forceTablet) {
+      Mode.tablet = true;
+    } else if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
         dpi < 1.75 && dpi * (width < height ? width : height) > 1320 ||
-        dpi < 1.55 && dpi * (width < height ? width : height) > 1000 ||
-        Mode.overrideModeTablet) {
-      if (!Mode.tablet) {
-        minEquiPixelsDisplayPortraitWidth = 125;
-        minEquiPixelsDisplayPortraitHeight = 250;
-        minEquiPixelsDisplayLandscapeWidth = 250;
-        minEquiPixelsDisplayLandscapeHeight = 125;
-        Mode.tablet = true;
-      }
+        dpi < 1.55 && dpi * (width < height ? width : height) > 1000) {
+      Mode.tablet = true;
     } else {
-      if (Mode.tablet) {
-        minEquiPixelsDisplayPortraitWidth = 100;
-        minEquiPixelsDisplayPortraitHeight = 200;
-        minEquiPixelsDisplayLandscapeWidth = 200;
-        minEquiPixelsDisplayLandscapeHeight = 100;
-        Mode.tablet = false;
-      }
+      Mode.tablet = false;
     }
   }
 
-  void squareMode() {
+  void _squareMode() {
     if ((aspect > .8 && aspect < 1 / .8) || Mode.tablet || Mode.overrideModeSquare) {
       Mode.square = true;
-      orientation = Orientation.landscape;
     } else {
       Mode.square = false;
     }
   }
 
-  void _enforceEquiWidthHeight() {
+  void _enforceEquiWidthHeightAndOrientation() {
+    if (Mode.tablet && !Mode.square) {
+      minEquiPixelsDisplayPortraitWidth = 200;
+      minEquiPixelsDisplayPortraitHeight = 400;
+      minEquiPixelsDisplayLandscapeWidth = 400;
+      minEquiPixelsDisplayLandscapeHeight = 200;
+    } else if (Mode.tablet && Mode.square) {
+      minEquiPixelsDisplayPortraitWidth = 200;
+      minEquiPixelsDisplayPortraitHeight = 400;
+      minEquiPixelsDisplayLandscapeWidth = 400;
+      minEquiPixelsDisplayLandscapeHeight = 200;
+    } else if (!Mode.tablet && !Mode.square) {
+      minEquiPixelsDisplayPortraitWidth = 100;
+      minEquiPixelsDisplayPortraitHeight = 200;
+      minEquiPixelsDisplayLandscapeWidth = 200;
+      minEquiPixelsDisplayLandscapeHeight = 100;
+    } else if (!Mode.tablet && Mode.square) {
+      minEquiPixelsDisplayPortraitWidth = 200;
+      minEquiPixelsDisplayPortraitHeight = 200;
+      minEquiPixelsDisplayLandscapeWidth = 200;
+      minEquiPixelsDisplayLandscapeHeight = 200;
+    }
     if (orientation == Orientation.portrait) {
       equipixel = height / minEquiPixelsDisplayPortraitHeight;
       equiwidth = width / equipixel;
@@ -279,6 +284,7 @@ class Display {
       }
       equiwidth = width / equipixel;
     }
+    if (Mode.square) orientation = Orientation.landscape;
   }
 
   @override
@@ -898,13 +904,13 @@ List<Color> predefinedPointSymbPalette = [
 ];
 
 class DfclI {
-  IconData icon;
-  Color color;
+  final IconData icon;
+  final Color color;
 
-  DfclI(this.icon, this.color);
+  const DfclI(this.icon, this.color);
 }
 
-Map<String, DfclI> obstacleChoice = {
+const Map<String, DfclI> obstacleChoice = {
   "Point de première destination": DfclI(DFCLIcons.pointdepremieredestination, Colors.black),
   "Barrière": DfclI(DFCLIcons.barriere, Colors.black),
   "Obstacle": DfclI(DFCLIcons.obstacles, Colors.black),
@@ -920,7 +926,7 @@ Map<String, DfclI> obstacleChoice = {
   "Ligne éléctrique": DfclI(DFCLIcons.ligneelectrique, Colors.pink),
 };
 
-Map<String, Color> roadCategoryChoice = {
+const Map<String, Color> roadCategoryChoice = {
   "Categorie 1": Colors.red,
   "Categorie 2": Colors.orange,
   "Categorie 3": Colors.yellow,
@@ -928,12 +934,12 @@ Map<String, Color> roadCategoryChoice = {
   "Impasse non amenagée": Colors.blue,
 };
 
-Map<String, Color> undoPistesChoices = {
+const Map<String, Color> undoPistesChoices = {
   "Supprimez le dernier point d'une piste.": Colors.blue,
   "Supprimez la dernière observation.": Colors.lightBlue,
 };
 
-Map<String, Color> pistesChoices = {
+const Map<String, Color> pistesChoices = {
   "Ajoutez un point intermédiaire.": Colors.orange,
   "Ajoutez un dernier point terminal.": Colors.red,
 };

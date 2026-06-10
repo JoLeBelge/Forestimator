@@ -648,7 +648,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   Widget get forestimatorBuildGeoMenu =>
       (gl.layerReady)
           ? SizedBox(
-            width: gl.eqPx * gl.chosenPolyBarWidth,
+            width: gl.Mode.tablet ? gl.eqPx * 150 : gl.eqPx * gl.chosenPolyBarWidth,
             height: gl.eqPx * computePolygonTitleHeight(),
             child: Card(
               shape: RoundedRectangleBorder(
@@ -661,7 +661,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
               child: Column(
                 children: [
                   SizedBox(
-                    width: gl.eqPx * gl.chosenPolyBarWidth,
+                    width: gl.Mode.tablet ? gl.eqPx * 150 : gl.eqPx * gl.chosenPolyBarWidth,
                     height: gl.eqPx * gl.chosenPolyBarHeight * 0.6,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -695,7 +695,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                         ),
                         Container(
                           alignment: AlignmentGeometry.center,
-                          width: gl.eqPx * 60,
+                          width: gl.Mode.tablet ? gl.eqPx * 100 : gl.eqPx * 60,
                           height: gl.eqPx * 10,
                           child: DropdownMenuFormField<int>(
                             label: Row(
@@ -740,7 +740,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   ],
                                 ),
                                 lt.ForestimatorScrollView(
-                                  width: gl.eqPx * 30,
+                                  width: gl.Mode.tablet ? gl.eqPx * 65 : gl.eqPx * 30,
                                   height: gl.eqPx * 6,
                                   horizontal: true,
                                   child: Text(
@@ -851,7 +851,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       ),
                                       lt.ForestimatorScrollView(
                                         height: gl.eqPx * 10,
-                                        width: gl.eqPx * 50,
+                                        width: gl.Mode.tablet ? gl.eqPx * 70 : gl.eqPx * 50,
                                         horizontal: true,
                                         child: Text(
                                           gl.geoLayers[index].name,
@@ -1599,7 +1599,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                               ),
                               lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                               lt.ForestimatorScrollView(
-                                width: gl.eqPx * gl.chosenPolyBarWidth,
+                                width: gl.Mode.tablet ? gl.eqPx * 140 : gl.eqPx * gl.chosenPolyBarWidth,
                                 height: gl.eqPx * gl.iconSizeXS * 2.5,
                                 sizeArrows: gl.eqPx * gl.iconSizeM,
                                 horizontal: true,
@@ -1632,7 +1632,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                               ),
                               lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                               lt.ForestimatorScrollView(
-                                width: gl.eqPx * gl.chosenPolyBarWidth,
+                                width: gl.Mode.tablet ? gl.eqPx * 140 : gl.eqPx * gl.chosenPolyBarWidth,
                                 height: gl.eqPx * gl.iconSizeXS * 2.5,
                                 sizeArrows: gl.eqPx * gl.iconSizeM,
                                 horizontal: true,
@@ -1650,10 +1650,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         backgroundColor:
                                             gl.selGeo.colorPolygon == gl.predefinedPointSymbPalette[k]
                                                 ? Colors.white
-                                                : Colors.transparent,
-                                        radius: gl.eqPx * gl.iconSizeXS * .9,
+                                                : gl.predefinedPointSymbPalette[k],
+                                        radius: gl.eqPx * gl.iconSizeXS * .95,
                                         child: CircleAvatar(
-                                          radius: gl.eqPx * gl.iconSizeXS * .85,
+                                          radius: gl.eqPx * gl.iconSizeXS * .5,
                                           backgroundColor: gl.predefinedPointSymbPalette[k],
                                         ),
                                       ),
@@ -1663,7 +1663,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                               ),
                               lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                               SizedBox(
-                                width: gl.eqPx * gl.chosenPolyBarWidth,
+                                width: gl.Mode.tablet ? gl.eqPx * 140 : gl.eqPx * gl.chosenPolyBarWidth,
                                 height: gl.eqPx * gl.chosenPolyBarHeight * .8,
                                 child: Slider(
                                   min: gl.iconSizeXXS,
@@ -1726,7 +1726,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                               lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                               if (gl.geoReady)
                                 lt.ForestimatorScrollView(
-                                  width: gl.eqPx * gl.chosenPolyBarWidth,
+                                  width: gl.Mode.tablet ? gl.eqPx * 140 : gl.eqPx * gl.chosenPolyBarWidth,
                                   height: gl.eqPx * gl.iconSizeXS * 2.5,
                                   sizeArrows: gl.eqPx * gl.iconSizeM,
                                   horizontal: true,
@@ -1745,10 +1745,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               backgroundColor:
                                                   gl.selGeo.colorPolygon == gl.selLay.defaultColor
                                                       ? Colors.white
-                                                      : Colors.transparent,
-                                              radius: gl.eqPx * gl.iconSizeXS * .9,
+                                                      : gl.selLay.defaultColor,
+                                              radius: gl.eqPx * gl.iconSizeXS * .95,
                                               child: CircleAvatar(
-                                                radius: gl.eqPx * gl.iconSizeXS * .85,
+                                                radius: gl.eqPx * gl.iconSizeXS * .5,
                                                 backgroundColor: gl.selLay.defaultColor.withAlpha(255),
                                               ),
                                             ),
@@ -1768,10 +1768,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               backgroundColor:
                                                   gl.selGeo.colorPolygon == gl.predefinedPointSymbPalette[k]
                                                       ? Colors.white
-                                                      : Colors.transparent,
-                                              radius: gl.eqPx * gl.iconSizeXS * .9,
+                                                      : gl.predefinedPointSymbPalette[k],
+                                              radius: gl.eqPx * gl.iconSizeXS * .95,
                                               child: CircleAvatar(
-                                                radius: gl.eqPx * gl.iconSizeXS * .85,
+                                                radius: gl.eqPx * gl.iconSizeXS * .5,
                                                 backgroundColor: gl.predefinedPointSymbPalette[k],
                                               ),
                                             ),
@@ -1794,7 +1794,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                 id: "geoScrollBar",
                                 horizontal: true,
                                 height: gl.eqPx * gl.iconSizeM,
-                                width: gl.eqPx * gl.chosenPolyBarWidth * .75,
+                                width: gl.Mode.tablet ? gl.eqPx * 120 : gl.eqPx * gl.chosenPolyBarWidth * .75,
                                 child: Row(
                                   children: List<Widget>.generate(gl.selLay.geometries.length, (int index) {
                                     return Container(
@@ -3481,284 +3481,220 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   }
 
   List<Marker> _getPolygonesLabels() {
-    if (gl.selectedGeoLayer < 0) return [];
-    return List.generate(gl.selLay.geometries.length, (i) {
-      String textArea = "${(gl.selLay.geometries[i].area / 100).round() / 100} Ha";
-      return gl.selLay.geometries[i].visibleOnMap && gl.selLay.geometries[i].labelsVisibleOnMap
-          ? gl.selLay.geometries[i].subsubtype == "Polygon"
-              ? Marker(
-                alignment: Alignment.center,
-                width: gl.eqPx * (!gl.Mode.debugLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
-                height: gl.eqPx * (gl.selLay.geometries[i].getNCheckedAttributes() + 1) * gl.iconSizeS * .8 + 5,
-                point: gl.selLay.geometries[i].center,
-                child: Card(
-                  color: !gl.Mode.debugLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children:
-                        <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              if (gl.Mode.labelCross)
-                                Container(
-                                  padding: EdgeInsets.all(2),
-                                  color: Colors.transparent,
-                                  height: gl.eqPx * gl.iconSizeXS,
-                                  width: gl.eqPx * gl.iconSizeXS,
-                                  child: IconButton(
-                                    style: ButtonStyle(
-                                      animationDuration: Duration(seconds: 1),
-                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                        <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
-                                      ),
-                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                          WidgetState.any: EdgeInsetsGeometry.zero,
-                                        },
-                                      ),
-                                    ),
-                                    onPressed: () {},
-                                    icon: FaIcon(
-                                      FontAwesomeIcons.list,
-                                      size: gl.eqPx * gl.iconSizeXS * .5,
+    List<Marker> labels = [];
+    for (GeometricLayer l in gl.geoLayers) {
+      for (ge.Geometry g in l.geometries) {
+        String textArea = "${(g.area / 100).round() / 100} Ha";
+        labels.add(
+          g.visibleOnMap && g.labelsVisibleOnMap
+              ? g.subsubtype == "Polygon"
+                  ? Marker(
+                    alignment: Alignment.center,
+                    width: gl.eqPx * (!gl.Mode.debugLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
+                    height: gl.eqPx * (g.getNCheckedAttributes() + 1) * gl.iconSizeS * .8 + 5,
+                    point: g.center,
+                    child: Card(
+                      color: !gl.Mode.debugLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                            <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  if (gl.Mode.labelCross)
+                                    Container(
+                                      padding: EdgeInsets.all(2),
                                       color: Colors.transparent,
+                                      height: gl.eqPx * gl.iconSizeXS,
+                                      width: gl.eqPx * gl.iconSizeXS,
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          animationDuration: Duration(seconds: 1),
+                                          backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                            <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                          ),
+                                          padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                            <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                              WidgetState.any: EdgeInsetsGeometry.zero,
+                                            },
+                                          ),
+                                        ),
+                                        onPressed: () {},
+                                        icon: FaIcon(
+                                          FontAwesomeIcons.list,
+                                          size: gl.eqPx * gl.iconSizeXS * .5,
+                                          color: Colors.transparent,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              if (!gl.Mode.essence && !gl.Mode.debugLabel)
-                                Container(
-                                  padding: EdgeInsets.all(2),
-                                  alignment: Alignment.center,
-                                  color: Colors.transparent,
-                                  height: gl.eqPx * gl.iconSizeXS,
-                                  width: gl.eqPx * gl.infoBoxPolygon / 2,
+                                  if (!gl.Mode.essence && !gl.Mode.debugLabel)
+                                    Container(
+                                      padding: EdgeInsets.all(2),
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      height: gl.eqPx * gl.iconSizeXS,
+                                      width: gl.eqPx * gl.infoBoxPolygon / 2,
 
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Text(
-                                      gl.selLay.geometries[i].name,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
-                                        fontSize: gl.eqPx * gl.fontSizeXS,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Text(
+                                          g.name,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
+                                            fontSize: gl.eqPx * gl.fontSizeXS,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              if (gl.Mode.labelCross)
-                                Container(
-                                  padding: EdgeInsets.zero,
-                                  color: Colors.transparent,
-                                  height: gl.eqPx * gl.iconSizeXS,
-                                  width: gl.eqPx * gl.iconSizeXS,
-                                  child: IconButton(
-                                    style: ButtonStyle(
-                                      animationDuration: Duration(seconds: 1),
-                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                        <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
-                                      ),
-                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                  if (gl.Mode.labelCross)
+                                    Container(
+                                      padding: EdgeInsets.zero,
+                                      color: Colors.transparent,
+                                      height: gl.eqPx * gl.iconSizeXS,
+                                      width: gl.eqPx * gl.iconSizeXS,
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          animationDuration: Duration(seconds: 1),
+                                          backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                            <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                          ),
+                                          padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                            <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                              WidgetState.any: EdgeInsetsGeometry.zero,
+                                            },
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          refreshView(() {
+                                            g.labelsVisibleOnMap = false;
+                                          });
+                                          g.serialize();
                                         },
+                                        icon: FaIcon(
+                                          Icons.close,
+                                          size: gl.eqPx * gl.iconSizeXS * .8,
+                                          color: Colors.red,
+                                        ),
                                       ),
                                     ),
-                                    onPressed: () {
-                                      refreshView(() {
-                                        gl.selLay.geometries[i].labelsVisibleOnMap = false;
-                                      });
-                                      gl.selLay.geometries[i].serialize();
-                                    },
-                                    icon: FaIcon(Icons.close, size: gl.eqPx * gl.iconSizeXS * .8, color: Colors.red),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          if (gl.Mode.debugLabel &&
-                              gl.selLay.geometries[i].getNCheckedAttributes() > 1 &&
-                              (!gl.Mode.essence && !gl.Mode.debugLabel))
-                            lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
-                        ] +
-                        List<Widget>.generate(gl.selLay.geometries[i].attributes.length, (j) {
-                          return gl.selLay.geometries[i].attributes[j].visibleOnMapLabel
-                              ? Container(
-                                padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
-                                color: Colors.transparent,
-                                height: gl.eqPx * gl.iconSizeXS,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    if (gl.Mode.debugLabel)
-                                      Container(
-                                        alignment: Alignment.centerLeft,
-                                        width: gl.eqPx * 15,
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: Text(
-                                            gl.selLay.geometries[i].attributes[j].name,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
-                                              fontSize: gl.eqPx * gl.fontSizeXS,
+                                ],
+                              ),
+                              if (gl.Mode.debugLabel &&
+                                  g.getNCheckedAttributes() > 1 &&
+                                  (!gl.Mode.essence && !gl.Mode.debugLabel))
+                                lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
+                            ] +
+                            List<Widget>.generate(g.attributes.length, (j) {
+                              return g.attributes[j].visibleOnMapLabel
+                                  ? Container(
+                                    padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
+                                    color: Colors.transparent,
+                                    height: gl.eqPx * gl.iconSizeXS,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        if (gl.Mode.debugLabel)
+                                          Container(
+                                            alignment: Alignment.centerLeft,
+                                            width: gl.eqPx * 15,
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Text(
+                                                g.attributes[j].name,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
+                                                  fontSize: gl.eqPx * gl.fontSizeXS,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        if (!gl.Mode.debugLabel)
+                                          lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
+                                        Container(
+                                          alignment: Alignment.centerLeft,
+                                          width: gl.eqPx * 15,
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Text(
+                                              g.attributes[j].value.toString(),
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
+                                                fontSize: gl.eqPx * gl.fontSizeXS,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    if (!gl.Mode.debugLabel)
-                                      lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
-                                    Container(
-                                      alignment: Alignment.centerLeft,
-                                      width: gl.eqPx * 15,
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Text(
-                                          gl.selLay.geometries[i].attributes[j].value.toString(),
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
-                                            fontSize: gl.eqPx * gl.fontSizeXS,
-                                          ),
-                                        ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              )
-                              : SizedBox();
-                        }),
-                  ),
-                ),
-              )
-              : gl.selLay.geometries[i].subsubtype.contains("Point")
-              ? Marker(
-                alignment: Alignment.bottomLeft,
-                width: gl.eqPx * (!gl.Mode.debugLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
-                height:
-                    gl.eqPx *
-                        (gl.selLay.geometries[i].getNCheckedAttributes() +
-                            ((!gl.selLay.subtype.contains("essence") && !gl.selLay.subtype.contains("dfci")) ? 1 : 0)) *
-                        gl.iconSizeS *
-                        .8 +
-                    5,
-                point: gl.selLay.geometries[i].center,
-                child: Card(
-                  color: !gl.Mode.debugLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children:
-                        <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              if (gl.Mode.labelCross)
-                                Container(
-                                  padding: EdgeInsets.all(2),
-                                  color: Colors.transparent,
-                                  height: gl.eqPx * gl.iconSizeXS,
-                                  width: gl.eqPx * gl.iconSizeXS,
-                                  child: IconButton(
-                                    style: ButtonStyle(
-                                      animationDuration: Duration(seconds: 1),
-                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                        <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
-                                      ),
-                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                          WidgetState.any: EdgeInsetsGeometry.zero,
-                                        },
-                                      ),
-                                    ),
-                                    onPressed: () {},
-                                    icon: FaIcon(
-                                      FontAwesomeIcons.list,
-                                      size: gl.eqPx * gl.iconSizeXS * .5,
-                                      color: Colors.transparent,
-                                    ),
-                                  ),
-                                ),
-                              if (!gl.selLay.subtype.contains("essence") && !gl.selLay.subtype.contains("dfci"))
-                                Container(
-                                  padding: EdgeInsets.all(2),
-                                  alignment: Alignment.center,
-                                  color: Colors.transparent,
-                                  height: gl.eqPx * gl.iconSizeXS,
-                                  width: gl.eqPx * gl.infoBoxPolygon / 2,
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Text(
-                                      gl.selLay.geometries[i].name,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
-                                        fontSize: gl.eqPx * gl.fontSizeXS,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              if (gl.Mode.labelCross)
-                                Container(
-                                  padding: EdgeInsets.zero,
-                                  color: Colors.transparent,
-                                  height: gl.eqPx * gl.iconSizeXS,
-                                  width: gl.eqPx * gl.iconSizeXS,
-                                  child: IconButton(
-                                    style: ButtonStyle(
-                                      animationDuration: Duration(seconds: 1),
-                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                        <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
-                                      ),
-                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                          WidgetState.any: EdgeInsetsGeometry.zero,
-                                        },
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      refreshView(() {
-                                        gl.selLay.geometries[i].labelsVisibleOnMap = false;
-                                      });
-                                      gl.selLay.geometries[i].serialize();
-                                    },
-                                    icon: FaIcon(Icons.close, size: gl.eqPx * gl.iconSizeXS * .8, color: Colors.red),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          if (gl.selLay.geometries[i].getNCheckedAttributes() > 1)
-                            lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
-                        ] +
-                        List<Widget>.generate(gl.selLay.geometries[i].attributes.length, (j) {
-                          return gl.selLay.geometries[i].attributes[j].visibleOnMapLabel
-                              ? Container(
-                                padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
-                                color: Colors.transparent,
-                                height: gl.eqPx * gl.iconSizeXS,
-                                child: Row(
+                                  )
+                                  : SizedBox();
+                            }),
+                      ),
+                    ),
+                  )
+                  : g.subsubtype.contains("Point")
+                  ? Marker(
+                    alignment: Alignment.bottomLeft,
+                    width: gl.eqPx * (!gl.Mode.debugLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
+                    height:
+                        gl.eqPx *
+                            (g.getNCheckedAttributes() +
+                                ((!l.subtype.contains("essence") && !l.subtype.contains("dfci")) ? 1 : 0)) *
+                            gl.iconSizeS *
+                            .8 +
+                        5,
+                    point: g.center,
+                    child: Card(
+                      color: !gl.Mode.debugLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                            <Widget>[
+                              if (l.subtype != "Essence" && l.subtype != "dfci" && !gl.Mode.debugLabel)
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    if (gl.Mode.debugLabel)
+                                    if (gl.Mode.labelCross)
                                       Container(
-                                        alignment: Alignment.centerLeft,
-                                        width: gl.eqPx * 15,
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: Text(
-                                            gl.selLay.geometries[i].attributes[j].name,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
+                                        padding: EdgeInsets.all(2),
+                                        color: Colors.transparent,
+                                        height: gl.eqPx * gl.iconSizeXS,
+                                        width: gl.eqPx * gl.iconSizeXS,
+                                        child: IconButton(
+                                          style: ButtonStyle(
+                                            animationDuration: Duration(seconds: 1),
+                                            backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                              <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                            ),
+                                            padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                              <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                                WidgetState.any: EdgeInsetsGeometry.zero,
+                                              },
+                                            ),
+                                          ),
+                                          onPressed: () {},
+                                          icon: FaIcon(
+                                            FontAwesomeIcons.list,
+                                            size: gl.eqPx * gl.iconSizeXS * .5,
+                                            color: Colors.transparent,
                                           ),
                                         ),
                                       ),
-                                    if (gl.Mode.debugLabel)
-                                      lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
+
                                     Container(
-                                      alignment: Alignment.centerLeft,
-                                      width: gl.eqPx * 15,
+                                      padding: EdgeInsets.all(2),
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      height: gl.eqPx * gl.iconSizeXS,
+                                      width: gl.eqPx * gl.infoBoxPolygon / 2,
                                       child: SingleChildScrollView(
                                         scrollDirection: Axis.horizontal,
                                         child: Text(
-                                          gl.selLay.geometries[i].attributes[j].value.toString(),
+                                          g.name,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
@@ -3767,63 +3703,138 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         ),
                                       ),
                                     ),
+                                    if (gl.Mode.labelCross)
+                                      Container(
+                                        padding: EdgeInsets.zero,
+                                        color: Colors.transparent,
+                                        height: gl.eqPx * gl.iconSizeXS,
+                                        width: gl.eqPx * gl.iconSizeXS,
+                                        child: IconButton(
+                                          style: ButtonStyle(
+                                            animationDuration: Duration(seconds: 1),
+                                            backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                              <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                            ),
+                                            padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                              <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                                WidgetState.any: EdgeInsetsGeometry.zero,
+                                              },
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            refreshView(() {
+                                              g.labelsVisibleOnMap = false;
+                                            });
+                                            g.serialize();
+                                          },
+                                          icon: FaIcon(
+                                            Icons.close,
+                                            size: gl.eqPx * gl.iconSizeXS * .8,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
-                              )
-                              : SizedBox();
-                        }),
-                  ),
-                ),
-              )
-              : gl.selLay.geometries[i].subsubtype.contains("MP")
-              ? Marker(
-                alignment: Alignment.center,
-                width:
-                    textArea.length > gl.selLay.geometries[i].name.length
-                        ? gl.eqPx * gl.infoBoxPolygon * 2.5 + textArea.length * gl.fontSizeS
-                        : gl.eqPx * gl.infoBoxPolygon * 1.5 + gl.selLay.geometries[i].name.length * gl.fontSizeS,
-                height: gl.eqPx * gl.infoBoxPolygon * 1.5,
-                point: gl.selLay.geometries[i].center,
-                child: Column(),
-              )
-              : Marker(
-                alignment: Alignment.center,
-                width:
-                    textArea.length > gl.selLay.geometries[i].name.length
-                        ? gl.eqPx * gl.infoBoxPolygon * 2.5 + textArea.length * gl.fontSizeS
-                        : gl.eqPx * gl.infoBoxPolygon * 1.5 + gl.selLay.geometries[i].name.length * gl.fontSizeS,
-                height: gl.eqPx * gl.infoBoxPolygon * 1.5,
-                point: gl.selLay.geometries[i].center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Row(
+                              if (g.getNCheckedAttributes() > 1)
+                                lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
+                            ] +
+                            List<Widget>.generate(g.attributes.length, (j) {
+                              return g.attributes[j].visibleOnMapLabel
+                                  ? Container(
+                                    padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
+                                    color: Colors.transparent,
+                                    height: gl.eqPx * gl.iconSizeXS,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        if (gl.Mode.debugLabel)
+                                          Container(
+                                            alignment: Alignment.centerLeft,
+                                            width: gl.eqPx * 15,
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Text(
+                                                g.attributes[j].name,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: gl.eqPx * gl.fontSizeXS,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        if (gl.Mode.debugLabel)
+                                          lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
+                                        Container(
+                                          alignment: Alignment.centerLeft,
+                                          width: gl.eqPx * 15,
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Text(
+                                              g.attributes[j].value.toString(),
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: !gl.Mode.debugLabel ? Colors.black : Colors.white,
+                                                fontSize: gl.eqPx * gl.fontSizeXS,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                  : SizedBox();
+                            }),
+                      ),
+                    ),
+                  )
+                  : g.subsubtype.contains("MP")
+                  ? Marker(
+                    alignment: Alignment.center,
+                    width:
+                        textArea.length > g.name.length
+                            ? gl.eqPx * gl.infoBoxPolygon * 2.5 + textArea.length * gl.fontSizeS
+                            : gl.eqPx * gl.infoBoxPolygon * 1.5 + g.name.length * gl.fontSizeS,
+                    height: gl.eqPx * gl.infoBoxPolygon * 1.5,
+                    point: g.center,
+                    child: Column(),
+                  )
+                  : Marker(
+                    alignment: Alignment.center,
+                    width:
+                        textArea.length > g.name.length
+                            ? gl.eqPx * gl.infoBoxPolygon * 2.5 + textArea.length * gl.fontSizeS
+                            : gl.eqPx * gl.infoBoxPolygon * 1.5 + g.name.length * gl.fontSizeS,
+                    height: gl.eqPx * gl.infoBoxPolygon * 1.5,
+                    point: g.center,
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                            Column(
                               children: [
-                                Icon(Icons.layers, color: gl.selLay.geometries[i].colorLine),
-                                Text("Unknown Geometry", overflow: TextOverflow.clip),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.layers, color: g.colorLine),
+                                    Text("Unknown Geometry", overflow: TextOverflow.clip),
+                                  ],
+                                ),
                               ],
                             ),
                           ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              )
-          : Marker(
-            alignment: Alignment.center,
-            width: 1,
-            height: 1,
-            point: gl.selLay.geometries[i].center,
-            child: SizedBox(),
-          );
-    });
+                  )
+              : Marker(alignment: Alignment.center, width: 1, height: 1, point: g.center, child: SizedBox()),
+        );
+      }
+    }
+    return labels;
   }
 
   void _writePositionDataToSharedPreferences(double lon, double lat, double zoom) async {
