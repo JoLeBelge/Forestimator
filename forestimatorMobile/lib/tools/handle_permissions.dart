@@ -7,39 +7,38 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
-PermissionStatus location = PermissionStatus.granted;
-PermissionStatus storage = PermissionStatus.granted;
-PermissionStatus storage2 = PermissionStatus.granted;
-PermissionStatus extStorage = PermissionStatus.granted;
+PermissionStatus _location = PermissionStatus.granted;
+PermissionStatus _storage = PermissionStatus.granted;
+PermissionStatus _extStorage = PermissionStatus.granted;
 
-bool askOnceForLocation = true;
-bool askOnceForStorage = true;
+bool _askOnceForLocation = true;
+bool _askOnceForStorage = true;
 
-bool getVersion = true;
-double release = 33;
-int sdkInt = 33;
-String system = "";
+bool _getVersion = true;
+double _release = 33;
+int sdkNmb = 33;
+String _system = "";
 
 /* Ask permissions at start of map and if not granted ask to grant them */
-bool getLocation() => location.isGranted;
-bool getStorage() => system == "Android" && release < 13 ? storage.isGranted : true;
-bool getExtStorage() => extStorage.isGranted;
+bool getLocation() => _location.isGranted;
+bool getStorage() => _system == "Android" && _release < 13 ? _storage.isGranted : true;
+bool getExtStorage() => _extStorage.isGranted;
 
 Future<bool> openPhoneForestimatorSettings() async => await openAppSettings();
 
 void initPermissions() async {
   refreshPermissionInfos();
-  if (getVersion && Platform.isAndroid) {
-    system = "Android";
+  if (_getVersion && Platform.isAndroid) {
+    _system = "Android";
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await infos.androidInfo;
     if (androidInfo.version.release.length > 1) {
-      release = double.parse(androidInfo.version.release[0] + androidInfo.version.release[1]);
+      _release = double.parse(androidInfo.version.release[0] + androidInfo.version.release[1]);
     } else {
-      release = double.parse(androidInfo.version.release[0]);
+      _release = double.parse(androidInfo.version.release[0]);
     }
-    sdkInt = androidInfo.version.sdkInt;
-    gl.print("Android $release (sdk $sdkInt)");
+    sdkNmb = androidInfo.version.sdkInt;
+    gl.print("Android $_release (sdk $sdkNmb)");
   } /* else if (getVersion && Platform.isIOS) {
     system = "iOS";
     DeviceInfoPlugin infos = DeviceInfoPlugin();
@@ -47,46 +46,26 @@ void initPermissions() async {
     release = double.parse(iOSInfo.systemVersion);
     gl.print("iOS $release ${iOSInfo.systemName}");
   }*/
-  getVersion = false;
+  _getVersion = false;
 }
 
 void refreshPermissionInfos() async {
-  location = await Permission.location.status;
-  storage = await Permission.storage.status;
-  extStorage = await Permission.manageExternalStorage.status;
+  _location = await Permission.location.status;
+  _storage = await Permission.storage.status;
+  _extStorage = await Permission.manageExternalStorage.status;
 }
 
-bool locationGranted() => location.isGranted;
-bool storageGranted() => storage.isGranted;
-bool extStorageGranted() => extStorage.isGranted;
+bool locationGranted() => _location.isGranted;
+bool storageGranted() => _storage.isGranted;
+bool extStorageGranted() => _extStorage.isGranted;
 
 void makeAllPermissionRequests() {
   Permission.location.request();
 }
 
 Widget handlePermissionForLocation({required Widget child, required VoidSetter refreshParentWidgetTree}) {
-  if (!askOnceForLocation) return child;
-  if (location.isPermanentlyDenied) {
-    return PopupPermissions(
-      title: "GPS desactivées",
-      accept: "Ouvrir paramètres",
-      onAccept: () async {
-        await openAppSettings();
-        refreshPermissionInfos();
-        refreshParentWidgetTree(() {
-          askOnceForLocation = false;
-        });
-      },
-      decline: "non",
-      onDecline: () async {
-        refreshParentWidgetTree(() {
-          askOnceForLocation = false;
-        });
-      },
-      dialog:
-          "L'application utilise le gps pour afficher votre position actuelle sur la carte. Si vous voulez utiliser cette fonctionalité il faut donner la permission dans les parametres.\nSouhaitez vous ouvrir les parametres de votre smartphone?",
-    );
-  } else if (location.isDenied) {
+  if (_location.isPermanentlyDenied || !_askOnceForLocation || gl.firstTimeUse) return child;
+  if (_location.isDenied) {
     return PopupPermissions(
       title: "Permission pour le GPS",
       accept: "oui",
@@ -94,13 +73,13 @@ Widget handlePermissionForLocation({required Widget child, required VoidSetter r
         await Permission.location.request();
         refreshPermissionInfos();
         refreshParentWidgetTree(() {
-          askOnceForLocation = false;
+          _askOnceForLocation = false;
         });
       },
       decline: "non",
       onDecline: () async {
         refreshParentWidgetTree(() {
-          askOnceForLocation = false;
+          _askOnceForLocation = false;
         });
       },
       dialog:
@@ -111,8 +90,8 @@ Widget handlePermissionForLocation({required Widget child, required VoidSetter r
 }
 
 Widget handlePermissionForStorage({required Widget child, required VoidSetter refreshParentWidgetTree}) {
-  if (!askOnceForStorage) return child;
-  if (storage.isDenied && release < 13) {
+  if (_storage.isPermanentlyDenied || !_askOnceForStorage || gl.firstTimeUse) return child;
+  if (_storage.isDenied && _release < 13) {
     return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "oui",
@@ -121,37 +100,17 @@ Widget handlePermissionForStorage({required Widget child, required VoidSetter re
         await Permission.manageExternalStorage.request();
         refreshPermissionInfos();
         refreshParentWidgetTree(() {
-          askOnceForStorage = false;
+          _askOnceForStorage = false;
         });
       },
       decline: "non",
       onDecline: () async {
         refreshParentWidgetTree(() {
-          askOnceForStorage = false;
+          _askOnceForStorage = false;
         });
       },
       dialog:
           "Autorisez-vous l'application à stocker des resultats en forme de PDF dans le dossier 'Downloads' de votre smartphone?",
-    );
-  } else if (storage.isPermanentlyDenied && release < 13) {
-    return PopupPermissions(
-      title: "Permission pour le stockage des données.",
-      accept: "Ouvrir paramètres",
-      onAccept: () async {
-        await openAppSettings();
-        refreshPermissionInfos();
-        refreshParentWidgetTree(() {
-          askOnceForStorage = false;
-        });
-      },
-      decline: "non",
-      onDecline: () async {
-        refreshParentWidgetTree(() {
-          askOnceForStorage = false;
-        });
-      },
-      dialog:
-          "Vous pouvez ouvrir les paramètres et autoriser l'application à stocker des resultats en forme de PDF dans le dossier 'Downloads' de votre smartphone.",
     );
   }
   return child;
