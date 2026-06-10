@@ -14,12 +14,14 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const double dbVersion = 1.0;
+
 // TODO: Add state to SENT status with callback in timer.
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
 
 typedef VoidSetter = void Function(void Function());
 
-const String forestimatorMobileVersion = "3.0.0 - build 30"; //02/2026
+const String forestimatorMobileVersion = "3.1.0 - build 35"; //06/2026
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -54,9 +56,7 @@ class UserData {
   }
 
   static bool validUserData() {
-    return UserData.forename.isNotEmpty &&
-        UserData.name.isNotEmpty &&
-        validMail(UserData.mail);
+    return UserData.forename.isNotEmpty && UserData.name.isNotEmpty && validMail(UserData.mail);
   }
 
   static bool validMail(String str) {
@@ -102,10 +102,8 @@ class Anim {
   static Offset get offScreenPosMessages => Offset(0, -400);
   static Offset get offScreenPosWindows => Offset(0, -6666);
 
-  static Offset get debugOnScreenPos =>
-      Offset(dsp.alignX(eqPxW * .5), dsp.alignY(dsp.eqAlignTop + 10));
-  static Offset get debugOffScreenPos =>
-      Offset(dsp.alignX(eqPxW * .5), dsp.alignY(-250));
+  static Offset get debugOnScreenPos => Offset(dsp.alignX(eqPxW * .5), dsp.alignY(dsp.eqAlignTop + 10));
+  static Offset get debugOffScreenPos => Offset(dsp.alignX(eqPxW * .5), dsp.alignY(-250));
 }
 
 class Mode {
@@ -123,7 +121,7 @@ class Mode {
   static bool keyboardExpanded = false;
   static bool square = false;
   static bool tablet = false;
-  static bool overrideModeTablet = false;
+  static bool forceTablet = false;
   static bool overrideModeSquare = false;
   static bool overrideWellDefinedCheck = false;
   static bool _expert = false;
@@ -201,14 +199,10 @@ class Display {
   double get eqAlignLeft => paddingLeft / equipixel - equiwidth / 2;
   double get eqAlignRight => -paddingRight / equipixel + equiwidth / 2;
 
-  double get eqMaxWindowWidth =>
-      (width - 2 * math.max(paddingLeft, paddingRight)) / equipixel;
-  double get eqMaxWindowHeight =>
-      (height - 2 * math.max(paddingTop, paddingBot)) / equipixel;
+  double get eqMaxWindowWidth => (width - 2 * math.max(paddingLeft, paddingRight)) / equipixel;
+  double get eqMaxWindowHeight => (height - 2 * math.max(paddingTop, paddingBot)) / equipixel;
   double get maxWinPaddingHeight =>
-      eqMaxWindowHeight * eqPx - insetBot > 0
-          ? eqMaxWindowHeight * eqPx - insetBot
-          : eqPx;
+      eqMaxWindowHeight * eqPx - insetBot > 0 ? eqMaxWindowHeight * eqPx - insetBot : eqPx;
 
   Display(BuildContext context) {
     paddingTop = MediaQuery.of(context).padding.top;
@@ -224,54 +218,55 @@ class Display {
     insetBot = MediaQuery.of(context).viewInsets.bottom;
     insetBot > 0 ? showKeyboard = true : showKeyboard = false;
     Mode.keyboardExpanded = showKeyboard;
-    //_tabletMode();
-    //_squareMode();
-    _enforceEquiWidthHeight();
-    if (Mode.square || Mode.overrideModeSquare) {
-      minEquiPixelsDisplayLandscapeHeight =
-          minEquiPixelsDisplayLandscapeWidth * .8;
-      minEquiPixelsDisplayPortraitHeight =
-          minEquiPixelsDisplayPortraitWidth * .8;
-    }
+    _tabletMode();
+    _squareMode();
+    _enforceEquiWidthHeightAndOrientation();
   }
 
   set context(BuildContext context) => dsp = Display(context);
 
-  void tabletMode() {
-    if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
+  void _tabletMode() {
+    if (Mode.forceTablet) {
+      Mode.tablet = true;
+    } else if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
         dpi < 1.75 && dpi * (width < height ? width : height) > 1320 ||
-        dpi < 1.55 && dpi * (width < height ? width : height) > 1000 ||
-        Mode.overrideModeTablet) {
-      if (!Mode.tablet) {
-        minEquiPixelsDisplayPortraitWidth = 125;
-        minEquiPixelsDisplayPortraitHeight = 250;
-        minEquiPixelsDisplayLandscapeWidth = 250;
-        minEquiPixelsDisplayLandscapeHeight = 125;
-        Mode.tablet = true;
-      }
+        dpi < 1.55 && dpi * (width < height ? width : height) > 1000) {
+      Mode.tablet = true;
     } else {
-      if (Mode.tablet) {
-        minEquiPixelsDisplayPortraitWidth = 100;
-        minEquiPixelsDisplayPortraitHeight = 200;
-        minEquiPixelsDisplayLandscapeWidth = 200;
-        minEquiPixelsDisplayLandscapeHeight = 100;
-        Mode.tablet = false;
-      }
+      Mode.tablet = false;
     }
   }
 
-  void squareMode() {
-    if ((aspect > .8 && aspect < 1 / .8) ||
-        Mode.tablet ||
-        Mode.overrideModeSquare) {
+  void _squareMode() {
+    if ((aspect > .8 && aspect < 1 / .8) || Mode.tablet || Mode.overrideModeSquare) {
       Mode.square = true;
-      orientation = Orientation.landscape;
     } else {
       Mode.square = false;
     }
   }
 
-  void _enforceEquiWidthHeight() {
+  void _enforceEquiWidthHeightAndOrientation() {
+    if (Mode.tablet && !Mode.square) {
+      minEquiPixelsDisplayPortraitWidth = 200;
+      minEquiPixelsDisplayPortraitHeight = 400;
+      minEquiPixelsDisplayLandscapeWidth = 400;
+      minEquiPixelsDisplayLandscapeHeight = 200;
+    } else if (Mode.tablet && Mode.square) {
+      minEquiPixelsDisplayPortraitWidth = 200;
+      minEquiPixelsDisplayPortraitHeight = 400;
+      minEquiPixelsDisplayLandscapeWidth = 400;
+      minEquiPixelsDisplayLandscapeHeight = 200;
+    } else if (!Mode.tablet && !Mode.square) {
+      minEquiPixelsDisplayPortraitWidth = 100;
+      minEquiPixelsDisplayPortraitHeight = 200;
+      minEquiPixelsDisplayLandscapeWidth = 200;
+      minEquiPixelsDisplayLandscapeHeight = 100;
+    } else if (!Mode.tablet && Mode.square) {
+      minEquiPixelsDisplayPortraitWidth = 200;
+      minEquiPixelsDisplayPortraitHeight = 200;
+      minEquiPixelsDisplayLandscapeWidth = 200;
+      minEquiPixelsDisplayLandscapeHeight = 200;
+    }
     if (orientation == Orientation.portrait) {
       equipixel = height / minEquiPixelsDisplayPortraitHeight;
       equiwidth = width / equipixel;
@@ -289,6 +284,7 @@ class Display {
       }
       equiwidth = width / equipixel;
     }
+    if (Mode.square) orientation = Orientation.landscape;
   }
 
   @override
@@ -316,11 +312,9 @@ double topAppForestimatorFontHeight = 5;
 double topAppForestimatorFontWidth = 60;
 // PopupWindows
 double popupWindowsPortraitWidth = minEquiPixelsDisplayPortraitWidth - 5;
-double popupWindowsPortraitHeight =
-    minEquiPixelsDisplayPortraitHeight - topAppInfoBarThickness - 5;
+double popupWindowsPortraitHeight = minEquiPixelsDisplayPortraitHeight - topAppInfoBarThickness - 5;
 double popupWindowsLandscapeWidth = minEquiPixelsDisplayLandscapeWidth - 5;
-double popupWindowsLandscapeHeight =
-    minEquiPixelsDisplayLandscapeHeight - topAppInfoBarThickness - 5;
+double popupWindowsLandscapeHeight = minEquiPixelsDisplayLandscapeHeight - topAppInfoBarThickness - 5;
 double popupReturnButtonHeight = 16;
 double popupReturnButtonWidth = 52;
 // Menus
@@ -365,8 +359,7 @@ double layerSwitcherBoxHeightPortrait = 5.5 * layerSwitcherTileHeight;
 double layerSwitcherBoxHeightPortraitOffline = 2.5 * layerSwitcherTileHeight;
 double layerSwitcherBoxHeightLandscape = 66;
 double layerswitcherButtonsBoxHeight = 30;
-double layerswitcherControlBoxHeight =
-    layerSwitcherTileHeight + fontSizeM * 1.2;
+double layerswitcherControlBoxHeight = layerSwitcherTileHeight + fontSizeM * 1.2;
 // Do you really dialogue
 double dyrDialogWidth = 60;
 double dyrDialogHeight = 60;
@@ -440,20 +433,13 @@ pol.Geometry get selGeo => selLay.geometries[selLay.selectedGeometry];
 GeometricLayer get selPathLay => geoLayers[selectedPathLayer];
 pol.Geometry get selPath => selPathLay.geometries[selectedPath];
 
-bool get pathReady =>
-    selectedPathLayer > -1 &&
-    selectedPath > -1 &&
-    geoLayers[selectedPathLayer].geometries.isNotEmpty;
+bool get pathReady => selectedPathLayer > -1 && selectedPath > -1 && geoLayers[selectedPathLayer].geometries.isNotEmpty;
 
-bool get layerReady =>
-    selectedGeoLayer > -1 &&
-    selectedGeoLayer < geoLayers.length &&
-    geoLayers.isNotEmpty;
+bool get layerReady => selectedGeoLayer > -1 && selectedGeoLayer < geoLayers.length && geoLayers.isNotEmpty;
 bool get geoReady =>
     layerReady &&
     geoLayers[selectedGeoLayer].selectedGeometry > -1 &&
-    geoLayers[selectedGeoLayer].selectedGeometry <
-        geoLayers[selectedGeoLayer].geometries.length &&
+    geoLayers[selectedGeoLayer].selectedGeometry < geoLayers[selectedGeoLayer].geometries.length &&
     geoLayers[selectedGeoLayer].geometries.isNotEmpty;
 
 double get eqPx => dsp.equipixel;
@@ -467,8 +453,7 @@ int selectedPathLayer = -1;
 int selectedPath = -1;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
-String queryApiRastDownload =
-    "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
+String queryApiRastDownload = "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
 
 String defaultLayer = "IGN";
 List<String> interfaceSelectedLCode = ["IGN"];
@@ -481,11 +466,7 @@ class SelectedLayer {
   String mCode;
   bool offline;
   String sourceImagePath;
-  SelectedLayer({
-    required this.mCode,
-    this.offline = false,
-    this.sourceImagePath = "",
-  });
+  SelectedLayer({required this.mCode, this.offline = false, this.sourceImagePath = ""});
 }
 
 List<SelectedLayer> switcherMaps = [
@@ -503,11 +484,7 @@ void initializeSelectedLayerForFlutterMap() {
   forceDFCIMode(offlineMode);
   if (!firstTimeUse) {
     for (int i = 0; i < interfaceSelectedLCode.length; i++) {
-      replaceLayerFromList(
-        interfaceSelectedLCode.elementAt(i),
-        index: i,
-        offline: false,
-      );
+      replaceLayerFromList(interfaceSelectedLCode.elementAt(i), index: i, offline: false);
     }
   } else {
     replaceLayerFromList(defaultLayer, index: 0, offline: false);
@@ -559,14 +536,7 @@ List<String> anaSurfSelectedLayerKeys = [
   "COMPOALL",
 ];
 
-List<String> downloadableLayerKeys = [
-  "ZBIO",
-  "NT",
-  "NH",
-  "Topo",
-  "CS_A",
-  "CNSWrast",
-];
+List<String> downloadableLayerKeys = ["ZBIO", "NT", "NH", "Topo", "CS_A", "CNSWrast"];
 
 Position _position = Position(
   longitude: latlonCenter.longitude,
@@ -596,12 +566,7 @@ bool get positionInit => _positionInit;
 late proj4.Point pt;
 
 const Color colorAgroBioTech = Color.fromRGBO(185, 205, 118, 1.0);
-const Color colorPathPoints = Color.from(
-  alpha: 1,
-  red: 0.894,
-  green: 0.298,
-  blue: 0.063,
-);
+const Color colorDfci = Color.from(alpha: 1, red: 0.894, green: 0.298, blue: 0.063);
 const Color colorDeselected = Color.fromARGB(255, 46, 46, 46);
 const Color colorUliege = Color.fromRGBO(00, 112, 127, 1.0);
 const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
@@ -631,11 +596,7 @@ bool firstTimeUse = true;
 LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
-void removeLayerFromList({
-  bool offline = false,
-  int index = -1,
-  String key = "",
-}) {
+void removeLayerFromList({bool offline = false, int index = -1, String key = ""}) {
   forceDFCIMode(offline);
   if (Mode.dfci) return;
   if (key != "" && index > -1) {
@@ -652,18 +613,12 @@ void removeLayerFromList({
     if (sL != null) {
       int index = switcherMaps.indexOf(sL);
       switcherMaps.removeAt(index);
-      switcherMaps.insert(
-        index,
-        SelectedLayer(mCode: '${index + 1}', offline: offline),
-      );
+      switcherMaps.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
     }
   }
   if (index > -1) {
     switcherMaps.removeAt(index);
-    switcherMaps.insert(
-      index,
-      SelectedLayer(mCode: '${index + 1}', offline: offline),
-    );
+    switcherMaps.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
   }
 }
 
@@ -680,12 +635,7 @@ void forceDFCIMode(bool offline) {
   }
 }
 
-void replaceLayerFromList(
-  String replacement, {
-  String key = "",
-  int index = -1,
-  bool offline = false,
-}) {
+void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
   forceDFCIMode(offline);
   if (Mode.dfci) return;
   if (key != "") {
@@ -698,17 +648,11 @@ void replaceLayerFromList(
     if (sL != null) {
       int index = switcherMaps.indexOf(sL);
       switcherMaps.removeAt(index);
-      switcherMaps.insert(
-        index,
-        SelectedLayer(mCode: replacement, offline: offline),
-      );
+      switcherMaps.insert(index, SelectedLayer(mCode: replacement, offline: offline));
     }
   } else if (index > -1) {
     switcherMaps.removeAt(index);
-    switcherMaps.insert(
-      index,
-      SelectedLayer(mCode: replacement, offline: offline),
-    );
+    switcherMaps.insert(index, SelectedLayer(mCode: replacement, offline: offline));
   } else if (getCountOfSelectedLayersForMap() == 3) {
     switcherMaps.removeAt(2);
     switcherMaps.insert(0, SelectedLayer(mCode: replacement, offline: offline));
@@ -797,10 +741,7 @@ void savePrefSelLayOnline() async {
     offlineLayer.add(dico.getLayerBase(sL.mCode).mOffline ? "t" : "n");
   }
   await shared!.setStringList('interfaceSelectedLCode', interfaceSelectedLCode);
-  await shared!.setStringList(
-    'interfaceSelectedLCodeOfflineFlag',
-    offlineLayer,
-  );
+  await shared!.setStringList('interfaceSelectedLCodeOfflineFlag', offlineLayer);
 }
 
 void savePrefSelLayOffline() async {
@@ -808,25 +749,16 @@ void savePrefSelLayOffline() async {
   for (SelectedLayer sL in switcherMaps) {
     interfaceSelectedLCode.add(sL.mCode);
   }
-  await shared!.setStringList(
-    'interfaceSelectedOffCode',
-    interfaceSelectedLCode,
-  );
+  await shared!.setStringList('interfaceSelectedOffCode', interfaceSelectedLCode);
 }
 
 void loadPrefSelLayOnline() async {
-  interfaceSelectedLCode = shared!.getStringList('interfaceSelectedLCode')!;
-  List<String> offlineLayer =
-      shared!.getStringList('interfaceSelectedLCodeOfflineFlag')!;
+  interfaceSelectedLCode = shared!.getStringList('interfaceSelectedLCode') ?? [defaultLayer];
+  List<String> offlineLayer = shared!.getStringList('interfaceSelectedLCodeOfflineFlag') ?? ["f"];
   switcherMaps.clear();
   int index = 0;
   for (String key in interfaceSelectedLCode) {
-    switcherMaps.add(
-      SelectedLayer(
-        mCode: key,
-        offline: offlineLayer[index] == "t" ? true : false,
-      ),
-    );
+    switcherMaps.add(SelectedLayer(mCode: key, offline: offlineLayer[index] == "t" ? true : false));
     index++;
   }
 }
@@ -853,20 +785,10 @@ void changeSelectedLayerModeOffline() {
   }
 
   switcherMaps.removeWhere((element) => element.offline == false);
-  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty &&
-      switcherMaps.isEmpty) {
+  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty && switcherMaps.isEmpty) {
     switcherMaps.insert(
       0,
-      SelectedLayer(
-        mCode:
-            dico
-                .getLayersOffline()
-                .where((i) => i.mBits == 8)
-                .toList()
-                .first
-                .mCode,
-        offline: true,
-      ),
+      SelectedLayer(mCode: dico.getLayersOffline().where((i) => i.mBits == 8).toList().first.mCode, offline: true),
     );
   } else {
     while (switcherMaps.length > 1) {
@@ -895,19 +817,14 @@ bool isSelectedLayer(String key, {offline = false}) {
 }
 
 bool slotContainsLayer(int index, String key) {
-  return offlineMode
-      ? switcherMaps.first.mCode == key
-      : switcherMaps[index].mCode == key;
+  return offlineMode ? switcherMaps.first.mCode == key : switcherMaps[index].mCode == key;
 }
 
 List<SelectedLayer> getLayersForFlutterMap() {
   return switcherMaps
       .where(
         (val) =>
-            !(val.mCode.length < 3 &&
-                (val.mCode.contains('1') ||
-                    val.mCode.contains('2') ||
-                    val.mCode.contains('3'))),
+            !(val.mCode.length < 3 && (val.mCode.contains('1') || val.mCode.contains('2') || val.mCode.contains('3'))),
       )
       .toList()
       .reversed
@@ -987,41 +904,29 @@ List<Color> predefinedPointSymbPalette = [
 ];
 
 class DfclI {
-  IconData icon;
-  Color color;
+  final IconData icon;
+  final Color color;
 
-  DfclI(this.icon, this.color);
+  const DfclI(this.icon, this.color);
 }
 
-Map<String, DfclI> obstacleChoice = {
-  "Point de première destination": DfclI(
-    DFCLIcons.pointdepremieredestination,
-    Colors.black,
-  ),
+const Map<String, DfclI> obstacleChoice = {
+  "Point de première destination": DfclI(DFCLIcons.pointdepremieredestination, Colors.black),
   "Barrière": DfclI(DFCLIcons.barriere, Colors.black),
   "Obstacle": DfclI(DFCLIcons.obstacles, Colors.black),
   "Aire de croisement": DfclI(DFCLIcons.airedecroisement, Colors.black),
-  "Aire de retournement sans impasse": DfclI(
-    DFCLIcons.airederetournement,
-    Colors.black,
-  ),
-  "Aire de retournement au bout d'une impasse": DfclI(
-    DFCLIcons.airederetournement,
-    Colors.red,
-  ),
+  "Aire de retournement sans impasse": DfclI(DFCLIcons.airederetournement, Colors.black),
+  "Aire de retournement au bout d'une impasse": DfclI(DFCLIcons.airederetournement, Colors.red),
   "Parking": DfclI(DFCLIcons.parking, Colors.black),
   "Bouche ou Borne d'incendie": DfclI(DFCLIcons.borneincendie, Colors.blue),
   "Citerne": DfclI(DFCLIcons.citerne, Colors.lightBlue),
   "Point d'aspiration": DfclI(DFCLIcons.pointaspiration, Colors.lightBlue),
-  "Aire d'alimentation HBE": DfclI(
-    DFCLIcons.airealimentationhbe,
-    Colors.lightBlue,
-  ),
+  "Aire d'alimentation HBE": DfclI(DFCLIcons.airealimentationhbe, Colors.lightBlue),
   "Tour d'observation": DfclI(DFCLIcons.tourdobservation, Colors.red),
   "Ligne éléctrique": DfclI(DFCLIcons.ligneelectrique, Colors.pink),
 };
 
-Map<String, Color> roadCategoryChoice = {
+const Map<String, Color> roadCategoryChoice = {
   "Categorie 1": Colors.red,
   "Categorie 2": Colors.orange,
   "Categorie 3": Colors.yellow,
@@ -1029,28 +934,29 @@ Map<String, Color> roadCategoryChoice = {
   "Impasse non amenagée": Colors.blue,
 };
 
+const Map<String, Color> undoPistesChoices = {
+  "Supprimez le dernier point d'une piste.": Colors.blue,
+  "Supprimez la dernière observation.": Colors.lightBlue,
+};
+
+const Map<String, Color> pistesChoices = {
+  "Ajoutez un point intermédiaire.": Colors.orange,
+  "Ajoutez un dernier point terminal.": Colors.red,
+};
+
 Color lastUsedCategory = Colors.red;
 
 const String labelSendCompoFeature =
     "Vous pouvez nous communiquer des observations relatives à la composition dans le but d'améliorer la carte de composition. Veillez à complêter l'attribut 'essence' avec l'espèce observée. Nous attirons votre attention qu'une entitée (polygone ou point) ne peux être envoyée qu'une seule fois. Merci pour votre contribution !";
 
-void startTimer(
-  Future<bool> Function() timeupCall,
-  bool Function() stop,
-  int start,
-  int repeat,
-) {
+void startTimer(Future<bool> Function() timeupCall, bool Function() stop, int start, int repeat) {
   Timer(Duration(seconds: start), () {
     repeatTimer(timeupCall, stop, repeat);
     timeupCall();
   });
 }
 
-void repeatTimer(
-  Future<bool> Function() timeupCall,
-  bool Function() stop,
-  int repeat,
-) {
+void repeatTimer(Future<bool> Function() timeupCall, bool Function() stop, int repeat) {
   print("Stop repeating task ${stop()}");
   if (!stop()) {
     Timer(Duration(seconds: repeat), () {

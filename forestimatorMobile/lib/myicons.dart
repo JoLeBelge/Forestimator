@@ -34,4 +34,5 @@ class DFCLIcons {
   static const IconData tourdobservation = IconData(0x008a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData ligneelectrique = IconData(0x008b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData impassennonamenagee = IconData(0x008c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData fin = IconData(0x008d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }
