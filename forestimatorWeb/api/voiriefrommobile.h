@@ -26,8 +26,7 @@ private:
 
 class observationVoirie{
 public:
-    std::string  type,categorie, rmq, nom_contact,contact, date, geom ;
-    int objectid;
+    std::string  type,categorie, rmq, nom_contact,contact, date, geom ,objectid;
     template<class Action>
     void persist(Action& a)
     {

@@ -37,7 +37,7 @@ void polygFromMobile::handleRequest(const Http::Request &request,Http::Response 
     OGRLayer * lay = ds->GetLayer(0);
     OGRFeature *poFeature=lay->GetFeature(0);
     std::unique_ptr<validCompoRaster> a = std::make_unique<validCompoRaster>();
-    a->objectid = poFeature->GetFieldAsInteger("objectid");
+    a->objectid = poFeature->GetFieldAsString("objectid");
     a->essence = poFeature->GetFieldAsString("essence");
     a->rmq = poFeature->GetFieldAsString("rmq");
     a->nom_contact = poFeature->GetFieldAsString("nom_contact");

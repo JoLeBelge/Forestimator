@@ -42,10 +42,10 @@ void voirieFromMobile::handleRequest(const Http::Request &request,Http::Response
     if(poFeature->GetGeometryRef() == nullptr){response.out() << "NOK";std::cout << "null geom" << std::endl;} else {
     dbo::Transaction transaction(session);
     if (!actionRemove){
-    int count = session.query<int>("select count(1) from observationVoirie").where("objectid = ?").bind(poFeature->GetFieldAsInteger("objectid"));
+    int count = session.query<int>("select count(1) from observationVoirie").where("objectid = ?").bind(poFeature->GetFieldAsString("objectid"));
     if (count==0){
     std::unique_ptr<observationVoirie> a = std::make_unique<observationVoirie>();
-    a->objectid = poFeature->GetFieldAsInteger("objectid");
+    a->objectid = poFeature->GetFieldAsString("objectid");
     a->type = poFeature->GetFieldAsString("type");
     a->categorie = poFeature->GetFieldAsString("categorie");
     a->rmq = poFeature->GetFieldAsString("rmq");
@@ -62,9 +62,9 @@ void voirieFromMobile::handleRequest(const Http::Request &request,Http::Response
     }
     } else {
         // demande de suppression de l'objet
-        int count = session.query<int>("select count(1) from observationVoirie").where("objectid = ?").bind(poFeature->GetFieldAsInteger("objectid"));
+        int count = session.query<int>("select count(1) from observationVoirie").where("objectid = ?").bind(poFeature->GetFieldAsString("objectid"));
         if (count==1){
-        dbo::ptr<observationVoirie> feature = session.find<observationVoirie>().where("objectid = ?").bind(poFeature->GetFieldAsInteger("objectid"));
+        dbo::ptr<observationVoirie> feature = session.find<observationVoirie>().where("objectid = ?").bind(poFeature->GetFieldAsString("objectid"));
         feature.remove();
         response.out() << "REMOVED" ;
         } else {
