@@ -665,7 +665,7 @@ class DicoAptProvider {
     String aRes = "";
     for (Station st in mStations) {
       if (st.mStationNum == usRastVal) {
-        aRes = "US-${zbio2CSPrefix(st.mZbio)}-${st.mStationId}.pdf";
+        aRes = "US-" + zbio2CSPrefix(st.mZbio) + "${st.mStationId}.pdf";
         break;
       }
     }
