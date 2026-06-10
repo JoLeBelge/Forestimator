@@ -26,9 +26,11 @@ private:
 class validCompoRaster{
 public:
     std::string  essence, rmq, nom_contact,contact, date, geom ;
+    std::string objectid;
     template<class Action>
     void persist(Action& a)
     {
+        dbo::field(a, objectid,       "objectid");
         dbo::field(a, essence,       "essence");
         dbo::field(a, rmq,   "rmq");
         dbo::field(a, nom_contact,    "nom_contact");
