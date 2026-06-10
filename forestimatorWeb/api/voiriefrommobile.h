@@ -27,9 +27,11 @@ private:
 class observationVoirie{
 public:
     std::string  type,categorie, rmq, nom_contact,contact, date, geom ;
+    int objectid;
     template<class Action>
     void persist(Action& a)
     {
+        dbo::field(a, objectid,       "objectid");
         dbo::field(a, type,       "type");
         dbo::field(a, categorie,       "categorie");
         dbo::field(a, rmq,   "rmq");

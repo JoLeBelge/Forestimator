@@ -70,6 +70,7 @@ int launchForestimator(int argc, char **argv)
 
         server.addResource(fromMobile, "/api/polygFromMobile/${feature}");
         server.addResource(route, "/api/voirieFromMobile/${feature}");
+        server.addResource(route, "/api/voirieFromMobile/${feature}/action/${action}");
 
         // fileResource pour les cartes à l'échelle de toute la RW
         for (auto kv : dico->VlayerBase())
