@@ -2459,7 +2459,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                     ],
                   ),
                   SizedBox(
-                    width: gl.eqPx * 98,
+                    width: gl.eqPx * 95,
                     height:
                         listPartHeight > 0
                             ? gl.dsp.orientation == Orientation.portrait
@@ -2519,7 +2519,6 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                                     i == gl.selectedGeoLayer
                                         ? () {
                                           setState(() {
-                                            gl.selectedGeoLayer = -1;
                                           });
                                         }
                                         : () {
