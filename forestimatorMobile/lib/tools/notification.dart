@@ -12,7 +12,6 @@ import 'package:fforestimator/tools/geometry_layer.dart';
 import 'package:fforestimator/tools/layout_tools.dart' as lt;
 import 'package:fforestimator/tools/geometry/geometry.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
-import 'package:fforestimator/tools/handle_permissions.dart' as permissions;
 import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:fforestimator/tools/pretty_print_nominatim_results.dart';
 import 'package:fforestimator/tools/pretty_print_polygon_results.dart';
@@ -2459,7 +2458,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                     ],
                   ),
                   SizedBox(
-                    width: gl.eqPx * 98,
+                    width: gl.eqPx * 95,
                     height:
                         listPartHeight > 0
                             ? gl.dsp.orientation == Orientation.portrait
@@ -2518,9 +2517,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> with WidgetsBindingObser
                                 onPressed:
                                     i == gl.selectedGeoLayer
                                         ? () {
-                                          setState(() {
-                                            gl.selectedGeoLayer = -1;
-                                          });
+                                          setState(() {});
                                         }
                                         : () {
                                           setState(() {
@@ -5414,7 +5411,7 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
             ),
           ],
         ),
-        if (permissions.sdkInt < 33)
+        if (sdkNmb < 33)
           Container(
             constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * 0.95),
             child: Row(

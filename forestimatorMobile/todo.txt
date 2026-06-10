@@ -33,8 +33,8 @@ NOUVELLES OPTIONS - LONG TERME
 Debug suite à la formation SFRSB
 --------------------------------
 
--mode points/polygones de l'utilisateur ; passage de l'interface "liste des layers" au mode compact pas très intuitif : si pas de layer sélectionnée, appuyer sur le bouton "reduire" fait quitter le mode points/polygones. Il faudrai à la place afficher l'interface "compact" avec la première layer de la liste, par exemple.
--permission GPS ; demande la permission à chaque utilisation de l'appli, devrait demander une seule et unique fois.
+V -mode points/polygones de l'utilisateur ; passage de l'interface "liste des layers" au mode compact pas très intuitif : si pas de layer sélectionnée, appuyer sur le bouton "reduire" fait quitter le mode points/polygones. Il faudrai à la place afficher l'interface "compact" avec la première layer de la liste, par exemple.
+V -permission GPS ; demande la permission à chaque utilisation de l'appli, devrait demander une seule et unique fois.
 -visu toujour ON pour les layers si mode edition de polygones (si jamais l'utilisateur a mis à off via le sélecteur de couche)
 -check firewall si de très nombreuses personnes utilisent forestimator depuis la fac
 -mode offline : changer le logo dans les couches du catalogue offline, logo disquette.

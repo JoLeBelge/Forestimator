@@ -240,6 +240,9 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   Widget build(BuildContext context) {
     int i = 0;
     gl.notificationContext = context;
+    if (gl.selectedGeoLayer == -1 && gl.geoLayers.isNotEmpty) {
+      gl.selectedGeoLayer = 0;
+    }
     return handlePermissionForLocation(
       refreshParentWidgetTree: refreshView,
       child: handlePermissionForStorage(
