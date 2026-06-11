@@ -287,14 +287,54 @@ void cApliCarteApt::carteDeriveCS(){
     year_month_day today = year_month_day{floor<days>(std::chrono::system_clock::now())};
     std::string d = "carte dérivée du catalogue de stations générée le " + format("%F",today);
     GDALRasterBand *outBand;
+    std::string credits("Crédit","Jonathan Lisein , Pauline Cubelier, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
 
-    /**** sensibilité climatique ****/
+    /**** production de bois ****/
+    std::cout << "production de bois" << std::endl;
+    aOut=dico->File("prod_b");
+    poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
+    poDstDS->SetSpatialRef(spatialReference);
+    poDstDS->SetMetadataItem("Version",d.c_str());
+    poDstDS->SetMetadataItem(credits);
+    outBand = poDstDS->GetRasterBand(1);
+    outBand->SetNoDataValue(0);
+
+    for ( int row = 0; row < y; row++ )
+    {
+        CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
+
+        ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
+        // iterate on pixels in row
+#pragma omp parallel num_threads(6)
+        {
+#pragma omp for
+        for (int col = 0; col < x; col++)
+        {
+            int val(0), st(0);
+            int zbio = scanlineZBIO[ col ];
+           // if (zbio==1 | zbio==2 |zbio==10 ){
+                st = scanlineCS1[ col ];
+                // passer de la digital number station au numéro de station.
+
+                val = dico->getKKCS(dico->ZBIO2CSid(zbio),st).PB;
+           // }
+            scanline[ col ] = val;
+        }
+        }
+        // écriture du résultat dans le fichier de destination
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%step==0){std::cout<< "-" << std::endl;}
+    }
+    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+
+
+    if (0){/**** sensibilité climatique ****/
     std::cout << "sensibilite climatique" << std::endl;
     std::string aOut=dico->File("SCC");
     GDALDataset* poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem("Crédit","Jonathan Lisein , Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    poDstDS->SetMetadataItem(credits);
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -331,7 +371,7 @@ void cApliCarteApt::carteDeriveCS(){
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -361,50 +401,13 @@ void cApliCarteApt::carteDeriveCS(){
     }
     if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
 
-    /**** production de bois ****/
-    std::cout << "production de bois" << std::endl;
-    aOut=dico->File("prod_b");
-    poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
-    poDstDS->SetSpatialRef(spatialReference);
-    poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
-    outBand = poDstDS->GetRasterBand(1);
-    outBand->SetNoDataValue(0);
-
-    for ( int row = 0; row < y; row++ )
-    {
-        CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-
-        ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
-        // iterate on pixels in row
-#pragma omp parallel num_threads(6)
-        {
-#pragma omp for
-        for (int col = 0; col < x; col++)
-        {
-            int val(0), st(0);
-            int zbio = scanlineZBIO[ col ];
-            if (zbio==1 | zbio==2 |zbio==10 ){
-                st = scanlineCS1[ col ];
-                //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
-                val = dico->getKKCS(dico->ZBIO2CSid(zbio),st).PB;
-            }
-            scanline[ col ] = val;
-        }
-        }
-        // écriture du résultat dans le fichier de destination
-        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
-        if (row%step==0){std::cout<< "-" << std::endl;}
-    }
-    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
-
     /**** Valeur conservatoire potentielle ****/
     std::cout << "Valeur conservatoire potentielle" << std::endl;
     aOut=dico->File("vcp");
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -440,7 +443,7 @@ void cApliCarteApt::carteDeriveCS(){
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -478,7 +481,7 @@ void cApliCarteApt::carteDeriveCS(){
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -509,6 +512,7 @@ void cApliCarteApt::carteDeriveCS(){
         if (row%step==0){std::cout<< "-" << std::endl;}
     }
     if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+    }
 
     std::cout << " done " << std::endl;
 }
