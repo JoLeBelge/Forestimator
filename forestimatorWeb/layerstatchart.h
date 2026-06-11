@@ -10,6 +10,14 @@
 #include <Wt/WStandardItemModel.h>
 #include <Wt/WStandardItem.h>
 #include <Wt/WTableView.h>
+#include <Wt/WTable.h>
+#include <Wt/WImage.h>
+#include <Wt/WVBoxLayout.h>
+#include <Wt/WHBoxLayout.h>
+#include <Wt/WRasterImage.h>
+#include <Wt/WPainter.h>
+#include <Wt/WRectArea.h>
+
 #include "layer.h"
 
 using namespace Wt;
