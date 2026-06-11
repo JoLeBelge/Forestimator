@@ -349,7 +349,7 @@ class DicoAptProvider {
     //docDir = await getApplicationDocumentsDirectory();
 
     final String path = join(gl.docDir, "db/fforestimator.db");
-    gl.print("db path: $path");
+    gl.print("Info: db path is $path");
     var exists = await databaseExists(path);
     if (exists) {
       List<Map<String, dynamic>> result;
@@ -358,13 +358,15 @@ class DicoAptProvider {
         result = await db.query('Info');
         if (result.first['Version'] != gl.dbVersion) {
           gl.print(
-            "database version ${result.first['Version']} is different from app db version ${gl.dbVersion}, deleting old database",
+            "Warning: database version ${result.first['Version']} is different from app db version ${gl.dbVersion}, deleting old database",
           );
           db.close();
           await File(path).delete();
           exists = false;
         } else {
-          gl.print("database version ${result.first['Version']} is up to date with app db version ${gl.dbVersion}");
+          gl.print(
+            "Info: database version ${result.first['Version']} is up to date with app db version ${gl.dbVersion}",
+          );
         }
       } catch (e) {
         db.close();
@@ -379,7 +381,7 @@ class DicoAptProvider {
       try {
         await Directory(dirname(path)).create(recursive: true);
       } catch (e) {
-        gl.print("$e");
+        gl.print("Error: $e");
       }
 
       // Create the writable database file from the bundled  (asset bulk) fforestimator.db database file:
@@ -390,10 +392,8 @@ class DicoAptProvider {
     }
 
     db = await openDatabase(path);
-    List<Map<String, dynamic>> result = await db.query('Info');
-    gl.print("database version ${result.first['Version']}");
 
-    result = await db.query('dico_color');
+    List<Map<String, dynamic>> result = await db.query('dico_color');
 
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
@@ -498,7 +498,9 @@ class DicoAptProvider {
     if (mLayerBases.containsKey(aCode)) {
       return mLayerBases[aCode]!;
     } else {
-      gl.print("oops no layerBase $aCode");
+      if (!gl.placeHolderNames.contains(aCode)) {
+        gl.print("Warning: no layerBase $aCode");
+      }
       return LayerBase();
     }
   }

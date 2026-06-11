@@ -488,7 +488,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                 ),
                               ),
                             ] +
-                            (gl.Mode.editPolygon
+                            (gl.Mode.editPolygon && gl.geoReady
                                 ? <Widget>[
                                   if (gl.selLay.geometries.isNotEmpty &&
                                       gl.selGeo.points.length > 1 &&

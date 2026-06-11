@@ -399,11 +399,13 @@ bool offlineMode = false;
 bool debug = false;
 int currentPage = 0;
 
-List<String> onboardLog = [forestimatorMobileVersion];
+List<String> onboardLog = ["${DateTime.now().toString()}\n${forestimatorMobileVersion.toString()}"];
 int lengthLog = 1;
 @override
 void print(dynamic it) {
-  onboardLog.add("${DateTime.now().toString()}\n${it.toString()}");
+  refreshLog(() {
+    onboardLog.add("${DateTime.now().toString()}\n${it.toString()}");
+  });
 }
 
 // -1 means that no marker is selected
@@ -463,6 +465,8 @@ List<bool> interfaceSelectedLOffline = [false];
 String pathExternalStorage = "";
 String docDir = "";
 
+List<String> placeHolderNames = ["___one", "___two", "___three"];
+
 class SelectedLayer {
   String mCode;
   bool offline;
@@ -471,9 +475,9 @@ class SelectedLayer {
 }
 
 List<SelectedLayer> switcherMaps = [
-  SelectedLayer(mCode: "3", offline: false),
-  SelectedLayer(mCode: "2", offline: false),
-  SelectedLayer(mCode: "1", offline: false),
+  SelectedLayer(mCode: placeHolderNames[2], offline: false),
+  SelectedLayer(mCode: placeHolderNames[1], offline: false),
+  SelectedLayer(mCode: placeHolderNames[0], offline: false),
 ];
 
 String getFirstSelLayOffline() {
@@ -577,6 +581,9 @@ const Color colorBackgroundSecondary = Color.fromRGBO(243, 243, 243, 1);
 VoidSetter refreshStack = (void Function() f) {
   f();
 };
+VoidSetter refreshLog = (void Function() f) {
+  f();
+};
 VoidSetter rebuildSwitcherCatalogueButtons = (void Function() setter) {};
 VoidSetter refreshSearch = (void Function() setter) {};
 VoidSetter refreshSettingsMenu = (void Function() setter) {};
@@ -614,12 +621,12 @@ void removeLayerFromList({bool offline = false, int index = -1, String key = ""}
     if (sL != null) {
       int index = switcherMaps.indexOf(sL);
       switcherMaps.removeAt(index);
-      switcherMaps.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
+      switcherMaps.insert(index, SelectedLayer(mCode: placeHolderNames[index], offline: offline));
     }
   }
   if (index > -1) {
     switcherMaps.removeAt(index);
-    switcherMaps.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
+    switcherMaps.insert(index, SelectedLayer(mCode: placeHolderNames[index], offline: offline));
   }
 }
 
@@ -631,7 +638,7 @@ void forceDFCIMode(bool offline) {
     switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: offline));
     if (!offlineMode) {
       switcherMaps.insert(1, SelectedLayer(mCode: 'IGN', offline: offline));
-      switcherMaps.insert(2, SelectedLayer(mCode: '3', offline: offline));
+      switcherMaps.insert(2, SelectedLayer(mCode: placeHolderNames[2], offline: offline));
     }
   }
 }
@@ -679,7 +686,7 @@ int getCountOfSelectedLayersForMap() {
 int getIndexForEmptySlot() {
   int count = 0;
   for (SelectedLayer layer in switcherMaps) {
-    if (layer.mCode.length < 2) {
+    if (placeHolderNames.contains(layer.mCode)) {
       return count;
     }
     count++;
@@ -797,7 +804,7 @@ void changeSelectedLayerModeOffline() {
     }
   }
   if (switcherMaps.isEmpty) {
-    switcherMaps.insert(0, SelectedLayer(mCode: '1', offline: true));
+    switcherMaps.insert(0, SelectedLayer(mCode: placeHolderNames[0], offline: true));
   }
 }
 
@@ -822,14 +829,7 @@ bool slotContainsLayer(int index, String key) {
 }
 
 List<SelectedLayer> getLayersForFlutterMap() {
-  return switcherMaps
-      .where(
-        (val) =>
-            !(val.mCode.length < 3 && (val.mCode.contains('1') || val.mCode.contains('2') || val.mCode.contains('3'))),
-      )
-      .toList()
-      .reversed
-      .toList();
+  return switcherMaps.where((val) => !(placeHolderNames.contains(val.mCode))).toList().reversed.toList();
 }
 
 Map<int, int> lutVulnerabiliteCS = {

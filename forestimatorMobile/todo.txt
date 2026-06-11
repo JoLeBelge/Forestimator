@@ -39,7 +39,7 @@ V -permission GPS ; demande la permission à chaque utilisation de l'appli, devr
 -check firewall si de très nombreuses personnes utilisent forestimator depuis la fac
 -mode offline : changer le logo dans les couches du catalogue offline, logo disquette.
 -mode offline : carte numérique des sols de wallonie ; ne pas mettre de bouton "afficher" car on ne peut pas l'afficher (pour l'instant le bouton existe mais ne sert à rien)
--dans les logs de l'appli, trouver d'ou viens le message "oops no layerBase 2" et résoudre.
+V -dans les logs de l'appli, trouver d'ou viens le message "oops no layerBase 2" et résoudre.
 -si une couche en mode offline dans le sélecteur et que je clique dessus : ouvre le catalogue online!
 -si une couche ne mode offline numéro 1 dans sélecteur et que je fait un appui court sur la carte ; envoie la demande de légende au serveur (devrais faire l'analyse en offline pour cette couche)
 

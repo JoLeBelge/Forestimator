@@ -4354,83 +4354,99 @@ class _SearchResultCard extends State<SearchResultCard> {
   @override
   Widget build(BuildContext context) {
     bool selected = _selectedSearchResultCard == widget.index ? true : false;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextButton(
-          onPressed: () {
-            widget.state(widget.entry);
-            gl.refreshStack(() {
-              gl.modeMapShowSearchMarker = true;
-            });
-            selected
-                ? setState(() {
-                  _selectedSearchResultCard = -1;
-                  _revertStateOfSelectedSearchResultCard = () {};
-                })
-                : setState(() {
-                  _selectedSearchResultCard = widget.index;
-                  _revertStateOfSelectedSearchResultCard();
-                  _revertStateOfSelectedSearchResultCard = () {
-                    if (mounted) {
-                      setState(() {
-                        selected = false;
-                      });
-                    }
-                  };
+    return OrientationBuilder(
+      builder: (c, o) {
+        final double cWidth = gl.eqPx * gl.eqPxW * .9;
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {
+                widget.state(widget.entry);
+                gl.refreshStack(() {
+                  gl.modeMapShowSearchMarker = true;
                 });
-          },
-          child: Card(
-            margin: EdgeInsets.all(0.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(12.0),
-              side:
-                  selected
-                      ? BorderSide(color: widget.boxColor, width: 2.0)
-                      : BorderSide(color: widget.boxColor.withAlpha(255), width: 1.0),
-            ),
-            color: selected ? widget.boxColor.withAlpha(255) : widget.boxColor.withAlpha(150),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
+                selected
+                    ? setState(() {
+                      _selectedSearchResultCard = -1;
+                      _revertStateOfSelectedSearchResultCard = () {};
+                    })
+                    : setState(() {
+                      _selectedSearchResultCard = widget.index;
+                      _revertStateOfSelectedSearchResultCard();
+                      _revertStateOfSelectedSearchResultCard = () {
+                        if (mounted) {
+                          setState(() {
+                            selected = false;
+                          });
+                        }
+                      };
+                    });
+              },
+              child: Card(
+                margin: EdgeInsets.all(0.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(12.0),
+                  side:
+                      selected
+                          ? BorderSide(color: widget.boxColor, width: 2.0)
+                          : BorderSide(color: widget.boxColor.withAlpha(255), width: 1.0),
+                ),
+                color: selected ? widget.boxColor.withAlpha(255) : widget.boxColor.withAlpha(150),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      constraints: BoxConstraints(maxWidth: gl.eqPx * (gl.popupWindowsPortraitWidth - 15)),
-                      child: Text(
-                        widget.typeDeResultat,
-                        style: TextStyle(
-                          color: lt.getColorTextFromBackground(widget.boxColor),
-                          fontSize: gl.eqPx * gl.fontSizeS,
-                        ),
-                      ),
-                    ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Column(
                       children: [
                         Container(
-                          padding: EdgeInsets.all(5),
-                          alignment: Alignment.center,
-                          constraints: BoxConstraints(maxWidth: gl.eqPx * (gl.popupWindowsPortraitWidth - 15)),
+                          constraints: BoxConstraints(
+                            maxWidth:
+                                (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape)
+                                    ? cWidth * .4
+                                    : cWidth * .9,
+                          ),
                           child: Text(
-                            widget.descriptionDeResultat,
-                            textAlign: TextAlign.justify,
+                            widget.typeDeResultat,
                             style: TextStyle(
                               color: lt.getColorTextFromBackground(widget.boxColor),
                               fontSize: gl.eqPx * gl.fontSizeS,
                             ),
                           ),
                         ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AnimatedContainer(
+                              duration: Duration(milliseconds: 200),
+                              padding: EdgeInsets.all(5),
+                              alignment: Alignment.center,
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape)
+                                        ? cWidth * .4
+                                        : cWidth * .9,
+                              ),
+                              child: Text(
+                                widget.descriptionDeResultat,
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(
+                                  color: lt.getColorTextFromBackground(widget.boxColor),
+                                  fontSize: gl.eqPx * gl.fontSizeS,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
@@ -4480,13 +4496,11 @@ class _SearchMenu extends State<SearchMenu> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (c, o) {
+        final double cWidth = gl.eqPx * gl.eqPxW * .9;
         return AnimatedContainer(
           alignment: Alignment.center,
           duration: Duration(milliseconds: 100),
-          width:
-              gl.dsp.orientation == Orientation.portrait
-                  ? gl.eqPx * gl.popupWindowsPortraitWidth
-                  : gl.eqPx * gl.popupWindowsLandscapeWidth,
+          width: cWidth,
           height:
               gl.dsp.showKeyboard
                   ? gl.dsp.orientation == Orientation.landscape
@@ -4499,7 +4513,8 @@ class _SearchMenu extends State<SearchMenu> with WidgetsBindingObserver {
                 alignment: Alignment.center,
                 constraints: BoxConstraints(
                   maxHeight: gl.eqPx * (gl.dsp.eqMaxWindowHeight - 21) - gl.dsp.insetBot,
-                  maxWidth: gl.popupWindowsPortraitWidth * gl.eqPx,
+                  maxWidth:
+                      (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape) ? cWidth * .44 : cWidth * .9,
                 ),
                 child: ListView(children: <Widget>[] + searchResults),
               ),
@@ -4511,7 +4526,8 @@ class _SearchMenu extends State<SearchMenu> with WidgetsBindingObserver {
                   children: [
                     SizedBox(
                       height: gl.eqPx * gl.searchBarHeight,
-                      width: gl.eqPx * gl.searchBarWidth,
+                      width:
+                          (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape) ? cWidth * .44 : cWidth * .9,
                       child: Card(
                         child: TextFormField(
                           decoration: InputDecoration(
@@ -4684,7 +4700,12 @@ Widget forestimatorSettingsVersion(VoidSetter state) {
                   "Forestimator Mobile",
                   overflow: TextOverflow.clip,
                   textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: gl.fontSizeXL * gl.eqPx),
+                  style: TextStyle(
+                    color: Colors.black,
+                    overflow: TextOverflow.fade,
+                    fontSize: gl.eqPx * gl.fontSizeL,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -4731,16 +4752,23 @@ Widget forestimatorSettingsVersion(VoidSetter state) {
                 ),
               ],
             ),
+            lt.stroke(vertical: false, gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  constraints: BoxConstraints(maxWidth: gl.eqPx * 60),
+                SizedBox(
+                  width:
+                      (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape)
+                          ? gl.eqPx * gl.eqPxW * 0.35
+                          : gl.eqPx * gl.eqPxW * .8,
                   child: Text(
                     "Finançements du projet",
-                    overflow: TextOverflow.clip,
-                    textAlign: TextAlign.justify,
-                    textScaler: TextScaler.linear(1.5),
+                    style: TextStyle(
+                      color: Colors.black,
+                      overflow: TextOverflow.fade,
+                      fontSize: gl.eqPx * gl.fontSizeL,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -4748,8 +4776,11 @@ Widget forestimatorSettingsVersion(VoidSetter state) {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .6),
+                SizedBox(
+                  width:
+                      (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape)
+                          ? gl.eqPx * gl.eqPxW * 0.35
+                          : gl.eqPx * gl.eqPxW * .8,
                   child: Text(
                     "Le développement est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.\nLe contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de Gestion des Ressources Forestières de Gembloux Agro-Bio Tech (ULiège).\n",
                     textAlign: TextAlign.justify,
@@ -4761,10 +4792,14 @@ Widget forestimatorSettingsVersion(VoidSetter state) {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .7),
+                SizedBox(
+                  width:
+                      (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape)
+                          ? gl.eqPx * gl.eqPxW * 0.35
+                          : gl.eqPx * gl.eqPxW * .8,
                   child: Text(
                     "Contact: Philippe Lejeune",
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
                     overflow: TextOverflow.clip,
                     textAlign: TextAlign.justify,
                     textScaler: TextScaler.linear(1.0),
@@ -5132,21 +5167,42 @@ Widget forestimatorSettingsContacts() {
                 ),
               ],
             ),
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                TextButton(
-                  onPressed: () {
-                    launchURL('JO.Lisein@uliege.be');
-                  },
-                  child: Text(
-                    "JO.Lisein@uliege.be",
-                    overflow: TextOverflow.clip,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: gl.eqPx * gl.fontSizeS,
-                      fontWeight: FontWeight.w400,
+                Container(
+                  alignment: AlignmentGeometry.centerLeft,
+                  child: TextButton(
+                    onPressed: () {
+                      launchURL('JO.Lisein@uliege.be');
+                    },
+                    child: Text(
+                      "JO.Lisein@uliege.be",
+                      overflow: TextOverflow.clip,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: gl.eqPx * gl.fontSizeS,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  alignment: AlignmentGeometry.centerLeft,
+                  child: TextButton(
+                    onPressed: () {
+                      launchURL('tthissen@uliege.be');
+                    },
+                    child: Text(
+                      "tthissen@uliege.be",
+                      overflow: TextOverflow.clip,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: gl.eqPx * gl.fontSizeS,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
                 ),
@@ -5275,90 +5331,196 @@ class ForestimatorLog extends StatefulWidget {
 }
 
 class _ForestimatorLog extends State<ForestimatorLog> {
-  int lengthLog = 10;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      gl.refreshLog = (void Function() setter) {
+        try {
+          mounted
+              ? setState(() {
+                setter();
+              })
+              : setter();
+        } catch (exception) {
+          gl.print("Warning: $exception");
+          setter();
+        }
+        ();
+      };
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
-        return Column(
-          children:
-              <Widget>[
-                Container(
-                  constraints: BoxConstraints(minWidth: gl.eqPx * 50),
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      setState(() {
-                        lengthLog + 5 < gl.onboardLog.length
-                            ? lengthLog = lengthLog + 5
-                            : lengthLog = gl.onboardLog.length;
-                      });
-                    },
-                    child: lengthLog != gl.onboardLog.length ? Text("Afficher +") : Text("FIN"),
+        final double cWidth = gl.eqPx * gl.eqPxW * .9;
+        return lt.ForestimatorScrollView(
+          height: gl.eqPx * gl.eqPxH * .8,
+          width: cWidth,
+          reverse: true,
+          child: Column(
+            children: List<Widget>.generate(gl.onboardLog.length, (i) {
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: gl.eqPx * 8,
+                        child: Text(
+                          "$i",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black,
+                            fontSize: gl.eqPx * gl.fontSizeXS,
+                          ),
+                        ),
+                      ),
+                      gl.onboardLog[i].split("\n").length > 1
+                          ? Column(
+                            children: [
+                              SizedBox(
+                                width:
+                                    gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                        ? cWidth * .3
+                                        : cWidth * .7,
+                                child: Text(
+                                  gl.onboardLog[i].split("\n")[0],
+                                  style: TextStyle(
+                                    backgroundColor: Colors.greenAccent.withAlpha(100),
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                    fontSize: gl.eqPx * gl.fontSizeXS,
+                                  ),
+                                ),
+                              ),
+                              (gl.onboardLog[i].split("\n")[1].split(":")[0].toLowerCase().contains("warning") ||
+                                      gl.onboardLog[i].split("\n")[1].split(":")[0].toLowerCase().contains("error") ||
+                                      gl.onboardLog[i].split("\n")[1].split(":")[0].toLowerCase().contains("info"))
+                                  ? Row(
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                                ? cWidth * .1
+                                                : cWidth * .2,
+                                        child: Text(
+                                          "${gl.onboardLog[i].split("\n")[1].split(":")[0]}:",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            backgroundColor:
+                                                gl.onboardLog[i]
+                                                        .split("\n")[1]
+                                                        .split(":")[0]
+                                                        .toLowerCase()
+                                                        .contains("warning")
+                                                    ? Colors.amber.withAlpha(100)
+                                                    : gl.onboardLog[i]
+                                                        .split("\n")[1]
+                                                        .split(":")[0]
+                                                        .toLowerCase()
+                                                        .contains("error")
+                                                    ? Colors.redAccent.withAlpha(100)
+                                                    : gl.onboardLog[i]
+                                                        .split("\n")[1]
+                                                        .split(":")[0]
+                                                        .toLowerCase()
+                                                        .contains("info")
+                                                    ? Colors.blueAccent.withAlpha(100)
+                                                    : Colors.purpleAccent.withAlpha(100),
+                                            color: Colors.black,
+                                            fontSize: gl.eqPx * gl.fontSizeXS,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                                ? cWidth * .2
+                                                : cWidth * .5,
+                                        child: Text(
+                                          "${gl.onboardLog[i].split("\n")[1].split(":")[1]}:",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black,
+                                            fontSize: gl.eqPx * gl.fontSizeXS,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                  : SizedBox(
+                                    width:
+                                        gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                            ? cWidth * .3
+                                            : cWidth * .7,
+                                    child: Text(
+                                      gl.onboardLog[i].split("\n")[1],
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
+                                        fontSize: gl.eqPx * gl.fontSizeXS,
+                                      ),
+                                    ),
+                                  ),
+                            ],
+                          )
+                          : Column(
+                            children: [
+                              SizedBox(
+                                width:
+                                    gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                        ? cWidth * .3
+                                        : cWidth * .7,
+                                child: Text(
+                                  "Log style missed!!!",
+                                  style: TextStyle(
+                                    backgroundColor: Colors.deepPurple.withAlpha(100),
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                    fontSize: gl.eqPx * gl.fontSizeXS,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width:
+                                    gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                        ? cWidth * .3
+                                        : cWidth * .7,
+                                child: Text(
+                                  gl.onboardLog[i],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                    fontSize: gl.eqPx * gl.fontSizeXS,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                      SizedBox(
+                        width: cWidth * .1,
+                        child: IconButton(
+                          onPressed: () {
+                            SharePlus.instance.share(
+                              ShareParams(
+                                subject: "Forestimator log from ${gl.onboardLog[i].toString().split("\n")[0]}",
+                                text: gl.onboardLog[i].toString().split("\n")[1],
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.share),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ] +
-              List<Widget>.generate(lengthLog, (i) {
-                return gl.onboardLog.length - lengthLog > 0
-                    ? Column(
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              constraints: BoxConstraints(
-                                minWidth: gl.eqPx * "${gl.onboardLog.length - lengthLog + i})".length * 2,
-                              ),
-                              child: Text(
-                                "${gl.onboardLog.length - lengthLog + i})",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                  fontSize: gl.eqPx * gl.fontSizeXS,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .8),
-                              child: Text(
-                                gl.onboardLog[gl.onboardLog.length - lengthLog + i],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
-                                  fontSize: gl.eqPx * gl.fontSizeXS,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (lengthLog != i + 1) lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                      ],
-                    )
-                    : gl.onboardLog.length - i > 0
-                    ? Column(
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              constraints: BoxConstraints(minWidth: gl.eqPx * "$i)".length * 2),
-                              child: Text(
-                                "$i)",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                  fontSize: gl.eqPx * gl.fontSizeXS,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .7),
-                              child: Text(gl.onboardLog[i]),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
-                    : Row();
-              }),
+                  lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                ],
+              );
+            }),
+          ),
         );
       },
     );
@@ -5463,9 +5625,11 @@ Widget forestimatorConfidentiality() {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: EdgeInsets.all(10),
-                constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .7),
+              SizedBox(
+                width:
+                    (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape)
+                        ? gl.eqPx * gl.eqPxW * .35
+                        : gl.eqPx * gl.eqPxW * .8,
                 child: Text(
                   "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au:",
                   overflow: TextOverflow.clip,
@@ -5482,9 +5646,11 @@ Widget forestimatorConfidentiality() {
                 onPressed: () {
                   launchURL('https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_');
                 },
-                child: Container(
-                  padding: EdgeInsets.all(5),
-                  constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .7),
+                child: SizedBox(
+                  width:
+                      (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape)
+                          ? gl.eqPx * gl.eqPxW * .35
+                          : gl.eqPx * gl.eqPxW * .8,
                   child: Text(
                     "https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_",
                     overflow: TextOverflow.clip,
@@ -5498,9 +5664,11 @@ Widget forestimatorConfidentiality() {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: EdgeInsets.all(5),
-                constraints: BoxConstraints(maxWidth: gl.eqPx * gl.popupWindowsPortraitWidth * .7),
+              SizedBox(
+                width:
+                    (gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape)
+                        ? gl.eqPx * gl.eqPxW * .35
+                        : gl.eqPx * gl.eqPxW * .8,
                 child: Text(
                   "L'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation.",
                   overflow: TextOverflow.clip,
@@ -7571,8 +7739,8 @@ class _SwitcherBox extends State<SwitcherBox> {
         },
 
         children: List<Widget>.generate(3, (i) {
-          if ((!gl.offlineMode && !"123".contains(gl.switcherMaps[i].mCode)) ||
-              (i == 0 && !"123".contains(gl.switcherMaps[i].mCode))) {
+          if ((!gl.offlineMode && !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode)) ||
+              (i == 0 && !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode))) {
             return Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(12.0),
