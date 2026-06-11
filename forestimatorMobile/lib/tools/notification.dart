@@ -7739,7 +7739,9 @@ class _SwitcherBox extends State<SwitcherBox> {
         },
 
         children: List<Widget>.generate(3, (i) {
-          if ((!gl.offlineMode && !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode)) ||
+          if ((!gl.offlineMode &&
+                  i < gl.switcherMaps.length &&
+                  !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode)) ||
               (i == 0 && !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode))) {
             return Card(
               shape: RoundedRectangleBorder(
