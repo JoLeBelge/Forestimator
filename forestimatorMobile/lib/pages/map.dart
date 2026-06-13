@@ -2456,15 +2456,15 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                   style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
                 ),
                 Text(
-                  "Padding Left: ${gl.dsp.paddingBot.toStringAsFixed(1)}",
+                  "switcher: ${gl.switcherMaps[0].mCode}",
                   style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
                 ),
                 Text(
-                  "Padding Right: ${gl.dsp.paddingBot.toStringAsFixed(1)}",
+                  "switcher1: ${gl.switcherMaps[1].mCode}",
                   style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
                 ),
                 Text(
-                  "ViewInset Bottom: ${MediaQuery.of(context).viewInsets.bottom.toStringAsFixed(1)}",
+                  "switcher2: ${gl.switcherMaps[2].mCode}",
                   style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXXS),
                 ),
               ],

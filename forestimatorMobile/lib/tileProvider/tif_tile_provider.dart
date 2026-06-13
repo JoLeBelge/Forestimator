@@ -38,7 +38,11 @@ class TifFileTileProvider extends TileProvider {
     final File image = File(sourceImPath);
     if (await image.exists()) {
       Uint8List? bytes = await image.readAsBytes();
-      img.TiffInfo tiffInfo = img.TiffDecoder().startDecode(bytes)!;
+      img.TiffInfo? tiffInfo = img.TiffDecoder().startDecode(bytes);
+      if(tiffInfo == null) {
+        gl.print("Error: file $sourceImPath is not a valid tif");
+        return;
+      }
       img.TiffImage tifIm = tiffInfo.images[0];
       int bps = tifIm.bitsPerSample;
       gl.print("Info: file with $bps bps loaded in memory ${image.path}");
@@ -47,24 +51,25 @@ class TifFileTileProvider extends TileProvider {
       if (bps <= 8) {
         File jpgFile = File("$sourceImPath.jpg");
         if (jpgFile.existsSync()) {
-          gl.print("jpg file already exists, loading it in memory");
-          _sourceImage = await Isolate.run<img.Image?>(() {
-            return img.JpegDecoder().decode(jpgFile.readAsBytesSync());
-          });
+          gl.print("Info: jpg file already exists, loading it in memory");
+          _sourceImage = img.decodePng(jpgFile.readAsBytesSync());
+          gl.print("Info: jpg decoded");
         } else {
           _sourceImage = await Isolate.run<img.Image?>(() {
             return img.TiffDecoder().decode(bytes);
           });
+          gl.print("Info: tiff decoded");
         }
         // test si sauver l'image décodée permet un gain de temps
         if (!jpgFile.existsSync()) {
-          jpgFile.writeAsBytesSync(img.encodeJpg(_sourceImage!));
+          gl.print("Info: writing jpg!");
+          jpgFile.writeAsBytesSync(img.encodePng(_sourceImage!, singleFrame: true));
         }
-
         _loaded = true;
-        gl.print("file decoded in memory $e");
+        gl.print("Info: file decoded in memory");
       } else {
         gl.print("Error: jpg bpm > 8!");
+        _loaded = true;
       }
     }
   }

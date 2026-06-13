@@ -5096,11 +5096,10 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                     if (gl.Mode.dfci) {
                       if (gl.offlineMode) {
                         gl.savePrefSelLayOffline();
-                        gl.changeSelectedLayerModeOffline();
                       } else {
                         gl.savePrefSelLayOnline();
-                        gl.changeSelectedLayerModeOnline();
                       }
+                      gl.forceDFCIMode();
                     } else {
                       if (gl.offlineMode) {
                         gl.loadPrefSelLayOffline();
@@ -6379,22 +6378,12 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
                 gl.replaceLayerFromList(widget.layerTile.key, index: interfaceSelectedMapSwitcherSlot, offline: true);
               });
               // }
-            } else if (gl.getCountOfflineLayerSelected() == 1) {
-              /*if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) != -1) {
-                setState(() {
-                  int index = gl.getIndexForNextLayerOffline();
-                  gl.replaceLayerFromList(gl.switcherMaps[index].mCode, index: index, offline: false);
-                  index = gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true);
-                  gl.removeLayerFromList(index: index, offline: false);
-                  gl.replaceLayerFromList(widget.layerTile.key, index: index, offline: true);
-                });
-              } else {*/
+            } else {
               setState(() {
-                int index = gl.getIndexForNextLayerOffline();
-                gl.removeLayerFromList(index: index, offline: true);
+                int index = 0;
                 gl.replaceLayerFromList(widget.layerTile.key, index: index, offline: true);
               });
-              //}
+
             }
           }
           gl.refreshStack(() {});
@@ -7439,7 +7428,7 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
                 child: FloatingActionButton(
                   backgroundColor: modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
                   onPressed: () {
-                    if (!modeViewOnlineMap && !modeViewOnlineMap) {
+                    if (!modeViewOnlineMap) {
                       PopupOnlineMapMenu(
                         () {
                           gl.refreshStack(() {
@@ -7740,9 +7729,8 @@ class _SwitcherBox extends State<SwitcherBox> {
 
         children: List<Widget>.generate(3, (i) {
           if ((!gl.offlineMode &&
-                  i < gl.switcherMaps.length &&
                   !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode)) ||
-              (i == 0 && !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode))) {
+              (i == 0 )) {
             return Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(12.0),
