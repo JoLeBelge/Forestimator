@@ -977,7 +977,7 @@ class _SelectPolyType extends State<SelectPolyType> {
             ),
           ),
         ),
-        if (gl.Mode.dfci)
+        if (gl.Mode.multipoint)
           Container(
             width: gl.eqPx * gl.iconSizeM * 1.65,
             height: gl.eqPx * gl.iconSizeM * 1.35,
@@ -991,8 +991,15 @@ class _SelectPolyType extends State<SelectPolyType> {
               },
               child: Column(
                 children: [
-                  FaIcon(FontAwesomeIcons.personHiking, color: Colors.white),
-                  Text("Chemin", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS)),
+                  Icon(Icons.polyline, color: Colors.white),
+                  SizedBox(
+                    width: gl.eqPx * gl.iconSizeM * 1.65,
+                    height: gl.eqPx * gl.iconSizeM,
+                    child: Text(
+                      "Multi Point",
+                      style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -5096,10 +5103,11 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                     if (gl.Mode.dfci) {
                       if (gl.offlineMode) {
                         gl.savePrefSelLayOffline();
+                        gl.changeSelectedLayerModeOffline();
                       } else {
                         gl.savePrefSelLayOnline();
+                        gl.changeSelectedLayerModeOnline();
                       }
-                      gl.forceDFCIMode();
                     } else {
                       if (gl.offlineMode) {
                         gl.loadPrefSelLayOffline();
@@ -5279,10 +5287,18 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           gl.refreshStack(() {});
           gl.Mode.serialize();
         }, false),
+        variableBooleanSlider("Multi point", gl.Mode.multipoint, (bool it) {
+          setState(() {
+            gl.Mode.multipoint = it;
+          });
+          gl.refreshStack(() {});
+          gl.Mode.serialize();
+        }, false),
         variableBooleanSlider("Debug Info Window", gl.Mode.debugInfo, (bool it) {
           setState(() {
             gl.Mode.debugInfo = it;
           });
+          gl.refreshStack(() {});
           gl.Mode.serialize();
         }, false),
       ],
@@ -6339,7 +6355,17 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
       if (mounted) setState(() {});
     };
     int interfaceSelectedMapSwitcherSlot = widget.selectionMode;
-    if (interfaceSelectedMapKey == -1) {
+    if (gl.notVisualizableLayerKeys.contains(widget.layerTile.key)) {
+      return SizedBox(
+        width: gl.eqPx * gl.onCatalogueLayerSelectionButton,
+        height: gl.eqPx * gl.onCatalogueLayerSelectionButton,
+        child: Icon(
+          widget.offlineMode ? Icons.rounded_corner : Icons.layers_clear,
+          size: gl.eqPx * gl.onCatalogueLayerSelectionButton,
+          color: Colors.grey,
+        ),
+      );
+    } else if (interfaceSelectedMapKey == -1) {
       return TextButton(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
@@ -6378,18 +6404,32 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
                 gl.replaceLayerFromList(widget.layerTile.key, index: interfaceSelectedMapSwitcherSlot, offline: true);
               });
               // }
-            } else {
+            } else if (gl.getCountOfflineLayerSelected() == 1) {
+              /*if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) != -1) {
+                setState(() {
+                  int index = gl.getIndexForNextLayerOffline();
+                  gl.replaceLayerFromList(gl.switcherMaps[index].mCode, index: index, offline: false);
+                  index = gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true);
+                  gl.removeLayerFromList(index: index, offline: false);
+                  gl.replaceLayerFromList(widget.layerTile.key, index: index, offline: true);
+                });
+              } else {*/
               setState(() {
-                int index = 0;
+                int index = gl.getIndexForNextLayerOffline();
+                gl.removeLayerFromList(index: index, offline: true);
                 gl.replaceLayerFromList(widget.layerTile.key, index: index, offline: true);
               });
-
+              //}
             }
           }
           gl.refreshStack(() {});
           _callSelectedButtonsSetStates();
         },
-        child: Icon(Icons.layers, size: gl.eqPx * gl.onCatalogueLayerSelectionButton, color: Colors.black),
+        child: Icon(
+          widget.offlineMode ? Icons.save : Icons.layers,
+          size: gl.eqPx * gl.onCatalogueLayerSelectionButton,
+          color: Colors.black,
+        ),
       );
     } else {
       return TextButton(
@@ -7428,7 +7468,7 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
                 child: FloatingActionButton(
                   backgroundColor: modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
                   onPressed: () {
-                    if (!modeViewOnlineMap) {
+                    if (!modeViewOnlineMap && !modeViewOnlineMap) {
                       PopupOnlineMapMenu(
                         () {
                           gl.refreshStack(() {
@@ -7728,9 +7768,8 @@ class _SwitcherBox extends State<SwitcherBox> {
         },
 
         children: List<Widget>.generate(3, (i) {
-          if ((!gl.offlineMode &&
-                  !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode)) ||
-              (i == 0 )) {
+          if ((!gl.offlineMode && !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode)) ||
+              (i == 0 && !gl.placeHolderNames.contains(gl.switcherMaps[i].mCode))) {
             return Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(12.0),

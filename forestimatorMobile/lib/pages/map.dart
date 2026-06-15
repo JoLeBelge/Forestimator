@@ -2044,7 +2044,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         onPressed: () {
                                           gl.refreshStack(() {
                                             gl.modeMapShowPolygons = true;
-                                            gl.selGeo.visibleOnMap = true;
+                                            gl.selLay.visible(true);
                                             gl.Mode.editPolygon = !gl.Mode.editPolygon;
                                             if (gl.Mode.editPolygon &&
                                                 gl.selGeo.subsubtype.contains("Point") &&
@@ -4015,7 +4015,7 @@ class _AnaPtPreview extends State<AnaPtPreview> {
   Future _runAnaPtPreview(proj4.Point ptBL72, VoidCallback after) async {
     Map data;
     bool internet = await InternetConnection().hasInternetAccess;
-    if (!gl.offlineMode) {
+    if (!gl.offlineMode && !gl.switcherMaps.first.offline) {
       if (internet) {
         String request =
             "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/${gl.getInterfaceSelectedLCode().first}/x/${ptBL72.x}/y/${ptBL72.y}";

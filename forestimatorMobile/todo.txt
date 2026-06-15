@@ -35,13 +35,13 @@ Debug suite à la formation SFRSB
 
 V -mode points/polygones de l'utilisateur ; passage de l'interface "liste des layers" au mode compact pas très intuitif : si pas de layer sélectionnée, appuyer sur le bouton "reduire" fait quitter le mode points/polygones. Il faudrai à la place afficher l'interface "compact" avec la première layer de la liste, par exemple.
 V -permission GPS ; demande la permission à chaque utilisation de l'appli, devrait demander une seule et unique fois.
--visu toujour ON pour les layers si mode edition de polygones (si jamais l'utilisateur a mis à off via le sélecteur de couche)
+V -visu toujour ON pour les layers si mode edition de polygones (si jamais l'utilisateur a mis à off via le sélecteur de couche)
 -check firewall si de très nombreuses personnes utilisent forestimator depuis la fac
--mode offline : changer le logo dans les couches du catalogue offline, logo disquette.
--mode offline : carte numérique des sols de wallonie ; ne pas mettre de bouton "afficher" car on ne peut pas l'afficher (pour l'instant le bouton existe mais ne sert à rien)
+V -mode offline : changer le logo dans les couches du catalogue offline, logo disquette.
+V -mode offline : carte numérique des sols de wallonie ; ne pas mettre de bouton "afficher" car on ne peut pas l'afficher (pour l'instant le bouton existe mais ne sert à rien)
 V -dans les logs de l'appli, trouver d'ou viens le message "oops no layerBase 2" et résoudre.
--si une couche en mode offline dans le sélecteur et que je clique dessus : ouvre le catalogue online!
--si une couche ne mode offline numéro 1 dans sélecteur et que je fait un appui court sur la carte ; envoie la demande de légende au serveur (devrais faire l'analyse en offline pour cette couche)
+V -si une couche en mode offline dans le sélecteur et que je clique dessus : ouvre le catalogue online!
+V -si une couche ne mode offline numéro 1 dans sélecteur et que je fait un appui court sur la carte ; envoie la demande de légende au serveur (devrais faire l'analyse en offline pour cette couche)
 
 
 TODO avant prochaine release:

@@ -127,6 +127,7 @@ class Mode {
   static bool overrideWellDefinedCheck = false;
   static bool _expert = false;
   static bool _expertTools = false;
+  static bool multipoint = false;
 
   static bool polygon = false;
   static bool polygonList = false;
@@ -159,6 +160,8 @@ class Mode {
   static void serialize() async {
     await shared!.setBool('Modes.firePath', dfci);
     await shared!.setBool('Modes.essence', essence);
+    await shared!.setBool('Modes.multipoint', multipoint);
+    await shared!.setBool('Modes.variableset', variableSets);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.labelCross', labelCross);
     await shared!.setBool('Modes.smallLabel', debugLabel);
@@ -167,6 +170,8 @@ class Mode {
   static void deserialize() {
     dfci = shared!.getBool('Modes.firePath') ?? false;
     essence = shared!.getBool('Modes.essence') ?? false;
+    multipoint = shared!.getBool('Modes.multipoint') ?? false;
+    variableSets = shared!.getBool('Modes.variableset') ?? false;
     userDataFilled = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
     debugLabel = shared!.getBool('Modes.smallLabel') ?? false;
@@ -517,6 +522,8 @@ List<String> getInterfaceSelectedLOffline() {
 LayerAnaPt? anaPtPreview;
 List<LayerAnaPt> requestedLayers = [];
 
+List<String> notVisualizableLayerKeys = ["CNSWrast"];
+
 List<String> anaPtSelectedLayerKeys = [
   "ZBIO",
   "CNSWrast",
@@ -605,7 +612,8 @@ LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
 void removeLayerFromList({bool offline = false, int index = -1, String key = ""}) {
-  print("hello"); if (Mode.dfci) return forceDFCIMode();
+  print("hello");
+  if (Mode.dfci) return forceDFCIMode();
   if (key != "" && index > -1) {
     print("Error in removeLayerFromList(): key != '' && index > -1");
     return;
@@ -642,8 +650,9 @@ void forceDFCIMode() {
 }
 
 void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
-  print("hello"); if (Mode.dfci) return forceDFCIMode();
-  print("hello"); 
+  print("hello");
+  if (Mode.dfci) return forceDFCIMode();
+  print("hello");
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in switcherMaps) {
@@ -768,8 +777,8 @@ void loadPrefSelLayOnline() async {
     index++;
   }
   while (switcherMaps.length < 3) {
-      switcherMaps.add(SelectedLayer(mCode: placeHolderNames[switcherMaps.length], offline: false));
-    }
+    switcherMaps.add(SelectedLayer(mCode: placeHolderNames[switcherMaps.length], offline: false));
+  }
 }
 
 void loadPrefSelLayOffline() async {
@@ -786,7 +795,7 @@ void loadPrefSelLayOffline() async {
 }
 
 void changeSelectedLayerModeOffline() {
-  if (Mode.dfci) return  forceDFCIMode();
+  if (Mode.dfci) return forceDFCIMode();
   if (dico.getLayersOffline().isEmpty) {
     offlineMode = false;
     return;
@@ -806,9 +815,8 @@ void changeSelectedLayerModeOffline() {
       switcherMaps.removeLast();
     }
   }
-  for(int i = switcherMaps.length; i < 3; i++) {
+  for (int i = switcherMaps.length; i < 3; i++) {
     switcherMaps.insert(i, SelectedLayer(mCode: placeHolderNames[i], offline: true));
-
   }
 }
 

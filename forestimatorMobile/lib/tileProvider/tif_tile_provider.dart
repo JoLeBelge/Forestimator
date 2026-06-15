@@ -39,36 +39,36 @@ class TifFileTileProvider extends TileProvider {
     if (await image.exists()) {
       Uint8List? bytes = await image.readAsBytes();
       img.TiffInfo? tiffInfo = img.TiffDecoder().startDecode(bytes);
-      if(tiffInfo == null) {
+      if (tiffInfo == null) {
         gl.print("Error: file $sourceImPath is not a valid tif");
         return;
       }
-      img.TiffImage tifIm = tiffInfo.images[0];
-      int bps = tifIm.bitsPerSample;
+      img.TiffImage tiff = tiffInfo.images[0];
+      int bps = tiff.bitsPerSample;
       gl.print("Info: file with $bps bps loaded in memory ${image.path}");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {
-        File jpgFile = File("$sourceImPath.jpg");
-        if (jpgFile.existsSync()) {
-          gl.print("Info: jpg file already exists, loading it in memory");
-          _sourceImage = img.decodePng(jpgFile.readAsBytesSync());
-          gl.print("Info: jpg decoded");
-        } else {
-          _sourceImage = await Isolate.run<img.Image?>(() {
-            return img.TiffDecoder().decode(bytes);
-          });
-          gl.print("Info: tiff decoded");
-        }
+        /*File png = File("${sourceImPath.substring(0, sourceImPath.length - 3)}png");
+        if (png.existsSync()) {
+          gl.print("Info: Png file already exists, loading it in memory");
+          _sourceImage = img.decodeJpg(png.readAsBytesSync());
+          gl.print("Info: Png decoded");
+        } else {*/
+        _sourceImage = await Isolate.run<img.Image?>(() {
+          return img.TiffDecoder().decode(bytes);
+        });
+        gl.print("Info: tiff decoded");
+        /*}
         // test si sauver l'image décodée permet un gain de temps
-        if (!jpgFile.existsSync()) {
-          gl.print("Info: writing jpg!");
-          jpgFile.writeAsBytesSync(img.encodePng(_sourceImage!, singleFrame: true));
-        }
+        if (!png.existsSync()) {
+          gl.print("Info: writing Png");
+          png.writeAsBytesSync(img.encodeJpg(_sourceImage!, quality: 50));
+        }*/
         _loaded = true;
         gl.print("Info: file decoded in memory");
       } else {
-        gl.print("Error: jpg bpm > 8!");
+        gl.print("Error: tiff bps > 8!: $bps");
         _loaded = true;
       }
     }

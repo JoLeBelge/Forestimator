@@ -320,8 +320,10 @@ class LayerBase {
 
   Future<int> getValXY(proj4.Point pt) async {
     final File fileIm = File("${gl.pathExternalStorage}/$mNomRaster");
-    if (!await fileIm.exists()) {return -1;
-    };
+    if (!await fileIm.exists()) {
+      gl.print("Error: Cant find ${fileIm.path} for anaPt offline");
+      return -1;
+    }
     OnePixGeotifDecoder myDecoder = OnePixGeotifDecoder(x: pt.x, y: pt.y);
     Uint8List bytes = await fileIm.readAsBytes();
     return myDecoder.getVal(bytes);
