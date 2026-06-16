@@ -38,38 +38,17 @@ class TifFileTileProvider extends TileProvider {
     final File image = File(sourceImPath);
     if (await image.exists()) {
       Uint8List? bytes = await image.readAsBytes();
-      img.TiffInfo? tiffInfo = img.TiffDecoder().startDecode(bytes);
-      if (tiffInfo == null) {
-        gl.print("Error: file $sourceImPath is not a valid tif");
-        return;
-      }
-      img.TiffImage tiff = tiffInfo.images[0];
-      int bps = tiff.bitsPerSample;
-      gl.print("Info: file with $bps bps loaded in memory ${image.path}");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
-      if (bps <= 8) {
-        /*File png = File("${sourceImPath.substring(0, sourceImPath.length - 3)}png");
-        if (png.existsSync()) {
-          gl.print("Info: Png file already exists, loading it in memory");
-          _sourceImage = img.decodeJpg(png.readAsBytesSync());
-          gl.print("Info: Png decoded");
-        } else {*/
-        _sourceImage = await Isolate.run<img.Image?>(() {
-          return img.TiffDecoder().decode(bytes);
-        });
-        gl.print("Info: tiff decoded");
-        /*}
-        // test si sauver l'image décodée permet un gain de temps
-        if (!png.existsSync()) {
-          gl.print("Info: writing Png");
-          png.writeAsBytesSync(img.encodeJpg(_sourceImage!, quality: 50));
-        }*/
+      _sourceImage = await Isolate.run<img.Image?>(() {
+        return img.TiffDecoder().decode(bytes);
+      });
+      if (_sourceImage != null && _sourceImage!.data != null && _sourceImage!.data!.bitsPerChannel <= 8) {
         _loaded = true;
-        gl.print("Info: file decoded in memory");
+        gl.print("Info: 8 bit tiff decoded!");
       } else {
-        gl.print("Error: tiff bps > 8!: $bps");
         _loaded = true;
+        gl.print("Warning: 16 bit tiff decoded!");
       }
     }
   }

@@ -64,7 +64,7 @@ void makeAllPermissionRequests() {
 }
 
 Widget handlePermissionForLocation({required Widget child, required VoidSetter refreshParentWidgetTree}) {
-  if (_location.isPermanentlyDenied || !_askOnceForLocation || gl.firstTimeUse) return child;
+  if (_location.isPermanentlyDenied || !_askOnceForLocation || !gl.firstTimeUse) return child;
   if (_location.isDenied) {
     return PopupPermissions(
       title: "Permission pour le GPS",

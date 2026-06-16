@@ -406,7 +406,7 @@ int currentPage = 0;
 
 List<String> onboardLog = ["${DateTime.now().toString()}\n${forestimatorMobileVersion.toString()}"];
 int lengthLog = 1;
-@override
+
 void print(dynamic it) {
   refreshLog(() {
     onboardLog.add("${DateTime.now().toString()}\n${it.toString()}");
@@ -522,7 +522,7 @@ List<String> getInterfaceSelectedLOffline() {
 LayerAnaPt? anaPtPreview;
 List<LayerAnaPt> requestedLayers = [];
 
-List<String> notVisualizableLayerKeys = ["CNSWrast"];
+List<String> notVisualizableLayerKeysOffline = ["CNSWrast"];
 
 List<String> anaPtSelectedLayerKeys = [
   "ZBIO",
@@ -862,7 +862,7 @@ Map<int, int> lutVulnerabiliteCS = {
 
 ForestimatorStack stack = ForestimatorStack();
 
-List<IconData> selectableIcons = [
+List<dynamic> selectableIcons = [
   Icons.square_outlined,
   Icons.circle,
   Icons.gps_fixed,
@@ -891,7 +891,7 @@ List<IconData> selectableIcons = [
   FontAwesomeIcons.road,
 ];
 
-List<IconData> selectableIconGeo = [
+List<dynamic> selectableIconGeo = [
   Icons.square_outlined,
   Icons.circle_outlined,
   Icons.pentagon_outlined,
