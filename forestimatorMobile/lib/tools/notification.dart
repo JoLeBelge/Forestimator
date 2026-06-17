@@ -827,7 +827,7 @@ class _SelectLayerSymbol extends State<SelectLayerSymbol> {
                 _mode = !_mode;
               });
             },
-            icon: AllIcons(
+            icon: FIcon(
               color: Colors.black,
               size: gl.eqPx * gl.iconSizeM,
               widget.type == "Polygon" ? gl.selectableIconGeo[_current!] : gl.selectableIcons[_current!],
@@ -856,7 +856,7 @@ class _SelectLayerSymbol extends State<SelectLayerSymbol> {
                           _current = k;
                         });
                       },
-                      icon: AllIcons(
+                      icon: FIcon(
                         widget.type == "Polygon" ? gl.selectableIconGeo[k] : gl.selectableIcons[k],
                         size: gl.iconSizeM * gl.eqPx,
                         color: Colors.black,
@@ -2965,7 +2965,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                   },
                                                 );
                                               },
-                                              icon: AllIcons(
+                                              icon: FIcon(
                                                 gl.selLay.geometries[index].subsubtype.contains("Point")
                                                     ? gl.selectableIcons[gl.selLay.geometries[index].selectedPointIcon]
                                                     : gl.selectableIconGeo[gl
@@ -5405,109 +5405,184 @@ class _ForestimatorLog extends State<ForestimatorLog> {
     });
   }
 
+  int _nLogsVisible = 20;
+
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
         final double cWidth = gl.eqPx * gl.eqPxW * .9;
-        return lt.ForestimatorScrollView(
-          height: gl.eqPx * gl.eqPxH * .8,
-          width: cWidth,
-          reverse: true,
-          child: Column(
-            children: List<Widget>.generate(gl.onboardLog.length, (i) {
-              return Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: gl.eqPx * 8,
-                        child: Text(
-                          "$i",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            color: Colors.black,
-                            fontSize: gl.eqPx * gl.fontSizeXS,
-                          ),
-                        ),
-                      ),
-                      gl.onboardLog[i].split("\n").length > 1
-                          ? Column(
-                              children: [
-                                SizedBox(
-                                  width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
-                                      ? cWidth * .3
-                                      : cWidth * .7,
-                                  child: Text(
-                                    gl.onboardLog[i].split("\n")[0],
-                                    style: TextStyle(
-                                      backgroundColor: Colors.greenAccent.withAlpha(100),
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                      fontSize: gl.eqPx * gl.fontSizeXS,
-                                    ),
-                                  ),
+        return Column(
+          children: [
+            Row(
+              children: [
+                lt.forestimatorButton(() {
+                  setState(() {
+                    _nLogsVisible += 50;
+                  });
+                }, Icons.add_rounded),
+                lt.forestimatorButton(() {
+                  String entireLog = "";
+                  for (dynamic entry in gl.onboardLog) {
+                    entireLog = "$entireLog${entry.toString().split("\n")[0]}\n";
+                    entireLog = "$entireLog${entry.toString().split("\n")[1]}\n";
+                  }
+                  SharePlus.instance.share(
+                    ShareParams(
+                      subject: "Complete Forestimator logs from ${gl.onboardLog[1].toString().split("\n")[0]}",
+                      text: entireLog,
+                    ),
+                  );
+                }, Icons.outgoing_mail),
+              ],
+            ),
+            lt.ForestimatorScrollView(
+              height: gl.eqPx * gl.eqPxH * .8,
+              width: cWidth,
+              reverse: true,
+              child: Column(
+                children: List<Widget>.generate(
+                  _nLogsVisible > gl.onboardLog.length ? gl.onboardLog.length : _nLogsVisible,
+                  (i) {
+                    if (_nLogsVisible > gl.onboardLog.length) {
+                      _nLogsVisible = gl.onboardLog.length;
+                    }
+                    int index = gl.onboardLog.length - _nLogsVisible + i;
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: gl.eqPx * 8,
+                              child: Text(
+                                "$index",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                  fontSize: gl.eqPx * gl.fontSizeXS,
                                 ),
-                                (gl.onboardLog[i].split("\n")[1].split(":")[0].toLowerCase().contains("warning") ||
-                                        gl.onboardLog[i].split("\n")[1].split(":")[0].toLowerCase().contains("error") ||
-                                        gl.onboardLog[i].split("\n")[1].split(":")[0].toLowerCase().contains("info"))
-                                    ? Row(
-                                        children: [
-                                          SizedBox(
-                                            width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
-                                                ? cWidth * .1
-                                                : cWidth * .2,
-                                            child: Text(
-                                              "${gl.onboardLog[i].split("\n")[1].split(":")[0]}:",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                backgroundColor:
-                                                    gl.onboardLog[i]
-                                                        .split("\n")[1]
-                                                        .split(":")[0]
-                                                        .toLowerCase()
-                                                        .contains("warning")
-                                                    ? Colors.amber.withAlpha(100)
-                                                    : gl.onboardLog[i]
-                                                          .split("\n")[1]
-                                                          .split(":")[0]
-                                                          .toLowerCase()
-                                                          .contains("error")
-                                                    ? Colors.redAccent.withAlpha(100)
-                                                    : gl.onboardLog[i]
-                                                          .split("\n")[1]
-                                                          .split(":")[0]
-                                                          .toLowerCase()
-                                                          .contains("info")
-                                                    ? Colors.blueAccent.withAlpha(100)
-                                                    : Colors.purpleAccent.withAlpha(100),
-                                                color: Colors.black,
-                                                fontSize: gl.eqPx * gl.fontSizeXS,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
-                                                ? cWidth * .2
-                                                : cWidth * .5,
-                                            child: Text(
-                                              "${gl.onboardLog[i].split("\n")[1].split(":")[1]}:",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.black,
-                                                fontSize: gl.eqPx * gl.fontSizeXS,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(
+                              ),
+                            ),
+                            gl.onboardLog[index].split("\n").length > 1
+                                ? Column(
+                                    children: [
+                                      SizedBox(
                                         width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
                                             ? cWidth * .3
                                             : cWidth * .7,
                                         child: Text(
-                                          gl.onboardLog[i].split("\n")[1],
+                                          gl.onboardLog[index].split("\n")[0],
+                                          style: TextStyle(
+                                            backgroundColor: Colors.greenAccent.withAlpha(100),
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black,
+                                            fontSize: gl.eqPx * gl.fontSizeXS,
+                                          ),
+                                        ),
+                                      ),
+                                      (gl.onboardLog[index]
+                                                  .split("\n")[1]
+                                                  .split(":")[0]
+                                                  .toLowerCase()
+                                                  .contains("warning") ||
+                                              gl.onboardLog[index]
+                                                  .split("\n")[1]
+                                                  .split(":")[0]
+                                                  .toLowerCase()
+                                                  .contains("error") ||
+                                              gl.onboardLog[index]
+                                                  .split("\n")[1]
+                                                  .split(":")[0]
+                                                  .toLowerCase()
+                                                  .contains("info"))
+                                          ? Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                                      ? cWidth * .1
+                                                      : cWidth * .2,
+                                                  child: Text(
+                                                    "${gl.onboardLog[index].split("\n")[1].split(":")[0]}:",
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w500,
+                                                      backgroundColor:
+                                                          gl.onboardLog[index]
+                                                              .split("\n")[1]
+                                                              .split(":")[0]
+                                                              .toLowerCase()
+                                                              .contains("warning")
+                                                          ? Colors.amber.withAlpha(100)
+                                                          : gl.onboardLog[index]
+                                                                .split("\n")[1]
+                                                                .split(":")[0]
+                                                                .toLowerCase()
+                                                                .contains("error")
+                                                          ? Colors.redAccent.withAlpha(100)
+                                                          : gl.onboardLog[index]
+                                                                .split("\n")[1]
+                                                                .split(":")[0]
+                                                                .toLowerCase()
+                                                                .contains("info")
+                                                          ? Colors.blueAccent.withAlpha(100)
+                                                          : Colors.purpleAccent.withAlpha(100),
+                                                      color: Colors.black,
+                                                      fontSize: gl.eqPx * gl.fontSizeXS,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                                      ? cWidth * .2
+                                                      : cWidth * .5,
+                                                  child: Text(
+                                                    "${gl.onboardLog[index].split("\n")[1].split(":")[1]}:",
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.black,
+                                                      fontSize: gl.eqPx * gl.fontSizeXS,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : SizedBox(
+                                              width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                                  ? cWidth * .3
+                                                  : cWidth * .7,
+                                              child: Text(
+                                                gl.onboardLog[index].split("\n")[1],
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black,
+                                                  fontSize: gl.eqPx * gl.fontSizeXS,
+                                                ),
+                                              ),
+                                            ),
+                                    ],
+                                  )
+                                : Column(
+                                    children: [
+                                      SizedBox(
+                                        width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                            ? cWidth * .3
+                                            : cWidth * .7,
+                                        child: Text(
+                                          "Log style missed!!!",
+                                          style: TextStyle(
+                                            backgroundColor: Colors.deepPurple.withAlpha(100),
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black,
+                                            fontSize: gl.eqPx * gl.fontSizeXS,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
+                                            ? cWidth * .3
+                                            : cWidth * .7,
+                                        child: Text(
+                                          gl.onboardLog[index],
                                           style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                             color: Colors.black,
@@ -5515,60 +5590,33 @@ class _ForestimatorLog extends State<ForestimatorLog> {
                                           ),
                                         ),
                                       ),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                SizedBox(
-                                  width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
-                                      ? cWidth * .3
-                                      : cWidth * .7,
-                                  child: Text(
-                                    "Log style missed!!!",
-                                    style: TextStyle(
-                                      backgroundColor: Colors.deepPurple.withAlpha(100),
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                      fontSize: gl.eqPx * gl.fontSizeXS,
-                                    ),
+                                    ],
                                   ),
-                                ),
-                                SizedBox(
-                                  width: gl.Mode.tablet || gl.dsp.orientation == Orientation.landscape
-                                      ? cWidth * .3
-                                      : cWidth * .7,
-                                  child: Text(
-                                    gl.onboardLog[i],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black,
-                                      fontSize: gl.eqPx * gl.fontSizeXS,
+                            SizedBox(
+                              width: cWidth * .1,
+                              child: IconButton(
+                                onPressed: () {
+                                  SharePlus.instance.share(
+                                    ShareParams(
+                                      subject:
+                                          "Forestimator log from ${gl.onboardLog[index].toString().split("\n")[0]}",
+                                      text: gl.onboardLog[index].toString().split("\n")[1],
                                     ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                      SizedBox(
-                        width: cWidth * .1,
-                        child: IconButton(
-                          onPressed: () {
-                            SharePlus.instance.share(
-                              ShareParams(
-                                subject: "Forestimator log from ${gl.onboardLog[i].toString().split("\n")[0]}",
-                                text: gl.onboardLog[i].toString().split("\n")[1],
+                                  );
+                                },
+                                icon: Icon(Icons.share),
                               ),
-                            );
-                          },
-                          icon: Icon(Icons.share),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                ],
-              );
-            }),
-          ),
+                        lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -5865,9 +5913,7 @@ class _SettingsMenu extends State<SettingsMenu> with WidgetsBindingObserver {
                       TextButton(
                         key: Key('$i'),
                         onPressed: () {
-                          setState(() {
-                            openedItem[i] = !openedItem[i];
-                          });
+                          setState(() {});
                         },
                         child: Container(
                           alignment: Alignment.center,

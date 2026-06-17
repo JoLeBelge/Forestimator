@@ -680,12 +680,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             });
                           },
                           icon: gl.selLay.visibleOnMap
-                              ? FaIcon(
-                                  FontAwesomeIcons.eyeSlash,
-                                  size: gl.eqPx * gl.iconSizeS * .9,
-                                  color: Colors.white,
-                                )
-                              : FaIcon(FontAwesomeIcons.eye, size: gl.eqPx * gl.iconSizeS * .9, color: Colors.white),
+                              ? FIcon(FontAwesomeIcons.eyeSlash, size: gl.eqPx * gl.iconSizeS * .9, color: Colors.white)
+                              : FIcon(FontAwesomeIcons.eye, size: gl.eqPx * gl.iconSizeS * .9, color: Colors.white),
                         ),
                       ),
                       Container(
@@ -725,7 +721,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           "OHA?",
                                           style: TextStyle(color: Colors.red, fontSize: gl.eqPx * gl.fontSizeXS * .9),
                                         ),
-                                  AllIcons(
+                                  FIcon(
                                     (gl.selLay.type.contains("Point")
                                         ? gl.selectableIcons[gl.selLay.defaultPointIcon]
                                         : gl.selectableIconGeo[gl.selLay.defaultPointIcon]),
@@ -745,12 +741,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                               ),
                             ],
                           ),
-                          trailingIcon: Icon(
+                          trailingIcon: FIcon(
                             Icons.arrow_drop_down_outlined,
                             size: gl.eqPx * gl.iconSizeXS,
                             color: Colors.white,
                           ),
-                          selectedTrailingIcon: Icon(
+                          selectedTrailingIcon: FIcon(
                             Icons.arrow_drop_up_outlined,
                             size: gl.eqPx * gl.iconSizeXS,
                             color: Colors.white,
@@ -830,7 +826,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                   fontSize: gl.eqPx * gl.fontSizeXS * .9,
                                                 ),
                                               ),
-                                        AllIcons(
+                                        FIcon(
                                           (gl.geoLayers[index].type.contains("Point")
                                               ? gl.selectableIcons[gl.geoLayers[index].defaultPointIcon]
                                               : gl.selectableIconGeo[gl.geoLayers[index].defaultPointIcon]),
@@ -890,7 +886,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         iconSize: gl.eqPx * gl.iconSizeS,
                                         color: Colors.lightGreenAccent,
                                         onPressed: _closeEditingMenu,
-                                        icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
+                                        icon: FIcon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                       ),
                                     ),
                                     if (gl.selLay.subtype == "dfci")
@@ -959,7 +955,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                     });
                                                   }
                                                 },
-                                                icon: const Icon(Icons.remove_circle),
+                                                icon: const FIcon(Icons.remove_circle),
                                               ),
                                             ),
                                           )
@@ -970,7 +966,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               iconSize: gl.eqPx * gl.iconSizeS,
                                               color: Colors.white24,
                                               onPressed: () {},
-                                              icon: const Icon(Icons.remove_circle),
+                                              icon: const FIcon(Icons.remove_circle),
                                             ),
                                           ),
                                     (gl.selGeo.subsubtype == "Polygon" ||
@@ -1010,7 +1006,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                     });
                                                   }
                                                 },
-                                                icon: Icon(
+                                                icon: FIcon(
                                                   gl.selGeo.subsubtype == "MP" ? Icons.next_plan : Icons.add_circle,
                                                 ),
                                               ),
@@ -1023,7 +1019,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               iconSize: gl.eqPx * gl.iconSizeS,
                                               color: Colors.white24,
                                               onPressed: () {},
-                                              icon: const Icon(Icons.add_circle),
+                                              icon: const FIcon(Icons.add_circle),
                                             ),
                                           ),
                                     gl.Mode.showButtonMoveVertexesPolygon
@@ -1087,7 +1083,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                     });
                                                   }
                                                 },
-                                                icon: const Icon(Icons.open_with_rounded),
+                                                icon: const FIcon(Icons.open_with_rounded),
                                               ),
                                             ),
                                           )
@@ -1098,7 +1094,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               iconSize: gl.eqPx * gl.iconSizeS,
                                               color: Colors.white24,
                                               onPressed: () {},
-                                              icon: const Icon(Icons.open_with_rounded),
+                                              icon: const FIcon(Icons.open_with_rounded),
                                             ),
                                           ),
                                   ],
@@ -1118,7 +1114,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         onPressed: () {
                                           _closeEditingMenu();
                                         },
-                                        icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
+                                        icon: FIcon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                       ),
                                     ),
                                   ],
@@ -1147,7 +1143,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                             gl.Mode.editAttributes = false;
                                           });
                                         },
-                                        icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
+                                        icon: FIcon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                       ),
                                     ),
                                   ),
@@ -1183,7 +1179,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
                                       SizedBox(
                                         width: gl.eqPx * 7,
-                                        child: Icon(
+                                        child: FIcon(
                                           Icons.remove_red_eye,
                                           color: Colors.white,
                                           size: gl.eqPx * gl.iconSizeXS,
@@ -1353,12 +1349,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                                         .geometries[gl.selLay.selectedGeometry]
                                                                         .attributes[i]
                                                                         .visibleOnMapLabel
-                                                                    ? Icon(
+                                                                    ? FIcon(
                                                                         Icons.check_box_outlined,
                                                                         color: Colors.white,
                                                                         size: gl.eqPx * gl.iconSizeXS,
                                                                       )
-                                                                    : Icon(
+                                                                    : FIcon(
                                                                         Icons.check_box_outline_blank,
                                                                         color: Colors.white,
                                                                         size: gl.eqPx * gl.iconSizeXS,
@@ -1558,7 +1554,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           });
                                           gl.selGeo.serialize();
                                         },
-                                        icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
+                                        icon: FIcon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                       ),
                                     ),
                                   ),
@@ -1594,7 +1590,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               gl.selGeo.selectedPointIcon = k;
                                             });
                                           },
-                                          icon: AllIcons(
+                                          icon: FIcon(
                                             gl.selectableIcons[k],
                                             size: gl.iconSizeM * gl.eqPx,
                                             color: Colors.white,
@@ -1683,7 +1679,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                           });
                                           gl.selGeo.serialize();
                                         },
-                                        icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
+                                        icon: FIcon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                       ),
                                     ),
                                   ),
@@ -1811,7 +1807,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                   }
                                                 });
                                               },
-                                              icon: AllIcons(
+                                              icon: FIcon(
                                                 gl.selLay.type == "MP" && gl.selLay.subtype == "dfci"
                                                     ? gl
                                                               .obstacleChoice[gl
@@ -1848,7 +1844,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                             if (gl.selLay.geometries[index].toDelete)
                                               Container(
                                                 alignment: AlignmentGeometry.xy(gl.dsp.alignX(0), gl.dsp.alignY(0)),
-                                                child: Icon(
+                                                child: FIcon(
                                                   Icons.delete_sweep,
                                                   color: Colors.redAccent,
                                                   size: gl.eqPx * gl.iconSizeXS,
@@ -1883,7 +1879,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                         gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
                                       });
                                     },
-                                    icon: Icon(
+                                    icon: FIcon(
                                       Icons.add_circle,
                                       color: gl.colorAgroBioTech,
                                       size: gl.eqPx * gl.iconSizeS,
@@ -1910,7 +1906,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               gl.modeMapShowPolygons = true;
                                             });
                                           },
-                                          icon: Icon(
+                                          icon: FIcon(
                                             Icons.label,
                                             size: gl.eqPx * gl.iconSizeS * .9,
                                             color: Colors.white,
@@ -1927,7 +1923,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                             });
                                             gl.selGeo.serialize();
                                           },
-                                          icon: FaIcon(
+                                          icon: FIcon(
                                             FontAwesomeIcons.eyeSlash,
                                             size: gl.eqPx * gl.iconSizeS * .9,
                                             color: Colors.white,
@@ -1970,7 +1966,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               gl.modeMapShowPolygons = true;
                                             });
                                           },
-                                          icon: Icon(
+                                          icon: FIcon(
                                             Icons.gps_fixed,
                                             size: gl.eqPx * gl.iconSizeS * .9,
                                             opticalSize: gl.eqPx * gl.iconSizeS,
@@ -1987,7 +1983,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                   gl.Mode.editPointMarker = !gl.Mode.editPointMarker;
                                                 });
                                               },
-                                              icon: FaIcon(
+                                              icon: FIcon(
                                                 FontAwesomeIcons.noteSticky,
                                                 size: gl.eqPx * gl.iconSizeS * .9,
                                                 color: Colors.white,
@@ -2002,7 +1998,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                   gl.Mode.editPolyMarker = !gl.Mode.editPolyMarker;
                                                 });
                                               },
-                                              icon: FaIcon(
+                                              icon: FIcon(
                                                 FontAwesomeIcons.noteSticky,
                                                 size: gl.eqPx * gl.iconSizeS * .9,
                                                 color: Colors.white,
@@ -2043,7 +2039,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               }
                                             });
                                           },
-                                          icon: FaIcon(
+                                          icon: FIcon(
                                             FontAwesomeIcons.drawPolygon,
                                             size: gl.eqPx * gl.iconSizeS * .9,
                                             color: Colors.white,
@@ -2058,7 +2054,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                             gl.Mode.editAttributes = !gl.Mode.editAttributes;
                                           });
                                         },
-                                        icon: FaIcon(
+                                        icon: FIcon(
                                           FontAwesomeIcons.tableColumns,
                                           size: gl.eqPx * gl.iconSizeS * .9,
                                           color: Colors.white,
@@ -2266,12 +2262,16 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     child: Stack(
       alignment: AlignmentGeometry.center,
       children: [
-        Icon(
+        FIcon(
           Icons.settings,
           color: gl.modeSettings ? Colors.black : gl.colorAgroBioTech,
           size: gl.eqPx * (gl.iconSizeM + 2),
         ),
-        Icon(Icons.settings, color: gl.modeSettings ? gl.colorAgroBioTech : Colors.black, size: gl.eqPx * gl.iconSizeM),
+        FIcon(
+          Icons.settings,
+          color: gl.modeSettings ? gl.colorAgroBioTech : Colors.black,
+          size: gl.eqPx * gl.iconSizeM,
+        ),
       ],
     ),
   );
@@ -2317,33 +2317,33 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             if (gl.Mode.editPolygon && gl.selLay.type == "Point" && gl.selLay.subtype == "Essence")
               Container(
                 alignment: Alignment.bottomRight,
-                child: Icon(CustomIcons.tree, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+                child: FIcon(CustomIcons.tree, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
               )
             else if (gl.Mode.editPolygon && gl.selLay.type == "Point")
               Container(
                 alignment: Alignment.bottomRight,
-                child: Icon(Icons.location_pin, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+                child: FIcon(Icons.location_pin, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
               )
             else if (gl.Mode.editPolygon && gl.selLay.type == "Polygon")
               Container(
                 alignment: Alignment.bottomRight,
-                child: FaIcon(FontAwesomeIcons.drawPolygon, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+                child: FIcon(FontAwesomeIcons.drawPolygon, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
               )
             else if (gl.Mode.essence)
               Container(
                 alignment: Alignment.bottomRight,
-                child: Icon(CustomIcons.tree, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+                child: FIcon(CustomIcons.tree, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
               )
             else if (gl.Mode.dfci)
               Container(
                 alignment: Alignment.bottomRight,
-                child: FaIcon(FontAwesomeIcons.road, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
+                child: FIcon(FontAwesomeIcons.road, color: gl.colorBack, size: gl.eqPx * gl.iconSizeXXS),
               ),
             (gl.Mode.dfci &&
                     (GeometricLayer.getDFCILayer().geometries.isNotEmpty &&
                         !GeometricLayer.getDFCILayer().lastUnfinishedGeometry.finished))
-                ? Icon(Icons.adjust_rounded, color: Colors.white, size: gl.eqPx * gl.iconSizeS)
-                : Icon(Icons.add, color: Colors.white, size: gl.eqPx * gl.iconSizeS),
+                ? FIcon(Icons.adjust_rounded, color: Colors.white, size: gl.eqPx * gl.iconSizeS)
+                : FIcon(Icons.add, color: Colors.white, size: gl.eqPx * gl.iconSizeS),
           ],
         ),
       ),
@@ -2359,7 +2359,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
       onPressed: () {
         _closeEditingMenu();
       },
-      child: Icon(
+      child: FIcon(
         Icons.verified_outlined,
         color: gl.Mode.essence ? Colors.black : Colors.white,
         size: gl.eqPx * gl.iconSizeSettings,
@@ -2374,13 +2374,13 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         alignment: Alignment.center,
         width: gl.eqPx * 10,
         height: gl.eqPx * 10,
-        child: FaIcon(FontAwesomeIcons.crosshairs, color: Colors.black.withAlpha(180), size: gl.eqPx * 10),
+        child: FIcon(FontAwesomeIcons.crosshairs, color: Colors.black.withAlpha(180), size: gl.eqPx * 10),
       ),
       Container(
         alignment: Alignment.center,
         width: gl.eqPx * 10,
         height: gl.eqPx * 10,
-        child: FaIcon(FontAwesomeIcons.crosshairs, color: Colors.white.withAlpha(50), size: gl.eqPx * 8),
+        child: FIcon(FontAwesomeIcons.crosshairs, color: Colors.white.withAlpha(50), size: gl.eqPx * 8),
       ),
     ],
   );
@@ -2473,7 +2473,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                 tooltip:
                     "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
                 onPressed: () {},
-                icon: Icon(Icons.info_rounded),
+                icon: FIcon(Icons.info_rounded),
               )
             : Container(width: gl.eqPx * gl.iconSizeSettings * 1.5)
       : Container(width: gl.eqPx * gl.iconSizeSettings * 1.5);
@@ -2562,7 +2562,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             });
                           }
                         },
-                        icon: AllIcons(
+                        icon: FIcon(
                           layer.subtype == "dfci"
                               ? gl.obstacleChoice[ess[j]]?.icon ?? getIconForPiste(ess[j])
                               : gl.selectableIcons[geometry.selectedPointIcon],
@@ -2575,7 +2575,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           color: geometry.colorLine,
                         ),
                       )
-                    : AllIcons(
+                    : FIcon(
                         layer.subtype == "dfci"
                             ? gl.obstacleChoice[ess[j]]?.icon ?? getIconForPiste(ess[j])
                             : gl.selectableIcons[geometry.selectedPointIcon],
@@ -2652,7 +2652,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           });
                         }
                       },
-                      icon: AllIcons(
+                      icon: FIcon(
                         layer.subtype == "dfci" && geometry.attributes[1].value == "Obstacle"
                             ? gl.obstacleChoice[geometry.attributes[0].value]!.icon
                             : gl.selectableIcons[geometry.selectedPointIcon],
@@ -2660,7 +2660,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                         color: geometry.colorLine,
                       ),
                     )
-                  : AllIcons(
+                  : FIcon(
                       layer.subtype == "dfci" && geometry.attributes[1].value == "Obstacle"
                           ? gl.obstacleChoice[geometry.attributes[0].value]!.icon
                           : gl.selectableIcons[geometry.selectedPointIcon],
@@ -2784,7 +2784,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                 gl.print("Selected searchMarker = ${gl.selectedSearchMarker}");
               });
             },
-            icon: Icon(Icons.circle_notifications, color: Colors.red, size: 20),
+            icon: FIcon(Icons.circle_notifications, color: Colors.red, size: 20),
           ),
         ),
       );
@@ -2887,14 +2887,14 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
         width: 50,
         height: 50,
         point: _pt ?? const LatLng(0.0, 0.0),
-        child: const Icon(Icons.donut_small, color: Color.fromRGBO(0, 0, 0, .75)),
+        child: const FIcon(Icons.donut_small, color: Color.fromRGBO(0, 0, 0, .75)),
       ),
       Marker(
         alignment: Alignment.center,
         width: 50,
         height: 50,
         point: _pt ?? const LatLng(0.0, 0.0),
-        child: const Icon(Icons.donut_large_sharp, color: Color.fromRGBO(255, 255, 255, .75)),
+        child: const FIcon(Icons.donut_large_sharp, color: Color.fromRGBO(255, 255, 255, .75)),
       ),
     ];
   }
@@ -2908,7 +2908,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           width: iconSize * 1.1,
           height: iconSize * 1.1,
           point: _mapController.camera.center,
-          child: const Icon(Icons.donut_large, color: Colors.red),
+          child: const FIcon(Icons.donut_large, color: Colors.red),
         ),
       );
     } else if (gl.Mode.moveVertexesPolygon || _modeMeasurePath) {
@@ -2918,7 +2918,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
           width: iconSize,
           height: iconSize,
           point: _mapController.camera.center,
-          child: const Icon(Icons.donut_small, color: Colors.blue),
+          child: const FIcon(Icons.donut_small, color: Colors.blue),
         ),
       );
     }
@@ -3171,7 +3171,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                   _closePolygonMenu();
                 });
               },
-              Icon(Icons.forest, size: gl.eqPx * gl.menuBarLength / 5),
+              FIcon(Icons.forest, size: gl.eqPx * gl.menuBarLength / 5),
             ),
             _menuButton(
               gl.eqPx * gl.menuBarLength / 4,
@@ -3210,7 +3210,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                   _closePolygonMenu();
                 });
               },
-              Icon(Icons.hexagon_outlined, size: gl.eqPx * gl.menuBarLength / 5),
+              FIcon(Icons.hexagon_outlined, size: gl.eqPx * gl.menuBarLength / 5),
             ),
             _menuButton(
               gl.eqPx * gl.menuBarLength / 4,
@@ -3254,7 +3254,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                   _closeSwitchesMenu();
                 });
               },
-              Icon(Icons.remove_red_eye, size: gl.eqPx * gl.menuBarLength / 5),
+              FIcon(Icons.remove_red_eye, size: gl.eqPx * gl.menuBarLength / 5),
             ),
           ],
         ),
@@ -3269,7 +3269,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     Color color,
     VoidCallback onPressed,
     VoidCallback onLongPress,
-    Icon icon,
+    FIcon icon,
   ) {
     return Container(
       width: width,
@@ -3353,7 +3353,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                       });
                                     }
                                   },
-                                  icon: const Icon(Icons.analytics),
+                                  icon: const FIcon(Icons.analytics),
                                 ),
                               IconButton(
                                 iconSize: gl.eqPx * gl.iconSizeM,
@@ -3365,7 +3365,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                     });
                                   }
                                 },
-                                icon: Icon(Icons.gps_fixed),
+                                icon: FIcon(Icons.gps_fixed),
                               ),
                             ],
                           ),
@@ -3381,7 +3381,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                   refreshView(() {});
                                 }
                               },
-                              icon: Icon(Icons.gps_fixed),
+                              icon: FIcon(Icons.gps_fixed),
                             ),
                           ],
                         ),
@@ -3399,7 +3399,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                             _measurePath.clear();
                           });
                         },
-                        icon: Icon(Icons.more_horiz_outlined),
+                        icon: FIcon(Icons.more_horiz_outlined),
                       ),
                     ),
                   Container(
@@ -3425,7 +3425,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                           },
                         );
                       },
-                      icon: FaIcon(FontAwesomeIcons.magnifyingGlassLocation),
+                      icon: FIcon(FontAwesomeIcons.magnifyingGlassLocation),
                     ),
                   ),
                 ],
@@ -3478,7 +3478,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               ),
                                             ),
                                             onPressed: () {},
-                                            icon: FaIcon(
+                                            icon: FIcon(
                                               FontAwesomeIcons.list,
                                               size: gl.eqPx * gl.iconSizeXS * .5,
                                               color: Colors.transparent,
@@ -3529,7 +3529,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                               });
                                               g.serialize();
                                             },
-                                            icon: Icon(
+                                            icon: FIcon(
                                               Icons.close,
                                               size: gl.eqPx * gl.iconSizeXS * .8,
                                               color: Colors.red,
@@ -3639,7 +3639,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                 ),
                                               ),
                                               onPressed: () {},
-                                              icon: FaIcon(
+                                              icon: FIcon(
                                                 FontAwesomeIcons.list,
                                                 size: gl.eqPx * gl.iconSizeXS * .5,
                                                 color: Colors.transparent,
@@ -3689,7 +3689,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                                 });
                                                 g.serialize();
                                               },
-                                              icon: Icon(
+                                              icon: FIcon(
                                                 Icons.close,
                                                 size: gl.eqPx * gl.iconSizeXS * .8,
                                                 color: Colors.red,
@@ -3784,7 +3784,7 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        Icon(Icons.layers, color: g.colorLine),
+                                        FIcon(Icons.layers, color: g.colorLine),
                                         Text("Unknown Geometry", overflow: TextOverflow.clip),
                                       ],
                                     ),
@@ -3858,8 +3858,8 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
             SizedBox(
               width: gl.eqPx * 7,
               child: checked
-                  ? Icon(Icons.check_box, color: Colors.white12, size: gl.eqPx * gl.iconSizeXS)
-                  : Icon(Icons.check_box_outline_blank, color: Colors.white12, size: gl.eqPx * gl.iconSizeXS),
+                  ? FIcon(Icons.check_box, color: Colors.white12, size: gl.eqPx * gl.iconSizeXS)
+                  : FIcon(Icons.check_box_outline_blank, color: Colors.white12, size: gl.eqPx * gl.iconSizeXS),
             ),
             lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
             Container(
