@@ -201,8 +201,8 @@ int main(int argc, char *argv[])
                         for (std::string &code: codeList){
                              std::string layerNbColName=code+"_nb";
                             basicStat stat =dico.getLayerBase(code)->computeBasicStatOnPolyg(poGeom);
-                            poFeature->SetField(code.c_str(),stat.getSum());
-                            poFeature->SetField(layerNbColName,stat.getNb());
+                            poFeature->SetField(code.c_str(),stat.getSumInt());
+                            poFeature->SetField(layerNbColName.c_str(),stat.getNbInt());
                         }
 
                         lay->SetFeature(poFeature);
