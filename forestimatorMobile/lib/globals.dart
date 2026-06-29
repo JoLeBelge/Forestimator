@@ -127,6 +127,7 @@ class Mode {
   static bool overrideWellDefinedCheck = false;
   static bool _expert = false;
   static bool _expertTools = false;
+  static bool multipoint = false;
 
   static bool polygon = false;
   static bool polygonList = false;
@@ -159,6 +160,8 @@ class Mode {
   static void serialize() async {
     await shared!.setBool('Modes.firePath', dfci);
     await shared!.setBool('Modes.essence', essence);
+    await shared!.setBool('Modes.multipoint', multipoint);
+    await shared!.setBool('Modes.variableset', variableSets);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.labelCross', labelCross);
     await shared!.setBool('Modes.smallLabel', debugLabel);
@@ -167,6 +170,8 @@ class Mode {
   static void deserialize() {
     dfci = shared!.getBool('Modes.firePath') ?? false;
     essence = shared!.getBool('Modes.essence') ?? false;
+    multipoint = shared!.getBool('Modes.multipoint') ?? false;
+    variableSets = shared!.getBool('Modes.variableset') ?? false;
     userDataFilled = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
     debugLabel = shared!.getBool('Modes.smallLabel') ?? false;
@@ -401,7 +406,7 @@ int currentPage = 0;
 
 List<String> onboardLog = ["${DateTime.now().toString()}\n${forestimatorMobileVersion.toString()}"];
 int lengthLog = 1;
-@override
+
 void print(dynamic it) {
   refreshLog(() {
     onboardLog.add("${DateTime.now().toString()}\n${it.toString()}");
@@ -486,7 +491,7 @@ String getFirstSelLayOffline() {
 }
 
 void initializeSelectedLayerForFlutterMap() {
-  forceDFCIMode(offlineMode);
+  if (Mode.dfci) return forceDFCIMode();
   if (!firstTimeUse) {
     for (int i = 0; i < interfaceSelectedLCode.length; i++) {
       replaceLayerFromList(interfaceSelectedLCode.elementAt(i), index: i, offline: false);
@@ -516,6 +521,8 @@ List<String> getInterfaceSelectedLOffline() {
 
 LayerAnaPt? anaPtPreview;
 List<LayerAnaPt> requestedLayers = [];
+
+List<String> notVisualizableLayerKeysOffline = ["CNSWrast"];
 
 List<String> anaPtSelectedLayerKeys = [
   "ZBIO",
@@ -605,8 +612,8 @@ LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
 void removeLayerFromList({bool offline = false, int index = -1, String key = ""}) {
-  forceDFCIMode(offline);
-  if (Mode.dfci) return;
+  print("hello");
+  if (Mode.dfci) return forceDFCIMode();
   if (key != "" && index > -1) {
     print("Error in removeLayerFromList(): key != '' && index > -1");
     return;
@@ -630,22 +637,22 @@ void removeLayerFromList({bool offline = false, int index = -1, String key = ""}
   }
 }
 
-void forceDFCIMode(bool offline) {
+void forceDFCIMode() {
   if (Mode.dfci && switcherMaps.first.mCode != "routes") {
     while (switcherMaps.isNotEmpty) {
       switcherMaps.removeLast();
     }
-    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: offline));
-    if (!offlineMode) {
-      switcherMaps.insert(1, SelectedLayer(mCode: 'IGN', offline: offline));
-      switcherMaps.insert(2, SelectedLayer(mCode: placeHolderNames[2], offline: offline));
-    }
+    switcherMaps.insert(0, SelectedLayer(mCode: 'routes', offline: false));
+    switcherMaps.insert(1, SelectedLayer(mCode: 'IGN', offline: false));
+    switcherMaps.insert(2, SelectedLayer(mCode: placeHolderNames[2], offline: false));
+    offlineMode = false;
   }
 }
 
 void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
-  forceDFCIMode(offline);
-  if (Mode.dfci) return;
+  print("hello");
+  if (Mode.dfci) return forceDFCIMode();
+  print("hello");
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in switcherMaps) {
@@ -762,12 +769,15 @@ void savePrefSelLayOffline() async {
 
 void loadPrefSelLayOnline() async {
   interfaceSelectedLCode = shared!.getStringList('interfaceSelectedLCode') ?? [defaultLayer];
-  List<String> offlineLayer = shared!.getStringList('interfaceSelectedLCodeOfflineFlag') ?? ["f"];
+  List<String> offlineLayer = shared!.getStringList('interfaceSelectedLCodeOfflineFlag') ?? ["f", "f", "f"];
   switcherMaps.clear();
   int index = 0;
   for (String key in interfaceSelectedLCode) {
     switcherMaps.add(SelectedLayer(mCode: key, offline: offlineLayer[index] == "t" ? true : false));
     index++;
+  }
+  while (switcherMaps.length < 3) {
+    switcherMaps.add(SelectedLayer(mCode: placeHolderNames[switcherMaps.length], offline: false));
   }
 }
 
@@ -778,12 +788,14 @@ void loadPrefSelLayOffline() async {
     for (String key in interfaceSelectedLCode) {
       switcherMaps.add(SelectedLayer(mCode: key, offline: true));
     }
+    while (switcherMaps.length < 3) {
+      switcherMaps.add(SelectedLayer(mCode: placeHolderNames[switcherMaps.length], offline: true));
+    }
   }
 }
 
 void changeSelectedLayerModeOffline() {
-  forceDFCIMode(true);
-  if (Mode.dfci) return;
+  if (Mode.dfci) return forceDFCIMode();
   if (dico.getLayersOffline().isEmpty) {
     offlineMode = false;
     return;
@@ -803,14 +815,13 @@ void changeSelectedLayerModeOffline() {
       switcherMaps.removeLast();
     }
   }
-  if (switcherMaps.isEmpty) {
-    switcherMaps.insert(0, SelectedLayer(mCode: placeHolderNames[0], offline: true));
+  for (int i = switcherMaps.length; i < 3; i++) {
+    switcherMaps.insert(i, SelectedLayer(mCode: placeHolderNames[i], offline: true));
   }
 }
 
 void changeSelectedLayerModeOnline() {
-  forceDFCIMode(false);
-  if (Mode.dfci) return;
+  if (Mode.dfci) return forceDFCIMode();
   savePrefSelLayOffline();
   loadPrefSelLayOnline();
 }
@@ -851,7 +862,7 @@ Map<int, int> lutVulnerabiliteCS = {
 
 ForestimatorStack stack = ForestimatorStack();
 
-List<IconData> selectableIcons = [
+List<dynamic> selectableIcons = [
   Icons.square_outlined,
   Icons.circle,
   Icons.gps_fixed,
@@ -880,7 +891,7 @@ List<IconData> selectableIcons = [
   FontAwesomeIcons.road,
 ];
 
-List<IconData> selectableIconGeo = [
+List<dynamic> selectableIconGeo = [
   Icons.square_outlined,
   Icons.circle_outlined,
   Icons.pentagon_outlined,

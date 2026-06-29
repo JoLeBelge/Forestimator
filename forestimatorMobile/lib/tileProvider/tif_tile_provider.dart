@@ -38,33 +38,17 @@ class TifFileTileProvider extends TileProvider {
     final File image = File(sourceImPath);
     if (await image.exists()) {
       Uint8List? bytes = await image.readAsBytes();
-      img.TiffInfo tiffInfo = img.TiffDecoder().startDecode(bytes)!;
-      img.TiffImage tifIm = tiffInfo.images[0];
-      int bps = tifIm.bitsPerSample;
-      gl.print("Info: file with $bps bps loaded in memory ${image.path}");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
-      if (bps <= 8) {
-        File jpgFile = File("$sourceImPath.jpg");
-        if (jpgFile.existsSync()) {
-          gl.print("jpg file already exists, loading it in memory");
-          _sourceImage = await Isolate.run<img.Image?>(() {
-            return img.JpegDecoder().decode(jpgFile.readAsBytesSync());
-          });
-        } else {
-          _sourceImage = await Isolate.run<img.Image?>(() {
-            return img.TiffDecoder().decode(bytes);
-          });
-        }
-        // test si sauver l'image décodée permet un gain de temps
-        if (!jpgFile.existsSync()) {
-          jpgFile.writeAsBytesSync(img.encodeJpg(_sourceImage!));
-        }
-
+      _sourceImage = await Isolate.run<img.Image?>(() {
+        return img.TiffDecoder().decode(bytes);
+      });
+      if (_sourceImage != null && _sourceImage!.data != null && _sourceImage!.data!.bitsPerChannel <= 8) {
         _loaded = true;
-        gl.print("file decoded in memory $e");
+        gl.print("Info: 8 bit tiff decoded!");
       } else {
-        gl.print("Error: jpg bpm > 8!");
+        _loaded = true;
+        gl.print("Warning: 16 bit tiff decoded!");
       }
     }
   }

@@ -33,7 +33,7 @@ def keystoreProperties = new Properties()
 android {
     namespace "com.forestimator"
     compileSdkVersion 36 // pour permisson_handler c'est 33 qui est préconisé, mais pour d'autres package c'est 34 au minimum..
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
 
  	signingConfigs {
         release {

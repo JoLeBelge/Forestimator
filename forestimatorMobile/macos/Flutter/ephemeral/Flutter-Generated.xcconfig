@@ -1,10 +1,11 @@
 // This is a generated file; do not edit or check into version control.
 FLUTTER_ROOT=/Users/macgef/Documents/SDK/flutter
 FLUTTER_APPLICATION_PATH=/Users/macgef/Documents/Forestimator/forestimatorMobile
+FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/macgef/Documents/Forestimator/forestimatorMobile/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=3.0.0
-FLUTTER_BUILD_NUMBER=30
+FLUTTER_BUILD_NAME=3.1.0
+FLUTTER_BUILD_NUMBER=35
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false
