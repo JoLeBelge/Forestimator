@@ -80,6 +80,7 @@ public:
         return roundDouble(mean*(nb*pow(resolution,2))/10000.0,precisionVal);}
 
     int getNbInt(){return nb;}
+    int getSumInt(){return nb;}
     std::string getSd(int precisionVal=1){return roundDouble(stdev,precisionVal);}
     std::string getCV(){if (mean!=0) {return roundDouble(100.0*stdev/mean)+"%";} else { return "-1";};}
 
