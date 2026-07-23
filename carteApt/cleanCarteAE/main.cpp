@@ -1,7 +1,7 @@
 #include "cleanAE.h"
 
 
-std::string pathAE("/home/jo/Documents/Carto/NH_RW2019/AE_W_202408.tif");
+//std::string pathRaster("/home/jo/Documents/Carto/NH_RW2019/AE_W_202408.tif");
 
 int main(int argc, char *argv[])
 {
@@ -9,7 +9,8 @@ int main(int argc, char *argv[])
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
-            ("outils", po::value<int>()->required(), "choix de l'outil à utiliser")
+            ("outils", po::value<int>()->required(), "choix de l'outil à utiliser. 0: clean carte AE. 1 clean carte compo Nicolas 2026 04")
+            ("raster", po::value<string>()->required(), "raster à nettoyer")
             ;
 
     po::variables_map vm;
@@ -23,11 +24,12 @@ int main(int argc, char *argv[])
 
     GDALAllRegister();
     int mode(vm["outils"].as<int>());
+    std::string pathRaster(vm["raster"].as<std::string>());
 
     switch (mode) {
     case 0:{
-        std::cout << " nettoyage carte " << pathAE << std::endl;
-        GDALDataset *pIn= (GDALDataset*) GDALOpen(pathAE.c_str(), GA_ReadOnly);
+        std::cout << " nettoyage carte " << pathRaster << std::endl;
+        GDALDataset *pIn= (GDALDataset*) GDALOpen(pathRaster.c_str(), GA_ReadOnly);
         bool test(0);
         //const char *comp = "DEFLATE";
         // comparaison de deux char * : pas d'overload pour ==, attention
@@ -38,19 +40,19 @@ int main(int argc, char *argv[])
 
         if (test){
             std::cout << "compression détectée" << std::endl;
-            if (!fs::exists(getNameTmp(pathAE))){
+            if (!fs::exists(getNameTmp(pathRaster))){
                 // on décompresse tout ça
-                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' "+ pathAE +" "+getNameTmp(pathAE)+" ");
+                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' "+ pathRaster +" "+getNameTmp(pathRaster)+" ");
                 std::cout << aCommand << "\n";
                 system(aCommand.c_str());
 
             }
-             pathAE=getNameTmp(pathAE);
+             pathRaster=getNameTmp(pathRaster);
         }
 
         //lecture du raster
-        std::cout << "charge image " << pathAE << std::endl;
-        Im2D_U_INT1 * aIn=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathAE));
+        std::cout << "charge image " << pathRaster << std::endl;
+        Im2D_U_INT1 * aIn=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathRaster));
 
         //int Val2Clean(3),ValConflict1(10),ValCopain(10),seuilVois(5);
         // Val Conflict: les classe pour lesquelles ont ne veux pas de filtrage: ex filtrage de perte, ne peux pas toucher à apport variable
@@ -95,9 +97,55 @@ int main(int argc, char *argv[])
 
 
         // sauver resultat
-        std::string aOut=pathAE.substr(0,pathAE.size()-4)+"_clean.tif";
+        std::string aOut=pathRaster.substr(0,pathRaster.size()-4)+"_clean.tif";
         Tiff_Im::CreateFromIm(*aIn,aOut);
-        copyTifMTD(pathAE,aOut);
+        copyTifMTD(pathRaster,aOut);
+        compressTif(aOut);
+
+        break;
+    }
+    case 1:{
+    // 2026 06 j'aimerai boucher les trou dans la nouvelle carte de composition de Nicolas, qui sont des trous entre deux houppiers ou de petites trouées
+    // résolution de 10 mètres
+
+        std::cout << " nettoyage carte " << pathRaster << std::endl;
+        GDALDataset *pIn= (GDALDataset*) GDALOpen(pathRaster.c_str(), GA_ReadOnly);
+        bool test(0);
+        const char *comp = "COMPRESSION=DEFLATE";
+        if (strcmp(*pIn->GetMetadata("IMAGE_STRUCTURE"),comp)== 0){test=1;}
+        GDALClose(pIn);
+
+        if (test){
+            std::cout << "compression détectée" << std::endl;
+            if (!fs::exists(getNameTmp(pathRaster))){
+                // on décompresse tout ça
+                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' "+ pathRaster +" "+getNameTmp(pathRaster)+" ");
+                std::cout << aCommand << "\n";
+                system(aCommand.c_str());
+
+            }
+            pathRaster=getNameTmp(pathRaster);
+        }
+
+        //lecture du raster
+        std::cout << "charge image " << pathRaster << std::endl;
+        Im2D_U_INT1 * aIn=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathRaster));
+
+
+        std::cout << "clean image\n";
+
+        int Val2Clean(2),ValConflict1(3),ValCopain(3),seuilVois(5);
+
+        // boucle sur toutes les valeurs de classes carte compo
+        for (int dn(1); dn <10;dn++){
+            std::cout << "fill hole pour val " << dn << std::endl;
+            fillHole(aIn,0,dn,dn,5,int(1));
+        }
+
+        // sauver resultat
+        std::string aOut=pathRaster.substr(0,pathRaster.size()-4)+"_clean.tif";
+        Tiff_Im::CreateFromIm(*aIn,aOut);
+        copyTifMTD(pathRaster,aOut);
         compressTif(aOut);
 
         break;

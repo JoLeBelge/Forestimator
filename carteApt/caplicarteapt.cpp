@@ -153,7 +153,7 @@ void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bo
 
         // copie du fichier de style qgis
         std::string aStyleFile=dico->Files()->at("styleApt");
-        boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml",boost::filesystem::copy_option::overwrite_if_exists);
+        boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml");//,boost::filesystem::copy_option::overwrite_if_exists);
         std::cout << " done " << std::endl;
 
     }else {
@@ -162,7 +162,7 @@ void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bo
 
     // copie du fichier de style qgis
     std::string aStyleFile=dico->Files()->at("styleApt");
-    boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml",boost::filesystem::copy_option::overwrite_if_exists);
+    boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml");//,boost::filesystem::copy_option::overwrite_if_exists);
 }
 
 void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, bool force)
@@ -259,7 +259,7 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
         if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
         // copie du fichier de style qgis
         std::string aStyleFile=dico->Files()->at("styleAptCS");
-        boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml",boost::filesystem::copy_option::overwrite_if_exists);
+        boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml");//,boost::filesystem::copy_option::overwrite_if_exists);
         std::cout << " done " << std::endl;
 
     }else {

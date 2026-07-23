@@ -87,8 +87,7 @@ public:
     void closeConnection();
     int openConnection();
     cdicoAptBase(std::string aBDFile);
-    ~cdicoAptBase(){
-        std::cout << "destruction du dico ; la fin d'une longue histoire (bug)" << std::endl;}
+    ~cdicoAptBase(){}
 
     std::map<int,std::map<std::string,int>> getFEEApt(std::string aCodeEs);
     std::map<int,int> getZBIOApt(std::string aCodeEs);

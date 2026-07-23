@@ -2,7 +2,7 @@
 #define CAPPLICARTEPH_H
 #include "cdicocarteph.h"
 #include "gdal_priv.h"
-#include "gdalwarper.h"
+//#include "gdalwarper.h"
 #include "cpl_conv.h" // for CPLMalloc()
 #include "cpl_string.h"
 #include <iostream>

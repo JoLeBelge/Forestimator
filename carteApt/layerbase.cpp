@@ -35,10 +35,10 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ, double na):mean(0),ma
             }
         }
     }
-    mean=mean/nb;
-
+    if (nb!=0){mean=mean/nb;
     double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
     stdev = std::sqrt(sq_sum / nb - mean * mean);
+    }
 }
 
 basicStat::basicStat(std::vector<double> v):mean(0),max(0),min(0),nb(0){
@@ -55,9 +55,10 @@ basicStat::basicStat(std::vector<double> v):mean(0),max(0),min(0),nb(0){
             test=1;
         }
     }
-    mean=mean/nb;
-    double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
-    stdev = std::sqrt(sq_sum / nb - mean * mean);
+    if (nb!=0){mean=mean/nb;
+        double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
+        stdev = std::sqrt(sq_sum / nb - mean * mean);
+    }
 }
 
 rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathRaster(aPathTif),mPathQml(""),mCode(aCode), mResolution(0){
@@ -537,7 +538,7 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
                 CPLFree(ppszProj4A);
             }*/
             // driver et dataset shp -- creation depuis la géométrie
-            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("Memory");
+            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("MEM");
             boost::filesystem::path tmpPath = boost::filesystem::path("/vsimem/") / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%");
 
             std::string name1 = tmpPath.string();
@@ -1002,7 +1003,7 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
             OGRSpatialReference oSRS;
             oSRS.importFromWkt(&pszWkt);
             // driver et dataset shp -- creation depuis la géométrie
-            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("Memory");
+            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("MEM");
             pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
             OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
             OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());

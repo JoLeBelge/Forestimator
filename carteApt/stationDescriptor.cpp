@@ -793,7 +793,6 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
             poFeature->SetField("sco",freqSco );
             int nb =bs.getNbInt();
             poFeature->SetField("pix",nb);
-            //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
             lay->SetFeature(poFeature);
         }
 

@@ -11,7 +11,7 @@
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
 #include <fstream>
-#import "date.h"
+#include "date.h"
 
 using namespace std;
 using namespace date;

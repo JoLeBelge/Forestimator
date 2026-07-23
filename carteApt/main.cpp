@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
             ("gpkg_layer", po::value<std::string>(), "name of layer")
             ("layerCode", po::value<std::vector<std::string>>()->multitoken(), "layer Code (or ess code) list, ex: --layerCode dendro_gha dendro_vha dendro_cdom dendro_hdom")
             ("buffer", po::value<int>(), "buffer to apply to point geometry, def 30")
+            ("stat", po::value<std::string>(), "stat metrics: AVG | SUM. DEF=AVG")
 
             ;
 
@@ -143,6 +144,11 @@ int main(int argc, char *argv[])
 
                 std::vector<std::string> codeList(vm["layerCode"].as<std::vector<std::string>>());
 
+                std::string statMode("AVG");
+                if (vm.count("stat")){
+                statMode=(vm["stat"].as<std::string>());
+                }
+
                 int buffer = 30;
 
                 if (vm.count("buffer")){buffer=vm["buffer"].as<int>();}
@@ -162,50 +168,53 @@ int main(int argc, char *argv[])
 
                     std::cout << "layer chargée " << std::endl;
 
-                    OGRSpatialReference *oSRS = lay->GetSpatialRef();
-                    if (oSRS == NULL || oSRS->AutoIdentifyEPSG()!=31370)
+                    //const OGRSpatialReference *oSRS = lay->GetSpatialRef();
+                    //if (oSRS == NULL || oSRS->AutoIdentifyEPSG()!=31370)
+                    /* check plus valide avec version récente de gdal
+                     * if (oSRS == NULL || oSRS->GetEPSGGeogCS()!=31370)
+
                     {
-                        std::cout << "la couche doit être en BL72. epsg est de  " << oSRS->AutoIdentifyEPSG()  << std::endl;
-                    }
+                        std::cout << "la couche doit être en BL72. epsg est de  " << oSRS->GetEPSGGeogCS()  << std::endl;
+                    }*/
 
 
                     for (std::string &code: codeList){
-                        std::string layerNbColName=code+"_nb";
-
                         if (lay->FindFieldIndex(code.c_str(),0)==-1){
                             OGRFieldDefn * oFLD(NULL);
                             oFLD= new OGRFieldDefn(code.c_str(),  OFTReal);
                             oFLD->SetJustify(OGRJustification::OJLeft);
                             lay->CreateField(oFLD);
-                            OGRFieldDefn * oFLD2(NULL);
-                            oFLD2= new OGRFieldDefn(layerNbColName.c_str(),  OFTReal);
-                            oFLD2->SetJustify(OGRJustification::OJLeft);
-                            lay->CreateField(oFLD2);
                             //std::cout << "champ créé " << std::endl;
                         }
                     }
                     OGRFeature *poFeature;
+                    int nb =lay->GetFeatureCount();
+                    int c(0), step=double(nb/100.0);
                     while( (poFeature = lay->GetNextFeature()) != NULL )
                     {
-
+                        c++;
                         OGRGeometry * poGeom = poFeature->GetGeometryRef();
                         if (poFeature->GetGeometryRef()->getIsoGeometryType()==1001 || poFeature->GetGeometryRef()->getIsoGeometryType()==1)
                         {
                             std::cout << " buffer on point, " << buffer << " meters" << std::endl;
                             poGeom = poFeature->GetGeometryRef()->Buffer(buffer);
 
-                        } else {
-                            std::cout << "geometry type is " << poFeature->GetGeometryRef()->getGeometryName() << ", iso geom type " << poFeature->GetGeometryRef()->getIsoGeometryType() <<std::endl;
-                        }
+                        } //else {
+                            //std::cout << "geometry type is " << poFeature->GetGeometryRef()->getGeometryName() << ", iso geom type " << poFeature->GetGeometryRef()->getIsoGeometryType() <<std::endl;
+                        //}
 
                         for (std::string &code: codeList){
-                             std::string layerNbColName=code+"_nb";
                             basicStat stat =dico.getLayerBase(code)->computeBasicStatOnPolyg(poGeom);
+                            if (statMode=="AVG"){
+                            poFeature->SetField(code.c_str(),stat.getMeanDbl());
+                            } else if (statMode=="SUM"){
                             poFeature->SetField(code.c_str(),stat.getSumInt());
-                            poFeature->SetField(layerNbColName.c_str(),stat.getNbInt());
+                            }
                         }
 
                         lay->SetFeature(poFeature);
+                        if (c%step==0){std::cout << c << " polygon over " << nb <<std::endl;}
+
                     }
                     GDALClose(mDS);
                 } else {
@@ -416,7 +425,7 @@ void matriceApt(cDicoApt * dico, std::string aFile, int RN){
     std::map<std::string,std::shared_ptr<cEss>> VEss=dico->getAllEss();
     std::cout << "matrice pour Région " << dico->ZBIO(RN) << std::endl;
     std::string aOut(aFile+"_"+std::to_string(RN)+".sla");
-    boost::filesystem::copy_file(aFile,aOut,boost::filesystem::copy_option::overwrite_if_exists);
+    boost::filesystem::copy_file(aFile,aOut);//,boost::filesystem::copy_option::overwrite_if_exists);
 
     replaceInDoc(aOut,"RégionNat",dico->ZBIO(RN));
 
@@ -610,35 +619,6 @@ void replaceFullLineInDoc(std::string aFileIn,std::string aReplace,int lineNumbe
     std::remove(aFileIn.c_str());
     std::rename(aTmp.c_str(),aFileIn.c_str());
 }
-
-std::string findTxtInBaliseAtLine(std::string aFileIn, std::string aBalise, int lineNumber){
-    int l(1);
-    std::string aOut("");
-    std::ifstream in(aFileIn);
-    if (!in)
-    {
-        std::cout << "Could not open " << aFileIn << "\n";
-    }
-    std::string line;
-    while (getline(in, line))
-    {
-        if ( l==lineNumber ){
-            size_t pos = line.find(aBalise);
-            if (pos != std::string::npos){
-                std::string sub=line.substr(pos,pos+10);
-                //std::cout << " sub string for balise " << aBalise << " is " << sub << std::endl;
-                char *aBuffer = strdup((char*)sub.c_str());
-                std::string aVal1Str = strtok(aBuffer,"\"");
-                aOut = strtok( NULL, "\"" );
-            }
-            break;
-        }
-        l++;
-    }
-    in.close();
-    return aOut;
-}
-
 
 void replaceInDoc(std::string aFileIn,std::string aFind,std::vector<std::string> aReplace){
     std::string aStr;
