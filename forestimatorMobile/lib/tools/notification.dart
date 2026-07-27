@@ -7153,46 +7153,80 @@ Card catalogueTileCard(
                 )
               : Column(
                   children: [
-                    if (gl.dsp.orientation == Orientation.portrait)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          MapStatusSymbols(offlineMode: offlineMode, layerCode: layerTile.key),
-                          SizedBox(
-                            height: gl.eqPx * gl.onCatalogueMapHeight,
-                            width: gl.eqPx * 55,
-                            child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  _CatalogueMenu.selectedMap == i
-                                      ? {_CatalogueMenu.selectedMap = -1, _CatalogueMenu.selectedLayerTile = null}
-                                      : {_CatalogueMenu.selectedMap = i, _CatalogueMenu.selectedLayerTile = layerTile};
-                                });
-                              },
-                              child: Text(
-                                layerTile.name,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                  fontSize: gl.eqPx * gl.fontSizeS,
+                    (gl.dsp.orientation == Orientation.portrait)
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              MapStatusSymbols(offlineMode: offlineMode, layerCode: layerTile.key),
+                              SizedBox(
+                                height: gl.eqPx * gl.onCatalogueMapHeight,
+                                width: gl.eqPx * 55,
+                                child: TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _CatalogueMenu.selectedMap == i
+                                          ? {_CatalogueMenu.selectedMap = -1, _CatalogueMenu.selectedLayerTile = null}
+                                          : {
+                                              _CatalogueMenu.selectedMap = i,
+                                              _CatalogueMenu.selectedLayerTile = layerTile,
+                                            };
+                                    });
+                                  },
+                                  child: Text(
+                                    layerTile.name,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black,
+                                      fontSize: gl.eqPx * gl.fontSizeS,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              SizedBox(
+                                height: gl.eqPx * gl.iconSizeM * 1,
+                                width: gl.eqPx * gl.iconSizeM * 1.2,
+                                child: MapLayerSelectionButton(
+                                  layerTile: layerTile,
+                                  offlineMode: offlineMode,
+                                  index: i,
+                                  selectionMode: selectionMode,
+                                  state: stateOfLayerSwitcher,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(height: gl.eqPx * gl.iconSizeM * 1, width: gl.eqPx * gl.iconSizeM * 1.2),
+                              Container(
+                                alignment: Alignment.center,
+                                height: gl.eqPx * gl.onCatalogueMapHeight,
+                                width: gl.eqPx * 80,
+                                child: Text(
+                                  layerTile.name,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                    fontSize: gl.eqPx * gl.fontSizeM,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: gl.eqPx * gl.iconSizeM * 1,
+                                width: gl.eqPx * gl.iconSizeM * 1.2,
+                                child: MapLayerSelectionButton(
+                                  layerTile: layerTile,
+                                  offlineMode: offlineMode,
+                                  index: i,
+                                  selectionMode: selectionMode,
+                                  state: stateOfLayerSwitcher,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            height: gl.eqPx * gl.iconSizeM * 1,
-                            width: gl.eqPx * gl.iconSizeM * 1.2,
-                            child: MapLayerSelectionButton(
-                              layerTile: layerTile,
-                              offlineMode: offlineMode,
-                              index: i,
-                              selectionMode: selectionMode,
-                              state: stateOfLayerSwitcher,
-                            ),
-                          ),
-                        ],
-                      ),
                     lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                     OnlineMapStatusTool(layerTile: layerTile),
                     lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
