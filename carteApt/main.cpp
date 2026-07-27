@@ -1,6 +1,7 @@
 #include "caplicarteapt.h"
 #include "capplicarteph.h"
 #include "boost/program_options.hpp"
+#include "boost/filesystem.hpp"
 #include "algorithm"
 namespace po = boost::program_options;
 using namespace std;
@@ -169,12 +170,17 @@ int main(int argc, char *argv[])
 
 
                     for (std::string &code: codeList){
+                        std::string layerNbColName=code+"_nb";
 
                         if (lay->FindFieldIndex(code.c_str(),0)==-1){
                             OGRFieldDefn * oFLD(NULL);
                             oFLD= new OGRFieldDefn(code.c_str(),  OFTReal);
                             oFLD->SetJustify(OGRJustification::OJLeft);
                             lay->CreateField(oFLD);
+                            OGRFieldDefn * oFLD2(NULL);
+                            oFLD2= new OGRFieldDefn(layerNbColName.c_str(),  OFTReal);
+                            oFLD2->SetJustify(OGRJustification::OJLeft);
+                            lay->CreateField(oFLD2);
                             //std::cout << "champ créé " << std::endl;
                         }
                     }
@@ -193,8 +199,10 @@ int main(int argc, char *argv[])
                         }
 
                         for (std::string &code: codeList){
+                             std::string layerNbColName=code+"_nb";
                             basicStat stat =dico.getLayerBase(code)->computeBasicStatOnPolyg(poGeom);
-                            poFeature->SetField(code.c_str(),stat.getMeanDbl());
+                            poFeature->SetField(code.c_str(),stat.getSumInt());
+                            poFeature->SetField(layerNbColName.c_str(),stat.getNbInt());
                         }
 
                         lay->SetFeature(poFeature);

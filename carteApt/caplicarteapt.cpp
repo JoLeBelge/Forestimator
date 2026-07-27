@@ -291,11 +291,12 @@ void cApliCarteApt::carteDeriveCS(){
 
     /**** production de bois ****/
     std::cout << "production de bois" << std::endl;
-    aOut=dico->File("prod_b");
+    std::string aOut=dico->File("prod_b");
+    GDALDataset  * poDstDS;
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem(credits);
+    //poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -334,7 +335,7 @@ void cApliCarteApt::carteDeriveCS(){
     GDALDataset* poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem(credits);
+    //poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -371,7 +372,7 @@ void cApliCarteApt::carteDeriveCS(){
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem(credits.c_str());
+    //poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -407,7 +408,7 @@ void cApliCarteApt::carteDeriveCS(){
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem(credits.c_str());
+    //poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -443,7 +444,7 @@ void cApliCarteApt::carteDeriveCS(){
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem(credits.c_str());
+    //poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 
@@ -481,7 +482,7 @@ void cApliCarteApt::carteDeriveCS(){
     poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem(credits.c_str());
+    //poDstDS->SetMetadataItem(credits.c_str());
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 

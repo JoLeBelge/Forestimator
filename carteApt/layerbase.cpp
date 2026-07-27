@@ -193,8 +193,9 @@ void layerBase::createRasterColorInterpPalette(GDALRasterBand * aBand){
 
     //std::cout << "get number of entry " << colors.GetColorEntryCount() << " of colortable" << std::endl; -> dicoCol.size, ok
     //aBand->GetColorTable()->GetColorEntryCount() -> always 255 for 8 bits
-
-    aBand->SetColorTable(&colors);
+    if(aBand->GetRasterDataType() == GDT_Byte || aBand->GetRasterDataType() == GDT_UInt16){
+        aBand->SetColorTable(&colors);
+    }
 
     // ne fonctionne pas du tout pour l'instant
     if (false && mTypeVar == TypeVar::Classe){

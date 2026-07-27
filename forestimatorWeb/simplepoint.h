@@ -14,7 +14,7 @@
 #include <Wt/Render/WPdfRenderer.h>
 #include "iostream"
 #include <Wt/WRasterImage.h>
-#include "cwebaptitude.h";
+#include "cwebaptitude.h"
 
 class EcogrammeEss;
 class simplepoint;
