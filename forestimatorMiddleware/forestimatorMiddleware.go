@@ -21,7 +21,7 @@ const (
 	bufferSize                 = 1 << 20
 	updateIntervall            = 100 * time.Millisecond
 	listOfProperties           = "Name: State: VmPeak: VmSize: VmLck: VmPin: VmHWM: VmRSS: VmData: VmStk: VmExe: VmLib: VmPTE: VmSwap: HugetlbPages: CoreDumping: ThpEnabled: Threads: SigQ: SigPnd: ShdPnd: SigBlk: SigIgn: SigCgt: CapInh: CapPrm: CapEff: CapBnd: CapAmb: Cpus_allowed_list:"
-	workingDirectory           = "/home/carto/app/"
+	workingDirectory           = /*"/home/gef/Documents/"*/ "/home/carto/app/"
 )
 
 type proc struct {
@@ -336,7 +336,7 @@ func main() {
 						time.Now().Month().String() + "." +
 						strconv.Itoa(time.Now().Day()) + "." +
 						strconv.Itoa(time.Now().Hour()) + "." + strconv.Itoa(time.Now().Minute()) + "." + strconv.Itoa(time.Now().Second()) + "."
-					forestimator.infoDirName = "/home/carto/app/Forestimator/forestimatorMiddleware/logs/" + t + strconv.Itoa(forestimator.pid)
+					forestimator.infoDirName = workingDirectory + "/Forestimator/forestimatorMiddleware/logs/" + t + strconv.Itoa(forestimator.pid)
 					os.Mkdir(forestimator.infoDirName, os.ModePerm)
 					forestimator.started = true
 					log.Println("Started Forestimator web server. pid: " + strconv.Itoa(forestimator.pid))
@@ -371,7 +371,7 @@ func main() {
 				director := forestimator.proxy.Director
 				forestimator.proxy.Director = func(r *http.Request) {
 					director(r)
-					recordRequest(&forestimator, r.RequestURI)
+					recordRequest(&forestimator, r.RemoteAddr+r.RequestURI)
 					if strings.Contains(r.RequestURI, "?signal=") && strings.Contains(r.RequestURI, "&wtd=") {
 						log.Println("Signal detected in request URI")
 						r.URL.RawQuery = "GET /"
