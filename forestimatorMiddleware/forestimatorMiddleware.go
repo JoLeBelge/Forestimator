@@ -310,6 +310,22 @@ func getProcessInfo(p *proc) string {
 	return ""
 }
 
+func sendRobotsTxt(w http.ResponseWriter, r *http.Request) {
+	openFile, _ := os.Open(workingDirectory + "Forestimator/forestimatorMiddleware/robots.txt")
+	defer openFile.Close()
+	content, _ := io.ReadAll(openFile)
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(content))
+}
+
+func sendLLMsTxt(w http.ResponseWriter, r *http.Request) {
+	openFile, _ := os.Open(workingDirectory + "Forestimator/forestimatorMiddleware/llms.txt")
+	defer openFile.Close()
+	content, _ := io.ReadAll(openFile)
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(content))
+}
+
 func main() {
 	forestimator := proc{
 		started:               false,
@@ -381,6 +397,8 @@ func main() {
 
 				http.Handle("/collect/", forestimator.openforis)
 				http.Handle("/", forestimator.proxy)
+				http.HandleFunc("/robots.txt", sendRobotsTxt)
+				http.HandleFunc("/llms.txt", sendLLMsTxt)
 				http.Handle("/results/", forestimator.downloader)
 				log.Println(http.ListenAndServe(":8085", nil))
 				log.Println("Proxy server has stopped")
