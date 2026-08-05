@@ -107,6 +107,9 @@ class Anim {
 }
 
 class Mode {
+  static bool messageDataEstimation = false;
+  static bool messageDataEstimationNeverShowAgain = false;
+
   static bool userDataFilled = false;
   static bool dfci = false;
   static bool essence = false;
@@ -158,6 +161,7 @@ class Mode {
   }
 
   static void serialize() async {
+    await shared!.setBool('Modes.estimationwarning', messageDataEstimationNeverShowAgain);
     await shared!.setBool('Modes.firePath', dfci);
     await shared!.setBool('Modes.essence', essence);
     await shared!.setBool('Modes.multipoint', multipoint);
@@ -168,6 +172,7 @@ class Mode {
   }
 
   static void deserialize() {
+    messageDataEstimationNeverShowAgain = shared!.getBool('Modes.estimationwarning') ?? false;
     dfci = shared!.getBool('Modes.firePath') ?? false;
     essence = shared!.getBool('Modes.essence') ?? false;
     multipoint = shared!.getBool('Modes.multipoint') ?? false;

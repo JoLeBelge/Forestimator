@@ -244,6 +244,10 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
     if (gl.selectedGeoLayer == -1 && gl.geoLayers.isNotEmpty) {
       gl.selectedGeoLayer = 0;
     }
+    if(!gl.Mode.messageDataEstimationNeverShowAgain && !gl.Mode.messageDataEstimation) {
+      PopupDataEstimation();
+      gl.Mode.messageDataEstimation = true;
+    }
     return handlePermissionForLocation(
       refreshParentWidgetTree: refreshView,
       child: handlePermissionForStorage(
