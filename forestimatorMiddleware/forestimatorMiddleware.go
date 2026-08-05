@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"errors"
 	"io"
 	"log"
@@ -395,18 +396,34 @@ func main() {
 					}
 				}
 
-				http.Handle("/collect/", forestimator.openforis)
-				http.Handle("/", forestimator.proxy)
-				http.HandleFunc("/robots.txt", sendRobotsTxt)
-				http.HandleFunc("/llms.txt", sendLLMsTxt)
-				http.Handle("/results/", forestimator.downloader)
 				certFile, err := os.Open(workingDirectory + "Forestimator/forestimatorMiddleware/certificates/forestimator.pem")
 				if err != nil {
 					log.Println("Error opening certificate file: starting in non TLS mode:", err)
+					http.Handle("/collect/", forestimator.openforis)
+					http.Handle("/", forestimator.proxy)
+					http.HandleFunc("/robots.txt", sendRobotsTxt)
+					http.HandleFunc("/llms.txt", sendLLMsTxt)
+					http.Handle("/results/", forestimator.downloader)
 					log.Println(http.ListenAndServe(":8085", nil))
 
 				} else {
-					log.Println(http.ListenAndServeTLS(":443", certFile.Name(), workingDirectory+"Forestimator/forestimatorMiddleware/certificates/forestimator.key", nil))
+					mux := http.NewServeMux()
+					mux.Handle("/collect/", forestimator.openforis)
+					mux.Handle("/", forestimator.proxy)
+					mux.HandleFunc("/robots.txt", sendRobotsTxt)
+					mux.HandleFunc("/llms.txt", sendLLMsTxt)
+					mux.Handle("/results/", forestimator.downloader)
+					server := &http.Server{
+						Addr:              ":8443",
+						Handler:           mux,
+						ReadHeaderTimeout: 5 * time.Second,
+						IdleTimeout:       60 * time.Second,
+						MaxHeaderBytes:    1 << 20,
+						TLSConfig: &tls.Config{
+							MinVersion: tls.VersionTLS12,
+						},
+					}
+					log.Println(server.ListenAndServeTLS(certFile.Name(), workingDirectory+"Forestimator/forestimatorMiddleware/certificates/forestimator.key"))
 				}
 				defer certFile.Close()
 				log.Println("Proxy server has stopped")
