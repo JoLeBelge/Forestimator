@@ -423,7 +423,7 @@ func main() {
 							MinVersion: tls.VersionTLS12,
 						},
 					}
-					log.Println(server.ListenAndServeTLS(certFile.Name(), workingDirectory+"Forestimator/forestimatorMiddleware/certificates/forestimator.key"))
+					log.Println(server.ListenAndServeTLS(":443", certFile.Name(), workingDirectory+"Forestimator/forestimatorMiddleware/certificates/forestimator.key", nil))
 				}
 				defer certFile.Close()
 				log.Println("Proxy server has stopped")
