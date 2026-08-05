@@ -395,13 +395,13 @@ func main() {
 					}
 				}
 
-				certFile, err := os.Open(/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/fullchain.pem)
+				certFile, err := os.Open("/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/fullchain.pem")
 				if err != nil {
 					log.Println("Error opening certificate file: starting in non TLS mode:", err)
 					log.Println(http.ListenAndServe(":8085", nil))
 
 				} else {
-					log.Println(http.ListenAndServeTLS(":443", certFile.Name(), /etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/privkey.pem, nil))
+					log.Println(http.ListenAndServeTLS(":443", certFile.Name(), "/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/privkey.pem", nil))
 				}
 				defer certFile.Close()
 				log.Println("Proxy server has stopped")
