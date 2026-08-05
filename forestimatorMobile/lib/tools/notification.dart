@@ -239,7 +239,7 @@ class DataEstimation extends StatefulWidget {
 class _DataEstimationState extends State<DataEstimation> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       child: Column(
         children: [
           Row(

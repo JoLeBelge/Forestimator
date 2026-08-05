@@ -400,7 +400,15 @@ func main() {
 				http.HandleFunc("/robots.txt", sendRobotsTxt)
 				http.HandleFunc("/llms.txt", sendLLMsTxt)
 				http.Handle("/results/", forestimator.downloader)
-				log.Println(http.ListenAndServe(":8085", nil))
+				certFile, err := os.Open(workingDirectory + "Forestimator/forestimatorMiddleware/forestimator.pem")
+				if err != nil {
+					log.Println("Error opening certificate file: starting in non TLS mode:", err)
+					log.Println(http.ListenAndServe(":8080", nil))
+
+				} else {
+					log.Println(http.ListenAndServeTLS(":443", certFile.Name(), workingDirectory+"Forestimator/forestimatorMiddleware/forestimator.key", nil))
+				}
+				defer certFile.Close()
 				log.Println("Proxy server has stopped")
 				log.Println("Restarting now...")
 			}
