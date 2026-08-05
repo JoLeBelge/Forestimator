@@ -403,7 +403,7 @@ func main() {
 				certFile, err := os.Open(workingDirectory + "Forestimator/forestimatorMiddleware/forestimator.pem")
 				if err != nil {
 					log.Println("Error opening certificate file: starting in non TLS mode:", err)
-					log.Println(http.ListenAndServe(":8080", nil))
+					log.Println(http.ListenAndServe(":8085", nil))
 
 				} else {
 					log.Println(http.ListenAndServeTLS(":443", certFile.Name(), workingDirectory+"Forestimator/forestimatorMiddleware/forestimator.key", nil))
