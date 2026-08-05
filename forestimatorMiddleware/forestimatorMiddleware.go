@@ -414,7 +414,7 @@ func main() {
 					mux.HandleFunc("/llms.txt", sendLLMsTxt)
 					mux.Handle("/results/", forestimator.downloader)
 					server := &http.Server{
-						Addr:              ":8443",
+						Addr:              ":443",
 						Handler:           mux,
 						ReadHeaderTimeout: 5 * time.Second,
 						IdleTimeout:       60 * time.Second,
