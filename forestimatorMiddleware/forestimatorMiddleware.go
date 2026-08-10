@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"errors"
 	"io"
 	"log"
@@ -75,7 +76,7 @@ func startForestimatorWebServer(wd string) (cmd *exec.Cmd) {
 }
 
 func startForestimatorDownloadServer(wd string) (cmd *exec.Cmd) {
-	cmd = exec.Command("/usr/local/go/bin/go", "run", "downloadServer.go") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
+	cmd = exec.Command("/usr/local/go/bin/go", "run", "downloadServer.go")
 	cmd.Dir = wd + "Forestimator/forestimatorDownloadServer"
 	return cmd
 }
@@ -327,6 +328,11 @@ func sendLLMsTxt(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	cert1, err := tls.LoadX509KeyPair("domain1.crt", "domain1.key")
+	if err != nil {
+		panic(err)
+	}
+
 	forestimator := proc{
 		started:               false,
 		cmd:                   nil,
@@ -400,15 +406,22 @@ func main() {
 				http.HandleFunc("/robots.txt", sendRobotsTxt)
 				http.HandleFunc("/llms.txt", sendLLMsTxt)
 				http.Handle("/results/", forestimator.downloader)
-				certFile, err := os.Open(workingDirectory + "Forestimator/forestimatorMiddleware/certificates/forestimator.pem")
+				certFile, err := os.Open("/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/fullchain.pem")
 				if err != nil {
 					log.Println("Error opening certificate file: starting in non TLS mode:", err)
 					log.Println(http.ListenAndServe(":8085", nil))
 
 				} else {
-					log.Println(http.ListenAndServeTLS(":443", certFile.Name(), workingDirectory+"Forestimator/forestimatorMiddleware/forestimator.key", nil))
+					mapserveur := &http.Server{
+						Addr: ":443",
+						Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							w.Write([]byte("Hello from Domain 1"))
+						}),
+						TLSConfig: &tls.Config{Certificates: []tls.Certificate{cert1}},
+					}
+					go mapserveur.ListenAndServeTLS("", "")
+					log.Println(http.ListenAndServeTLS(":443", certFile.Name(), "/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/privkey.pem", nil))
 				}
-				defer certFile.Close()
 				log.Println("Proxy server has stopped")
 				log.Println("Restarting now...")
 			}

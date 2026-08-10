@@ -17,7 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 const double dbVersion = 1.0;
 
 // TODO: Add state to SENT status with callback in timer.
-// TODO optional: remove global variable notificationContext for clarity and proper stack usage
 
 typedef VoidSetter = void Function(void Function());
 
@@ -403,7 +402,6 @@ late DicoAptProvider dico;
 
 Memory? memory;
 
-BuildContext? notificationContext;
 BuildContext? anaPtPageContext;
 bool offlineMode = false;
 bool debug = false;

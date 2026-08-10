@@ -329,8 +329,7 @@ class ForestimatorDownloader {
       }
       if (status == DownloadTaskStatus.complete) {
         gl.print("Downloader: download completed.");
-        BuildContext context = gl.notificationContext!;
-        PopupDownloadSuccess(context, layerName);
+        PopupDownloadSuccess(layerName);
         widgetState(() {
           gl.dico.getLayerBase(layerKey).mOffline = true;
           gl.dico.getLayerBase(layerKey).mInDownload = false;
@@ -340,9 +339,8 @@ class ForestimatorDownloader {
       }
       if (DownloadTaskStatus.failed == status) {
         gl.print("Downloader: download failed.");
-        BuildContext context = gl.notificationContext!;
 
-        PopupDownloadFailed(context, layerName);
+        PopupDownloadFailed(layerName);
         widgetState(() {
           gl.dico.getLayerBase(layerKey).mOffline = false;
           gl.dico.getLayerBase(layerKey).mInDownload = false;
