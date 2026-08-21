@@ -362,79 +362,6 @@ func sendLLMsTxt(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(content))
 }
 
-/*
-	func handleDownload(w http.ResponseWriter, r *http.Request, path string) {
-		// Extract request from URL
-		request := strings.TrimPrefix(r.URL.Path, "/cgi-bin/")
-		if request == "" {
-			renderError(w, http.StatusBadRequest, "Bad Request", "Filename not specified.")
-			return
-		}
-
-		// Prevent directory traversal
-		if strings.Contains(request, "..") {
-			renderError(w, http.StatusBadRequest, "Bad Request", "Invalid filename.")
-			return
-		}
-
-		filePath := filepath.Join(path, request)
-
-		// Check if script file exists
-		info, err := os.Stat(filePath)
-		if err != nil {
-			if os.IsNotExist(err) {
-				renderError(w, http.StatusNotFound, "Not Found", "The requested file does not exist.")
-			} else {
-				renderError(w, http.StatusInternalServerError, "Server Error", "Unable to access file.")
-			}
-			return
-		}
-
-		// Ensure it's not a directory
-		if info.IsDir() {
-			renderError(w, http.StatusBadRequest, "Bad Request", "Requested path is a directory.")
-			return
-		}
-		// Execute cgi script and capture output
-		cmd := exec.Command("php", filePath)
-		switch request {
-		case "forestimator":
-			cmd.Env = append(os.Environ(), "MS_MAPFILE=/var/www/html/ForestimatorAutre.map")
-		}
-
-		println(request)
-		output, err := cmd.CombinedOutput()
-
-		if err != nil {
-			renderError(w, http.StatusInternalServerError, "Server Error", "Unable to execute script.")
-			return
-		}
-
-		w.Header().Set("Content-Type", "text/plain;")
-		w.Write(output)
-	}
-
-	func renderError(w http.ResponseWriter, status int, title, msg string) {
-		w.WriteHeader(status)
-		_ = errorTemplate.Execute(w, map[string]string{
-			"Title":   title,
-			"Message": msg,
-		})
-	}
-
-var errorTemplate = template.Must(template.New("error").Parse(`
-<!DOCTYPE html>
-<html>
-<head><title>Error</title></head>
-<body>
-
-	<h1>{{.Title}}</h1>
-	<p>{{.Message}}</p>
-
-</body>
-</html>
-`))
-*/
 func normalizeKeys(v url.Values, normalFunc func(string) string) {
 	for param, values := range v {
 		normalizedParam := normalFunc(param)
@@ -447,6 +374,44 @@ func normalizeKeys(v url.Values, normalFunc func(string) string) {
 
 func getFilenameForMapserv(request string) string {
 	return mapMapservRoutes[request]
+}
+
+func handleCgiRequest(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+
+	normalizeKeys(r.Form, strings.ToUpper)
+
+	if r.Form.Get("REQUEST") == "" {
+		r.Form.Set("REQUEST", "GetCapabilities")
+	}
+
+	if r.Form.Get("SERVICE") == "" {
+		r.Form.Set("SERVICE", "WMS")
+	}
+
+	res := strings.Split(r.URL.Path, "cgi-bin/")
+	if len(res) < 2 {
+		http.Error(w, "Invalid request path", http.StatusBadRequest)
+		return
+	}
+	request := res[1]
+	if request == "" {
+		http.Error(w, "Invalid request path", http.StatusBadRequest)
+		return
+	}
+
+	r.Form.Del("MAP")
+	r.Form.Set("MAP", getFilenameForMapserv(request))
+
+	queryString := "QUERY_STRING=" + r.Form.Encode()
+	// env := append(config.Environment, queryString)
+	handler := cgi.Handler{
+		Path: "/usr/lib/cgi-bin/" + request,
+		Env:  []string{queryString},
+	}
+
+	handler.ServeHTTP(w, r)
 }
 
 func main() {
@@ -547,11 +512,8 @@ func main() {
 				mapservHandler.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 					handleDownload(w, r, "/var/www/html/")
 				})
-				mapservHandler.HandleFunc("/cgi-bin/", func(w http.ResponseWriter, r *http.Request) {
-					//handleDownload(w, r, "/usr/lib/cgi-bin/")
-					cgihandler := cgi.Handler{Path: "/usr/lib/cgi-bin/", Root: "/var/www/html/", Dir: "/usr/lib/cgi-bin/", Env: []string{"PATH=/usr/local/bin:/usr/bin:/bin", "MS_MAPFILE=/var/www/html/ForestimatorAutre.map"}}
-					cgihandler.ServeHTTP(w, r)
-				})*/
+									mapservHandler.HandleFunc("/cgi-bin/", handleCgiRequest)
+				f*/
 
 				forestimatorHandler := http.NewServeMux()
 				forestimatorHandler.Handle("/collect/", forestimator.openforis)
@@ -559,42 +521,7 @@ func main() {
 				forestimatorHandler.HandleFunc("/robots.txt", sendRobotsTxt)
 				forestimatorHandler.HandleFunc("/llms.txt", sendLLMsTxt)
 				forestimatorHandler.Handle("/results/", forestimator.downloader)
-				forestimatorHandler.HandleFunc("/cgi-bin/", func(w http.ResponseWriter, r *http.Request) {
-					r.ParseForm()
-
-					normalizeKeys(r.Form, strings.ToUpper)
-
-					if r.Form.Get("REQUEST") == "" {
-						r.Form.Set("REQUEST", "GetCapabilities")
-					}
-
-					if r.Form.Get("SERVICE") == "" {
-						r.Form.Set("SERVICE", "WMS")
-					}
-
-					res := strings.Split(r.URL.Path, "cgi-bin/")
-					if len(res) < 2 {
-						http.Error(w, "Invalid request path", http.StatusBadRequest)
-						return
-					}
-					request := res[1]
-					if request == "" {
-						http.Error(w, "Invalid request path", http.StatusBadRequest)
-						return
-					}
-
-					r.Form.Del("MAP")
-					r.Form.Set("MAP", getFilenameForMapserv(request))
-
-					queryString := "QUERY_STRING=" + r.Form.Encode()
-					// env := append(config.Environment, queryString)
-					handler := cgi.Handler{
-						Path: "/usr/lib/cgi-bin/" + request,
-						Env:  []string{queryString},
-					}
-
-					handler.ServeHTTP(w, r)
-				})
+				forestimatorHandler.HandleFunc("/cgi-bin/", handleCgiRequest)
 
 				fmt.Println(http.ListenAndServe(":"+portMiddleWare, forestimatorHandler))
 
