@@ -4,8 +4,6 @@ PODS:
   - Flutter (1.0.0)
   - flutter_downloader (0.0.1):
     - Flutter
-  - flutter_rotation_sensor (0.0.1):
-    - Flutter
   - memory_info (0.0.1):
     - Flutter
 
@@ -13,7 +11,6 @@ DEPENDENCIES:
   - downloadsfolder (from `.symlinks/plugins/downloadsfolder/ios`)
   - Flutter (from `Flutter`)
   - flutter_downloader (from `.symlinks/plugins/flutter_downloader/ios`)
-  - flutter_rotation_sensor (from `.symlinks/plugins/flutter_rotation_sensor/ios`)
   - memory_info (from `.symlinks/plugins/memory_info/ios`)
 
 EXTERNAL SOURCES:
@@ -23,8 +20,6 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_downloader:
     :path: ".symlinks/plugins/flutter_downloader/ios"
-  flutter_rotation_sensor:
-    :path: ".symlinks/plugins/flutter_rotation_sensor/ios"
   memory_info:
     :path: ".symlinks/plugins/memory_info/ios"
 
@@ -32,7 +27,6 @@ SPEC CHECKSUMS:
   downloadsfolder: 7d5c7b5d23e3c4dded522ff2a2ef14a56846378a
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_downloader: 78da0da1084e709cbfd3b723c7ea349c71681f09
-  flutter_rotation_sensor: bf55ead3f64f27207dacc5972fe8ebe932f3de0b
   memory_info: 0c8ecafff5f646e2957972aee37801131affa512
 
 PODFILE CHECKSUM: 712cd86c34a4123ecb9274d5c71162538cec0c15

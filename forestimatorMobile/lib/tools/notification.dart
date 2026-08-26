@@ -216,7 +216,7 @@ class PopupPermissions extends StatelessWidget {
 }
 
 class PopupDownloadSuccess {
-  PopupDownloadSuccess(BuildContext context, String layerName) {
+  PopupDownloadSuccess(String layerName) {
     gl.refreshStack(() {
       popupForestimatorMessage(title: "Couche téléchargée", message: "La couche $layerName à été téléchargée.");
     });
@@ -224,7 +224,7 @@ class PopupDownloadSuccess {
 }
 
 class PopupDownloadFailed {
-  PopupDownloadFailed(BuildContext context, String layerName) {
+  PopupDownloadFailed(String layerName) {
     gl.refreshStack(() {
       popupForestimatorMessage(title: "Erreur", message: "La couche $layerName n'a pas été téléchargée.");
     });
@@ -239,6 +239,66 @@ class PopupPolygonNotWellDefined {
         message: "Avec ce point, le polygone n'est pas bien défini, c'est-à-dire on ne peut pas croiser des segments.",
       );
     });
+  }
+}
+
+class PopupDataEstimation {
+  PopupDataEstimation() {
+    gl.refreshStack(() {
+      popupForestimatorMessage(title: "Information", child: DataEstimation());
+    });
+  }
+}
+
+class DataEstimation extends StatefulWidget {
+  const DataEstimation({super.key});
+
+  @override
+  State<DataEstimation> createState() => _DataEstimationState();
+}
+
+class _DataEstimationState extends State<DataEstimation> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: gl.eqPx * 60,
+                child: Text(
+                  "Les données de Forestimator sont des estimations; la réalité du terrain doit toujours être vérifiée à pied.",
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeS),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Checkbox(
+                value: gl.Mode.messageDataEstimationNeverShowAgain,
+                activeColor: gl.colorAgroBioTech,
+                fillColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
+      WidgetState.any: gl.colorAgroBioTech.withAlpha(200),
+    }),
+                onChanged: (bool? value) {
+                  setState(() {
+                    gl.Mode.messageDataEstimationNeverShowAgain = value!;
+                    gl.Mode.serialize();
+                  });
+                },
+              ),
+              Text(
+                "Ne plus afficher ce message",
+                style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeS),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -695,13 +755,7 @@ class PopupForestimatorWindow extends StatelessWidget {
 class PopupColorChoser {
   Color pickerColor = Color(0xff443a49);
 
-  PopupColorChoser(
-    Color currentColor,
-    BuildContext context,
-    ValueChanged<Color> colorChange,
-    VoidCallback onDecline,
-    VoidCallback onAccept,
-  ) {
+  PopupColorChoser(Color currentColor, ValueChanged<Color> colorChange, VoidCallback onDecline, VoidCallback onAccept) {
     pickerColor = currentColor;
     gl.refreshStack(() {
       popupForestimatorMessage(
@@ -908,7 +962,6 @@ class _SelectPolyColor extends State<SelectPolyColor> {
       onPressed: () {
         PopupColorChoser(
           currentColor,
-          gl.notificationContext!,
           (Color color) {
             set(() {
               widget.colorChanged(color);
@@ -2944,7 +2997,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                               onPressed: () {
                                                 PopupColorChoser(
                                                   gl.selLay.geometries[index].colorInside,
-                                                  gl.notificationContext!,
                                                   //change color
                                                   (Color col) {
                                                     setState(() {
@@ -7153,46 +7205,80 @@ Card catalogueTileCard(
                 )
               : Column(
                   children: [
-                    if (gl.dsp.orientation == Orientation.portrait)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          MapStatusSymbols(offlineMode: offlineMode, layerCode: layerTile.key),
-                          SizedBox(
-                            height: gl.eqPx * gl.onCatalogueMapHeight,
-                            width: gl.eqPx * 55,
-                            child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  _CatalogueMenu.selectedMap == i
-                                      ? {_CatalogueMenu.selectedMap = -1, _CatalogueMenu.selectedLayerTile = null}
-                                      : {_CatalogueMenu.selectedMap = i, _CatalogueMenu.selectedLayerTile = layerTile};
-                                });
-                              },
-                              child: Text(
-                                layerTile.name,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                  fontSize: gl.eqPx * gl.fontSizeS,
+                    (gl.dsp.orientation == Orientation.portrait)
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              MapStatusSymbols(offlineMode: offlineMode, layerCode: layerTile.key),
+                              SizedBox(
+                                height: gl.eqPx * gl.onCatalogueMapHeight,
+                                width: gl.eqPx * 55,
+                                child: TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _CatalogueMenu.selectedMap == i
+                                          ? {_CatalogueMenu.selectedMap = -1, _CatalogueMenu.selectedLayerTile = null}
+                                          : {
+                                              _CatalogueMenu.selectedMap = i,
+                                              _CatalogueMenu.selectedLayerTile = layerTile,
+                                            };
+                                    });
+                                  },
+                                  child: Text(
+                                    layerTile.name,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black,
+                                      fontSize: gl.eqPx * gl.fontSizeS,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              SizedBox(
+                                height: gl.eqPx * gl.iconSizeM * 1,
+                                width: gl.eqPx * gl.iconSizeM * 1.2,
+                                child: MapLayerSelectionButton(
+                                  layerTile: layerTile,
+                                  offlineMode: offlineMode,
+                                  index: i,
+                                  selectionMode: selectionMode,
+                                  state: stateOfLayerSwitcher,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(height: gl.eqPx * gl.iconSizeM * 1, width: gl.eqPx * gl.iconSizeM * 1.2),
+                              Container(
+                                alignment: Alignment.center,
+                                height: gl.eqPx * gl.onCatalogueMapHeight,
+                                width: gl.eqPx * 80,
+                                child: Text(
+                                  layerTile.name,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                    fontSize: gl.eqPx * gl.fontSizeM,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: gl.eqPx * gl.iconSizeM * 1,
+                                width: gl.eqPx * gl.iconSizeM * 1.2,
+                                child: MapLayerSelectionButton(
+                                  layerTile: layerTile,
+                                  offlineMode: offlineMode,
+                                  index: i,
+                                  selectionMode: selectionMode,
+                                  state: stateOfLayerSwitcher,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            height: gl.eqPx * gl.iconSizeM * 1,
-                            width: gl.eqPx * gl.iconSizeM * 1.2,
-                            child: MapLayerSelectionButton(
-                              layerTile: layerTile,
-                              offlineMode: offlineMode,
-                              index: i,
-                              selectionMode: selectionMode,
-                              state: stateOfLayerSwitcher,
-                            ),
-                          ),
-                        ],
-                      ),
                     lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                     OnlineMapStatusTool(layerTile: layerTile),
                     lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),

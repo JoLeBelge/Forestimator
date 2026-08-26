@@ -17,7 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 const double dbVersion = 1.0;
 
 // TODO: Add state to SENT status with callback in timer.
-// TODO optional: remove global variable notificationContext for clarity and proper stack usage
 
 typedef VoidSetter = void Function(void Function());
 
@@ -107,6 +106,9 @@ class Anim {
 }
 
 class Mode {
+  static bool messageDataEstimation = false;
+  static bool messageDataEstimationNeverShowAgain = false;
+
   static bool userDataFilled = false;
   static bool dfci = false;
   static bool essence = false;
@@ -158,6 +160,7 @@ class Mode {
   }
 
   static void serialize() async {
+    await shared!.setBool('Modes.estimationwarning', messageDataEstimationNeverShowAgain);
     await shared!.setBool('Modes.firePath', dfci);
     await shared!.setBool('Modes.essence', essence);
     await shared!.setBool('Modes.multipoint', multipoint);
@@ -168,6 +171,7 @@ class Mode {
   }
 
   static void deserialize() {
+    messageDataEstimationNeverShowAgain = shared!.getBool('Modes.estimationwarning') ?? false;
     dfci = shared!.getBool('Modes.firePath') ?? false;
     essence = shared!.getBool('Modes.essence') ?? false;
     multipoint = shared!.getBool('Modes.multipoint') ?? false;
@@ -398,7 +402,6 @@ late DicoAptProvider dico;
 
 Memory? memory;
 
-BuildContext? notificationContext;
 BuildContext? anaPtPageContext;
 bool offlineMode = false;
 bool debug = false;
@@ -612,7 +615,6 @@ LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
 void removeLayerFromList({bool offline = false, int index = -1, String key = ""}) {
-  print("hello");
   if (Mode.dfci) return forceDFCIMode();
   if (key != "" && index > -1) {
     print("Error in removeLayerFromList(): key != '' && index > -1");
@@ -650,9 +652,7 @@ void forceDFCIMode() {
 }
 
 void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
-  print("hello");
   if (Mode.dfci) return forceDFCIMode();
-  print("hello");
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in switcherMaps) {
@@ -969,8 +969,9 @@ void startTimer(Future<bool> Function() timeupCall, bool Function() stop, int st
 }
 
 void repeatTimer(Future<bool> Function() timeupCall, bool Function() stop, int repeat) {
-  print("Stop repeating task ${stop()}");
-  if (!stop()) {
+  bool stoP = stop();
+  print("Timer: Stop repeating task $stoP");
+  if (!stoP) {
     Timer(Duration(seconds: repeat), () {
       repeatTimer(timeupCall, stop, repeat);
       timeupCall();

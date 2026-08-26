@@ -2,9 +2,11 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"net/http/cgi"
 	"net/http/httputil"
 	"net/url"
 	"os"
@@ -15,14 +17,49 @@ import (
 )
 
 const (
-	portForestimatorWeb        = 8500
-	portForestimatorDownloader = 8501
-	portOpenForis              = 8380
+	portMiddleWare             = "8085"
+	portForestimatorWeb        = "8500"
+	portForestimatorDownloader = "8501"
+	portOpenForis              = "8380"
 	bufferSize                 = 1 << 20
 	updateIntervall            = 100 * time.Millisecond
 	listOfProperties           = "Name: State: VmPeak: VmSize: VmLck: VmPin: VmHWM: VmRSS: VmData: VmStk: VmExe: VmLib: VmPTE: VmSwap: HugetlbPages: CoreDumping: ThpEnabled: Threads: SigQ: SigPnd: ShdPnd: SigBlk: SigIgn: SigCgt: CapInh: CapPrm: CapEff: CapBnd: CapAmb: Cpus_allowed_list:"
-	workingDirectory           = "/home/carto/app/"
+	workingDirectory           = /*"/home/gef/Documents/" */ "/home/carto/app/"
 )
+
+var mapMapservRoutes = map[string]string{
+	"map":       "/var/www/html/PPNW.map",
+	"ppnw":      "/var/www/html/PPNW.map",
+	"ppnc":      "/var/www/html/PPNC.map",
+	"ppnw_tiff": "/var/www/html/PPNW_TIFF.map",
+	"ign":       "/var/www/html/IGN.map",
+	"ancien":    "/var/www/html/Ancien.map",
+	"mnh":       "/var/www/html/MNH.map",
+	// "GxABT_851XHy47": "/var/www/html/GxABT_851XHy47.map",  // Commented out
+	// "GxABT_851XHy47o": "/var/www/html/GxABT_851XHy47o.map", // Commented out
+	// "scolyte": "/var/www/html/Scolyte.map",                 // Commented out
+	// "scolyte_rw": "/var/www/html/Scolyte_rw.map",           // Commented out
+	// "scolyte_shp": "/var/www/html/Scolyte_shp.map",         // Commented out
+	// "scolyte_wcs": "/var/www/html/Scolyte_wcs.map",         // Commented out
+	// "scolyte_wms": "/var/www/html/Scolyte_wms.map",         // Commented out
+	// "makalaya": "/var/www/html/Makalaya.map",               // Commented out (duplicate key)
+	// "idroc/congo": "/var/www/html/iDROC_RC.map",            // Commented out (duplicate key)
+	"sambia":       "/var/www/html/Sambia.map",
+	"planet":       "/var/www/html/Planet.map",
+	"probos":       "/var/www/html/Probos.map",
+	"mnh_wms":      "/var/www/html/MNH_WMS.map",
+	"aptitude_fee": "/var/www/html/ForestimatorFEE.map",
+	"aptitude_cs":  "/var/www/html/ForestimatorCS.map",
+	"station_fee":  "/var/www/html/StationFEE.map",
+	// "station_cs": "/var/www/html/StationCS.map",             // Commented out
+	"forestimator": "/var/www/html/ForestimatorAutre.map",
+	"ahf":          "/var/www/html/Probos_ahf.map",
+	// "vcantreul": "/var/www/html/VCantreul.map",              // Commented out
+	"planet_ir":   "/var/www/html/Planet_IR.map",
+	"makalaya":    "/var/www/html/iDROC_Cam.map", // Overrides previous makalaya entry
+	"idroc/congo": "/var/www/html/iDROC_RC.map",  // Overrides previous idroc/congo entry
+	"ogf":         "/var/www/html/ogf.map",
+}
 
 type proc struct {
 	proxy                 *httputil.ReverseProxy
@@ -75,7 +112,7 @@ func startForestimatorWebServer(wd string) (cmd *exec.Cmd) {
 }
 
 func startForestimatorDownloadServer(wd string) (cmd *exec.Cmd) {
-	cmd = exec.Command("/usr/local/go/bin/go", "run", "downloadServer.go") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
+	cmd = exec.Command("/usr/local/go/bin/go", "run", "downloadServer.go")
 	cmd.Dir = wd + "Forestimator/forestimatorDownloadServer"
 	return cmd
 }
@@ -310,7 +347,100 @@ func getProcessInfo(p *proc) string {
 	return ""
 }
 
+func sendRobotsTxt(w http.ResponseWriter, r *http.Request) {
+	openFile, _ := os.Open(workingDirectory + "Forestimator/forestimatorMiddleware/robots.txt")
+	defer openFile.Close()
+	content, _ := io.ReadAll(openFile)
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(content))
+}
+
+func sendLLMsTxt(w http.ResponseWriter, r *http.Request) {
+	openFile, _ := os.Open(workingDirectory + "Forestimator/forestimatorMiddleware/llms.txt")
+	defer openFile.Close()
+	content, _ := io.ReadAll(openFile)
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(content))
+}
+
+func normalizeKeys(v url.Values, normalFunc func(string) string) {
+	for param, values := range v {
+		normalizedParam := normalFunc(param)
+		v.Del(param)
+		// Mapserv doesn't take multiple values per param
+		//  Save a little time and only set the first one
+		v.Set(normalizedParam, values[0])
+	}
+}
+
+func getFilenameForMapserv(request string) string {
+	return mapMapservRoutes[request]
+}
+
+func handleCgiRequest(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+
+	normalizeKeys(r.Form, strings.ToUpper)
+
+	if r.Form.Get("REQUEST") == "" {
+		r.Form.Set("REQUEST", "GetCapabilities")
+	}
+
+	if r.Form.Get("SERVICE") == "" {
+		r.Form.Set("SERVICE", "WMS")
+	}
+
+	res := strings.Split(r.URL.Path, "cgi-bin/")
+	if len(res) < 2 {
+		http.Error(w, "Invalid request path", http.StatusBadRequest)
+		return
+	}
+	request := res[1]
+	if request == "" {
+		http.Error(w, "Invalid request path", http.StatusBadRequest)
+		return
+	}
+
+	r.Form.Del("MAP")
+	r.Form.Set("MAP", getFilenameForMapserv(request))
+
+	queryString := "QUERY_STRING=" + r.Form.Encode()
+	// env := append(config.Environment, queryString)
+	handler := cgi.Handler{
+		Path: "/usr/lib/cgi-bin/" + request,
+		Env:  []string{queryString},
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 func main() {
+	/*certCarto, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/fullchain.pem", "/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/privkey.pem")
+	if err != nil {
+		fmt.Println("Carto certificate not found!")
+	}
+
+	certForestimator, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/fullchain.pem", "/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/privkey.pem")
+	if err != nil {
+		fmt.Println("Forestimator certificate not found!")
+	}
+
+	getCertificates := func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+		switch hello.ServerName {
+		case "gxgfservcarto.gxabt.ulg.ac.be":
+			return &certCarto, nil
+		case "forestimator.gembloux.ulg.ac.be":
+			return &certForestimator, nil
+		default:
+			return nil, fmt.Errorf("no certificate for %s", hello.ServerName)
+		}
+	}*/
+
+	/*tlsConfig := &tls.Config{
+		GetCertificate: getCertificates,
+	}
+	*/
 	forestimator := proc{
 		started:               false,
 		cmd:                   nil,
@@ -336,7 +466,7 @@ func main() {
 						time.Now().Month().String() + "." +
 						strconv.Itoa(time.Now().Day()) + "." +
 						strconv.Itoa(time.Now().Hour()) + "." + strconv.Itoa(time.Now().Minute()) + "." + strconv.Itoa(time.Now().Second()) + "."
-					forestimator.infoDirName = "/home/carto/app/Forestimator/forestimatorMiddleware/logs/" + t + strconv.Itoa(forestimator.pid)
+					forestimator.infoDirName = workingDirectory + "/Forestimator/forestimatorMiddleware/logs/" + t + strconv.Itoa(forestimator.pid)
 					os.Mkdir(forestimator.infoDirName, os.ModePerm)
 					forestimator.started = true
 					log.Println("Started Forestimator web server. pid: " + strconv.Itoa(forestimator.pid))
@@ -363,26 +493,69 @@ func main() {
 
 	}()
 	go func() {
-		forestimator.proxy, _ = NewProxy("http://localhost:" + strconv.Itoa(portForestimatorWeb))
-		forestimator.downloader, _ = NewProxy("http://localhost:" + strconv.Itoa(portForestimatorDownloader))
-		forestimator.openforis, _ = NewProxy("http://localhost:" + strconv.Itoa(portOpenForis))
+		forestimator.proxy, _ = NewProxy("http://localhost:" + portForestimatorWeb)
+		forestimator.downloader, _ = NewProxy("http://localhost:" + portForestimatorDownloader)
+		forestimator.openforis, _ = NewProxy("http://localhost:" + portOpenForis)
 		for {
 			if forestimator.started {
 				director := forestimator.proxy.Director
 				forestimator.proxy.Director = func(r *http.Request) {
 					director(r)
-					recordRequest(&forestimator, r.RequestURI)
-					if strings.Contains(r.RequestURI, "?signal=") && strings.Contains(r.RequestURI, "&wtd=") {
+					recordRequest(&forestimator, r.RemoteAddr+r.RequestURI)
+					/*if strings.Contains(r.RequestURI, "?signal=") && strings.Contains(r.RequestURI, "&wtd=") {
 						log.Println("Signal detected in request URI")
 						r.URL.RawQuery = "GET /"
 						return
-					}
+					}*/
 				}
 
-				http.Handle("/collect/", forestimator.openforis)
-				http.Handle("/", forestimator.proxy)
-				http.Handle("/results/", forestimator.downloader)
-				log.Println(http.ListenAndServe(":8085", nil))
+				/*mapservHandler := http.NewServeMux()
+				mapservHandler.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+					handleDownload(w, r, "/var/www/html/")
+				})
+									mapservHandler.HandleFunc("/cgi-bin/", handleCgiRequest)
+				f*/
+
+				forestimatorHandler := http.NewServeMux()
+				forestimatorHandler.Handle("/collect/", forestimator.openforis)
+				forestimatorHandler.Handle("/", forestimator.proxy)
+				forestimatorHandler.HandleFunc("/robots.txt", sendRobotsTxt)
+				forestimatorHandler.HandleFunc("/llms.txt", sendLLMsTxt)
+				forestimatorHandler.Handle("/results/", forestimator.downloader)
+				forestimatorHandler.HandleFunc("/cgi-bin/", handleCgiRequest)
+
+				fmt.Println(http.ListenAndServe(":"+portMiddleWare, forestimatorHandler))
+
+				/*listener, err := tls.Listen("tcp", portMiddleware, tlsConfig)
+				?if err != nil {
+					log.Fatalf("Failed to listen on port 443: %v", err)
+				}*/
+
+				/*mapserveur := &http.Server{
+					Addr: ":443",
+					Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						mux1.ServeHTTP(w, r)
+					}),
+					TLSConfig: &tls.Config{Certificates: []tls.Certificate{certCarto}},
+				}
+				carto := &http.Server{
+					Addr: ":443",
+					Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						mux2.ServeHTTP(w, r)
+					}),
+					TLSConfig: &tls.Config{Certificates: []tls.Certificate{certForestimator}},
+				}*/
+
+				/*http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+					switch r.Host {
+					case "gxgfservcarto.gxabt.ulg.ac.be":
+						mux1.ServeHTTP(w, r)
+					case "forestimator.gembloux.ulg.ac.be":
+						mux2.ServeHTTP(w, r)
+					}
+				})
+				log.Println(http.Serve(listener, nil))*/
+
 				log.Println("Proxy server has stopped")
 				log.Println("Restarting now...")
 			}

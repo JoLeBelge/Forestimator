@@ -240,9 +240,12 @@ class _ForestimatorMapState extends State<ForestimatorMap> {
   @override
   Widget build(BuildContext context) {
     int i = 0;
-    gl.notificationContext = context;
     if (gl.selectedGeoLayer == -1 && gl.geoLayers.isNotEmpty) {
       gl.selectedGeoLayer = 0;
+    }
+    if (!gl.Mode.messageDataEstimationNeverShowAgain && !gl.Mode.messageDataEstimation) {
+      PopupDataEstimation();
+      gl.Mode.messageDataEstimation = true;
     }
     return handlePermissionForLocation(
       refreshParentWidgetTree: refreshView,

@@ -220,10 +220,6 @@ class _MyApp extends State<MyApp> {
     _listAndCopyPdfassets();
     _readPreference();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _navigatorKey = GlobalKey<NavigatorState>();
-      gl.notificationContext = _navigatorKey!.currentContext;
-    });
     if (GeometricLayer.essenceLayerExists()) {
       Geometry.sendEssencePointsInBackground();
     }
