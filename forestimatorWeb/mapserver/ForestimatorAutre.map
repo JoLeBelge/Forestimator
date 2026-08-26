@@ -18,7 +18,6 @@ MAP
             "wms_enable_request" "*" 
         END
     END
-    INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/layer_OGF.map"
     INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/layer_routesDFCI.map"
     LAYER
         NAME "parcellaire_DNF"

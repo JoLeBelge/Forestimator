@@ -1,3 +1,22 @@
+MAP
+    NAME "forestimator"
+    EXTENT 42250.00012 21170.00012000001 295170.00012 167700.00012
+    SIZE 800 800
+    SHAPEPATH "/media/Data10/Forestimator/Autre/"
+    IMAGECOLOR 255 255 255
+    IMAGETYPE "PNG"
+    PROJECTION
+        "init=epsg:31370"
+    END
+    WEB
+        METADATA
+            "wms_label" "Serveur WMS de diverses cartes relatives aux forêts subnaturelles matures" 
+            "wms_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf?" 
+            "wms_service_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf?" 
+            "wms_srs" "EPSG:31370" 
+            "wms_enable_request" "*" 
+        END
+    END
  LAYER
     NAME "OGF_preCarto_seuil70"
     TYPE RASTER
@@ -1353,4 +1372,5 @@ LAYER
         "wms_title" "OGF_hauteur_q90"
         "wms_srs"   "EPSG:31370"
     END
+END
 END
