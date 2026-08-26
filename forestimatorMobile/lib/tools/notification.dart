@@ -279,6 +279,10 @@ class _DataEstimationState extends State<DataEstimation> {
             children: [
               Checkbox(
                 value: gl.Mode.messageDataEstimationNeverShowAgain,
+                activeColor: gl.colorAgroBioTech,
+                fillColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
+      WidgetState.any: gl.colorAgroBioTech.withAlpha(200),
+    }),
                 onChanged: (bool? value) {
                   setState(() {
                     gl.Mode.messageDataEstimationNeverShowAgain = value!;

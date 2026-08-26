@@ -58,6 +58,7 @@ var mapMapservRoutes = map[string]string{
 	"planet_ir":   "/var/www/html/Planet_IR.map",
 	"makalaya":    "/var/www/html/iDROC_Cam.map", // Overrides previous makalaya entry
 	"idroc/congo": "/var/www/html/iDROC_RC.map",  // Overrides previous idroc/congo entry
+	"ogf":         "/var/www/html/ogf.map",
 }
 
 type proc struct {

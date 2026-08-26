@@ -17,10 +17,8 @@ ForestimatorDownloader? fD;
 void initDownloader() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
-    debug:
-        gl.debug, // optional: set to false to disable printing logs to console (default: true)
-    ignoreSsl:
-        false, // option: set to false to disable working with http links (default: false)
+    debug: gl.debug, // optional: set to false to disable printing logs to console (default: true)
+    ignoreSsl: false, // option: set to false to disable working with http links (default: false)
   );
   fD = ForestimatorDownloader();
 }
@@ -61,24 +59,14 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
       return TextButton(
         style: ButtonStyle(
-          minimumSize: WidgetStateProperty<Size>.fromMap(
-            <WidgetStatesConstraint, Size>{
-              WidgetState.any: Size(
-                gl.onCatalogueWidth * gl.eqPx,
-                gl.eqPx * 10,
-              ),
-            },
-          ),
+          minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+            WidgetState.any: Size(gl.onCatalogueWidth * gl.eqPx, gl.eqPx * 10),
+          }),
         ),
         onPressed: () async {
           PopupDoYouReally(
             () {
-              fileDelete(
-                join(
-                  gl.pathExternalStorage,
-                  gl.dico.getLayerBase(widget.layer.key).mNomRaster,
-                ),
-              ).whenComplete(() {
+              fileDelete(join(gl.pathExternalStorage, gl.dico.getLayerBase(widget.layer.key).mNomRaster)).whenComplete(() {
                 setState(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                   gl.removeFromOfflineList(widget.layer.key);
@@ -102,18 +90,11 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(
-              Icons.delete,
-              size: gl.onCatalogueIconSize * gl.eqPx,
-              color: Colors.black,
-            ),
+            Icon(Icons.delete, size: gl.onCatalogueIconSize * gl.eqPx, color: Colors.black),
             Container(constraints: BoxConstraints(maxWidth: 5 * gl.eqPx)),
             Container(
               constraints: BoxConstraints(maxWidth: 60 * gl.eqPx),
-              child: const Text(
-                "La couche est enregistrée.",
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text("La couche est enregistrée.", style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
@@ -121,14 +102,9 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     } else if (gl.dico.getLayerBase(widget.layer.key).mInDownload) {
       return TextButton(
         style: ButtonStyle(
-          minimumSize: WidgetStateProperty<Size>.fromMap(
-            <WidgetStatesConstraint, Size>{
-              WidgetState.any: Size(
-                gl.onCatalogueWidth * gl.eqPx,
-                10 * gl.eqPx,
-              ),
-            },
-          ),
+          minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+            WidgetState.any: Size(gl.onCatalogueWidth * gl.eqPx, 10 * gl.eqPx),
+          }),
         ),
         onPressed: () async {
           FlutterDownloader.cancel(taskId: downloadId!);
@@ -154,18 +130,11 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(
-              Icons.repeat_rounded,
-              size: gl.onCatalogueIconSize * gl.eqPx,
-              color: Colors.black,
-            ),
+            Icon(Icons.repeat_rounded, size: gl.onCatalogueIconSize * gl.eqPx, color: Colors.black),
             Container(constraints: BoxConstraints(maxWidth: 10 * gl.eqPx)),
             Container(
               constraints: BoxConstraints(maxWidth: 60 * gl.eqPx),
-              child: const Text(
-                "Relancer.",
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text("Relancer.", style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
@@ -173,14 +142,9 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     } else {
       return TextButton(
         style: ButtonStyle(
-          minimumSize: WidgetStateProperty<Size>.fromMap(
-            <WidgetStatesConstraint, Size>{
-              WidgetState.any: Size(
-                gl.onCatalogueWidth * gl.eqPx,
-                10 * gl.eqPx,
-              ),
-            },
-          ),
+          minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+            WidgetState.any: Size(gl.onCatalogueWidth * gl.eqPx, 10 * gl.eqPx),
+          }),
         ),
         onPressed: () async {
           setState(() {
@@ -205,18 +169,11 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(
-              Icons.download,
-              size: gl.onCatalogueIconSize * gl.eqPx,
-              color: Colors.black,
-            ),
+            Icon(Icons.download, size: gl.onCatalogueIconSize * gl.eqPx, color: Colors.black),
             Container(constraints: BoxConstraints(maxWidth: 5 * gl.eqPx)),
             Container(
               constraints: BoxConstraints(maxWidth: 60 * gl.eqPx),
-              child: const Text(
-                "La couche peut être téléchargée pour l'utilisation hors ligne.",
-                style: TextStyle(color: Colors.black),
-              ),
+              child: const Text("La couche peut être téléchargée pour l'utilisation hors ligne.", style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
@@ -265,7 +222,7 @@ Future<bool> fileDelete(String path) async {
 class ForestimatorDownloader {
   final Map<String, String> layerToId = {};
   final ReceivePort _port = ReceivePort();
-  final List<Map> downloadData = [];
+  List<Map> downloadData = [];
 
   ForestimatorDownloader() {
     FlutterDownloader.registerCallback(downloadCallback, step: 10);
@@ -274,8 +231,7 @@ class ForestimatorDownloader {
 
   @pragma('vm:entry-point')
   static void downloadCallback(String id, int status, int progress) {
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port')!;
+    final SendPort send = IsolateNameServer.lookupPortByName('downloader_send_port')!;
     send.send([id, status, progress]);
   }
 
@@ -288,8 +244,7 @@ class ForestimatorDownloader {
     FlutterDownloader.registerCallback(downloadCallback, step: 10);
     if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
       taskId = await FlutterDownloader.enqueue(
-        url:
-            "${gl.queryApiRastDownload}/${gl.dico.getLayerBase(layerKey).mCode}",
+        url: "${gl.queryApiRastDownload}/${gl.dico.getLayerBase(layerKey).mCode}",
         fileName: gl.dico.getLayerBase(layerKey).mNomRaster,
         savedDir: gl.pathExternalStorage,
         showNotification: false,
@@ -300,14 +255,22 @@ class ForestimatorDownloader {
     _downloadIdToLayerKey[taskId!] = layerKey;
     _downloadIdToLayerName[taskId] = gl.dico.getLayerBase(layerKey).mNom;
     layerToId[layerKey] = taskId;
+    gl.startTimer(
+      () async {
+        getAllDownloads();
+        return false;
+      },
+      () {
+        return false;
+      },
+      0,
+      5,
+    );
     return taskId;
   }
 
   void _listenToDownloader() {
-    IsolateNameServer.registerPortWithName(
-      _port.sendPort,
-      'downloader_send_port',
-    );
+    IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) {
       String idListened = data[0];
       String layerKey = "", layerName = "";
@@ -360,8 +323,14 @@ class ForestimatorDownloader {
       map['id'] = task.taskId;
       map['filename'] = task.filename;
       map['savedDirectory'] = task.savedDir;
-      downloadData.add(map);
     });
+    gl.print("Hier sind die super tasks");
+    gl.print(getTasks.toString());
+    downloadData =
+        getTasks?.map((task) {
+          return {'status': task.status, 'progress': task.progress, 'id': task.taskId, 'filename': task.filename, 'savedDirectory': task.savedDir};
+        }).toList() ??
+        [];
   }
 
   int getProgress(String? id) {

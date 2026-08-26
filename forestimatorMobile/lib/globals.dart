@@ -615,7 +615,6 @@ LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
 void removeLayerFromList({bool offline = false, int index = -1, String key = ""}) {
-  print("hello");
   if (Mode.dfci) return forceDFCIMode();
   if (key != "" && index > -1) {
     print("Error in removeLayerFromList(): key != '' && index > -1");
@@ -653,9 +652,7 @@ void forceDFCIMode() {
 }
 
 void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
-  print("hello");
   if (Mode.dfci) return forceDFCIMode();
-  print("hello");
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in switcherMaps) {
@@ -972,8 +969,9 @@ void startTimer(Future<bool> Function() timeupCall, bool Function() stop, int st
 }
 
 void repeatTimer(Future<bool> Function() timeupCall, bool Function() stop, int repeat) {
-  print("Stop repeating task ${stop()}");
-  if (!stop()) {
+  bool stoP = stop();
+  print("Timer: Stop repeating task $stoP");
+  if (!stoP) {
     Timer(Duration(seconds: repeat), () {
       repeatTimer(timeupCall, stop, repeat);
       timeupCall();
