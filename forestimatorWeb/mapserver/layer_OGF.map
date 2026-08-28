@@ -2,1375 +2,2136 @@ MAP
     NAME "ogf"
     EXTENT 42250.00012 21170.00012000001 295170.00012 167700.00012
     SIZE 800 800
+
     SHAPEPATH "/media/Data10/Forestimator/Autre/"
     IMAGECOLOR 255 255 255
     IMAGETYPE "PNG"
+    TRANSPARENT ON
+
     PROJECTION
         "init=epsg:31370"
     END
+
     WEB
         METADATA
-            "wms_label" "Serveur WMS de diverses cartes relatives aux forêts subnaturelles matures" 
-            "wms_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf?" 
-            "wms_service_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf?" 
-            "wms_srs" "EPSG:31370" 
-            "wms_enable_request" "*" 
+            "wms_label" "Serveur WMS de diverses cartes relatives aux forets subnaturelles matures"
+            "wms_title" "Cartes de ciblage des OGF potentielles"
+            "wms_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf"
+            "wms_service_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf"
+            "wms_srs" "EPSG:31370"
+            "wms_enable_request" "*"
+            "wms_getfeatureinfo_formatlist" "text/plain,application/vnd.ogc.gml,text/html"
         END
     END
- LAYER
-    NAME "OGF_preCarto_seuil70"
-    TYPE RASTER
-    STATUS ON
-
-    DATA "STATUS_MIX_q70_DLG.tif"
-    PROJECTION
-        "init=epsg:31370"
-    END
-
-    PROCESSING "BANDS=1"
-    OFFSITE 0 0 0
-    CLASSITEM "[pixel]"
-
-    CLASS
-        NAME "OGF potentielle"
-        EXPRESSION "1"
-        STYLE
-            COLOR 0 0 0
-        END
-    END
-
-    CLASS
-        NAME "feuillus sur forêt ancienne pas mature"
-        EXPRESSION "2"
-        STYLE
-            COLOR 255 255 255
-            OPACITY 0
-        END
-    END
-
-    METADATA
-        "wms_title" "OGF precarto avec seuil de 70"
-        "wms_srs"   "EPSG:31370"
-    END
-END
-
-
-LAYER
-    NAME "OGF_preCarto_seuil90"
-    TYPE RASTER
-    STATUS ON
-
-    DATA "STATUS_MIX_q90_DLG.tif"
-    PROJECTION
-        "init=epsg:31370"
-    END
-
-    PROCESSING "BANDS=1"
-    OFFSITE 0 0 0
-    CLASSITEM "[pixel]"
-
-    CLASS
-        NAME "OGF potentielle"
-        EXPRESSION "1"
-        STYLE
-            COLOR 0 0 0
-        END
-    END
-
-    CLASS
-        NAME "feuillus sur forêt ancienne pas mature"
-        EXPRESSION "2"
-        STYLE
-            COLOR 255 255 255
-            OPACITY 0
-        END
-    END
-
-    METADATA
-        "wms_title" "OGF precarto avec seuil de 90"
-        "wms_srs"   "EPSG:31370"
-    END
-END
-
-
-LAYER
-    NAME "OGFhauteur_q70"
-    TYPE RASTER
-    STATUS ON
-
-    DATA "THRESH_MIX_q70_v3_DLG.tif"
-    PROJECTION
-        "init=epsg:31370"
-    END
-
-    PROCESSING "BANDS=1"
-    OFFSITE 0 0 0
-    CLASSITEM "[pixel]"
-
-    CLASS
-        NAME "seuil q70 : 2030"
-        EXPRESSION "2030"
-        STYLE
-            COLOR 242 24 24
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2230"
-        EXPRESSION "2230"
-        STYLE
-            COLOR 61 114 242
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2250"
-        EXPRESSION "2250"
-        STYLE
-            COLOR 132 191 48
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2260"
-        EXPRESSION "2260"
-        STYLE
-            COLOR 191 19 170
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2308"
-        EXPRESSION "2308"
-        STYLE
-            COLOR 61 242 212
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2310"
-        EXPRESSION "2310"
-        STYLE
-            COLOR 242 159 61
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2330"
-        EXPRESSION "2330"
-        STYLE
-            COLOR 62 19 191
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2380"
-        EXPRESSION "2380"
-        STYLE
-            COLOR 54 191 48
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2420"
-        EXPRESSION "2420"
-        STYLE
-            COLOR 242 61 121
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2430"
-        EXPRESSION "2430"
-        STYLE
-            COLOR 24 161 242
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2440"
-        EXPRESSION "2440"
-        STYLE
-            COLOR 179 191 48
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2450"
-        EXPRESSION "2450"
-        STYLE
-            COLOR 161 48 191
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2460"
-        EXPRESSION "2460"
-        STYLE
-            COLOR 238 119 119
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2480"
-        EXPRESSION "2480"
-        STYLE
-            COLOR 24 242 133
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2490"
-        EXPRESSION "2490"
-        STYLE
-            COLOR 242 98 61
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2500"
-        EXPRESSION "2500"
-        STYLE
-            COLOR 48 60 191
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2510"
-        EXPRESSION "2510"
-        STYLE
-            COLOR 25 240 88
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2520"
-        EXPRESSION "2520"
-        STYLE
-            COLOR 169 90 226
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2530"
-        EXPRESSION "2530"
-        STYLE
-            COLOR 84 191 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2540"
-        EXPRESSION "2540"
-        STYLE
-            COLOR 195 173 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2550"
-        EXPRESSION "2550"
-        STYLE
-            COLOR 242 61 182
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2560"
-        EXPRESSION "2560"
-        STYLE
-            COLOR 61 235 242
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2570"
-        EXPRESSION "2570"
-        STYLE
-            COLOR 191 148 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2580"
-        EXPRESSION "2580"
-        STYLE
-            COLOR 119 218 238
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2590"
-        EXPRESSION "2590"
-        STYLE
-            COLOR 240 25 141
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2600"
-        EXPRESSION "2600"
-        STYLE
-            COLOR 113 48 191
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2610"
-        EXPRESSION "2610"
-        STYLE
-            COLOR 124 226 90
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2620"
-        EXPRESSION "2620"
-        STYLE
-            COLOR 27 19 195
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2630"
-        EXPRESSION "2630"
-        STYLE
-            COLOR 238 159 119
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2650"
-        EXPRESSION "2650"
-        STYLE
-            COLOR 25 240 160
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2660"
-        EXPRESSION "2660"
-        STYLE
-            COLOR 215 90 226
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2670"
-        EXPRESSION "2670"
-        STYLE
-            COLOR 158 195 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2680"
-        EXPRESSION "2680"
-        STYLE
-            COLOR 119 178 238
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2690"
-        EXPRESSION "2690"
-        STYLE
-            COLOR 240 25 69
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2700"
-        EXPRESSION "2700"
-        STYLE
-            COLOR 61 242 90
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2710"
-        EXPRESSION "2710"
-        STYLE
-            COLOR 85 19 195
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2720"
-        EXPRESSION "2720"
-        STYLE
-            COLOR 238 199 119
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2730"
-        EXPRESSION "2730"
-        STYLE
-            COLOR 25 240 232
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2740"
-        EXPRESSION "2740"
-        STYLE
-            COLOR 226 90 192
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2750"
-        EXPRESSION "2750"
-        STYLE
-            COLOR 99 195 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2760"
-        EXPRESSION "2760"
-        STYLE
-            COLOR 242 24 52
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2770"
-        EXPRESSION "2770"
-        STYLE
-            COLOR 240 52 25
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2780"
-        EXPRESSION "2780"
-        STYLE
-            COLOR 90 226 147
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2790"
-        EXPRESSION "2790"
-        STYLE
-            COLOR 144 19 195
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2800"
-        EXPRESSION "2800"
-        STYLE
-            COLOR 48 108 191
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2810"
-        EXPRESSION "2810"
-        STYLE
-            COLOR 238 238 119
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2820"
-        EXPRESSION "2820"
-        STYLE
-            COLOR 25 177 240
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2830"
-        EXPRESSION "2830"
-        STYLE
-            COLOR 226 90 146
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2840"
-        EXPRESSION "2840"
-        STYLE
-            COLOR 41 195 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2850"
-        EXPRESSION "2850"
-        STYLE
-            COLOR 139 119 238
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2860"
-        EXPRESSION "2860"
-        STYLE
-            COLOR 240 124 25
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2870"
-        EXPRESSION "2870"
-        STYLE
-            COLOR 150 191 48
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2880"
-        EXPRESSION "2880"
-        STYLE
-            COLOR 195 19 187
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2900"
-        EXPRESSION "2900"
-        STYLE
-            COLOR 25 105 240
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2910"
-        EXPRESSION "2910"
-        STYLE
-            COLOR 242 24 242
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2920"
-        EXPRESSION "2920"
-        STYLE
-            COLOR 61 242 189
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2930"
-        EXPRESSION "2930"
-        STYLE
-            COLOR 179 119 238
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2940"
-        EXPRESSION "2940"
-        STYLE
-            COLOR 191 107 48
-        END
-    END
 
-    CLASS
-        NAME "seuil q70 : 2950"
-        EXPRESSION "2950"
-        STYLE
-            COLOR 40 19 191
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2960"
-        EXPRESSION "2960"
-        STYLE
-            COLOR 195 19 128
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 2990"
-        EXPRESSION "2990"
-        STYLE
-            COLOR 226 125 90
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3010"
-        EXPRESSION "3010"
-        STYLE
-            COLOR 219 119 238
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3020"
-        EXPRESSION "3020"
-        STYLE
-            COLOR 92 242 61
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3040"
-        EXPRESSION "3040"
-        STYLE
-            COLOR 195 19 69
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3060"
-        EXPRESSION "3060"
-        STYLE
-            COLOR 242 61 145
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3070"
-        EXPRESSION "3070"
-        STYLE
-            COLOR 226 170 90
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3100"
-        EXPRESSION "3100"
-        STYLE
-            COLOR 238 119 217
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3110"
-        EXPRESSION "3110"
-        STYLE
-            COLOR 140 240 25
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3130"
-        EXPRESSION "3130"
-        STYLE
-            COLOR 195 28 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3160"
-        EXPRESSION "3160"
-        STYLE
-            COLOR 161 25 240
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3200"
-        EXPRESSION "3200"
-        STYLE
-            COLOR 19 157 195
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3220"
-        EXPRESSION "3220"
-        STYLE
-            COLOR 238 119 178
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3230"
-        EXPRESSION "3230"
-        STYLE
-            COLOR 68 240 25
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3270"
-        EXPRESSION "3270"
-        STYLE
-            COLOR 119 238 199
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3310"
-        EXPRESSION "3310"
-        STYLE
-            COLOR 19 149 191
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3350"
-        EXPRESSION "3350"
-        STYLE
-            COLOR 191 185 48
-        END
-    END
-
-    CLASS
-        NAME "seuil q70 : 3380"
-        EXPRESSION "3380"
-        STYLE
-            COLOR 25 240 54
-        END
-    END
-
-    METADATA
-        "wms_title" "OGF_hauteur_q70"
-        "wms_srs"   "EPSG:31370"
-    END
-END
-
-
-LAYER
-    NAME "OGFhauteur_q90"
-    TYPE RASTER
-    STATUS ON
-
-    DATA "THRESH_MIX_q90_v3_DLG.tif"
-    PROJECTION
-        "init=epsg:31370"
-    END
-
-    PROCESSING "BANDS=1"
-    OFFSITE 0 0 0
-    CLASSITEM "[pixel]"
-
-    CLASS
-        NAME "seuil q90 : 2270"
-        EXPRESSION "2270"
-        STYLE
-            COLOR 242 61 61
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2480"
-        EXPRESSION "2480"
-        STYLE
-            COLOR 24 242 133
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2500"
-        EXPRESSION "2500"
-        STYLE
-            COLOR 48 60 191
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2520"
-        EXPRESSION "2520"
-        STYLE
-            COLOR 169 90 226
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2560"
-        EXPRESSION "2560"
-        STYLE
-            COLOR 61 235 242
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2590"
-        EXPRESSION "2590"
-        STYLE
-            COLOR 240 25 141
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2610"
-        EXPRESSION "2610"
-        STYLE
-            COLOR 124 226 90
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2620"
-        EXPRESSION "2620"
-        STYLE
-            COLOR 27 19 195
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2630"
-        EXPRESSION "2630"
-        STYLE
-            COLOR 238 159 119
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2660"
-        EXPRESSION "2660"
-        STYLE
-            COLOR 215 90 226
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2670"
-        EXPRESSION "2670"
-        STYLE
-            COLOR 158 195 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2680"
-        EXPRESSION "2680"
-        STYLE
-            COLOR 119 178 238
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2700"
-        EXPRESSION "2700"
-        STYLE
-            COLOR 61 242 90
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2720"
-        EXPRESSION "2720"
-        STYLE
-            COLOR 238 199 119
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2740"
-        EXPRESSION "2740"
-        STYLE
-            COLOR 226 90 192
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2750"
-        EXPRESSION "2750"
-        STYLE
-            COLOR 99 195 19
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2760"
-        EXPRESSION "2760"
-        STYLE
-            COLOR 242 24 52
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2770"
-        EXPRESSION "2770"
-        STYLE
-            COLOR 240 52 25
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2780"
-        EXPRESSION "2780"
-        STYLE
-            COLOR 90 226 147
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2790"
-        EXPRESSION "2790"
-        STYLE
-            COLOR 144 19 195
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2800"
-        EXPRESSION "2800"
-        STYLE
-            COLOR 48 108 191
-        END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2810"
-        EXPRESSION "2810"
-        STYLE
-            COLOR 238 238 119
-        END
-    END
-
-    CLASS
-        NAME "seuil q90 : 2820"
-        EXPRESSION "2820"
-        STYLE
-            COLOR 25 177 240
-        END
-    END
+    # -------------------------------------------------------------------------
+    # Produit principal : cartographie polygonale de ciblage
+    # Colonne utilisee : Classe ; seules les classes 1 et 2 sont dessinees.
+    # Les valeurs 0 et NA / NULL ne correspondent a aucune classe et restent transparentes.
+    # -------------------------------------------------------------------------
+    LAYER
+        NAME "ogf_ciblage_polygones"
+        TYPE POLYGON
+        STATUS ON
 
-    CLASS
-        NAME "seuil q90 : 2830"
-        EXPRESSION "2830"
-        STYLE
-            COLOR 226 90 146
-        END
-    END
+        CONNECTIONTYPE OGR
+        CONNECTION "ogf_ciblage_polygones.gpkg"
+        DATA "ogf_ciblage_polygones"
 
-    CLASS
-        NAME "seuil q90 : 2850"
-        EXPRESSION "2850"
-        STYLE
-            COLOR 139 119 238
+        PROJECTION
+            "init=epsg:31370"
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2860"
-        EXPRESSION "2860"
-        STYLE
-            COLOR 240 124 25
-        END
-    END
+        CLASSITEM "Classe"
 
-    CLASS
-        NAME "seuil q90 : 2870"
-        EXPRESSION "2870"
-        STYLE
-            COLOR 150 191 48
+        CLASS
+            NAME "Classe 1"
+            EXPRESSION "1"
+            STYLE
+                COLOR 0 90 35
+                OUTLINECOLOR 0 70 25
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2889"
-        EXPRESSION "2889"
-        STYLE
-            COLOR 24 242 240
+        CLASS
+            NAME "Classe 2"
+            EXPRESSION "2"
+            STYLE
+                COLOR 145 200 110
+                OUTLINECOLOR 90 150 70
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2890"
-        EXPRESSION "2890"
-        STYLE
-            COLOR 198 238 119
+        METADATA
+            "wms_title" "Cartographie de ciblage des OGF potentielles"
+            "wms_abstract" "Couche principale de ciblage des peuplements potentiellement favorables au statut OGF. Les classes 1 et 2 identifient des secteurs prioritaires pour la prospection. Les valeurs 0 et NA ne sont pas dessinees. Le statut OGF doit etre confirme sur le terrain."
+            "wms_srs" "EPSG:31370"
+            "gml_include_items" "all"
+            "wms_include_items" "all"
         END
     END
 
-    CLASS
-        NAME "seuil q90 : 2900"
-        EXPRESSION "2900"
-        STYLE
-            COLOR 25 105 240
-        END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2910"
-        EXPRESSION "2910"
-        STYLE
-            COLOR 242 24 242
-        END
-    END
+    # -------------------------------------------------------------------------
+    # Aide terrain : cas stationnel indicatif
+    # Valeur 1 transparente ; valeur 2 rouge.
+    # -------------------------------------------------------------------------
+    LAYER
+        NAME "ogf_cas_stationnel"
+        TYPE RASTER
+        STATUS ON
 
-    CLASS
-        NAME "seuil q90 : 2920"
-        EXPRESSION "2920"
-        STYLE
-            COLOR 61 242 189
-        END
-    END
+        DATA "ogf_cas_stationnel.tif"
 
-    CLASS
-        NAME "seuil q90 : 2930"
-        EXPRESSION "2930"
-        STYLE
-            COLOR 179 119 238
+        PROJECTION
+            "init=epsg:31370"
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2940"
-        EXPRESSION "2940"
-        STYLE
-            COLOR 191 107 48
-        END
-    END
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
 
-    CLASS
-        NAME "seuil q90 : 2950"
-        EXPRESSION "2950"
-        STYLE
-            COLOR 40 19 191
+        CLASS
+            NAME "Cas 2 potentiel - a verifier sur le terrain"
+            EXPRESSION "2"
+            STYLE
+                COLOR 220 0 0
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2960"
-        EXPRESSION "2960"
-        STYLE
-            COLOR 195 19 128
+        CLASS
+            NAME "Cas 1 - transparent"
+            EXPRESSION "1"
+            STYLE
+                COLOR 255 255 255
+                OPACITY 0
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2970"
-        EXPRESSION "2970"
-        STYLE
-            COLOR 158 238 119
+        CLASS
+            NAME "Valeur 0 ou hors information - transparent"
+            EXPRESSION "0"
+            STYLE
+                COLOR 255 255 255
+                OPACITY 0
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 2980"
-        EXPRESSION "2980"
-        STYLE
-            COLOR 25 33 240
+        METADATA
+            "wms_title" "Cas stationnel indicatif"
+            "wms_abstract" "Couche indicative d'aide a l'attribution du cas stationnel. La valeur 2 signale une station susceptible de relever du cas 2 et doit etre verifiee sur le terrain. La valeur 1 est transparente."
+            "wms_srs" "EPSG:31370"
         END
     END
 
-    CLASS
-        NAME "seuil q90 : 3000"
-        EXPRESSION "3000"
-        STYLE
-            COLOR 19 195 115
-        END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3010"
-        EXPRESSION "3010"
-        STYLE
-            COLOR 219 119 238
-        END
-    END
+    # -------------------------------------------------------------------------
+    # Raster intermediaire q70 : 0 transparent ; 1 noir.
+    # -------------------------------------------------------------------------
+    LAYER
+        NAME "ogf_q70_pixels_retenus"
+        TYPE RASTER
+        STATUS ON
 
-    CLASS
-        NAME "seuil q90 : 3020"
-        EXPRESSION "3020"
-        STYLE
-            COLOR 92 242 61
-        END
-    END
+        DATA "ogf_q70_pixels_retenus.tif"
 
-    CLASS
-        NAME "seuil q90 : 3030"
-        EXPRESSION "3030"
-        STYLE
-            COLOR 90 169 226
+        PROJECTION
+            "init=epsg:31370"
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3040"
-        EXPRESSION "3040"
-        STYLE
-            COLOR 195 19 69
-        END
-    END
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
 
-    CLASS
-        NAME "seuil q90 : 3050"
-        EXPRESSION "3050"
-        STYLE
-            COLOR 119 238 120
+        CLASS
+            NAME "Pixel retenu par le scenario q70"
+            EXPRESSION "1"
+            STYLE
+                COLOR 0 0 0
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3060"
-        EXPRESSION "3060"
-        STYLE
-            COLOR 242 61 145
+        CLASS
+            NAME "Pixel non retenu - transparent"
+            EXPRESSION "0"
+            STYLE
+                COLOR 255 255 255
+                OPACITY 0
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3070"
-        EXPRESSION "3070"
-        STYLE
-            COLOR 226 170 90
+        METADATA
+            "wms_title" "Pixels retenus - scenario q70"
+            "wms_abstract" "Couche raster intermediaire. La valeur 1 identifie les pixels retenus par le scenario q70 ; la valeur 0 est transparente."
+            "wms_srs" "EPSG:31370"
         END
     END
 
-    CLASS
-        NAME "seuil q90 : 3080"
-        EXPRESSION "3080"
-        STYLE
-            COLOR 19 195 174
-        END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3090"
-        EXPRESSION "3090"
-        STYLE
-            COLOR 24 242 204
-        END
-    END
+    # -------------------------------------------------------------------------
+    # Raster intermediaire q90 : 0 transparent ; 1 noir.
+    # -------------------------------------------------------------------------
+    LAYER
+        NAME "ogf_q90_pixels_retenus"
+        TYPE RASTER
+        STATUS ON
 
-    CLASS
-        NAME "seuil q90 : 3100"
-        EXPRESSION "3100"
-        STYLE
-            COLOR 238 119 217
-        END
-    END
+        DATA "ogf_q90_pixels_retenus.tif"
 
-    CLASS
-        NAME "seuil q90 : 3110"
-        EXPRESSION "3110"
-        STYLE
-            COLOR 140 240 25
+        PROJECTION
+            "init=epsg:31370"
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3120"
-        EXPRESSION "3120"
-        STYLE
-            COLOR 90 123 226
-        END
-    END
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
 
-    CLASS
-        NAME "seuil q90 : 3130"
-        EXPRESSION "3130"
-        STYLE
-            COLOR 195 28 19
+        CLASS
+            NAME "Pixel retenu par le scenario q90"
+            EXPRESSION "1"
+            STYLE
+                COLOR 0 0 0
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3140"
-        EXPRESSION "3140"
-        STYLE
-            COLOR 119 238 160
+        CLASS
+            NAME "Pixel non retenu - transparent"
+            EXPRESSION "0"
+            STYLE
+                COLOR 255 255 255
+                OPACITY 0
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3160"
-        EXPRESSION "3160"
-        STYLE
-            COLOR 161 25 240
+        METADATA
+            "wms_title" "Pixels retenus - scenario q90"
+            "wms_abstract" "Couche raster intermediaire. La valeur 1 identifie les pixels retenus par le scenario q90 ; la valeur 0 est transparente."
+            "wms_srs" "EPSG:31370"
         END
     END
 
-    CLASS
-        NAME "seuil q90 : 3170"
-        EXPRESSION "3170"
-        STYLE
-            COLOR 226 216 90
-        END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3190"
-        EXPRESSION "3190"
-        STYLE
-            COLOR 242 204 61
-        END
-    END
+    # -------------------------------------------------------------------------
+    # Couche technique : modalites ecologiques et seuils de hauteur dominante
+    # Fichier attendu : shapefile ogf_modalites_seuils_hauteur.shp
+    # Champ utilise : group_id
+    # 210 classes explicites pour eviter RANGEITEM, non reconnu dans ce contexte.
+    # -------------------------------------------------------------------------
+    LAYER
+        NAME "ogf_modalites_seuils_hauteur"
+        TYPE POLYGON
+        STATUS ON
+        DUMP TRUE
 
-    CLASS
-        NAME "seuil q90 : 3200"
-        EXPRESSION "3200"
-        STYLE
-            COLOR 19 157 195
-        END
-    END
+        DATA "ogf_modalites_seuils_hauteur.shp"
+        TEMPLATE "/media/Data10/Forestimator/Autre/empty.html"
+        TOLERANCE 5
+        TOLERANCEUNITS PIXELS
+        
 
-    CLASS
-        NAME "seuil q90 : 3210"
-        EXPRESSION "3210"
-        STYLE
-            COLOR 95 61 242
+        PROJECTION
+            "init=epsg:31370"
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3220"
-        EXPRESSION "3220"
-        STYLE
-            COLOR 238 119 178
-        END
-    END
+        CLASSITEM "group_id"
 
-    CLASS
-        NAME "seuil q90 : 3230"
-        EXPRESSION "3230"
-        STYLE
-            COLOR 68 240 25
+        CLASS
+            NAME "Modalite 1"
+            EXPRESSION "1"
+            STYLE
+                COLOR 76 122 235
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3240"
-        EXPRESSION "3240"
-        STYLE
-            COLOR 61 242 116
+        CLASS
+            NAME "Modalite 2"
+            EXPRESSION "2"
+            STYLE
+                COLOR 133 199 40
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3250"
-        EXPRESSION "3250"
-        STYLE
-            COLOR 103 90 226
+        CLASS
+            NAME "Modalite 3"
+            EXPRESSION "3"
+            STYLE
+                COLOR 235 106 219
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3260"
-        EXPRESSION "3260"
-        STYLE
-            COLOR 195 87 19
+        CLASS
+            NAME "Modalite 4"
+            EXPRESSION "4"
+            STYLE
+                COLOR 65 199 176
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3280"
-        EXPRESSION "3280"
-        STYLE
-            COLOR 233 25 240
+        CLASS
+            NAME "Modalite 5"
+            EXPRESSION "5"
+            STYLE
+                COLOR 235 148 47
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3290"
-        EXPRESSION "3290"
-        STYLE
-            COLOR 191 226 90
+        CLASS
+            NAME "Modalite 6"
+            EXPRESSION "6"
+            STYLE
+                COLOR 117 90 199
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3323"
-        EXPRESSION "3323"
-        STYLE
-            COLOR 19 98 195
+        CLASS
+            NAME "Modalite 7"
+            EXPRESSION "7"
+            STYLE
+                COLOR 83 235 76
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3330"
-        EXPRESSION "3330"
-        STYLE
-            COLOR 238 119 138
+        CLASS
+            NAME "Modalite 8"
+            EXPRESSION "8"
+            STYLE
+                COLOR 199 40 93
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3340"
-        EXPRESSION "3340"
-        STYLE
-            COLOR 242 61 204
+        CLASS
+            NAME "Modalite 9"
+            EXPRESSION "9"
+            STYLE
+                COLOR 106 186 235
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3390"
-        EXPRESSION "3390"
-        STYLE
-            COLOR 148 90 226
+        CLASS
+            NAME "Modalite 10"
+            EXPRESSION "10"
+            STYLE
+                COLOR 188 199 65
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3410"
-        EXPRESSION "3410"
-        STYLE
-            COLOR 195 145 19
+        CLASS
+            NAME "Modalite 11"
+            EXPRESSION "11"
+            STYLE
+                COLOR 195 47 235
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3490"
-        EXPRESSION "3490"
-        STYLE
-            COLOR 119 237 238
+        CLASS
+            NAME "Modalite 12"
+            EXPRESSION "12"
+            STYLE
+                COLOR 90 199 144
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3580"
-        EXPRESSION "3580"
-        STYLE
-            COLOR 240 25 175
+        CLASS
+            NAME "Modalite 13"
+            EXPRESSION "13"
+            STYLE
+                COLOR 235 109 76
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3590"
-        EXPRESSION "3590"
-        STYLE
-            COLOR 204 242 61
+        CLASS
+            NAME "Modalite 14"
+            EXPRESSION "14"
+            STYLE
+                COLOR 40 53 199
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3600"
-        EXPRESSION "3600"
-        STYLE
-            COLOR 145 226 90
+        CLASS
+            NAME "Modalite 15"
+            EXPRESSION "15"
+            STYLE
+                COLOR 154 235 106
+                OUTLINECOLOR 120 120 120
+            END
         END
-    END
 
-    CLASS
-        NAME "seuil q90 : 3620"
-        EXPRESSION "3620"
-        STYLE
-            COLOR 19 39 195
-        END
-    END
+        CLASS
+            NAME "Modalite 16"
+            EXPRESSION "16"
+            STYLE
+                COLOR 199 65 154
+                OUTLINECOLOR 120 120 120
+            END
+        END
 
-    CLASS
-        NAME "seuil q90 : 3640"
-        EXPRESSION "3640"
-        STYLE
-            COLOR 61 95 242
-        END
-    END
+        CLASS
+            NAME "Modalite 17"
+            EXPRESSION "17"
+            STYLE
+                COLOR 47 227 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
 
-    CLASS
-        NAME "seuil q90 : 3730"
-        EXPRESSION "3730"
-        STYLE
-            COLOR 242 116 61
-        END
-    END
+        CLASS
+            NAME "Modalite 18"
+            EXPRESSION "18"
+            STYLE
+                COLOR 199 171 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
 
-    CLASS
-        NAME "seuil q90 : 3750"
-        EXPRESSION "3750"
-        STYLE
-            COLOR 238 140 119
+        CLASS
+            NAME "Modalite 19"
+            EXPRESSION "19"
+            STYLE
+                COLOR 148 76 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 20"
+            EXPRESSION "20"
+            STYLE
+                COLOR 40 199 66
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 21"
+            EXPRESSION "21"
+            STYLE
+                COLOR 235 106 122
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 22"
+            EXPRESSION "22"
+            STYLE
+                COLOR 65 121 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 23"
+            EXPRESSION "23"
+            STYLE
+                COLOR 180 235 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 24"
+            EXPRESSION "24"
+            STYLE
+                COLOR 199 90 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 25"
+            EXPRESSION "25"
+            STYLE
+                COLOR 76 235 188
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 26"
+            EXPRESSION "26"
+            STYLE
+                COLOR 199 106 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 27"
+            EXPRESSION "27"
+            STYLE
+                COLOR 121 106 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 28"
+            EXPRESSION "28"
+            STYLE
+                COLOR 88 199 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 29"
+            EXPRESSION "29"
+            STYLE
+                COLOR 235 47 134
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 30"
+            EXPRESSION "30"
+            STYLE
+                COLOR 90 172 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 31"
+            EXPRESSION "31"
+            STYLE
+                COLOR 235 227 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 32"
+            EXPRESSION "32"
+            STYLE
+                COLOR 145 40 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 33"
+            EXPRESSION "33"
+            STYLE
+                COLOR 106 235 153
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 34"
+            EXPRESSION "34"
+            STYLE
+                COLOR 199 75 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 35"
+            EXPRESSION "35"
+            STYLE
+                COLOR 47 87 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 36"
+            EXPRESSION "36"
+            STYLE
+                COLOR 145 199 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 37"
+            EXPRESSION "37"
+            STYLE
+                COLOR 235 76 202
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 38"
+            EXPRESSION "38"
+            STYLE
+                COLOR 40 199 185
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 39"
+            EXPRESSION "39"
+            STYLE
+                COLOR 235 186 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 40"
+            EXPRESSION "40"
+            STYLE
+                COLOR 109 65 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 41"
+            EXPRESSION "41"
+            STYLE
+                COLOR 47 235 54
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 42"
+            EXPRESSION "42"
+            STYLE
+                COLOR 199 90 117
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 43"
+            EXPRESSION "43"
+            STYLE
+                COLOR 76 163 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 44"
+            EXPRESSION "44"
+            STYLE
+                COLOR 173 199 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 45"
+            EXPRESSION "45"
+            STYLE
+                COLOR 218 106 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 46"
+            EXPRESSION "46"
+            STYLE
+                COLOR 65 199 142
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 47"
+            EXPRESSION "47"
+            STYLE
+                COLOR 235 101 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 48"
+            EXPRESSION "48"
+            STYLE
+                COLOR 90 90 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 49"
+            EXPRESSION "49"
+            STYLE
+                COLOR 123 235 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 50"
+            EXPRESSION "50"
+            STYLE
+                COLOR 199 40 134
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 51"
+            EXPRESSION "51"
+            STYLE
+                COLOR 106 219 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 52"
+            EXPRESSION "52"
+            STYLE
+                COLOR 199 176 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 53"
+            EXPRESSION "53"
+            STYLE
+                COLOR 147 47 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 54"
+            EXPRESSION "54"
+            STYLE
+                COLOR 90 199 116
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 55"
+            EXPRESSION "55"
+            STYLE
+                COLOR 235 76 84
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 56"
+            EXPRESSION "56"
+            STYLE
+                COLOR 40 94 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 57"
+            EXPRESSION "57"
+            STYLE
+                COLOR 187 235 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 58"
+            EXPRESSION "58"
+            STYLE
+                COLOR 199 65 189
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 59"
+            EXPRESSION "59"
+            STYLE
+                COLOR 47 235 194
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 60"
+            EXPRESSION "60"
+            STYLE
+                COLOR 199 143 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 61"
+            EXPRESSION "61"
+            STYLE
+                COLOR 108 76 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 62"
+            EXPRESSION "62"
+            STYLE
+                COLOR 54 199 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 63"
+            EXPRESSION "63"
+            STYLE
+                COLOR 235 106 155
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 64"
+            EXPRESSION "64"
+            STYLE
+                COLOR 65 155 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 65"
+            EXPRESSION "65"
+            STYLE
+                COLOR 228 235 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 66"
+            EXPRESSION "66"
+            STYLE
+                COLOR 171 90 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 67"
+            EXPRESSION "67"
+            STYLE
+                COLOR 76 235 147
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 68"
+            EXPRESSION "68"
+            STYLE
+                COLOR 199 65 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 69"
+            EXPRESSION "69"
+            STYLE
+                COLOR 106 123 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 70"
+            EXPRESSION "70"
+            STYLE
+                COLOR 122 199 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 71"
+            EXPRESSION "71"
+            STYLE
+                COLOR 235 47 182
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 72"
+            EXPRESSION "72"
+            STYLE
+                COLOR 90 199 198
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 73"
+            EXPRESSION "73"
+            STYLE
+                COLOR 235 187 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 74"
+            EXPRESSION "74"
+            STYLE
+                COLOR 105 40 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 75"
+            EXPRESSION "75"
+            STYLE
+                COLOR 106 235 120
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 76"
+            EXPRESSION "76"
+            STYLE
+                COLOR 199 65 88
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 77"
+            EXPRESSION "77"
+            STYLE
+                COLOR 47 135 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 78"
+            EXPRESSION "78"
+            STYLE
+                COLOR 173 199 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 79"
+            EXPRESSION "79"
+            STYLE
+                COLOR 226 76 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 80"
+            EXPRESSION "80"
+            STYLE
+                COLOR 40 199 144
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 81"
+            EXPRESSION "81"
+            STYLE
+                COLOR 235 153 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 82"
+            EXPRESSION "82"
+            STYLE
+                COLOR 74 65 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 83"
+            EXPRESSION "83"
+            STYLE
+                COLOR 88 235 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 84"
+            EXPRESSION "84"
+            STYLE
+                COLOR 199 90 145
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 85"
+            EXPRESSION "85"
+            STYLE
+                COLOR 76 203 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 86"
+            EXPRESSION "86"
+            STYLE
+                COLOR 199 184 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 87"
+            EXPRESSION "87"
+            STYLE
+                COLOR 185 106 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 88"
+            EXPRESSION "88"
+            STYLE
+                COLOR 65 199 108
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 89"
+            EXPRESSION "89"
+            STYLE
+                COLOR 235 53 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 90"
+            EXPRESSION "90"
+            STYLE
+                COLOR 90 118 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 91"
+            EXPRESSION "91"
+            STYLE
+                COLOR 164 235 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 92"
+            EXPRESSION "92"
+            STYLE
+                COLOR 199 40 174
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 93"
+            EXPRESSION "93"
+            STYLE
+                COLOR 106 235 217
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 94"
+            EXPRESSION "94"
+            STYLE
+                COLOR 199 141 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 95"
+            EXPRESSION "95"
+            STYLE
+                COLOR 99 47 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 96"
+            EXPRESSION "96"
+            STYLE
+                COLOR 91 199 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 97"
+            EXPRESSION "97"
+            STYLE
+                COLOR 235 76 124
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 98"
+            EXPRESSION "98"
+            STYLE
+                COLOR 40 135 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 99"
+            EXPRESSION "99"
+            STYLE
+                COLOR 220 235 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 100"
+            EXPRESSION "100"
+            STYLE
+                COLOR 175 65 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 101"
+            EXPRESSION "101"
+            STYLE
+                COLOR 47 235 146
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 102"
+            EXPRESSION "102"
+            STYLE
+                COLOR 199 115 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 103"
+            EXPRESSION "103"
+            STYLE
+                COLOR 76 85 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 104"
+            EXPRESSION "104"
+            STYLE
+                COLOR 95 199 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 105"
+            EXPRESSION "105"
+            STYLE
+                COLOR 235 106 188
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 106"
+            EXPRESSION "106"
+            STYLE
+                COLOR 65 190 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 107"
+            EXPRESSION "107"
+            STYLE
+                COLOR 235 193 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 108"
+            EXPRESSION "108"
+            STYLE
+                COLOR 143 90 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 109"
+            EXPRESSION "109"
+            STYLE
+                COLOR 76 235 107
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 110"
+            EXPRESSION "110"
+            STYLE
+                COLOR 199 40 55
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 111"
+            EXPRESSION "111"
+            STYLE
+                COLOR 106 156 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 112"
+            EXPRESSION "112"
+            STYLE
+                COLOR 156 199 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 113"
+            EXPRESSION "113"
+            STYLE
+                COLOR 235 47 230
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 114"
+            EXPRESSION "114"
+            STYLE
+                COLOR 90 199 170
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 115"
+            EXPRESSION "115"
+            STYLE
+                COLOR 235 146 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 116"
+            EXPRESSION "116"
+            STYLE
+                COLOR 64 40 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 117"
+            EXPRESSION "117"
+            STYLE
+                COLOR 124 235 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 118"
+            EXPRESSION "118"
+            STYLE
+                COLOR 199 65 123
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 119"
+            EXPRESSION "119"
+            STYLE
+                COLOR 47 183 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 120"
+            EXPRESSION "120"
+            STYLE
+                COLOR 199 197 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 121"
+            EXPRESSION "121"
+            STYLE
+                COLOR 186 76 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 122"
+            EXPRESSION "122"
+            STYLE
+                COLOR 40 199 104
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 123"
+            EXPRESSION "123"
+            STYLE
+                COLOR 235 120 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 124"
+            EXPRESSION "124"
+            STYLE
+                COLOR 65 89 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 125"
+            EXPRESSION "125"
+            STYLE
+                COLOR 136 235 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 126"
+            EXPRESSION "126"
+            STYLE
+                COLOR 199 90 173
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 127"
+            EXPRESSION "127"
+            STYLE
+                COLOR 76 235 225
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 128"
+            EXPRESSION "128"
+            STYLE
+                COLOR 199 143 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 129"
+            EXPRESSION "129"
+            STYLE
+                COLOR 152 106 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 130"
+            EXPRESSION "130"
+            STYLE
+                COLOR 65 199 74
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 131"
+            EXPRESSION "131"
+            STYLE
+                COLOR 235 47 89
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 132"
+            EXPRESSION "132"
+            STYLE
+                COLOR 90 146 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 133"
+            EXPRESSION "133"
+            STYLE
+                COLOR 204 235 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 134"
+            EXPRESSION "134"
+            STYLE
+                COLOR 183 40 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 135"
+            EXPRESSION "135"
+            STYLE
+                COLOR 106 235 184
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 136"
+            EXPRESSION "136"
+            STYLE
+                COLOR 199 107 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 137"
+            EXPRESSION "137"
+            STYLE
+                COLOR 51 47 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 138"
+            EXPRESSION "138"
+            STYLE
+                COLOR 119 199 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 139"
+            EXPRESSION "139"
+            STYLE
+                COLOR 235 76 165
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 140"
+            EXPRESSION "140"
+            STYLE
+                COLOR 40 175 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 141"
+            EXPRESSION "141"
+            STYLE
+                COLOR 235 216 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 142"
+            EXPRESSION "142"
+            STYLE
+                COLOR 140 65 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 143"
+            EXPRESSION "143"
+            STYLE
+                COLOR 47 235 98
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 144"
+            EXPRESSION "144"
+            STYLE
+                COLOR 199 90 92
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 145"
+            EXPRESSION "145"
+            STYLE
+                COLOR 76 125 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 146"
+            EXPRESSION "146"
+            STYLE
+                COLOR 136 199 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 147"
+            EXPRESSION "147"
+            STYLE
+                COLOR 235 106 221
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 148"
+            EXPRESSION "148"
+            STYLE
+                COLOR 65 199 174
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 149"
+            EXPRESSION "149"
+            STYLE
+                COLOR 235 145 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 150"
+            EXPRESSION "150"
+            STYLE
+                COLOR 115 90 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 151"
+            EXPRESSION "151"
+            STYLE
+                COLOR 86 235 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 152"
+            EXPRESSION "152"
+            STYLE
+                COLOR 199 40 96
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 153"
+            EXPRESSION "153"
+            STYLE
+                COLOR 106 189 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 154"
+            EXPRESSION "154"
+            STYLE
+                COLOR 190 199 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 155"
+            EXPRESSION "155"
+            STYLE
+                COLOR 192 47 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 156"
+            EXPRESSION "156"
+            STYLE
+                COLOR 90 199 142
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 157"
+            EXPRESSION "157"
+            STYLE
+                COLOR 235 106 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 158"
+            EXPRESSION "158"
+            STYLE
+                COLOR 40 56 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 159"
+            EXPRESSION "159"
+            STYLE
+                COLOR 157 235 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 160"
+            EXPRESSION "160"
+            STYLE
+                COLOR 199 65 157
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 161"
+            EXPRESSION "161"
+            STYLE
+                COLOR 47 231 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 162"
+            EXPRESSION "162"
+            STYLE
+                COLOR 199 169 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 163"
+            EXPRESSION "163"
+            STYLE
+                COLOR 145 76 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 164"
+            EXPRESSION "164"
+            STYLE
+                COLOR 40 199 63
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 165"
+            EXPRESSION "165"
+            STYLE
+                COLOR 235 106 124
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 166"
+            EXPRESSION "166"
+            STYLE
+                COLOR 65 123 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 167"
+            EXPRESSION "167"
+            STYLE
+                COLOR 184 235 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 168"
+            EXPRESSION "168"
+            STYLE
+                COLOR 197 90 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 169"
+            EXPRESSION "169"
+            STYLE
+                COLOR 76 235 185
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 170"
+            EXPRESSION "170"
+            STYLE
+                COLOR 199 103 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 171"
+            EXPRESSION "171"
+            STYLE
+                COLOR 119 106 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 172"
+            EXPRESSION "172"
+            STYLE
+                COLOR 90 199 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 173"
+            EXPRESSION "173"
+            STYLE
+                COLOR 235 47 137
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 174"
+            EXPRESSION "174"
+            STYLE
+                COLOR 90 174 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 175"
+            EXPRESSION "175"
+            STYLE
+                COLOR 235 224 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 176"
+            EXPRESSION "176"
+            STYLE
+                COLOR 142 40 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 177"
+            EXPRESSION "177"
+            STYLE
+                COLOR 106 235 151
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 178"
+            EXPRESSION "178"
+            STYLE
+                COLOR 199 73 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 179"
+            EXPRESSION "179"
+            STYLE
+                COLOR 47 90 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 180"
+            EXPRESSION "180"
+            STYLE
+                COLOR 147 199 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 181"
+            EXPRESSION "181"
+            STYLE
+                COLOR 235 76 205
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 182"
+            EXPRESSION "182"
+            STYLE
+                COLOR 40 199 182
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 183"
+            EXPRESSION "183"
+            STYLE
+                COLOR 235 183 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 184"
+            EXPRESSION "184"
+            STYLE
+                COLOR 106 65 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 185"
+            EXPRESSION "185"
+            STYLE
+                COLOR 47 235 50
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 186"
+            EXPRESSION "186"
+            STYLE
+                COLOR 199 90 119
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 187"
+            EXPRESSION "187"
+            STYLE
+                COLOR 76 166 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 188"
+            EXPRESSION "188"
+            STYLE
+                COLOR 176 199 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 189"
+            EXPRESSION "189"
+            STYLE
+                COLOR 215 106 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 190"
+            EXPRESSION "190"
+            STYLE
+                COLOR 65 199 140
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 191"
+            EXPRESSION "191"
+            STYLE
+                COLOR 235 97 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 192"
+            EXPRESSION "192"
+            STYLE
+                COLOR 90 92 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 193"
+            EXPRESSION "193"
+            STYLE
+                COLOR 126 235 76
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 194"
+            EXPRESSION "194"
+            STYLE
+                COLOR 199 40 137
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 195"
+            EXPRESSION "195"
+            STYLE
+                COLOR 106 222 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 196"
+            EXPRESSION "196"
+            STYLE
+                COLOR 199 173 65
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 197"
+            EXPRESSION "197"
+            STYLE
+                COLOR 144 47 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 198"
+            EXPRESSION "198"
+            STYLE
+                COLOR 90 199 114
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 199"
+            EXPRESSION "199"
+            STYLE
+                COLOR 235 76 87
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 200"
+            EXPRESSION "200"
+            STYLE
+                COLOR 40 97 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 201"
+            EXPRESSION "201"
+            STYLE
+                COLOR 190 235 106
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 202"
+            EXPRESSION "202"
+            STYLE
+                COLOR 199 65 191
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 203"
+            EXPRESSION "203"
+            STYLE
+                COLOR 47 235 191
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 204"
+            EXPRESSION "204"
+            STYLE
+                COLOR 199 141 90
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 205"
+            EXPRESSION "205"
+            STYLE
+                COLOR 105 76 235
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 206"
+            EXPRESSION "206"
+            STYLE
+                COLOR 57 199 40
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 207"
+            EXPRESSION "207"
+            STYLE
+                COLOR 235 106 157
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 208"
+            EXPRESSION "208"
+            STYLE
+                COLOR 65 158 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 209"
+            EXPRESSION "209"
+            STYLE
+                COLOR 232 235 47
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        CLASS
+            NAME "Modalite 210"
+            EXPRESSION "210"
+            STYLE
+                COLOR 169 90 199
+                OUTLINECOLOR 120 120 120
+            END
+        END
+
+        METADATA
+            "wms_title" "Modalites ecologiques et seuils de hauteur dominante"
+            "wms_abstract" "Couche technique decrivant les modalites utilisees pour calculer les seuils q70 et q90 de hauteur dominante. Chaque modalite correspond au croisement entre territoire ecologique, position topographique et essence dominante. Les couleurs sont attribuees selon le champ group_id."
+            "wms_srs" "EPSG:31370"
+            "gml_include_items" "all"
+            "wms_include_items" "all"
+            "ows_include_items" "all"
+            "wms_feature_info_mime_type" "text/plain"
         END
     END
 
-    METADATA
-        "wms_title" "OGF_hauteur_q90"
-        "wms_srs"   "EPSG:31370"
-    END
-END
 END
