@@ -13,7 +13,8 @@
 	PROCESSING "SCALE_3=250,1700"
 	METADATA
             "wms_title" "Satellite Aout 2026" 
-            "wms_srs" "EPSG:31370 EPSG:32631" 
+            "wms_srs" "EPSG:31370 EPSG:32631"
+            "wms_abstract" "composition colorée sur base des bandes 11,8 et 3 de prises de vue Sentinel-2 dont la résolution est améliorée avec des images PlanetScope. Les stress hydriques particulièrement marqués cette année 2026 sont bien visible sur les peuplements dont les feuilles ont rougis prématurément"
         END
 
     END
@@ -26,9 +27,9 @@
             "init=epsg:32631"
         END
         MASK "MasqueForet"
-ETADATA
+	METADATA
             "wms_title" "Satellite Aout 2026 : CRSWIR" 
-            "wms_srs" "EPSG:31370" 
+            "wms_srs" "EPSG:31370 EPSG:32631" 
         END
 
     END
@@ -47,7 +48,7 @@ ETADATA
         PROCESSING "SCALE_3=250,1700"
         METADATA
             "wms_title" "Satellite été 2025" 
-            "wms_srs" "EPSG:31370"
+            "wms_srs" "EPSG:31370 EPSG:32631"
         END
     END
 LAYER
@@ -60,7 +61,7 @@ LAYER
         END
         METADATA
             "wms_title" "Satellite été 2025 : CRSWIR" 
-            "wms_srs" "EPSG:31370"
+            "wms_srs" "EPSG:31370 EPSG:32631"
         END
         MASK "MasqueForet"
     END
