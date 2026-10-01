@@ -3,15 +3,19 @@
         TYPE RASTER
         STATUS ON
         DATA "/mnt/pc57_data3/NICOLAS/RemoteSensing/RegionMosaics/ExportResults/Wallonia_august2026/SuperResolutionV2/predict_ms210_220_final_v2.tif"
-        PROJECTION
+        MASK "MasqueForet"
+	PROJECTION
             "init=epsg:32631"
         END
-        PROCESSING "BANDS=B8,B11,B12"
-        METADATA
+        PROCESSING "BANDS=9,8,2" #B11 B8 B3
+        PROCESSING "SCALE_1=700,4200"
+	PROCESSING "SCALE_2=1400,4700"
+	PROCESSING "SCALE_3=250,1700"
+	METADATA
             "wms_title" "Satellite Aout 2026" 
-            "wms_srs" "EPSG:31370" 
+            "wms_srs" "EPSG:31370 EPSG:32631" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "Super Résolution Satellite Aout 2026 : SWIR"
@@ -21,26 +25,30 @@
         PROJECTION
             "init=epsg:32631"
         END
-        METADATA
+        MASK "MasqueForet"
+ETADATA
             "wms_title" "Satellite Aout 2026 : CRSWIR" 
             "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "Super Résolution Satellite été 2025"
         TYPE RASTER
         STATUS ON
         DATA "/mnt/pc57_data3/NICOLAS/RemoteSensing/RegionMosaics/ExportResults/Wallonia_vegetation2025/SuperResolutionV2/predict_ms210_220_final_v2.tif"
+        MASK "MasqueForet"
         PROJECTION
             "init=epsg:32631"
         END
-        PROCESSING "BANDS=B8,B11,B12"
+        PROCESSING "BANDS=9,8,2" #B11 B8 B3
+        PROCESSING "SCALE_1=700,4200"
+        PROCESSING "SCALE_2=1400,4700"
+        PROCESSING "SCALE_3=250,1700"
         METADATA
             "wms_title" "Satellite été 2025" 
             "wms_srs" "EPSG:31370"
         END
-        TEMPLATE "../template.html"
     END
 LAYER
         NAME "Super Résolution Satellite été 2025 : CRSWIR"
@@ -54,5 +62,5 @@ LAYER
             "wms_title" "Satellite été 2025 : CRSWIR" 
             "wms_srs" "EPSG:31370"
         END
-        TEMPLATE "../template.html"
+        MASK "MasqueForet"
     END

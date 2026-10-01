@@ -1,16 +1,23 @@
-
  <server>
     <application-settings location="*">
     	<properties>
-    	        	<property name="auth-mail-sender-name">Forestimator</property>
-        		<property name="auth-mail-sender-address">noreply-auth@forestimator.uliege.be</property>
+    	        	<property name="auth-mail-sender-name">TT</property>
+<property name="auth-mail-sender-address">tthissen@uliege.be</property>
+
+        		<!--property name="auth-mail-sender-address">noreply-auth@forestimator.gembloux.ulg.ac.be</property-->
 			<!-- You can use the following properties to configure SMTP settings -->
 			<!-- The host to identify as (defaults to localhost if not specified) -->
-			<property name="smtp-self-host">forestimator.gembloux.ulg.ac.be</property>
+			<!--<property name="smtp-self-host">forestimator.gembloux.ulg.ac.be</property>-->
 			<!-- The SMTP host to connect to (defaults to localhost if not specified) -->
 			<property name="smtp-host">smtp.ulg.ac.be</property>
 			<!-- The SMTP port to connect to (defaults to 25 if not specified) -->
-			<property name="smtp-port">25</property>
+			<property name="smtp-port">465</property>
+    <property name="smtp-auth-username">tthissen@uliege.be</property>
+            <property name="smtp-auth-password">,H':^?3]k7NixM</property>
+                        <property name="smtp-auth-method">plain</property>
+                        <property name="smtp-transport-encryption">tls</property>
+
+
 		</properties>
 		<session-management>
 			<timeout>600</timeout>
