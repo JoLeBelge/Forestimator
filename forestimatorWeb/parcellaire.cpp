@@ -627,7 +627,7 @@ bool parcellaire::to31370AndGeoJson()
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);
-        OGRSpatialReference *oSRS = lay->GetSpatialRef();
+        const OGRSpatialReference *oSRS = lay->GetSpatialRef();
         if (oSRS == NULL)
         {
             testEPSG = 0;

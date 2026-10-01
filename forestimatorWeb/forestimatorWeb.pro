@@ -9,8 +9,8 @@ CONFIG += c++17
 # Enable warnings
 QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
 
-LIBS = -lcurl -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
-
+LIBS = -lcurl -lwthttp -lwt -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3 -lboost_program_options -lboost_filesystem
+#LIBS += -lboost_system -lboost_iostreams
 DEPENDPATH += /usr/include/gdal/
 INCLUDEPATH += /usr/include/gdal/
 
