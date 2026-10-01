@@ -19,6 +19,7 @@ MAP
         END
     END
     INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/layer_routesDFCI.map"
+    INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/layer_superresolution.map"
     LAYER
         NAME "parcellaire_DNF"
         TYPE POLYGON

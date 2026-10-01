@@ -1,0 +1,58 @@
+    LAYER
+        NAME "Super Résolution Satellite Aout 2026"
+        TYPE RASTER
+        STATUS ON
+        DATA "/mnt/pc57_data3/NICOLAS/RemoteSensing/RegionMosaics/ExportResults/Wallonia_august2026/SuperResolutionV2/predict_ms210_220_final_v2.tif"
+        PROJECTION
+            "init=epsg:32631"
+        END
+        PROCESSING "BANDS=B8,B11,B12"
+        METADATA
+            "wms_title" "Satellite Aout 2026" 
+            "wms_srs" "EPSG:31370" 
+        END
+        TEMPLATE "../template.html"
+    END
+    LAYER
+        NAME "Super Résolution Satellite Aout 2026 : SWIR"
+        TYPE RASTER
+        STATUS ON
+        DATA "/mnt/pc57_data3/NICOLAS/RemoteSensing/RegionMosaics/ExportResults/Wallonia_august2026/SuperResolutionV2/predict_ms210_220_final_v2_CRswir_x1000.tif"
+        PROJECTION
+            "init=epsg:32631"
+        END
+        METADATA
+            "wms_title" "Satellite Aout 2026 : CRSWIR" 
+            "wms_srs" "EPSG:31370" 
+        END
+        TEMPLATE "../template.html"
+    END
+    LAYER
+        NAME "Super Résolution Satellite été 2025"
+        TYPE RASTER
+        STATUS ON
+        DATA "/mnt/pc57_data3/NICOLAS/RemoteSensing/RegionMosaics/ExportResults/Wallonia_vegetation2025/SuperResolutionV2/predict_ms210_220_final_v2.tif"
+        PROJECTION
+            "init=epsg:32631"
+        END
+        PROCESSING "BANDS=B8,B11,B12"
+        METADATA
+            "wms_title" "Satellite été 2025" 
+            "wms_srs" "EPSG:31370"
+        END
+        TEMPLATE "../template.html"
+    END
+LAYER
+        NAME "Super Résolution Satellite été 2025 : CRSWIR"
+        TYPE RASTER
+        STATUS ON
+        DATA "/mnt/pc57_data3/NICOLAS/RemoteSensing/RegionMosaics/ExportResults/Wallonia_vegetation2025/SuperResolutionV2/predict_ms210_220_final_v2_CRswir_x1000.tif"
+        PROJECTION
+            "init=epsg:32631"
+        END
+        METADATA
+            "wms_title" "Satellite été 2025 : CRSWIR" 
+            "wms_srs" "EPSG:31370"
+        END
+        TEMPLATE "../template.html"
+    END
