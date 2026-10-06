@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
             ("help", "produce help message")
             ("outils", po::value<int>()->required(), "choix de l'outil à utiliser. 0: clean carte AE. 1 clean carte compo Nicolas 2026 04")
             ("raster", po::value<string>()->required(), "raster à nettoyer")
+            ("raster2", po::value<string>(), "raster de masque")
             ;
 
     po::variables_map vm;
@@ -92,10 +93,6 @@ int main(int argc, char *argv[])
         // erode des 3 isolé en bordure des 2
         seuilVois=8;
         fillHole(aIn,1,2,2,seuilVois,int(1));
-
-
-
-
         // sauver resultat
         std::string aOut=pathRaster.substr(0,pathRaster.size()-4)+"_clean.tif";
         Tiff_Im::CreateFromIm(*aIn,aOut);
@@ -110,6 +107,9 @@ int main(int argc, char *argv[])
 
         std::cout << " nettoyage carte " << pathRaster << std::endl;
         GDALDataset *pIn= (GDALDataset*) GDALOpen(pathRaster.c_str(), GA_ReadOnly);
+        std::string pathRaster2(vm["raster2"].as<std::string>());
+
+
         bool test(0);
         const char *comp = "COMPRESSION=DEFLATE";
         if (strcmp(*pIn->GetMetadata("IMAGE_STRUCTURE"),comp)== 0){test=1;}
@@ -127,24 +127,49 @@ int main(int argc, char *argv[])
             pathRaster=getNameTmp(pathRaster);
         }
 
+        test=0;
+        GDALDataset *pIn2= (GDALDataset*) GDALOpen(pathRaster2.c_str(), GA_ReadOnly);
+        if (strcmp(*pIn2->GetMetadata("IMAGE_STRUCTURE"),comp)== 0){test=1;}
+        GDALClose(pIn2);
+
+        if (test){
+            std::cout << "compression détectée" << std::endl;
+            if (!fs::exists(getNameTmp(pathRaster2))){
+                // on décompresse tout ça
+                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' "+ pathRaster2 +" "+getNameTmp(pathRaster2)+" ");
+                std::cout << aCommand << "\n";
+                system(aCommand.c_str());
+
+            }
+            pathRaster2=getNameTmp(pathRaster2);
+        }
+
         //lecture du raster
         std::cout << "charge image " << pathRaster << std::endl;
         Im2D_U_INT1 * aIn=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathRaster));
 
+        std::cout << "charge image " << pathRaster2 << std::endl;
+        Im2D_U_INT1 * aInMask=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathRaster2));
+
+        Im2D_U_INT1 aImLabMaj(aIn->sz().x,aIn->sz().y,0);
+        Im2D_U_INT1 aImOut(aIn->sz().x,aIn->sz().y,0);
 
         std::cout << "clean image\n";
 
-        int Val2Clean(2),ValConflict1(3),ValCopain(3),seuilVois(5);
-
-        // boucle sur toutes les valeurs de classes carte compo
-        for (int dn(1); dn <10;dn++){
-            std::cout << "fill hole pour val " << dn << std::endl;
-            fillHole(aIn,0,dn,dn,5,int(1));
+        // label_maj dans une fenetre de 3x3
+        for (int i(0); i<4 ; i++){
+            std::cout << "iteration 1 " << std::endl;
+        // label majoritaire
+        ELISE_COPY(aIn->all_pts(),label_maj(aIn->in(0),1000,Box2di(Pt2di(-1,-1),Pt2di(1,1))),aImLabMaj.oclip());
+        ELISE_COPY(select(aIn->all_pts(),aIn->in(0)=!0),aIn->in(0),aImOut.oclip());
+        ELISE_COPY(select(aIn->all_pts(),aIn->in(0)==0 & aInMask->in(0)==1),aImLabMaj.in(0),aImOut.oclip());
+        // pour que les itérations d'après soient opérationnelles
+        ELISE_COPY(aIn->all_pts(),aImOut.in(0),aIn->oclip());
         }
 
         // sauver resultat
         std::string aOut=pathRaster.substr(0,pathRaster.size()-4)+"_clean.tif";
-        Tiff_Im::CreateFromIm(*aIn,aOut);
+        Tiff_Im::CreateFromIm(aImOut,aOut);
         copyTifMTD(pathRaster,aOut);
         compressTif(aOut);
 
@@ -227,7 +252,7 @@ void cleanIsolatedPix(Im2D_U_INT1 * aIn,int Val2Clean, int Val2Replace, int seui
 
 void fillHole(Im2D_U_INT1 * aIn,int Val2Clean, int ValCopain,int ValConflict1, int seuilVois,int aSz1){
 
-    std::cout << "Nettoyage carte AE valeur " << Val2Clean << ", soutenu par valeur " << ValCopain <<", seuil nombre de voisin " << seuilVois << " Apport d'eau à ne pas modifier : " << ValConflict1 << std::endl;
+    std::cout << "Nettoyage raster valeur " << Val2Clean << ", soutenu par valeur " << ValCopain <<", seuil nombre de voisin " << seuilVois << " Apport d'eau à ne pas modifier : " << ValConflict1 << std::endl;
 
     Im2D_U_INT1 Im(aIn->sz().x,aIn->sz().y,0);
     // pixels qu'on va peut-être changer de catégorie
@@ -244,6 +269,3 @@ void fillHole(Im2D_U_INT1 * aIn,int Val2Clean, int ValCopain,int ValConflict1, i
     delete IbinTmp;
     ELISE_COPY(select(aIn->all_pts(),ImNbVois.in()>=seuilVois && Im.in()==1),Val2Clean,aIn->oclip());
 }
-
-
-
