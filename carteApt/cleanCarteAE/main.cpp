@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
             std::cout << "compression détectée" << std::endl;
             if (!fs::exists(getNameTmp(pathRaster))){
                 // on décompresse tout ça
-                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' -expand gray "+ pathRaster +" "+getNameTmp(pathRaster)+" ");
+                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' -colorinterp undefined "+ pathRaster +" "+getNameTmp(pathRaster)+" ");
                 std::cout << aCommand << "\n";
                 system(aCommand.c_str());
 
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
             std::cout << "compression détectée" << std::endl;
             if (!fs::exists(getNameTmp(pathRaster2))){
                 // on décompresse tout ça
-                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' -expand gray "+ pathRaster2 +" "+getNameTmp(pathRaster2)+" ");
+                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' -colorinterp undefined "+ pathRaster2 +" "+getNameTmp(pathRaster2)+" ");
                 std::cout << aCommand << "\n";
                 system(aCommand.c_str());
 
@@ -150,26 +150,27 @@ int main(int argc, char *argv[])
 
         //lecture du raster
         std::cout << "charge image " << pathRaster << std::endl;
-        Im2D_U_INT1 * aIn=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathRaster));
+        Im2D_U_INT1 aIn=Im2D_U_INT1::FromFileStd(pathRaster);
         std::cout << "done" <<std::endl;
         std::cout << "charge image " << pathRaster2 << std::endl;
-        Im2D_U_INT1 * aInMask=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathRaster2));
+        Im2D_U_INT1 aInMask=Im2D_U_INT1::FromFileStd(pathRaster2);
         std::cout << "done" <<std::endl;
 
-        Im2D_U_INT1 aImLabMaj(aIn->sz().x,aIn->sz().y,0);
-        Im2D_U_INT1 aImOut(aIn->sz().x,aIn->sz().y,0);
+        Im2D_U_INT1 aImLabMaj(aIn.sz().x,aIn.sz().y,0);
+        Im2D_U_INT1 aImOut(aIn.sz().x,aIn.sz().y,0);
 
         std::cout << "clean image\n";
+        ELISE_COPY(select(aIn.all_pts(),aIn.in(0)!=0),aIn.in(0),aImOut.oclip());
 
         // label_maj dans une fenetre de 3x3
-        for (int i(0); i<4 ; i++){
-            std::cout << "iteration 1 " << std::endl;
+        for (int i(0); i<5 ; i++){
+            std::cout << "iteration " << i << std::endl;
             // label majoritaire
-            ELISE_COPY(aIn->all_pts(),label_maj(aIn->in(0),1000,Box2di(Pt2di(-1,-1),Pt2di(1,1))),aImLabMaj.oclip());
-            ELISE_COPY(select(aIn->all_pts(),aIn->in(0)=!0),aIn->in(0),aImOut.oclip());
-            ELISE_COPY(select(aIn->all_pts(),aIn->in(0)==0 & aInMask->in(0)==1),aImLabMaj.in(0),aImOut.oclip());
-            // pour que les itérations d'après soient opérationnelles
-            ELISE_COPY(aIn->all_pts(),aImOut.in(0),aIn->oclip());
+            ELISE_COPY(aImOut.all_pts(),label_maj(aImOut.in(0),1000,Box2di(Pt2di(-1,-1),Pt2di(1,1))),aImLabMaj.oclip());
+            ELISE_COPY(select(aIn.all_pts(),aIn.in(0)==0 & aInMask.in(0)==1),aImLabMaj.in(0),aImOut.oclip());
+
+            //std::string aOuttmp=pathRaster.substr(0,pathRaster.size()-4)+"_"+std::to_string(i)+"_clean.tif";
+            //Tiff_Im::CreateFromIm(aImOut,aOuttmp);
         }
 
         // sauver resultat

@@ -458,7 +458,36 @@ MAP
             "wms_title" "Carte de composition ; espèce majoritaire 2021 " 
             "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+    END
+        LAYER
+        NAME "COMPOALLSIMP"
+        TYPE RASTER
+        STATUS ON
+        PROJECTION
+            "init=epsg:31370"
+        END
+        DATA "compo_all_sp_smoothed.tif"
+        PROCESSING "BANDS=1"
+        CLASSITEM "[pixel]"
+        INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_compo.map"
+        CLASS
+            NAME "AUb - Others broadleaves"
+            EXPRESSION "1"
+            STYLE
+                COLOR 166 206 227
+            END
+        END
+        CLASS
+            NAME "AUc -  Others coniferous"
+            EXPRESSION "10"
+            STYLE
+                COLOR 76 39 114
+            END
+        END
+        METADATA
+            "wms_title" "Carte de composition simplifiée ; espèce majoritaire 2021 " 
+            "wms_srs" "EPSG:31370" 
+        END
     END
     LAYER
         NAME "COMPOALL2018"
