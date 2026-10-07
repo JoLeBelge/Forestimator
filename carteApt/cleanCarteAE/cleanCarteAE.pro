@@ -9,11 +9,8 @@ QT += x11extras
 SOURCES += \
         main.cpp\
 
-LIBS += -L/home/jo/app/micmac/build/src/ -lelise
-PRE_TARGETDEPS += /home/jo/app/micmac/lib/libelise.a
-
-LIBS += -L/home/grf/app/micmac/lib/ -lelise
-PRE_TARGETDEPS += /home/grf/app/micmac/lib/libelise.a
+LIBS += -L$$PWD/../../../micmac/build/src/ -lelise
+PRE_TARGETDEPS += $$PWD/../../../micmac/lib/libelise.a
 
 LIBS += -lX11 -lboost_program_options -lboost_filesystem
 
