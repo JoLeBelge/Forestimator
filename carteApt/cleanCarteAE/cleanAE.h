@@ -29,9 +29,9 @@ std::string getNameTmp(std::string aName){
 void copyTifMTD(std::string aRasterIn, std::string aRasterOut){
     // copy projection et src dans gdal
     GDALDataset *pIn, *pOut;
-    GDALDriver *pDriver;
-    const char *pszFormat = "GTiff";
-    pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+    //GDALDriver *pDriver;
+    //const char *pszFormat = "GTiff";
+    //pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
     pOut = (GDALDataset*) GDALOpen(aRasterOut.c_str(), GA_Update);
     pIn = (GDALDataset*) GDALOpen(aRasterIn.c_str(), GA_ReadOnly);
     pOut->SetProjection( pIn->GetProjectionRef() );

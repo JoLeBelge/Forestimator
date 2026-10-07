@@ -8,11 +8,11 @@ int main(int argc, char *argv[])
     // Declare the supported options.
     po::options_description desc("Allowed options");
     desc.add_options()
-            ("help", "produce help message")
-            ("outils", po::value<int>()->required(), "choix de l'outil à utiliser. 0: clean carte AE. 1 clean carte compo Nicolas 2026 04")
-            ("raster", po::value<string>()->required(), "raster à nettoyer")
-            ("raster2", po::value<string>(), "raster de masque")
-            ;
+        ("help", "produce help message")
+        ("outils", po::value<int>()->required(), "choix de l'outil à utiliser. 0: clean carte AE. 1 clean carte compo Nicolas 2026 04")
+        ("raster", po::value<string>()->required(), "raster à nettoyer")
+        ("raster2", po::value<string>(), "raster de masque")
+        ;
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
                 system(aCommand.c_str());
 
             }
-             pathRaster=getNameTmp(pathRaster);
+            pathRaster=getNameTmp(pathRaster);
         }
 
         //lecture du raster
@@ -63,23 +63,23 @@ int main(int argc, char *argv[])
 
         int Val2Clean(2),ValConflict1(3),ValCopain(3),seuilVois(5);
         for (int iter(1); iter <3;iter++){
-        // 49-25 = 24.
-        seuilVois=14;
-        fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
-        // 9pow 2= 81 - 5pow2=56
-        //seuilVois=30;
-        //fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
+            // 49-25 = 24.
+            seuilVois=14;
+            fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
+            // 9pow 2= 81 - 5pow2=56
+            //seuilVois=30;
+            //fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
         }
 
 
         Val2Clean=3;ValConflict1=1;ValCopain=666;
         for (int iter(1); iter <2;iter++){
-        // 49-25 = 24.
-        seuilVois=14;
-        fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
-        // 9pow 2= 81 - 5pow2=56
-        //seuilVois=30;
-        //fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
+            // 49-25 = 24.
+            seuilVois=14;
+            fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
+            // 9pow 2= 81 - 5pow2=56
+            //seuilVois=30;
+            //fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
         }
 
 
@@ -102,12 +102,16 @@ int main(int argc, char *argv[])
         break;
     }
     case 1:{
-    // 2026 06 j'aimerai boucher les trou dans la nouvelle carte de composition de Nicolas, qui sont des trous entre deux houppiers ou de petites trouées
-    // résolution de 10 mètres
+        // 2026 06 j'aimerai boucher les trou dans la nouvelle carte de composition de Nicolas, qui sont des trous entre deux houppiers ou de petites trouées
+        // résolution de 10 mètres
 
         std::cout << " nettoyage carte " << pathRaster << std::endl;
         GDALDataset *pIn= (GDALDataset*) GDALOpen(pathRaster.c_str(), GA_ReadOnly);
-        std::string pathRaster2(vm["raster2"].as<std::string>());
+        std::string pathRaster2("");
+        if (vm.count("raster2")) {pathRaster2=vm["raster2"].as<std::string>();}
+        else {
+            std::cout << "renseigner le chemin d'accès au masque forest svp" << std::endl;
+            break;}
 
 
         bool test(0);
@@ -119,7 +123,7 @@ int main(int argc, char *argv[])
             std::cout << "compression détectée" << std::endl;
             if (!fs::exists(getNameTmp(pathRaster))){
                 // on décompresse tout ça
-                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' "+ pathRaster +" "+getNameTmp(pathRaster)+" ");
+                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' -expand gray "+ pathRaster +" "+getNameTmp(pathRaster)+" ");
                 std::cout << aCommand << "\n";
                 system(aCommand.c_str());
 
@@ -136,7 +140,7 @@ int main(int argc, char *argv[])
             std::cout << "compression détectée" << std::endl;
             if (!fs::exists(getNameTmp(pathRaster2))){
                 // on décompresse tout ça
-                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' "+ pathRaster2 +" "+getNameTmp(pathRaster2)+" ");
+                std::string aCommand= std::string("gdal_translate -co 'COMPRESS=NONE' -expand gray "+ pathRaster2 +" "+getNameTmp(pathRaster2)+" ");
                 std::cout << aCommand << "\n";
                 system(aCommand.c_str());
 
@@ -147,9 +151,10 @@ int main(int argc, char *argv[])
         //lecture du raster
         std::cout << "charge image " << pathRaster << std::endl;
         Im2D_U_INT1 * aIn=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathRaster));
-
+        std::cout << "done" <<std::endl;
         std::cout << "charge image " << pathRaster2 << std::endl;
         Im2D_U_INT1 * aInMask=new Im2D_U_INT1(Im2D_U_INT1::FromFileStd(pathRaster2));
+        std::cout << "done" <<std::endl;
 
         Im2D_U_INT1 aImLabMaj(aIn->sz().x,aIn->sz().y,0);
         Im2D_U_INT1 aImOut(aIn->sz().x,aIn->sz().y,0);
@@ -159,12 +164,12 @@ int main(int argc, char *argv[])
         // label_maj dans une fenetre de 3x3
         for (int i(0); i<4 ; i++){
             std::cout << "iteration 1 " << std::endl;
-        // label majoritaire
-        ELISE_COPY(aIn->all_pts(),label_maj(aIn->in(0),1000,Box2di(Pt2di(-1,-1),Pt2di(1,1))),aImLabMaj.oclip());
-        ELISE_COPY(select(aIn->all_pts(),aIn->in(0)=!0),aIn->in(0),aImOut.oclip());
-        ELISE_COPY(select(aIn->all_pts(),aIn->in(0)==0 & aInMask->in(0)==1),aImLabMaj.in(0),aImOut.oclip());
-        // pour que les itérations d'après soient opérationnelles
-        ELISE_COPY(aIn->all_pts(),aImOut.in(0),aIn->oclip());
+            // label majoritaire
+            ELISE_COPY(aIn->all_pts(),label_maj(aIn->in(0),1000,Box2di(Pt2di(-1,-1),Pt2di(1,1))),aImLabMaj.oclip());
+            ELISE_COPY(select(aIn->all_pts(),aIn->in(0)=!0),aIn->in(0),aImOut.oclip());
+            ELISE_COPY(select(aIn->all_pts(),aIn->in(0)==0 & aInMask->in(0)==1),aImLabMaj.in(0),aImOut.oclip());
+            // pour que les itérations d'après soient opérationnelles
+            ELISE_COPY(aIn->all_pts(),aImOut.in(0),aIn->oclip());
         }
 
         // sauver resultat
@@ -213,7 +218,7 @@ void checkCompression(std::string * aRaster){
             system(aCommand.c_str());
 
         }
-         *aRaster=nameTmp;
+        *aRaster=nameTmp;
     }
 }
 
