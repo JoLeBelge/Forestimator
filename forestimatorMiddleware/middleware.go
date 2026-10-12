@@ -53,7 +53,7 @@ func main() {
 		switch strings.ToLower(r.Host) {
 		case "forestimator.gembloux.ulg.ac.be":
 			if r.URL.Path == "/dev" {
-				log.Println("DEV")
+				r.URL.Path = "/"
 				devProxy.ServeHTTP(w, r)
 			}
 			siteProxy.ServeHTTP(w, r)
