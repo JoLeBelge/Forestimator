@@ -1,0 +1,8 @@
+forestimatorWeb contient le nouveau middleware sur port 8505.
+- lance les proxy pour le downloader et le open foris plus nominatim.
+ - lance forestimatorWeb avec launch.sh
+ - utilise /logs
+
+forestimatorWebOld contient le vieux middleware sur port 8500.
+ - lance forestimatorWeb avec launchOld.sh
+ - utilise /logsOld

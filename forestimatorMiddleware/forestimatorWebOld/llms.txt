@@ -1,0 +1,13 @@
+# Title
+
+> Forestimator Web is the cartographic portal of the forstry section of Uliege Agro Bio Tech Gembloux.
+Many of our work results in a map. To put them at disposal of the public, we have created this web portal. 
+
+It allows to visualize and download forest maps and data of the Walloon Region. 
+
+It allows to make analysis of points or areas of interest, and to create and download reports.
+
+It allows to consult the Belgium Cadasteral data.
+
+
+
