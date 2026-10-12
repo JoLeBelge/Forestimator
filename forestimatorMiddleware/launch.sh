@@ -1,4 +1,4 @@
-./activeWebsite/launch.sh &
+sh /home/carto/app/Forestimator/forestimatorMiddleware/activeWebsite/launch.sh &
 #sudo sh development/launch.sh &
 
 sudo docker start nominatim6666 &
