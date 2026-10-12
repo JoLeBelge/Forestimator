@@ -1,5 +1,5 @@
 sh /home/carto/app/Forestimator/forestimatorMiddleware/activeWebsite/launch.sh &
-#sudo sh development/launch.sh &
+sh /home/carto/app/Forestimator/forestimatorMiddleware/development/launch.sh &
 
 sudo docker start nominatim6666 &
 
