@@ -472,19 +472,7 @@ func main() {
 		}
 	}()
 	go func() {
-		for {
-			cmd := startForestimatorDownloadServer(workingDirectory)
-			cmd.Start()
-			cmd.Wait()
-			log.Println("Forestimator download server has stopped")
-			log.Println("Restarting now...")
-		}
-
-	}()
-	go func() {
 		forestimator.proxy, _ = NewProxy("http://localhost:" + portForestimatorWeb)
-		forestimator.downloader, _ = NewProxy("http://localhost:" + portForestimatorDownloader)
-		forestimator.openforis, _ = NewProxy("http://localhost:" + portOpenForis)
 		for {
 			if forestimator.started {
 				director := forestimator.proxy.Director
