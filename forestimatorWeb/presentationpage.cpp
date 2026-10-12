@@ -103,7 +103,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
 
   subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
   subMenu = subMenuPtr.get();
-  item = std::make_unique<Wt::WMenuItem>("Suivi sanitaire");
+  item = std::make_unique<Wt::WMenuItem>("Suivi de la vitalité");
   item->setMenu(std::move(subMenuPtr));
   item_ = menu->addItem(std::move(item));
   subMenu->addStyleClass("nav-stacked submenu");

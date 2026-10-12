@@ -524,20 +524,6 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             const char *pszWkt = mGDALDat->GetProjectionRef();
             OGRSpatialReference oSRS;
             oSRS.importFromWkt(&pszWkt);
-
-            /*if (globTest){
-
-                char *ppszProj4A = nullptr;
-                char *ppszProj4B = nullptr;
-
-                oSRS.exportToPrettyWkt(& ppszProj4A);
-
-                OGRSpatialReference * oSRS2 = poGeom->getSpatialReference();
-                oSRS2->exportToProj4(& ppszProj4B);
-                std::cout << "SRS raster : " <<  ppszProj4A << std::endl;
-                std::cout << "SRS vector : " << ppszProj4B  << std::endl;
-                CPLFree(ppszProj4A);
-            }*/
             // driver et dataset shp -- creation depuis la géométrie
             GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("MEM");
             boost::filesystem::path tmpPath = boost::filesystem::path("/vsimem/") / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%");
@@ -548,7 +534,6 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
 
             OGRLayer * lay = pShp->CreateLayer(name2.c_str(),&oSRS,wkbPolygon,NULL);
-
             OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
             feat->SetGeometry(poGeom);
             OGRErr err = lay->CreateFeature(feat);
@@ -577,14 +562,14 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             if (xSize>0 && ySize>0){
             pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
             pRaster->SetGeoTransform(tr2);
-            } else {
-                std::cout << "rasterfile::rasterizeGeom: raster size problem x="<<xSize <<", y=" << ySize <<"\n" << std::endl;
-            }
-
             // on en avait besoin que pour l'extent et resol
             pRaster->SetProjection(mGDALDat->GetProjectionRef());
-            GDALClose(mGDALDat);
             GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
+            } else {
+            std::cout << "rasterfile::rasterizeGeom: raster size problem x="<<xSize <<", y=" << ySize <<"\n" << std::endl;
+
+            }
+            GDALClose(mGDALDat);
             OGRFeature::DestroyFeature(feat);
             pShp->DeleteLayer(0);
             GDALClose(pShp);
@@ -1038,12 +1023,12 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
             pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
             pRaster->SetGeoTransform(tr2);
             pRaster->SetProjection(aGDALDat->GetProjectionRef());
+            GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
              } else {
                  std::cout << "global::rasterizeGeom: raster size problem x="<<xSize<<", y="<< ySize<<"\n" << std::endl;
              }
             // on en avait besoin que pour l'extent et resol
             GDALClose(aGDALDat);
-            GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
             OGRFeature::DestroyFeature(feat);
             pShp->DeleteLayer(0);
             GDALClose(pShp);
