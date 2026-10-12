@@ -18,7 +18,8 @@ import (
 
 const (
 	portMiddleWare             = "8085"
-	portForestimatorWeb        = "8500"
+	portForestimatorWebOld     = "8500"
+	portForestimatorWeb        = "8505"
 	portForestimatorDownloader = "8501"
 	portOpenForis              = "8380"
 	bufferSize                 = 1 << 20
@@ -28,22 +29,13 @@ const (
 )
 
 var mapMapservRoutes = map[string]string{
-	"map":       "/var/www/html/PPNW.map",
-	"ppnw":      "/var/www/html/PPNW.map",
-	"ppnc":      "/var/www/html/PPNC.map",
-	"ppnw_tiff": "/var/www/html/PPNW_TIFF.map",
-	"ign":       "/var/www/html/IGN.map",
-	"ancien":    "/var/www/html/Ancien.map",
-	"mnh":       "/var/www/html/MNH.map",
-	// "GxABT_851XHy47": "/var/www/html/GxABT_851XHy47.map",  // Commented out
-	// "GxABT_851XHy47o": "/var/www/html/GxABT_851XHy47o.map", // Commented out
-	// "scolyte": "/var/www/html/Scolyte.map",                 // Commented out
-	// "scolyte_rw": "/var/www/html/Scolyte_rw.map",           // Commented out
-	// "scolyte_shp": "/var/www/html/Scolyte_shp.map",         // Commented out
-	// "scolyte_wcs": "/var/www/html/Scolyte_wcs.map",         // Commented out
-	// "scolyte_wms": "/var/www/html/Scolyte_wms.map",         // Commented out
-	// "makalaya": "/var/www/html/Makalaya.map",               // Commented out (duplicate key)
-	// "idroc/congo": "/var/www/html/iDROC_RC.map",            // Commented out (duplicate key)
+	"map":          "/var/www/html/PPNW.map",
+	"ppnw":         "/var/www/html/PPNW.map",
+	"ppnc":         "/var/www/html/PPNC.map",
+	"ppnw_tiff":    "/var/www/html/PPNW_TIFF.map",
+	"ign":          "/var/www/html/IGN.map",
+	"ancien":       "/var/www/html/Ancien.map",
+	"mnh":          "/var/www/html/MNH.map",
 	"sambia":       "/var/www/html/Sambia.map",
 	"planet":       "/var/www/html/Planet.map",
 	"probos":       "/var/www/html/Probos.map",
@@ -51,18 +43,16 @@ var mapMapservRoutes = map[string]string{
 	"aptitude_fee": "/var/www/html/ForestimatorFEE.map",
 	"aptitude_cs":  "/var/www/html/ForestimatorCS.map",
 	"station_fee":  "/var/www/html/StationFEE.map",
-	// "station_cs": "/var/www/html/StationCS.map",             // Commented out
 	"forestimator": "/var/www/html/ForestimatorAutre.map",
 	"ahf":          "/var/www/html/Probos_ahf.map",
-	// "vcantreul": "/var/www/html/VCantreul.map",              // Commented out
-	"planet_ir":   "/var/www/html/Planet_IR.map",
-	"makalaya":    "/var/www/html/iDROC_Cam.map", // Overrides previous makalaya entry
-	"idroc/congo": "/var/www/html/iDROC_RC.map",  // Overrides previous idroc/congo entry
-	"ogf":         "/var/www/html/ogf.map",
+	"planet_ir":    "/var/www/html/Planet_IR.map",
+	"makalaya":     "/var/www/html/iDROC_Cam.map",
+	"idroc/congo":  "/var/www/html/iDROC_RC.map",
+	"ogf":          "/var/www/html/ogf.map",
 }
 
 type proc struct {
-	proxy                 *httputil.ReverseProxy
+	proxyOld              *httputil.ReverseProxy
 	downloader            *httputil.ReverseProxy
 	openforis             *httputil.ReverseProxy
 	started               bool
@@ -103,6 +93,12 @@ type proc struct {
 	capBnd          string
 	capAmb          string
 	cpusAllowedList string
+}
+
+func startForestimatorWebServerOld(wd string) (cmd *exec.Cmd) {
+	cmd = exec.Command("sh", "launchOld.sh") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
+	cmd.Dir = wd + "Forestimator/forestimatorWeb"
+	return cmd
 }
 
 func startForestimatorWebServer(wd string) (cmd *exec.Cmd) {
@@ -448,36 +444,43 @@ func main() {
 		pid:                   -1,
 		totalRequestsReceived: 0,
 	}
+	forestimatorOld := proc{
+		started:               false,
+		cmd:                   nil,
+		outPipe:               nil,
+		pid:                   -1,
+		totalRequestsReceived: 0,
+	}
 
 	go func() {
 		for {
-			forestimator.cmd = startForestimatorWebServer(workingDirectory)
-			log.Println(forestimator.cmd.Args)
-			forestimator.outPipe, _ = forestimator.cmd.StdoutPipe()
-			forestimator.errPipe, _ = forestimator.cmd.StderrPipe()
-			err := forestimator.cmd.Start()
+			forestimatorOld.cmd = startForestimatorWebServerOld(workingDirectory)
+			log.Println(forestimatorOld.cmd.Args)
+			forestimatorOld.outPipe, _ = forestimatorOld.cmd.StdoutPipe()
+			forestimatorOld.errPipe, _ = forestimatorOld.cmd.StderrPipe()
+			err := forestimatorOld.cmd.Start()
 			if err == nil {
-				forestimator.starttime = time.Now()
-				log.Println(forestimator.cmd.Args)
+				forestimatorOld.starttime = time.Now()
+				log.Println(forestimatorOld.cmd.Args)
 				go func() {
 					time.Sleep(100 * time.Millisecond)
-					forestimator.pid = getForestimatorPid("forestimatorWeb")
+					forestimatorOld.pid = getForestimatorPid("forestimatorWeb")
 					t := strconv.Itoa(time.Now().Year()) + "." +
 						time.Now().Month().String() + "." +
 						strconv.Itoa(time.Now().Day()) + "." +
 						strconv.Itoa(time.Now().Hour()) + "." + strconv.Itoa(time.Now().Minute()) + "." + strconv.Itoa(time.Now().Second()) + "."
-					forestimator.infoDirName = workingDirectory + "/Forestimator/forestimatorMiddleware/logs/" + t + strconv.Itoa(forestimator.pid)
-					os.Mkdir(forestimator.infoDirName, os.ModePerm)
-					forestimator.started = true
-					log.Println("Started Forestimator web server. pid: " + strconv.Itoa(forestimator.pid))
+					forestimatorOld.infoDirName = workingDirectory + "/Forestimator/forestimatorMiddleware/logs/" + t + strconv.Itoa(forestimatorOld.pid)
+					os.Mkdir(forestimatorOld.infoDirName, os.ModePerm)
+					forestimatorOld.started = true
+					log.Println("Started Forestimator web server. pid: " + strconv.Itoa(forestimatorOld.pid))
 				}()
 			} else {
 				log.Println("Failed to start Forestimator web server")
 				log.Println(err)
 			}
-			forestimator.cmd.Wait()
-			forestimator.started = false
-			recordEndLog(&forestimator)
+			forestimatorOld.cmd.Wait()
+			forestimatorOld.started = false
+			recordEndLog(&forestimatorOld)
 			log.Println("Forestimator web server has stopped")
 			log.Println("Restarting now...")
 		}
@@ -493,15 +496,15 @@ func main() {
 
 	}()
 	go func() {
-		forestimator.proxy, _ = NewProxy("http://localhost:" + portForestimatorWeb)
-		forestimator.downloader, _ = NewProxy("http://localhost:" + portForestimatorDownloader)
-		forestimator.openforis, _ = NewProxy("http://localhost:" + portOpenForis)
+		forestimatorOld.proxyOld, _ = NewProxy("http://localhost:" + portForestimatorWebOld)
+		forestimatorOld.downloader, _ = NewProxy("http://localhost:" + portForestimatorDownloader)
+		forestimatorOld.openforis, _ = NewProxy("http://localhost:" + portOpenForis)
 		for {
-			if forestimator.started {
-				director := forestimator.proxy.Director
-				forestimator.proxy.Director = func(r *http.Request) {
+			if forestimatorOld.started {
+				director := forestimatorOld.proxyOld.Director
+				forestimatorOld.proxyOld.Director = func(r *http.Request) {
 					director(r)
-					recordRequest(&forestimator, r.RemoteAddr+r.RequestURI)
+					recordRequest(&forestimatorOld, r.RemoteAddr+r.RequestURI)
 					/*if strings.Contains(r.RequestURI, "?signal=") && strings.Contains(r.RequestURI, "&wtd=") {
 						log.Println("Signal detected in request URI")
 						r.URL.RawQuery = "GET /"
@@ -517,11 +520,11 @@ func main() {
 				f*/
 
 				forestimatorHandler := http.NewServeMux()
-				forestimatorHandler.Handle("/collect/", forestimator.openforis)
-				forestimatorHandler.Handle("/", forestimator.proxy)
+				forestimatorHandler.Handle("/collect/", forestimatorOld.openforis)
+				forestimatorHandler.Handle("/", forestimatorOld.proxyOld)
 				forestimatorHandler.HandleFunc("/robots.txt", sendRobotsTxt)
 				forestimatorHandler.HandleFunc("/llms.txt", sendLLMsTxt)
-				forestimatorHandler.Handle("/results/", forestimator.downloader)
+				forestimatorHandler.Handle("/results/", forestimatorOld.downloader)
 				forestimatorHandler.HandleFunc("/cgi-bin/", handleCgiRequest)
 
 				fmt.Println(http.ListenAndServe(":"+portMiddleWare, forestimatorHandler))
@@ -564,9 +567,9 @@ func main() {
 	go func() {
 		timeup := true
 		for {
-			if forestimator.started && !timeup {
-				record, _ := refreshProcInfo(&forestimator)
-				recordData(&forestimator, record)
+			if forestimatorOld.started && !timeup {
+				record, _ := refreshProcInfo(&forestimatorOld)
+				recordData(&forestimatorOld, record)
 				timeup = true
 			} else {
 				time.Sleep(updateIntervall)
@@ -578,8 +581,8 @@ func main() {
 		timeup := true
 		tmp := []string{}
 		for {
-			if forestimator.started && !timeup {
-				processInfo := getProcessInfo(&forestimator)
+			if forestimatorOld.started && !timeup {
+				processInfo := getProcessInfo(&forestimatorOld)
 				if processInfo != "" {
 					tmp = append(tmp, strings.TrimSpace(processInfo))
 				}
@@ -588,7 +591,7 @@ func main() {
 				if len(tmp) > 10 {
 					for _, str := range tmp {
 						if str != "" {
-							recordThisInFile(false, strings.Split(time.Now().String(), "+")[0]+","+str+","+strconv.Itoa(forestimator.vmPeak), "threadSSig.csv", forestimator.infoDirName)
+							recordThisInFile(false, strings.Split(time.Now().String(), "+")[0]+","+str+","+strconv.Itoa(forestimatorOld.vmPeak), "threadSSig.csv", forestimatorOld.infoDirName)
 						}
 					}
 					tmp = []string{}
@@ -602,7 +605,7 @@ func main() {
 	go func() {
 		timeup := true
 		for timeup {
-			if forestimator.started {
+			if forestimatorOld.started {
 				timeup = false
 			}
 		}
@@ -610,8 +613,8 @@ func main() {
 	go func() {
 		timeup := true
 		for {
-			if forestimator.started && !timeup {
-				recordTerminalLogs(&forestimator)
+			if forestimatorOld.started && !timeup {
+				recordTerminalLogs(&forestimatorOld)
 				timeup = true
 			} else {
 				time.Sleep(time.Millisecond * 100)
@@ -622,8 +625,8 @@ func main() {
 	go func() {
 		timeup := true
 		for {
-			if forestimator.started && !timeup {
-				recordErrorLogs(&forestimator)
+			if forestimatorOld.started && !timeup {
+				recordErrorLogs(&forestimatorOld)
 				timeup = true
 			} else {
 				time.Sleep(time.Millisecond * 10)
