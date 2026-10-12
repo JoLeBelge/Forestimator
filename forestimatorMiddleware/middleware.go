@@ -54,7 +54,7 @@ func main() {
 		case "forestimator.gembloux.ulg.ac.be":
 			appProxy.ServeHTTP(w, r)
 
-		case "gxgfservcarto.gxabt.ulg.ac.be":
+		case "forestimator.gembloux.ulg.ac.be/dev":
 			apiProxy.ServeHTTP(w, r)
 
 		default:
