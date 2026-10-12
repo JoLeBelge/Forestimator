@@ -6,6 +6,7 @@ To do list forestimator Mobile
 	2) Forestimator middelware: ouvre un nouveau port et un pour une deuxième instance de forestimator, sur https://forestimator.gembloux.ulg.ac.be/dev/
 	3) dans la bd sqlite, nouveau directory pour les raster en Lambert2008 dans les colonnes "Dir" (tables fichier GIS et layerApt) -> on garde une bd unique 
 	4) on crée une nouvelle branche git et on modifie le code openlayer : systeme de projection et extend.
+	5) quand tout fonctionne, on change forestimator mobile pour qu'il soit compatible
 
 -Forestimator Web: -> formulaire consultation/modification email pour utilisateur : il faut alors une page "mon compte"
 

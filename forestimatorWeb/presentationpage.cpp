@@ -99,6 +99,20 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
     subMenu->addItem(std::move(item2));
     i++;
   }
+
+
+  subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
+  subMenu = subMenuPtr.get();
+  item = std::make_unique<Wt::WMenuItem>("Suivi sanitaire");
+  item->setMenu(std::move(subMenuPtr));
+  item_ = menu->addItem(std::move(item));
+  subMenu->addStyleClass("nav-stacked submenu");
+  subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
+
+  std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Présentation");
+  item2->setContents(std::make_unique<WText>(tr("sanitaire.description")));
+  item2->setPathComponent("");
+  subMenu->addItem(std::move(item2));
   subMenu->addItem(std::move(scolytePage()));
 
   subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
@@ -109,7 +123,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
   subMenu->addStyleClass("nav-stacked submenu");
   subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
 
-  std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Présentation");
+  item2 = std::make_unique<Wt::WMenuItem>("Présentation");
   item2->setContents(std::make_unique<WText>(tr("CS.intro")));
   item2->setPathComponent("");
   subMenu->addItem(std::move(item2));

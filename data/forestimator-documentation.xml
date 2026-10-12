@@ -218,10 +218,13 @@ Cette cartographie des essences forestières est le résultat de recherches men�
 </message>
 
 <message id="COMPO.version">
+
 Version 2026 04
+
 </message>
 
 <message id="COMPO.logs">
+<p>Version 2026 10 pour la carte simplifiée à 8 mètres de résolution au lieu de 2 mètreds et avec des valeurs attribuées aux espaces entre houppiers et  pour les trouées forestières. </p>
 <p>Avril 2026 ; diverses améliorations. </p> 
 <p>Décembre 2025 ; mise à jour majeure utilisant de concert les acquisitions LiDAR de 2021 et des prises de vue satellite. distinction de "autres résineux" et "autres feuillus". Version non finale - mise à jour à venir durant l'année 2026.</p>
 <p>Octobre 2021 ; passage à une résolution de 2,5 m (auparavant 10 m). Les cartes renseignent dorénavant la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence").</p>
@@ -538,6 +541,15 @@ Le manuel d'utilisation est téléchargeable sous format pdf
 <a target="_blank" rel="noopener noreferrer" href="/pdf/DocForestimatorMobile.pdf" download="DocForestimatorMobile">
  ici
 </a>.
+</message>
+
+<message id="sanitaire.description">
+<h4>Suivi de la vigueur des peuplements forestiers</h4>
+<p>Certains choix sylviculturaux d'hier ne sont plus adaptés aux enjeux sociétaux et climatiques d'aujourd'hui. Les conséquences des changements climatiques sur la <mark>monoculture intensive de l'épicéa</mark> ont été interpellant par leur intensité durant la crise sanitaire européenne de 2018-2022, durant laquelle les scolytes de l'épicéa ont profité de l'affaiblissement des arbres engendré par les stress hydrique pour ravager quelques 12% de la surface des pessières wallonne. Chez nous, l'épicéa, essence montagnarde, a dépéri plus fortement sur les stations en basse altitude. <mark>Le Douglas</mark> a cessé d'être la première essence de replantation depuis que les dégats causés par ses trois ravageur fongiques sèment l'inquiétude auprès des gestionnaires forestiers. <mark>Les hêtraies</mark> wallonnes sont dans un état sanitaire qui va en s'aggravant et il est rare d'observer des sujets adultes ayant une ramification et une feuillaison sans lacunes. <mark>Les frênes</mark> sont décimés par la Chalarose depuis 2015 et mêmes les essences indigènes présentant une autécologie les plus plastiques accusent le coup des saisons chaudes et sèches : <mark>les chênaies de Famenne</mark> sont le théâtre de descente de cimes extrêmes et d'une mortalité qui est généralisée sur les sols les plus superficiels.</p>
+
+<br></br>
+<p>Plusieurs cartes relatives à l'états sanitaires des peuplements ou à leur vigueur sont mises à disposition. Un suivi année par année de la crise du scolyte de l'épicéa a été réalisé dans le cadre de la thèse de Mr Gilles A. <mark>Des composites d'images satellites</mark> sont également générées à haute résolution (et sans nuages) pour des périodes charnières tels que la fin de la saison de végétation de 2025 et de 2026, sur lesquelles le brunissement précoce de certains peuplements, à commencer par les chênaies installées sur des sols superficiels, est particulièrement visible pour l'année 2026.
+</p>
 </message>
 
 </messages>

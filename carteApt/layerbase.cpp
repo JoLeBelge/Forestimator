@@ -544,7 +544,6 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
 
             std::string name1 = tmpPath.string();
             std::string name2 = name1.substr(5,name1.size()-5);
-            //pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
             pShp = pShpDriver->Create(name1.c_str(), 0, 0, 0, GDT_Unknown, NULL );// avoir des noms unique si je veux fontionner en parrallel computing
             // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
 
@@ -575,8 +574,12 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             tr2[5]=transform[5];
             // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
 
+            if (xSize>0 && ySize>0){
             pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
             pRaster->SetGeoTransform(tr2);
+            } else {
+                std::cout << "rasterfile::rasterizeGeom: raster size problem x="<<xSize <<", y=" << ySize <<"\n" << std::endl;
+            }
 
             // on en avait besoin que pour l'extent et resol
             pRaster->SetProjection(mGDALDat->GetProjectionRef());
@@ -1031,9 +1034,13 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
             tr2[4]=transform[4];
             tr2[5]=transform[5];
             // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
+             if (xSize>0 && ySize>0){
             pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
             pRaster->SetGeoTransform(tr2);
             pRaster->SetProjection(aGDALDat->GetProjectionRef());
+             } else {
+                 std::cout << "global::rasterizeGeom: raster size problem x="<<xSize<<", y="<< ySize<<"\n" << std::endl;
+             }
             // on en avait besoin que pour l'extent et resol
             GDALClose(aGDALDat);
             GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
