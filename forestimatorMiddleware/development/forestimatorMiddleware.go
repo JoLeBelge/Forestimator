@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	portMiddleWare             = "47000"
+	portMiddleWare             = "47100"
 	portForestimatorWeb        = "8505"
 	portForestimatorDownloader = "8501"
 	portOpenForis              = "8380"

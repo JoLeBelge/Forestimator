@@ -44,8 +44,8 @@ func newProxy(target string) *httputil.ReverseProxy {
 }
 
 func main() {
-	appProxy := newProxy("http://127.0.0.1:47000")
-	apiProxy := newProxy("http://127.0.0.1:47100")
+	appProxy := newProxy("localhost:47000")
+	apiProxy := newProxy("localhost:47100")
 
 	mux := http.NewServeMux()
 
