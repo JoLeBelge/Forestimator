@@ -1,34 +1,76 @@
 package forestimatormiddleware
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
+	"time"
 )
 
+func newProxy(target string) *httputil.ReverseProxy {
+	u, err := url.Parse(target)
+	if err != nil {
+		log.Fatalf("invalid backend URL %q: %v", target, err)
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(u)
+
+	originalDirector := proxy.Director
+	proxy.Director = func(req *http.Request) {
+		originalDirector(req)
+
+		// Set forwarding information.
+		clientIP := req.RemoteAddr
+		if host, _, err := strings.Cut(req.RemoteAddr, ":"); err {
+			clientIP = host
+		}
+		req.Header.Set("X-Forwarded-For", clientIP)
+		req.Header.Set("X-Forwarded-Proto", "https")
+		req.Header.Set("X-Forwarded-Host", req.Host)
+	}
+
+	proxy.ErrorHandler = func(
+		w http.ResponseWriter,
+		r *http.Request,
+		err error,
+	) {
+		log.Printf("proxy error: %v", err)
+		http.Error(w, "Bad Gateway", http.StatusBadGateway)
+	}
+
+	return proxy
+}
+
 func main() {
-	// Define target servers for reverse proxies
-	webSiteTarget, err := url.Parse("http://localhost:47000")
-	if err != nil {
-		log.Fatal(err)
+	appProxy := newProxy("http://127.0.0.1:47000")
+	apiProxy := newProxy("http://127.0.0.1:47100")
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		switch strings.ToLower(r.Host) {
+		case "app.example.com":
+			appProxy.ServeHTTP(w, r)
+
+		case "api.example.com":
+			apiProxy.ServeHTTP(w, r)
+
+		default:
+			http.Error(w, "Unknown host", http.StatusNotFound)
+		}
+	})
+
+	server := &http.Server{
+		Addr:              ":8085",
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      0,
+		IdleTimeout:       120 * time.Second,
 	}
 
-	devTarget, err := url.Parse("http://localhost:47100")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Create reverse proxies
-	webSiteProxy := httputil.NewSingleHostReverseProxy(webSiteTarget)
-	devProxy := httputil.NewSingleHostReverseProxy(devTarget)
-
-	// Set up handlers with path prefix stripping
-	http.HandleFunc("/", webSiteProxy.ServeHTTP)
-	http.HandleFunc("/dev/", devProxy.ServeHTTP)
-
-	// Start server on port 8085
-	fmt.Println("Server starting on :8085")
-	log.Fatal(http.ListenAndServe(":8085", nil))
+	log.Printf("reverse proxy listening on %s", server.Addr)
+	log.Fatal(server.ListenAndServe())
 }
