@@ -25,7 +25,7 @@ func main() {
 	devProxy := httputil.NewSingleHostReverseProxy(devTarget)
 
 	// Set up handlers with path prefix stripping
-	http.HandleFunc("/webSite/", webSiteProxy.ServeHTTP)
+	http.HandleFunc("/", webSiteProxy.ServeHTTP)
 	http.HandleFunc("/dev/", devProxy.ServeHTTP)
 
 	// Start server on port 8085
