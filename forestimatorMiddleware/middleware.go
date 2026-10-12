@@ -1,4 +1,4 @@
-package forestimatormiddleware
+package main
 
 import (
 	"log"
@@ -51,7 +51,7 @@ func main() {
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch strings.ToLower(r.Host) {
-		case "app.example.com":
+		case "forestimator.gembloux.ulg.ac.be":
 			appProxy.ServeHTTP(w, r)
 
 		case "api.example.com":
