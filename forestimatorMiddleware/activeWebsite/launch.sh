@@ -2,6 +2,4 @@
 # the next line solves an issiue with pango
 export FONTCONFIG_PATH=/etc/fonts
 
-sudo /usr/local/go/bin/go run /home/carto/app/Forestimator/forestimatorMiddleware/forestimatorWeb/forestimatorMiddleware.go
-
-sudo docker start nominatim6666
+sudo /usr/local/go/bin/go run /home/carto/app/Forestimator/forestimatorMiddleware/activeWebsite/forestimatorMiddleware.go
