@@ -44,18 +44,21 @@ func newProxy(target string) *httputil.ReverseProxy {
 }
 
 func main() {
-	appProxy := newProxy("http://localhost:47000")
-	apiProxy := newProxy("http://localhost:47100")
+	siteProxy := newProxy("http://localhost:47000")
+	devProxy := newProxy("http://localhost:47100")
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch strings.ToLower(r.Host) {
 		case "forestimator.gembloux.ulg.ac.be":
-			appProxy.ServeHTTP(w, r)
+			if r.URL.Path == "/dev" {
+				devProxy.ServeHTTP(w, r)
+			}
+			siteProxy.ServeHTTP(w, r)
 
-		case "forestimator.gembloux.ulg.ac.be/dev":
-			apiProxy.ServeHTTP(w, r)
+		case "gxgfservcarto.gxabt.ulg.ac.be":
+			devProxy.ServeHTTP(w, r)
 
 		default:
 			http.Error(w, "Unknown host", http.StatusNotFound)
