@@ -1,4 +1,4 @@
-package forestimatorMiddleware
+package main
 
 import (
 	"errors"
