@@ -45,10 +45,10 @@ func newProxy(target string) *httputil.ReverseProxy {
 }
 
 func main() {
-	/*certCarto, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/fullchain.pem", "/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/privkey.pem")
+	certCarto, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/fullchain.pem", "/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/privkey.pem")
 	if err != nil {
 		fmt.Println("Carto certificate not found!")
-	}*/
+	}
 
 	certForestimator, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/fullchain.pem", "/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/privkey.pem")
 	if err != nil {
@@ -63,7 +63,7 @@ func main() {
 	getCertificates := func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
 		switch hello.ServerName {
 		case "gxgfservcarto.gxabt.ulg.ac.be":
-			return nil, nil
+			return &certCarto, nil
 		case "forestimator.gembloux.ulg.ac.be":
 			return &certForestimator, nil
 		case "appliprfw.gembloux.ulg.ac.be":
@@ -123,7 +123,7 @@ func main() {
 			siteProxy.ServeHTTP(w, r)
 
 		case "gxgfservcarto.gxabt.ulg.ac.be":
-			devProxy.ServeHTTP(w, r)
+			siteProxy.ServeHTTP(w, r)
 
 		default:
 			http.Error(w, "Unknown host", http.StatusNotFound)
