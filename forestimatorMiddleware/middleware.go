@@ -8,7 +8,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
-	"time"
 )
 
 func newProxy(target string) *httputil.ReverseProxy {
@@ -46,10 +45,10 @@ func newProxy(target string) *httputil.ReverseProxy {
 }
 
 func main() {
-	certCarto, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/fullchain.pem", "/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/privkey.pem")
+	/*certCarto, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/fullchain.pem", "/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/privkey.pem")
 	if err != nil {
 		fmt.Println("Carto certificate not found!")
-	}
+	}*/
 
 	certForestimator, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/fullchain.pem", "/etc/letsencrypt/live/forestimator.gembloux.ulg.ac.be/privkey.pem")
 	if err != nil {
@@ -64,7 +63,7 @@ func main() {
 	getCertificates := func(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
 		switch hello.ServerName {
 		case "gxgfservcarto.gxabt.ulg.ac.be":
-			return &certCarto, nil
+			return nil, nil
 		case "forestimator.gembloux.ulg.ac.be":
 			return &certForestimator, nil
 		case "appliprfw.gembloux.ulg.ac.be":
@@ -100,14 +99,14 @@ func main() {
 		}
 	})
 
-	server := &http.Server{
+	/*server := &http.Server{
 		Addr:              ":8085",
 		Handler:           mux,
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       30 * time.Second,
 		WriteTimeout:      0,
 		IdleTimeout:       120 * time.Second,
-	}
+	}*/
 
 	listener, err := tls.Listen("tcp", ":443", tlsConfig)
 	if err != nil {
@@ -130,10 +129,10 @@ func main() {
 			http.Error(w, "Unknown host", http.StatusNotFound)
 		}
 	})
-	listener.Close()
-	//log.Println(http.Serve(listener, nil))
+	//listener.Close()
+	log.Println(http.Serve(listener, nil))
 
-	log.Printf("reverse proxy listening on %s", server.Addr)
-	log.Fatal(server.ListenAndServe())
+	//log.Printf("reverse proxy listening on %s", server.Addr)
+	//log.Fatal(server.ListenAndServe())
 
 }
