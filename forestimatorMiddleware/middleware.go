@@ -8,6 +8,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
+	"time"
 )
 
 func newProxy(target string) *httputil.ReverseProxy {
@@ -80,7 +81,7 @@ func main() {
 	siteProxy := newProxy("http://localhost:47000")
 	devProxy := newProxy("http://localhost:47100")
 
-	/*mux := http.NewServeMux()
+	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch strings.ToLower(r.Host) {
@@ -106,7 +107,7 @@ func main() {
 		ReadTimeout:       30 * time.Second,
 		WriteTimeout:      0,
 		IdleTimeout:       120 * time.Second,
-	}*/
+	}
 
 	listener, err := tls.Listen("tcp", ":443", tlsConfig)
 	if err != nil {
@@ -129,9 +130,10 @@ func main() {
 			http.Error(w, "Unknown host", http.StatusNotFound)
 		}
 	})
-	log.Println(http.Serve(listener, nil))
+	listener.Close()
+	//log.Println(http.Serve(listener, nil))
 
-	/*log.Printf("reverse proxy listening on %s", server.Addr)
-	log.Fatal(server.ListenAndServe())*/
+	log.Printf("reverse proxy listening on %s", server.Addr)
+	log.Fatal(server.ListenAndServe())
 
 }
