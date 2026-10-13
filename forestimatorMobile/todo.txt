@@ -10,6 +10,8 @@ To do list forestimator Mobile
 
 -Forestimator Web: -> formulaire consultation/modification email pour utilisateur : il faut alors une page "mon compte"
 
+-catalogue ; revoir le design, avec un style pour les couches dans le panier, un style pour la couche active, des liens vers la documentation
+
 -affichage de la cnsw 16 bits? en ayant un raster au format png et un autre au format tiff-> combo gagnant pour gagner en rapidité d'affichage.
 
 Forestimator Monitor
