@@ -44,6 +44,14 @@ func newProxy(target string) *httputil.ReverseProxy {
 	return proxy
 }
 
+func addCorsHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	certCarto, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/fullchain.pem", "/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/privkey.pem")
 	if err != nil {
@@ -123,7 +131,7 @@ func main() {
 			siteProxy.ServeHTTP(w, r)
 
 		case "gxgfservcarto.gxabt.ulg.ac.be":
-			siteProxy.ServeHTTP(w, r)
+			addCorsHeaders(siteProxy).ServeHTTP(w, r)
 
 		default:
 			http.Error(w, "Unknown host", http.StatusNotFound)
