@@ -12,8 +12,8 @@ MAP
     WEB
         METADATA
             "wms_label" "Serveur WMS de diverses cartes utilisées dans la plateforme Forestimator" 
-            "wms_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?" 
-            "wms_service_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?" 
+            "wms_onlineresource" "https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?" 
+            "wms_service_onlineresource" "https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?" 
             "wms_srs" "EPSG:31370" 
             "wms_enable_request" "*" 
         END

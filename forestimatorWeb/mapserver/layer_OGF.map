@@ -16,8 +16,8 @@ MAP
         METADATA
             "wms_label" "Serveur WMS de diverses cartes relatives aux forets subnaturelles matures"
             "wms_title" "Cartes de ciblage des OGF potentielles"
-            "wms_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf"
-            "wms_service_onlineresource" "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf"
+            "wms_onlineresource" "https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf"
+            "wms_service_onlineresource" "https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/ogf"
             "wms_srs" "EPSG:31370"
             "wms_enable_request" "*"
             "wms_getfeatureinfo_formatlist" "text/plain,application/vnd.ogc.gml,text/html"
