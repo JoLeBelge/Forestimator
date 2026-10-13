@@ -92,7 +92,7 @@ func main() {
 			siteProxy.ServeHTTP(w, r)
 
 		case "gxgfservcarto.gxabt.ulg.ac.be":
-			devProxy.ServeHTTP(w, r)
+			siteProxy.ServeHTTP(w, r)
 
 		default:
 			http.Error(w, "Unknown host", http.StatusNotFound)
