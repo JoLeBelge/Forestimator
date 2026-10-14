@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = forestimatorWeb-dev
+TARGET = forestimatorWeb
 INCLUDEPATH += .
 CONFIG -= qt
 QT -= gui
