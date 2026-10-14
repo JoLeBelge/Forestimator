@@ -97,7 +97,7 @@ func main() {
 		switch r.Host {
 		case "forestimator.gembloux.ulg.ac.be":
 			if strings.Contains(r.URL.Path, "/dev") {
-				strings.Replace(r.URL.Path, "/dev", "/", 1)
+				r.URL.Path = strings.TrimPrefix(r.URL.Path, "/dev")
 				devProxy.ServeHTTP(w, r)
 			}
 			siteProxy.ServeHTTP(w, r)
