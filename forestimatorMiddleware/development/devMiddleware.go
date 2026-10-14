@@ -51,6 +51,7 @@ var mapMapservRoutes = map[string]string{
 }
 
 type proc struct {
+	debugMode             bool
 	proxy                 *httputil.ReverseProxy
 	downloader            *httputil.ReverseProxy
 	openforis             *httputil.ReverseProxy
@@ -431,6 +432,7 @@ func main() {
 	}
 	*/
 	forestimator := proc{
+		debugMode:             true,
 		started:               false,
 		cmd:                   nil,
 		outPipe:               nil,
@@ -468,7 +470,12 @@ func main() {
 			forestimator.started = false
 			recordEndLog(&forestimator)
 			log.Println("Forestimator web server has stopped")
-			log.Println("Restarting now...")
+			if forestimator.debugMode {
+				log.Println("Restarting now...")
+			} else {
+				log.Println("Exiting now...")
+				os.Exit(0)
+			}
 		}
 	}()
 	go func() {
