@@ -374,7 +374,7 @@ std::map<int,double> layerBase::computeStat2(OGRGeometry * poGeom){
             aRes.emplace(std::make_pair(kv.first,0.0));
         }
         int nbPix(0);
-
+        if (globTest){std::cout << "geom : " << poGeom->exportToWkt() << std::endl;}
         GDALDataset * mask = rasterizeGeom(poGeom);
 
         if (mask!=NULL){
@@ -525,12 +525,14 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             OGRSpatialReference oSRS;
             oSRS.importFromWkt(&pszWkt);
             // driver et dataset shp -- creation depuis la géométrie
-            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("MEM");
+            //GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("MEM");
+            // bug sur le server carto en 2026 10 ; driver mem ne sais pas créer des layers
+            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("GPKG");
             boost::filesystem::path tmpPath = boost::filesystem::path("/vsimem/") / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%");
 
             std::string name1 = tmpPath.string();
             std::string name2 = name1.substr(5,name1.size()-5);
-            pShp = pShpDriver->Create(name1.c_str(), 0, 0, 0, GDT_Unknown, NULL );// avoir des noms unique si je veux fontionner en parrallel computing
+            pShp = pShpDriver->Create(name1.c_str(), 1, 1, 0, GDT_Unknown, NULL );// avoir des noms unique si je veux fontionner en parrallel computing
             // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
 
             OGRLayer * lay = pShp->CreateLayer(name2.c_str(),&oSRS,wkbPolygon,NULL);
