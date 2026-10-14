@@ -1165,7 +1165,7 @@ std::string layerBase::getJSdisplayLayer() const{
             "preload: Infinity,"+
             "title: 'MYTITLE',"+
             "url: 'MYURL',"+
-            "crossOrigin: 'null',"+
+            "crossOrigin: 'anonymous',"+
             "attributions: 'MYATTRIBUTION',"+
             "params: {"+
             "'LAYERS': 'MYLAYER',"+
