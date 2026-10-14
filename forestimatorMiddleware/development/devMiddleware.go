@@ -374,23 +374,23 @@ func main() {
 	go func() {
 		forestimator.proxy, _ = NewProxy("http://localhost:" + portForestimatorWeb)
 		for {
-			if forestimator.started {
-				director := forestimator.proxy.Director
-				forestimator.proxy.Director = func(r *http.Request) {
-					director(r)
-					recordRequest(&forestimator, r.RemoteAddr+r.RequestURI)
-				}
 
-				forestimatorHandler := http.NewServeMux()
-				forestimatorHandler.Handle("/", forestimator.proxy)
-				forestimatorHandler.HandleFunc("/robots.txt", sendRobotsTxt)
-				forestimatorHandler.HandleFunc("/llms.txt", sendLLMsTxt)
-
-				fmt.Println(http.ListenAndServe(":"+portMiddleWare, forestimatorHandler))
-
-				log.Println("Proxy server has stopped")
-				log.Println("Restarting now...")
+			director := forestimator.proxy.Director
+			forestimator.proxy.Director = func(r *http.Request) {
+				director(r)
+				recordRequest(&forestimator, r.RemoteAddr+r.RequestURI)
 			}
+
+			forestimatorHandler := http.NewServeMux()
+			forestimatorHandler.Handle("/", forestimator.proxy)
+			forestimatorHandler.HandleFunc("/robots.txt", sendRobotsTxt)
+			forestimatorHandler.HandleFunc("/llms.txt", sendLLMsTxt)
+
+			fmt.Println(http.ListenAndServe(":"+portMiddleWare, forestimatorHandler))
+
+			log.Println("Proxy server has stopped")
+			log.Println("Restarting now...")
+
 		}
 	}()
 	go func() {
