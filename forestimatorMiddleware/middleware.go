@@ -88,34 +88,6 @@ func main() {
 	siteProxy := newProxy("http://localhost:47000")
 	devProxy := newProxy("http://localhost:47100")
 
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch strings.ToLower(r.Host) {
-		case "forestimator.gembloux.ulg.ac.be":
-			if strings.Contains(r.URL.Path, "/dev") {
-				r.URL.Path = strings.Replace(r.URL.Path, "/dev", "", 1)
-				devProxy.ServeHTTP(w, r)
-			}
-			siteProxy.ServeHTTP(w, r)
-
-		case "gxgfservcarto.gxabt.ulg.ac.be":
-			devProxy.ServeHTTP(w, r)
-
-		default:
-			http.Error(w, "Unknown host", http.StatusNotFound)
-		}
-	})
-
-	/*server := &http.Server{
-		Addr:              ":8085",
-		Handler:           mux,
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       30 * time.Second,
-		WriteTimeout:      0,
-		IdleTimeout:       120 * time.Second,
-	}*/
-
 	listener, err := tls.Listen("tcp", ":443", tlsConfig)
 	if err != nil {
 		log.Fatalf("Failed to listen on port 443: %v", err)
@@ -125,7 +97,7 @@ func main() {
 		switch r.Host {
 		case "forestimator.gembloux.ulg.ac.be":
 			if strings.Contains(r.URL.Path, "/dev") {
-				strings.Replace(r.URL.Path, "/dev", "", 1)
+				strings.Replace(r.URL.Path, "/dev", "/", 1)
 				devProxy.ServeHTTP(w, r)
 			}
 			siteProxy.ServeHTTP(w, r)
