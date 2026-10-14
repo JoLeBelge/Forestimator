@@ -124,8 +124,8 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Host {
 		case "forestimator.gembloux.ulg.ac.be":
-			if r.URL.Path == "/dev" {
-				r.URL.Path = "/"
+			if strings.Contains(r.URL.Path, "/dev") {
+				strings.Replace(r.URL.Path, "/dev", "", 1)
 				devProxy.ServeHTTP(w, r)
 			}
 			siteProxy.ServeHTTP(w, r)
