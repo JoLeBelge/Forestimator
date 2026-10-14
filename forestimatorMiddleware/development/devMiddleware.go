@@ -474,7 +474,7 @@ func main() {
 				log.Println("Restarting now...")
 			} else {
 				log.Println("Exiting now...")
-				os.Exit(0)
+				continue
 			}
 		}
 	}()
