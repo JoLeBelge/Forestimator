@@ -335,6 +335,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             } else {
 
                 aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";
+                if (globTest) { std::cout << "polygon is " << aPolyg << " \n" << std::endl;}
             }
             break;
         }
