@@ -322,6 +322,7 @@ func sendLLMsTxt(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	loop := true
 	forestimator := proc{
 		debugMode:             true,
 		started:               false,
@@ -332,7 +333,7 @@ func main() {
 	}
 
 	go func() {
-		loop := true
+
 		for loop {
 			forestimator.cmd = startForestimatorWebServer(workingDirectory)
 			log.Println(forestimator.cmd.Args)
@@ -362,7 +363,7 @@ func main() {
 			forestimator.started = false
 			recordEndLog(&forestimator)
 			log.Println("Forestimator web server has stopped")
-			if forestimator.debugMode {
+			if !forestimator.debugMode {
 				log.Println("Restarting now...")
 			} else {
 				log.Println("Exiting now...")
