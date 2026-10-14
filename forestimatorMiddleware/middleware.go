@@ -93,8 +93,8 @@ func main() {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch strings.ToLower(r.Host) {
 		case "forestimator.gembloux.ulg.ac.be":
-			if r.URL.Path == "/dev" {
-				r.URL.Path = "/"
+			if strings.Contains(r.URL.Path, "/dev") {
+				r.URL.Path = strings.Replace(r.URL.Path, "/dev", "", 1)
 				devProxy.ServeHTTP(w, r)
 			}
 			siteProxy.ServeHTTP(w, r)
