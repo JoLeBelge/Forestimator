@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     po::options_description desc("options pour l'outil de calcul des cartes ");
     desc.add_options()
             ("help", "produce help message")
-            ("outils", po::value<int>()->required(), "choix de l'outil à utiliser. 0: generation des overview pour toutes les couches carto pour optimiser le rendu par mapserver. 1 : station Descriptor (1 layer, 1 shp polygone), 2 : ajout méta , 3 : aptCS, 31:carte dérivée CS, 4 aptFEE, 5 : carteNH, 6 carteProf, 7 carteSolFortePente")
+            ("outils", po::value<int>()->required(), "choix de l'outil à utiliser. 0: operation sur toute les layers, par exemple passage en BL2008. 1 : station Descriptor (1 layer, 1 shp polygone), 2 : ajout méta , 3 : aptCS, 31:carte dérivée CS, 4 aptFEE, 5 : carteNH, 6 carteProf, 7 carteSolFortePente")
             ("test", po::value<bool>(), "debug")
             ("carteNT", po::value<bool>(), "calcul de la carte des NT")
             ("cartepH", po::value<bool>(), "calcul de la carte des pH")
@@ -74,43 +74,43 @@ int main(int argc, char *argv[])
     if (vm.count("pathBD")) {dirBD=vm["pathBD"].as<std::string>();}
     if (vm.count("colPath")) {columnPath=vm["colPath"].as<std::string>();}
 
-    // ajoute un champ aux shapefile avec la valeur extraite de raster donné en entrée
+
     if (vm.count("outils")) {
 
         int mode(vm["outils"].as<int>());
         switch (mode) {
         case 0:{
+
             cDicoApt dico(dirBD);
             // je boucle les layersbase
             for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
 
                 std::shared_ptr<layerBase> l=kv.second;
 
-                if (l->mResolution!=0.0 && dico.lay4Visu(l->Code()) && !l->Expert() && l->rasterExist()){
+                if (l->rasterExist()){
+                    std::string inFile(l->getPathTif());
                     std::cout << "work on layer " << l->Code() << std::endl;
-                    //std::string aCommand ="gdal raster overview add --external --levels=2,4,8,16 --config COMPRESS=LZW "+ l->getPathTif();
-                    // 1) create COG if not already tiled
-                    GDALDataset *pIn= (GDALDataset*) GDALOpen(l->getPathTif().c_str(), GA_ReadOnly);
-                    int b1, b2;
-                    pIn->GetRasterBand(1)->GetBlockSize(&b1,&b2);
-                    //std::string layout;
-                    //layout = *pIn->GetMetadata("IMAGE_STRUCTURE");
-                    //std::cout << " layout " << layout << std::endl;
-                    GDALClose(pIn);
-                    //std::cout << " blocksize " << b1 << " " << b2 << std::endl;
+                    std::string outFile =inFile.substr(0,26)+"BL72/"+ inFile.substr(27,inFile.size()-26);
                     std::string aCommand("");
-
-                    if (b2!=512){
-                    //if (1) {
-                   /* std::cout << " tiling and overview" << std::endl;
-                    aCommand= "gdaladdo -r average -minsize 16 " + l->getPathTif();
+                    aCommand="~/app/gdal-3.12.2/build/apps/gdal raster reproject --resolution 10,10 --overwrite --target-aligned-pixels -s EPSG:31370 -d EPSG:3812 --co 'COMPRESS=LZW' -co 'BIGTIFF=YES' -of COG -i  "+inFile +" -o "+ outFile +" -of COG -co COMPRESS=LZW -co BIGTIFF=YES";
                     std::cout << aCommand << "\n";
                     if (!globTest){
-                    system(aCommand.c_str());
-                    }*/
+                        system(aCommand.c_str());
+                        GDALDataset *pIn= (GDALDataset*) GDALOpen(outFile.c_str(), GA_ReadOnly);
+                        l->createRasterColorInterpPalette(pIn->GetRasterBand(1));
+                        GDALClose(pIn);
+                    }
+
+                   /* GDALDataset *pIn= (GDALDataset*) GDALOpen(l->getPathTif().c_str(), GA_ReadOnly);
+                    int b1, b2;
+                    pIn->GetRasterBand(1)->GetBlockSize(&b1,&b2);
+                    GDALClose(pIn);
+
+
+
+                    if (b2!=512){
                     std::string cogfile =l->getPathTif()+"_cog.tif";
                     std::string bu ="/media/Data10/Forestimator/BU/"+l->NomFileWithExt();
-                    //aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -co TILED=YES -co COPY_SRC_OVERVIEWS=YES -co COMPRESS=DEFLATE";
                     aCommand="gdal_translate "+ l->getPathTif()+" "+ cogfile +" -of COG -co COMPRESS=LZW -co BIGTIFF=YES";
                     std::cout << aCommand << "\n";
                     if (!globTest){
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
                     }
                     } else {
                     std::cout << " tiling and overview already done" << std::endl;
-                    }
+                    }*/
 
                 }
 
@@ -403,7 +403,7 @@ int main(int argc, char *argv[])
         // compression, descendre à 4 ou 5 Gb par raster. Mais merde, gdalwarp enlève le gain! heureusement gdaltranslate fonctionne mieux
         for(auto & p : boost::filesystem::directory_iterator(dirBD)){
             std::string mnhPath= p.path().string();
-            int y= std::stoi(mnhPath.substr(mnhPath.size()-8,mnhPath.size()-4));
+            //int y= std::stoi(mnhPath.substr(mnhPath.size()-8,mnhPath.size()-4));
             //if (y>2009){
             outPath="/home/jo/Documents/Carto/MNH_TS/MNH/";
             boost::filesystem::create_directory(outPath);
