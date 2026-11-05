@@ -92,11 +92,11 @@ int main(int argc, char *argv[])
                     std::cout << "work on layer " << l->Code() << std::endl;
                     std::string outFile =inFile.substr(0,26)+"/BL2008/"+ inFile.substr(27,inFile.size()-26);
                     std::string aCommand("");
-                    aCommand="~/app/gdal-3.12.2/build/apps/gdal raster reproject --resolution "+ std::to_string(l->getResolution())+","+std::to_string(l->getResolution())+" --overwrite --target-aligned-pixels -s EPSG:31370 -d EPSG:3812 --co 'COMPRESS=LZW' --co 'BIGTIFF=YES' --of COG --to COORDINATE_OPERATION='+proj=pipeline +step +inv +proj=lcc +lat_0=90 +lon_0=4.36748666666667 +lat_1=51.1666672333333 +lat_2=49.8333339 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +step +proj=hgridshift +grids=be_ign_bd72lb72_etrs89lb08.tif +step +proj=lcc +lat_0=50.797815 +lon_0=4.35921583333333 +lat_1=49.8333333333333 +lat_2=51.1666666666667 +x_0=649328 +y_0=665262 +ellps=GRS80' -i  "+inFile +" -o "+ outFile ;
+                    aCommand="gdal raster reproject --resolution "+ std::to_string(l->getResolution())+","+std::to_string(l->getResolution())+" --overwrite --target-aligned-pixels -s EPSG:31370 -d EPSG:3812 --co 'COMPRESS=LZW' --co 'BIGTIFF=YES' --of COG --to COORDINATE_OPERATION='+proj=pipeline +step +inv +proj=lcc +lat_0=90 +lon_0=4.36748666666667 +lat_1=51.1666672333333 +lat_2=49.8333339 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +step +proj=hgridshift +grids=be_ign_bd72lb72_etrs89lb08.tif +step +proj=lcc +lat_0=50.797815 +lon_0=4.35921583333333 +lat_1=49.8333333333333 +lat_2=51.1666666666667 +x_0=649328 +y_0=665262 +ellps=GRS80' -i  "+inFile +" -o "+ outFile ;
                     std::cout << aCommand << "\n";
                     if (!globTest){
                         system(aCommand.c_str());
-                        GDALDataset *pIn= (GDALDataset*) GDALOpen(outFile.c_str(), GA_ReadOnly);
+                        GDALDataset *pIn= (GDALDataset*) GDALOpen(outFile.c_str(), GA_Update);
                         l->createRasterColorInterpPalette(pIn->GetRasterBand(1));
                         GDALClose(pIn);
                     }
@@ -105,8 +105,6 @@ int main(int argc, char *argv[])
                     int b1, b2;
                     pIn->GetRasterBand(1)->GetBlockSize(&b1,&b2);
                     GDALClose(pIn);
-
-
 
                     if (b2!=512){
                     std::string cogfile =l->getPathTif()+"_cog.tif";
