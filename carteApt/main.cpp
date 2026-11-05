@@ -90,9 +90,9 @@ int main(int argc, char *argv[])
                 if (l->rasterExist()){
                     std::string inFile(l->getPathTif());
                     std::cout << "work on layer " << l->Code() << std::endl;
-                    std::string outFile =inFile.substr(0,26)+"BL72/"+ inFile.substr(27,inFile.size()-26);
+                    std::string outFile =inFile.substr(0,26)+"/BL72/"+ inFile.substr(27,inFile.size()-26);
                     std::string aCommand("");
-                    aCommand="~/app/gdal-3.12.2/build/apps/gdal raster reproject --resolution 10,10 --overwrite --target-aligned-pixels -s EPSG:31370 -d EPSG:3812 --co 'COMPRESS=LZW' -co 'BIGTIFF=YES' -of COG -i  "+inFile +" -o "+ outFile +" -of COG -co COMPRESS=LZW -co BIGTIFF=YES";
+                    aCommand="~/app/gdal-3.12.2/build/apps/gdal raster reproject --resolution "+ std::to_string(l->getResolution())+","+std::to_string(l->getResolution())+" --overwrite --target-aligned-pixels -s EPSG:31370 -d EPSG:3812 --co 'COMPRESS=LZW' -co 'BIGTIFF=YES' -of COG -i  "+inFile +" -o "+ outFile +" -of COG -co COMPRESS=LZW -co BIGTIFF=YES";
                     std::cout << aCommand << "\n";
                     if (!globTest){
                         system(aCommand.c_str());

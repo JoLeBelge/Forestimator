@@ -105,34 +105,6 @@ public:
     std::map<double,int> mValFreq;// utile quand je veux des stats basiques sur un raster de variable discontinu
 };
 
-/*class statHdomBase {
-public:
-    statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool computeStat=1);
-    ~statHdomBase(){
-       for (OGRPolygon * pol: mVaddPol) OGRGeometryFactory::destroyGeometry(pol);
-       mVaddPol.clear();
-       mDistFrequ.clear();
-    }
-    std::shared_ptr<layerBase> Lay(){return mLay;}
-    bool deserveChart();
-    cDicoApt * Dico();
-
-    void predictHdomHex();
-    std::vector<std::pair<std::string,double>> computeDistrH();
-
-    basicStat bshdom();
-
-protected:
-
-    std::vector<std::unique_ptr<basicStat>> mStat;
-    std::shared_ptr<layerBase> mLay;
-    std::vector<std::pair<std::string,double>>mDistFrequ;// pair avec range de valeur (genre 3-9) et proportion de la distribution
-    OGRGeometry * mGeom;
-    // geometrie supplémentaire à afficher sur l'image statique
-    std::vector<OGRPolygon *> mVaddPol;
-    int mNbOccurence;
-};
-*/
 class rasterFiles{
 public:
     double mResolution;
@@ -153,6 +125,7 @@ public:
         }
         return aRes;
     }
+    double getResolution(){return mResolution;}
 
     // méthode GDAL
     int getValue(double x, double y);
