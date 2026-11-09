@@ -11,8 +11,7 @@ MAP
         METADATA
             "wms_label" "Serveur WMS des cartes de description stationnelle de Forestimator" 
             "wms_onlineresource" "https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee" 
-            "wms_service_onlineresource" "https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee" 
-            "wms_srs" "EPSG:31370" 
+            "wms_srs" "EPSG:31370 EPSG:3812" 
             "wms_enable_request" "*" 
         END
     END
@@ -50,7 +49,6 @@ MAP
         END
         METADATA
             "wms_title" "Situation d'apport en eau hors précipitation" 
-            "wms_srs" "EPSG:31370" 
         END
         TEMPLATE "../template.html"
     END
@@ -157,7 +155,7 @@ MAP
         END
         METADATA
             "wms_title" "Niveaux Hydrique" 
-            "wms_srs" "EPSG:31370" 
+
         END
         TEMPLATE "../template.html"
     END
@@ -215,7 +213,6 @@ MAP
         END
         METADATA
             "wms_title" "Niveaux Trophiques" 
-            "wms_srs" "EPSG:31370" 
         END
         TEMPLATE "../template.html"
     END
@@ -252,7 +249,7 @@ MAP
         END
         METADATA
             "wms_title" "Sous-secteur radiatif" 
-            "wms_srs" "EPSG:31370" 
+
         END
         TEMPLATE "../template.html"
     END
@@ -296,7 +293,7 @@ MAP
         END
         METADATA
             "wms_title" "Situation Topographique" 
-            "wms_srs" "EPSG:31370" 
+
         END
         TEMPLATE "../template.html"
     END
@@ -382,7 +379,7 @@ MAP
         END
         METADATA
             "wms_title" "Zone Bioclimatique" 
-            "wms_srs" "EPSG:31370" 
+
         END
         TEMPLATE "../template.html"
     END

@@ -1,0 +1,5523 @@
+MAP
+	NAME		"Aptitude_FEE"
+	EXTENT	42250.0001199999969685 21170.0001200000115205 295170.0001199999824166 167700.0001200000115205
+	SIZE           800 800
+	SHAPEPATH      "/media/Data10/Forestimator/FEE/"
+	IMAGECOLOR     255 255 255
+
+
+	PROJECTION
+		"init=epsg:31370"
+	END
+	
+	WEB
+		METADATA
+	    	"wms_label"           "Serveur WMS des cartes d'aptitudes du Fichier Ecologique des Essences"
+	    	"wms_onlineresource"  "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee?"
+			"wms_service_onlineresource"   "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee?"
+	    	"wms_srs"             "EPSG:31370 EPSG:3812"
+			"wms_enable_request"  "*"
+	  	END
+  	END
+LAYER
+  NAME "Aptitude_FEE_AG"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_AG.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Sapin de Vancouver"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_AN"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_AN.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Sapin noble"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_AP"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_AP.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Sapin pectine"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_AX"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_AX.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de Aulne glutineux"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_BP"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_BP.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Bouleau pubescent"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_BV"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_BV.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Bouleau verruqueux"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_CA"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_CA.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Charme"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_CD"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_CD.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Cèdre de Atlas"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_CO"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_CO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Cormier"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_CP"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_CP.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Chêne pedoncule"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_CR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_CR.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Chêne rouge Amerique"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_CS"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_CS.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Chêne sessile"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_CT"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_CT.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Châtaignier"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_CY"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_CY.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Cyprès de Lawson"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_DO"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_DO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Douglas"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_EC"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_EC.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de erable champêtre"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_EK"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_EK.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de epicea de Sitka"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_EL"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_EL.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de erable plane"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_EP"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_EP.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de epicea commun"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_ES"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_ES.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du erable sycomore"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_FR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_FR.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Frêne"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_HE"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_HE.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Hêtre"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_IF"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_IF.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de If commun"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_JH"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_JH.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Noyer hybride"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_JN"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_JN.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Noyer noir"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_JR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_JR.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Noyer commun"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_ME"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_ME.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Melèze Europe"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_MH"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_MH.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Melèze hybride"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_MJ"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_MJ.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Melèze du Japon"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_MR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_MR.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Merisier"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_NO"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_NO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Sapin de Nordmann"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_OC"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_OC.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de Orme champêtre"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_OL"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_OL.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de Orme lisse"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_OM"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_OM.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de Orme de montagne"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PA"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PA.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Pin noir Autriche"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PC"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PC.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Pin laricio de Corse"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PG"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PG.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Peuplier grisard"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PK"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PK.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Pin de Koekelare"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PM"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PM.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Pommier sauvage"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PN"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PN.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Peuplier noir"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PO"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Poirier sauvage"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PS"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PS.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Pin sylvestre"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PT"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PT.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Peuplier tremble"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PY"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PY.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Peuplier noir hybride"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_PZ"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_PZ.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Peuplier baumier"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_RO"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_RO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Robinier"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_RY"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_RY.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude desCaryers"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_SA"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_SA.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Saule blanc"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_SO"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_SO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Sorbier des oiseleurs"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_ST"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_ST.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude de Alisier torminal"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_TC"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_TC.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Tilleul à petites feuilles"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_TH"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_TH.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Thuya geant"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_TP"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_TP.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Tilleul à grandes feuilles"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_TU"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_TU.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Tulipier de Virginie"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Aptitude_FEE_TY"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "aptitudeFEE_TY.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+ METADATA
+      "wms_title"           "Aptitude du Tsuga heterophylle"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+END
