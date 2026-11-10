@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
                 std::shared_ptr<layerBase> l=kv.second;
 
-                if (l->rasterExist()){
+                if (l->rasterExist() && l->Code()=="dendro_prop_fe"){
                     std::string inFile(l->getPathTif());
                     std::string outFile =inFile.substr(0,26)+"/BL2008/"+ inFile.substr(27,inFile.size()-26);
 
