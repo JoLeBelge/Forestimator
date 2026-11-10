@@ -288,7 +288,7 @@ void parcellaire::upload()
                 std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl;
             }
             mLabelName = "";
-            if (to31370AndGeoJson())
+            if (projetAndConvert())
             {
                 m_app->addLog("upload a shp");
                 if (computeExtentAndSurf())
@@ -323,7 +323,7 @@ void parcellaire::upload()
         messageBox->show();
 
         mLabelName = "";
-        if (to31370AndGeoJson())
+        if (projetAndConvert())
         {
             m_app->addLog("upload a shp gpkg");
             if (computeExtentAndSurf())
@@ -617,10 +617,10 @@ void parcellaire::anaAllPol()
 }
 
 // le nouveau toGeoJson ; effectue un changement de src
-bool parcellaire::to31370AndGeoJson()
+bool parcellaire::projetAndConvert()
 {
     bool aRes = true;
-    std::cout << " parcellaire::toGeoJson() ... ";
+    std::cout << " parcellaire::projetAndConvert() ... ";
     // 0) suppression des polygones foireux - radical mais c'est l'utilisateur qui doit gérer ses propres merdes
     bool testEPSG(1);
     GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(fileName().c_str(), GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL));
@@ -671,7 +671,7 @@ bool parcellaire::to31370AndGeoJson()
             dialogBox->setClosable(false);
             dialogBox->contents()->addNew<Wt::WText>(tr("parcellaire.loadshp.srcNotDefined"));
             Wt::WComboBox *epsgSel = dialogBox->contents()->addNew<Wt::WComboBox>();
-            epsgSel->addItem("Belge Lambert 72");
+            epsgSel->addItem("Belge Lambert 2008");
             epsgSel->addItem("WGS 84");
             epsgSel->setCurrentIndex(0);
             Wt::WPushButton *ok =
@@ -681,14 +681,13 @@ bool parcellaire::to31370AndGeoJson()
             { dialogBox->accept(); });
             dialogBox->finished().connect([=]
             {
-                int inputEPSG(31370);
+                int inputEPSG(3812);
                 if (epsgSel->currentIndex() == 1)
                 {
                     inputEPSG = 4326;
                 }
                 std::cout << "epsg input " << inputEPSG << std::endl;
                 removeChild(dialogBox);
-                // to31370AndGeoJsonGDAL(inputEPSG);
                 OGRSpatialReference src;
                 src.importFromEPSG(inputEPSG);
 
@@ -702,7 +701,7 @@ bool parcellaire::to31370AndGeoJson()
                     out << wkt << "\n";
                     out.close();
                 }
-                to31370AndGeoJsonGDAL();
+                projetAndConvertGDAL();
                 //return aRes;
             });
             dialogBox->show();
@@ -710,7 +709,7 @@ bool parcellaire::to31370AndGeoJson()
         }
         else
         {
-            to31370AndGeoJsonGDAL();
+            projetAndConvertGDAL();
             return aRes;
         }
     }
@@ -722,7 +721,7 @@ bool parcellaire::to31370AndGeoJson()
     // check le code EPSG - sur serveur j'ai un probleme avec les couche qui sont en user Defined scr 100036, la reprojection en BL72 me met le shp en décalage de 100 m
 }
 
-void parcellaire::to31370AndGeoJsonGDAL()
+void parcellaire::projetAndConvertGDAL()
 {
 
     std::string output(geoJsonName().c_str());
@@ -733,12 +732,12 @@ void parcellaire::to31370AndGeoJsonGDAL()
 
     if (hSrcDS == NULL)
     {
-        std::cout << "to31370AndGeoJsonGDAL: failed to open source " << fileName() << std::endl;
+        std::cout << "projetAndConvertGDAL: failed to open source " << fileName() << std::endl;
         return;
     }
 
     papszArgv = CSLAddString(papszArgv, "-t_srs"); // target src with reprojection
-    papszArgv = CSLAddString(papszArgv, "EPSG:31370");
+    papszArgv = CSLAddString(papszArgv, "EPSG:3812");
     papszArgv = CSLAddString(papszArgv, "-dim");// pour retirer la dimension Z si elle existe.
     papszArgv = CSLAddString(papszArgv, "2");
 
@@ -771,14 +770,14 @@ void parcellaire::to31370AndGeoJsonGDAL()
     hSrcDS = GDALOpenEx(outPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
     if (hSrcDS == NULL)
     {
-        std::cout << "to31370AndGeoJsonGDAL: failed to open intermediate geojson " << outPath << std::endl;
+        std::cout << "projetAndConvertGDAL: failed to open intermediate geojson " << outPath << std::endl;
         return;
     }
     papszArgv = CSLAddString(papszArgv, "-overwrite");
     GDALVectorTranslateOptions *option2 = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
     if (option2)
     {
-        // 2) on s'assure que le shp soit en BL72
+        // 2) on s'assure que le shp soit en BL2008
         GDALDatasetH hOutDS = GDALVectorTranslate(fileName().c_str(), nullptr, 1, &hSrcDS, option2, nullptr);
         if (hOutDS)
         {

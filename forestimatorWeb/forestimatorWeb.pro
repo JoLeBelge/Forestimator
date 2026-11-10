@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = forestimatorWeb
+TARGET = forestimatorWeb-dev
 INCLUDEPATH += .
 CONFIG -= qt
 QT -= gui
@@ -27,7 +27,6 @@ DEPENDPATH += $$PWD./rapidxml/
 
 SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \
-    #ACR/terrainviellecouperase.cpp \
     OGF/formOGF.cpp \
     api/anasurfresource.cpp \
     analytics.cpp \
@@ -67,11 +66,8 @@ SOURCES += main.cpp \
 
 HEADERS += \
     ../carteApt/cdicoaptbase.h \
-    #ACR/terrainviellecouperase.h \
-    #ACR/formviellecouperase.h \
     OGF/formOGF.h \
     api/anasurfresource.h \
-    #desserteForest/desserteForest.h \
     analytics.h \
     api/anaponctuelleresource.h \
     api/polygfrommobile.h \

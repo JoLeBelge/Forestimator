@@ -73,8 +73,8 @@ class parcellaire : public WContainerWidget, public groupStat
 public:
     parcellaire(cWebAptitude *app, statWindow *statW);
     void cleanShpFile();
-    bool to31370AndGeoJson(); // boite de dialogue pour choisir src si jamais la couche n'en a pas de défini
-    void to31370AndGeoJsonGDAL();
+    bool projetAndConvert(); // boite de dialogue pour choisir src si jamais la couche n'en a pas de défini
+    void projetAndConvertGDAL();
     void display();
     // effectue des vérification du shp (polygone, src)
     void checkShp();

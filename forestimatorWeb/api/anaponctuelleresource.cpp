@@ -27,7 +27,7 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
     response.out() << "{\n\"forestimatorAnalyses\":\"point\",\n"
                    <<       "\"x\":" << roundDouble(x) << ",\n"
                    <<       "\"y\":" <<  roundDouble(y) << ",\n"
-                   <<       "\"src\":\"EPSG31370\",\n"
+                   <<       "\"src\":\"EPSG3812\",\n"
                    <<       "\"inRW\":" << inRW << ",\n"
                    <<       "\"RequestedLayers\":[\n";
 

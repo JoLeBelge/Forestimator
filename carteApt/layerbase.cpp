@@ -871,10 +871,8 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
     const char *connStr = CPLSPrintf("<GDAL_WMS>"
                                      "<Service name=\"WMS\">"
                                      "<Version>1.1.1</Version>"
-                                     //"<Version>1.3.0</Version>"
                                      "<ServerUrl>%s?</ServerUrl>"
-                                     "<SRS>EPSG:31370</SRS>"
-                                     //"<CRS>EPSG:31370</CRS>" //pour version 1.3.0
+                                     "<SRS>EPSG:3812</SRS>"
                                      "<ImageFormat>image/jpeg</ImageFormat>"
                                      "<Layers>%s</Layers>"
                                      "<Styles></Styles>"
@@ -887,7 +885,7 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      "<SizeX>%d</SizeX>"
                                      "<SizeY>%d</SizeY>"
                                      "</DataWindow>"
-                                     "<Projection>EPSG:31370</Projection>"
+                                     "<Projection>EPSG:3812</Projection>"
                                      "<BandsCount>3</BandsCount>"
                                      "<ZeroBlockHttpCodes>204,404,500</ZeroBlockHttpCodes>" // la couche topo de l'ign retourne le code 500 depuis leurs mise à jour de avril 2021,vers WMS version 1.3 qui n'utilise pas les même balises xml (ajout crs entre autre, mais ne fonctionne pas)
                                      "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
@@ -1169,8 +1167,8 @@ std::string layerBase::getJSdisplayLayer() const{
             //'TILED': false, // avant était à true mais ça faisait bugger cartoweb_topo
             "'FORMAT': 'image/png'"+
             "},"+
-            "tileGrid: tileGrid,"+
-            "projection: 'EPSG:31370',"+
+            //"tileGrid: tileGrid,"+
+            "projection: 'EPSG:3812',"+
             " }),"+
             //opacity: Object.keys(activeLayers).length==0?1:0.5 // première image ; opaque. Les autres ; tranparence
             " opacity: 1"+
