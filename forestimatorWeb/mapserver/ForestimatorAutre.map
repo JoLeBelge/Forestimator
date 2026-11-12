@@ -92,7 +92,7 @@ MAP
         METADATA
             "wms_title" "Masque Forêt" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MasqueForet2018"
@@ -114,7 +114,7 @@ MAP
         METADATA
             "wms_title" "Masque Forêt 2018" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ClassesDeHauteur"
@@ -179,7 +179,7 @@ MAP
             "wms_title" "Classes de Hauteur" 
             "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "plS2_falseColor_2020_05"
@@ -192,7 +192,7 @@ MAP
         METADATA
             "wms_title" "vue Sat (planetScope + Sentinel2) en fausse couleur de 2020 05" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "plS2_falseColor_052021"
@@ -209,7 +209,7 @@ MAP
         METADATA
             "wms_title" "vue Sat (planetScope + Sentinel2) en fausse couleur de 2021 05" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "plS2_falseColor_082022"
@@ -226,7 +226,7 @@ MAP
         METADATA
             "wms_title" "vue Sat (planetScope + Sentinel2) en fausse couleur de 2022 08" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNT"
@@ -242,7 +242,7 @@ MAP
         METADATA
             "wms_title" "Relief (modèle numérique de terrain)" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "pente"
@@ -258,7 +258,7 @@ MAP
         METADATA
             "wms_title" "Pente (pourcent)" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2016"
@@ -275,7 +275,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2016" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2017"
@@ -292,7 +292,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2017" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2018"
@@ -309,7 +309,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2018" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2019"
@@ -326,7 +326,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2019" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2020"
@@ -343,7 +343,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2020" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2021"
@@ -360,7 +360,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2021" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2022"
@@ -377,7 +377,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2022" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2023"
@@ -394,7 +394,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2023" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2024"
@@ -411,7 +411,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2024" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "COMPOALL"
@@ -492,7 +492,7 @@ MAP
         METADATA
             "wms_title" "Carte de composition ; espèce majoritaire 2018" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "SWC"
@@ -549,7 +549,7 @@ MAP
         METADATA
             "wms_title" "Réserve en eau du sol" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2016_SURV"
@@ -566,7 +566,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2016 - 1:100.000" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2017_SURV"
@@ -583,7 +583,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2017 - 1:100.000" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2018_SURV"
@@ -600,7 +600,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2018 - 1:100.000" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2019_SURV"
@@ -617,7 +617,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2019 - 1:100.000" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2020_SURV"
@@ -634,7 +634,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2020 - 1:100.000" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2021_SURV"
@@ -651,7 +651,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2021 - 1:100.000"  
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2022_SURV"
@@ -668,7 +668,7 @@ MAP
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2022 - 1:100.000" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2006"
@@ -684,7 +684,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2006" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2009"
@@ -700,7 +700,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2009" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2012"
@@ -716,7 +716,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2012" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2014"
@@ -732,7 +732,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2014" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2015"
@@ -748,7 +748,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2015" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2016"
@@ -764,7 +764,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2016" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2018"
@@ -780,7 +780,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2018" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2019"
@@ -796,7 +796,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2019" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2020"
@@ -812,7 +812,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2020" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2021"
@@ -828,7 +828,7 @@ MAP
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2021" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_vha"
@@ -839,12 +839,12 @@ MAP
         END
         DATA "dendro/dendro_vha_8bits.tif"
         PROCESSING "BANDS=1"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0 quand j'ajoute une colortable dans les métadonnées, et que celle-ci ne couvrent pas toutes les valeurs, l'instruction offsite va cacher tout les pixels qui ont dans la colortable le code 0 0 0!!
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_vha.map"
         METADATA
             "wms_title" "Modèle dendrométrique : Volume des peuplements (VHA) [m3/ha]" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_prop_fe"
@@ -855,12 +855,12 @@ MAP
         END
         DATA "dendro/dendro_prop_fe_8bits.tif"
         PROCESSING "BANDS=1"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
         METADATA
             "wms_title" "Modèle dendrométrique : proportion de feuillus [%]" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_hdom"
@@ -871,13 +871,12 @@ MAP
         END
         DATA "dendro/dendro_hdom_8bits.tif"
         PROCESSING "BANDS=1"
-        PROCESSING "SCALE=0,508"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
         METADATA
             "wms_title" "Modèle dendrométrique : hauteur dominante [m]" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_gha"
@@ -888,13 +887,12 @@ MAP
         END
         DATA "dendro/dendro_gha_8bits.tif"
         PROCESSING "BANDS=1"
-        PROCESSING "SCALE=0,508"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_gha.map"
         METADATA
             "wms_title" "Modèle dendrométrique : surface terrière [m2/ha]" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_nha"
@@ -905,13 +903,12 @@ MAP
         END
         DATA "dendro/dendro_nha_8bits.tif"
         PROCESSING "BANDS=1"
-        PROCESSING "SCALE=0,508"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
         METADATA
             "wms_title" "Modèle dendrométrique : nombre de tiges [/ha]" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_cdom"
@@ -922,12 +919,11 @@ MAP
         END
         DATA "dendro/dendro_cdom_8bits.tif"
         PROCESSING "BANDS=1"
-        PROCESSING "LUT=254:130"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_cdom.map"
         METADATA
             "wms_title" "Modèle dendrométrique : circonférence dominante [cm]" 
         END
-        TEMPLATE "../template.html"
+
     END
 END
