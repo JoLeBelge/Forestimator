@@ -150,17 +150,8 @@ void cadastre::loadInfo()
         std::cout << inputPath << " n'existe pas ";
     }
 
-    // lecture des parcelles cadastrales - il y en a 4 000 000 donc je ne vais pas tout lire, sinon c'est un peu lent.
-    // inputPath= mShpParcellePath.c_str();
-    // si j'ouvre uniquement le dbf, est-ce que je ne gagne pas un peu de temps? apparemment pas...
-    /*  std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3("cadastre.db")};
-    dbo::Session session;
-    session.setConnection(std::move(sqlite3));
-    session.mapClass<capa>("capa");
-    //session.createTables();
-    dbo::Transaction transaction{session}; // une seule transaction pour l'ajout de tout
-    */
-    // ça c'est fait uniquement une fois pour créer la bd sqlite
+    // lecture des parcelles cadastrales - il y en a 4 000 000 donc je ne vais pas tout lire
+    // ça c'est fait uniquement une fois pour créer la bd sqlite - Attention, devra etre mis a jours de temps à autre pour prendre en compte les modification du cadastre wallon
     if (0)
     {
         std::string tmp = mShpParcellePath.c_str();
@@ -185,17 +176,6 @@ void cadastre::loadInfo()
                 {
                     // création d'une parcelle cadastrale et ajout au vecteur
                     std::unique_ptr<capa> pt = std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"), poFeature->GetFieldAsString("CaPaKey"), poFeature->GetFID(), &mVDiv);
-
-                    /* if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
-                    mVCaPa.emplace(std::make_pair(pt->divCode,std::vector<std::unique_ptr<capa>>()));
-                }
-
-                mVCaPa.at(pt->divCode).push_back(std::move(pt));
-                */
-                    // ajout de la parcelle à la bd sqlite via ORM de wt
-
-                    // dbo::ptr<capa> capaPtr = session.add(std::move(pt));
-
                     i++;
                     if (i % 10000 == 0)
                     {
@@ -210,16 +190,6 @@ void cadastre::loadInfo()
             std::cout << inputPath << " n'existe pas ";
         }
     }
-
-    /*
-    std::cout << " j'ai lu " << mVCom.size() << " communes du cadastres (belgique)" << std::endl;
-    std::cout << " j'ai lu " << mVDiv.size() << " divisions du cadastres (belgique)" << std::endl;
-    std::cout << " j'ai rangé les parcelles cadastrales de Wallonie dans " << mVCaPa.size() << " vecteurs " << std::endl;
-    std::vector<std::string> test =getSectionForDiv(61007);
-    for (auto & s : test){std::cout << " section " << s << std::endl;}
-    std::vector<capa *> t=getCaPaPtrVector(std::get<0>(mVDiv.at(61003)),"A");
-    std::cout << " nombre de pointers capa" << t.size() << std::endl;
-    */
 }
 
 capa::capa(std::string aCaSecKey, std::string aCaPaKey, int aPID, std::map<int, std::tuple<int, std::string>> *aVDiv) : CaSecKey(aCaSecKey), CaPaKey(aCaPaKey), comINS(0), mPID(aPID)
@@ -304,7 +274,6 @@ std::string cadastre::createPolygonDiv(int aDivCode)
         }
         else
         {
-            // layer
             OGRLayer *lay = mDS->GetLayer(0);
             OGRFeature *poFeature;
             while ((poFeature = lay->GetNextFeature()) != NULL)
@@ -367,31 +336,6 @@ std::string cadastre::createPolygonCommune(int aINScode)
     }
     return aRes;
 }
-/*
-std::string cadastre::createPolygonPaCa(std::string aCaPaKey, int divCode){
-    std::string aRes;
-    const char *inputPath= mShpParcellePath.c_str();
-    if (boost::filesystem::exists(inputPath)){
-        GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
-        if( mDS == NULL )
-        {
-            std::cout << inputPath << " : " ;
-            printf( " cadastre : Open parcelles failed." );
-        } else{
-            // layer
-            OGRLayer * lay = mDS->GetLayer(0);
-           // OGRFeature *poFeature=lay->GetFeature();
-            // j'exporte ce polygone au format json, je le sauve dans un fichier, me retourne le nom du fichier
-            aRes=saveFeatAsGEOJSON(poFeature);
-
-
-        }
-        GDALClose(mDS);
-    } else {
-        std::cout << inputPath << " n'existe pas " ;
-    }
-    return aRes;
-}*/
 
 std::string cadastre::createPolygonPaCa(int aFID)
 {
@@ -411,7 +355,6 @@ std::string cadastre::createPolygonPaCa(int aFID)
             // layer
             OGRLayer *lay = mDS->GetLayer(0);
             OGRFeature *poFeature = lay->GetFeature(aFID);
-            // j'exporte ce polygone au format json, je le sauve dans un fichier, me retourne le nom du fichier
             aRes = saveFeatAsGEOJSON(poFeature);
         }
         GDALClose(mDS);
@@ -426,7 +369,7 @@ std::string cadastre::createPolygonPaCa(int aFID)
 std::string featureToGeoJSON(OGRFeature *f)
 {
     std::string aRes;
-    aRes += "{\"type\":\"FeatureCollection\",\n \"crs\": { \"type\": \"name\", \"properties\": { \"name\": \"urn:ogc:def:crs:EPSG::31370\" } },\n \"features\":[\n";
+    aRes += "{\"type\":\"FeatureCollection\",\n \"crs\": { \"type\": \"name\", \"properties\": { \"name\": \"urn:ogc:def:crs:EPSG::3812\" } },\n \"features\":[\n";
     // Geometry
     aRes += "{\"type\":\"Feature\",\"geometry\":" + std::string(f->GetGeometryRef()->exportToJson()) + ",\n";
     // Properties
@@ -469,7 +412,6 @@ std::string featureToGeoJSON(OGRFeature *f)
 
 std::string cadastre::saveFeatAsGEOJSON(OGRFeature *f)
 {
-    // Use a safe unique temporary filename
     boost::filesystem::path tmpPath = boost::filesystem::path(mTmpDir) / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.geojson");
     std::string aOut = tmpPath.string();
     std::string pol = featureToGeoJSON(f);
@@ -537,7 +479,6 @@ ptCadastre::ptCadastre(std::shared_ptr<cadastre> aCadastre, double x, double y) 
         session.mapClass<capa>("capa");
         mCad->getCaPa4pt(x, y, this);
 
-        // maintenant je vais chercher l'objet mappé capa
         if (mCaPaKey != "")
         {
             dbo::ptr<capa> pt = mCad->getCaPaPtr(mCaPaKey, &session);

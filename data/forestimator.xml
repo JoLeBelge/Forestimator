@@ -450,7 +450,7 @@ https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NO
 <br></br><br></br>
 CODE_COUCHE_OU_NOM_TRAITEMENT; consultez la page <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/help">https://forestimator.gembloux.ulg.ac.be/api/help</a> pour avoir la liste.
 <br></br><br></br>
-POLYGONE_FORMAT_WKT; le polygone délimitant la surface de terrain pour laquelle vous souhaitez effectuer les analyses. Le format doit être le WKT, le système de projection doit être en Belge Lambert 72. De plus, la géométrie du polygone doit être valide et sa surface ne peut dépasser 200 ha.
+POLYGONE_FORMAT_WKT; le polygone délimitant la surface de terrain pour laquelle vous souhaitez effectuer les analyses. Le format doit être le WKT, le système de projection doit être en Belge Lambert 2008. De plus, la géométrie du polygone doit être valide et sa surface ne peut dépasser 200 ha.
 <br></br><br></br>
 <p style="margin-bottom:0.2cm;margin-top:0.2cm">
 Certains traitements acceptent des arguments qui permettent de modifier leurs comportement par défaut. Dans ce cas, la syntaxe sera la suivante:
@@ -582,7 +582,7 @@ parcellaire.shp &lt;- st_read(shp.path)<br></br>
 <!--LEGEND_CARTE si je veux la légende couleur il faut ajouter de manière automatique les couleurs dans les styles ci-dessus, je le ferai ultérieurement-->
 <br></br>
 Copyright ; © CartoWeb.be – IGN/NGI.
-Position de la station (Belge Lambert 72) : 
+Position de la station (Belge Lambert 2008) : 
 POSITION_PTX, POSITION_PTY.
 </div>
 

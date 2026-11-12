@@ -81,7 +81,6 @@ int launchForestimator(int argc, char **argv)
             {
                 std::shared_ptr<layerResource> fileResource = std::shared_ptr<layerResource>(new layerResource(l,dico));
                 fileResource->suggestFileName(l->NomFileWithExt());
-                // if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
                 server.addResource(fileResource, "/telechargement/" + aCode);
                 // fichier de symbologie
                 std::shared_ptr<layerResource> fileResource2 = std::shared_ptr<layerResource>(new layerResource(l, dico,1));
@@ -105,10 +104,6 @@ int launchForestimator(int argc, char **argv)
         std::shared_ptr<Wt::WFileResource> fileResource = std::shared_ptr<Wt::WFileResource>(new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "observationVoirie.db"));
         fileResource->suggestFileName("observationVoirie.db");
         server.addResource(fileResource, "/telechargement/voirie");
-
-        std::shared_ptr<Wt::WFileResource> fileResource5 = std::shared_ptr<Wt::WFileResource>(new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "OGF.db"));
-        fileResource5->suggestFileName("OGF.db");
-        server.addResource(fileResource5, "/telechargement/OGF");
 
         std::shared_ptr<Wt::WFileResource> fileResource6 = std::shared_ptr<Wt::WFileResource>(new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "validCarteEss.db"));
         fileResource6->suggestFileName("validCarteEss.db");
@@ -163,11 +158,6 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
     else if (env.internalPath() == "/stats_analytics")
     {
         auto app = std::make_unique<PageAnalytics>(env, dico->File("docroot") + "analytics.db");
-        return app;
-    }
-    else if (env.internalPath() == "/encodage.OGF")
-    {
-        auto app = std::make_unique<formOGF>(env, dico, dico->File("docroot") + "OGF.db");
         return app;
     }
     else

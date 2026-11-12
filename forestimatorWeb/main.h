@@ -19,11 +19,7 @@ namespace po = boost::program_options;
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
 #include "./threadpool/ThreadPool.hpp"
-//#include "ACR/formviellecouperase.h"
-#include "ACR/terrainviellecouperase.h"
-//#include "desserteForest/desserteForest.h"
 #include "api/staticmapresource.h"
-#include "OGF/formOGF.h"
 #include "api/polygfrommobile.h"
 #include "api/voiriefrommobile.h"
 

@@ -34,7 +34,7 @@ statWindow::statWindow(cWebAptitude * aWebApp):mDico(aWebApp->mDico), m_app(aWeb
     mAllStatIndivCont = addWidget(std::make_unique<WContainerWidget>());
     mAllStatIndivCont->setId("AllStatIndividuelle");
 
-    mIGN= mDico->getLayerBase("IGNgrfmn");
+    mIGN= mDico->getLayerBase("IGN");
     mMNT= mDico->getLayerBase("MNT");
     mZBIO = mDico->getLayerBase("ZBIO");
     mPente= mDico->getLayerBase("slope");

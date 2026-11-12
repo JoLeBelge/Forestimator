@@ -27,7 +27,6 @@ DEPENDPATH += $$PWD./rapidxml/
 
 SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \
-    OGF/formOGF.cpp \
     api/anasurfresource.cpp \
     analytics.cpp \
     api/anaponctuelleresource.cpp \
@@ -66,7 +65,6 @@ SOURCES += main.cpp \
 
 HEADERS += \
     ../carteApt/cdicoaptbase.h \
-    OGF/formOGF.h \
     api/anasurfresource.h \
     analytics.h \
     api/anaponctuelleresource.h \

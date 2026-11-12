@@ -870,9 +870,8 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
     boost::replace_all(layerName," ","%20");
     const char *connStr = CPLSPrintf("<GDAL_WMS>"
                                      "<Service name=\"WMS\">"
-                                     "<Version>1.1.1</Version>"
+                                     "%s"
                                      "<ServerUrl>%s?</ServerUrl>"
-                                     "<SRS>EPSG:3812</SRS>"
                                      "<ImageFormat>image/jpeg</ImageFormat>"
                                      "<Layers>%s</Layers>"
                                      "<Styles></Styles>"
@@ -890,6 +889,7 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      "<ZeroBlockHttpCodes>204,404,500</ZeroBlockHttpCodes>" // la couche topo de l'ign retourne le code 500 depuis leurs mise à jour de avril 2021,vers WMS version 1.3 qui n'utilise pas les même balises xml (ajout crs entre autre, mais ne fonctionne pas)
                                      "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
                                      "</GDAL_WMS>",
+                                     mCode=="IGN" ? "<Version>1.3.0</Version><CRS>EPSG:3812</CRS>" :"<Version>1.1.0</Version><SRS>EPSG:3812</SRS>",
                                      mUrl.c_str(),
                                      layerName.c_str(),
                                      extent->MinX,
@@ -901,13 +901,12 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      );
 
     //"<Cache><Type>file</Type><Expires>%d</Expires></Cache>"
-    /*if (globTest){
+    if (globTest){
         std::cout <<mUrl << std::endl;
-        std::cout << connStr << std::endl;}*/
+        std::cout << connStr << std::endl;}
     GDALDataset *pDS = static_cast<GDALDataset*>(GDALOpenEx(connStr, GDAL_OF_RASTER, nullptr, nullptr, nullptr));
     if( pDS != NULL ){
 
-        //std::cout << " X size is " << pDS->GetRasterBand( 1 )->GetXSize() << " , Y size is " << pDS->GetRasterBand( 1 )->GetYSize()<< std::endl;
         // conversion vers jpg
         GDALDataset *pOutRaster;
         GDALDriver *pDriverPNG;
@@ -921,7 +920,6 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
         pOutRaster = pDriverPNG->CreateCopy( aOut.c_str(),pDS,FALSE, NULL,NULL, NULL );
         if( pOutRaster != NULL ){ GDALClose( pOutRaster );}
         GDALClose(pDS);
-        //GDALClose( (GDALDatasetH) pDS);
         aRes=1;
     }
     return aRes;
