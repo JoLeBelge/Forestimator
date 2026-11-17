@@ -29,7 +29,7 @@ data/OGF.db*
 forestimatorWeb/*.o
 forestimatorWeb/launch.sh
 forestimatorWeb/forestimatorWeb
-forestimatorMiddleware/logs/*
+forestimatorMiddleware/*
 forestimatorWeb/Makefile
 *.log
 forestimatorWeb/log.txt

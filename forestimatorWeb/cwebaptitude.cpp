@@ -122,8 +122,9 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     contPrincipal->setContentAlignment(Wt::AlignmentFlag::Top);// j'ai mis ça sur deux ou trois conteneur car sinon j'ai un bug avec la taille de la page "catalogue station" qui augmente sa taille à l'infini (voir post sur e layout manager for a container which does not have a height that is constrained somehow, you need to specify AlignTop in the alignment flags of WContainerWidget::setLayout().
     GDALAllRegister();
 
-    setLoadingIndicator(std::make_unique<Wt::WOverlayLoadingIndicator>());
-    loadingIndicator()->setMessage(Wt::WString::tr("defaultLoadingI"));
+    //setLoadingIndicator(std::make_unique<Wt::WOverlayLoadingIndicator>());
+    //loadingIndicator()->setMessage(Wt::WString::tr("defaultLoadingI"));
+
 
     for (const auto & kv : mDico->colors){
         color * col=kv.second.get();
