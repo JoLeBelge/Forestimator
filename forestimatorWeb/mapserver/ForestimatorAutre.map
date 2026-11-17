@@ -14,7 +14,7 @@ MAP
             "wms_label" "Serveur WMS de diverses cartes utilisées dans la plateforme Forestimator" 
             "wms_onlineresource" "https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator" 
             "wms_service_onlineresource" "https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator" 
-            "wms_srs" "EPSG:31370" 
+            "wms_srs" "EPSG:31370 EPSG:3812" 
             "wms_enable_request" "*" 
         END
     END
@@ -91,9 +91,8 @@ MAP
         OFFSITE 0 0 0
         METADATA
             "wms_title" "Masque Forêt" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MasqueForet2018"
@@ -114,9 +113,8 @@ MAP
         OFFSITE 0 0 0
         METADATA
             "wms_title" "Masque Forêt 2018" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ClassesDeHauteur"
@@ -181,7 +179,7 @@ MAP
             "wms_title" "Classes de Hauteur" 
             "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "plS2_falseColor_2020_05"
@@ -193,9 +191,8 @@ MAP
         END
         METADATA
             "wms_title" "vue Sat (planetScope + Sentinel2) en fausse couleur de 2020 05" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "plS2_falseColor_052021"
@@ -211,9 +208,8 @@ MAP
         END
         METADATA
             "wms_title" "vue Sat (planetScope + Sentinel2) en fausse couleur de 2021 05" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "plS2_falseColor_082022"
@@ -229,9 +225,8 @@ MAP
         END
         METADATA
             "wms_title" "vue Sat (planetScope + Sentinel2) en fausse couleur de 2022 08" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNT"
@@ -246,9 +241,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNT.map"
         METADATA
             "wms_title" "Relief (modèle numérique de terrain)" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "pente"
@@ -263,9 +257,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_pente.map"
         METADATA
             "wms_title" "Pente (pourcent)" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2016"
@@ -281,9 +274,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2016" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2017"
@@ -299,9 +291,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2017" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2018"
@@ -317,9 +308,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2018" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2019"
@@ -335,9 +325,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2019" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2020"
@@ -353,9 +342,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2020" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2021"
@@ -371,9 +359,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2021" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2022"
@@ -389,9 +376,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2022" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2023"
@@ -407,9 +393,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2023" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2024"
@@ -425,9 +410,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2024" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "COMPOALL"
@@ -456,7 +440,6 @@ MAP
         END
         METADATA
             "wms_title" "Carte de composition ; espèce majoritaire 2021 " 
-            "wms_srs" "EPSG:31370" 
         END
     END
         LAYER
@@ -486,7 +469,6 @@ MAP
         END
         METADATA
             "wms_title" "Carte de composition simplifiée ; espèce majoritaire 2021 " 
-            "wms_srs" "EPSG:31370" 
         END
     END
     LAYER
@@ -509,9 +491,8 @@ MAP
         END
         METADATA
             "wms_title" "Carte de composition ; espèce majoritaire 2018" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "SWC"
@@ -567,9 +548,8 @@ MAP
         END
         METADATA
             "wms_title" "Réserve en eau du sol" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2016_SURV"
@@ -585,9 +565,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2016 - 1:100.000" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2017_SURV"
@@ -603,9 +582,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2017 - 1:100.000" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2018_SURV"
@@ -621,9 +599,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2018 - 1:100.000" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2019_SURV"
@@ -639,9 +616,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2019 - 1:100.000" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2020_SURV"
@@ -657,9 +633,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2020 - 1:100.000" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2021_SURV"
@@ -674,10 +649,9 @@ MAP
         PROCESSING "BANDS=1"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
         METADATA
-            "wms_title" "Etat Sanitaire Pessière 2021 - 1:100.000" 
-            "wms_srs" "EPSG:31370" 
+            "wms_title" "Etat Sanitaire Pessière 2021 - 1:100.000"  
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "ES_EP_2022_SURV"
@@ -693,9 +667,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
         METADATA
             "wms_title" "Etat Sanitaire Pessière 2022 - 1:100.000" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2006"
@@ -710,9 +683,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2006" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2009"
@@ -727,9 +699,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2009" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2012"
@@ -744,9 +715,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2012" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2014"
@@ -761,9 +731,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2014" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2015"
@@ -778,9 +747,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2015" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2016"
@@ -795,9 +763,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2016" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2018"
@@ -812,9 +779,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2018" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2019"
@@ -829,9 +795,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2019" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2020"
@@ -846,9 +811,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2020" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "MNH2021"
@@ -863,9 +827,8 @@ MAP
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
         METADATA
             "wms_title" "Modèle Numérique de Hauteur 2021" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_vha"
@@ -876,13 +839,12 @@ MAP
         END
         DATA "dendro/dendro_vha_8bits.tif"
         PROCESSING "BANDS=1"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0 quand j'ajoute une colortable dans les métadonnées, et que celle-ci ne couvrent pas toutes les valeurs, l'instruction offsite va cacher tout les pixels qui ont dans la colortable le code 0 0 0!!
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_vha.map"
         METADATA
             "wms_title" "Modèle dendrométrique : Volume des peuplements (VHA) [m3/ha]" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_prop_fe"
@@ -893,13 +855,12 @@ MAP
         END
         DATA "dendro/dendro_prop_fe_8bits.tif"
         PROCESSING "BANDS=1"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
         METADATA
             "wms_title" "Modèle dendrométrique : proportion de feuillus [%]" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_hdom"
@@ -910,14 +871,12 @@ MAP
         END
         DATA "dendro/dendro_hdom_8bits.tif"
         PROCESSING "BANDS=1"
-        PROCESSING "SCALE=0,508"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
         METADATA
             "wms_title" "Modèle dendrométrique : hauteur dominante [m]" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_gha"
@@ -928,14 +887,12 @@ MAP
         END
         DATA "dendro/dendro_gha_8bits.tif"
         PROCESSING "BANDS=1"
-        PROCESSING "SCALE=0,508"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_gha.map"
         METADATA
             "wms_title" "Modèle dendrométrique : surface terrière [m2/ha]" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_nha"
@@ -946,14 +903,12 @@ MAP
         END
         DATA "dendro/dendro_nha_8bits.tif"
         PROCESSING "BANDS=1"
-        PROCESSING "SCALE=0,508"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
         METADATA
             "wms_title" "Modèle dendrométrique : nombre de tiges [/ha]" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
     LAYER
         NAME "dendro_cdom"
@@ -964,13 +919,11 @@ MAP
         END
         DATA "dendro/dendro_cdom_8bits.tif"
         PROCESSING "BANDS=1"
-        PROCESSING "LUT=254:130"
-        OFFSITE 0 0 0
+        #OFFSITE 0 0 0
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_cdom.map"
         METADATA
             "wms_title" "Modèle dendrométrique : circonférence dominante [cm]" 
-            "wms_srs" "EPSG:31370" 
         END
-        TEMPLATE "../template.html"
+
     END
 END

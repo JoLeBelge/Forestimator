@@ -192,28 +192,22 @@ void layerBase::createRasterColorInterpPalette(GDALRasterBand * aBand){
         colors.SetColorEntry(kv.first,&e);
     }
 
-    //std::cout << "get number of entry " << colors.GetColorEntryCount() << " of colortable" << std::endl; -> dicoCol.size, ok
-    //aBand->GetColorTable()->GetColorEntryCount() -> always 255 for 8 bits
     if(aBand->GetRasterDataType() == GDT_Byte || aBand->GetRasterDataType() == GDT_UInt16){
         aBand->SetColorTable(&colors);
     }
 
-    // ne fonctionne pas du tout pour l'instant
+    // ne fonctionne pas du tout pour l'instant - peut etre changer la version de gdal sur le serveur?
     if (false && mTypeVar == TypeVar::Classe){
         GDALRasterAttributeTableH poRAT =GDALCreateRasterAttributeTable();
         //GDALRasterAttributeTableH poRAT =reinterpret_cast<GDALRasterAttributeTableH>(aBand->GetDefaultRAT( ));
         GDALRATInitializeFromColorTable(poRAT, reinterpret_cast<GDALColorTableH>(&colors));
-        //GDALRATSetTableType(poRAT,GRTT_THEMATIC);
         GDALRATCreateColumn(poRAT,"label",GFT_String,GFU_Name);
-        //GDALRATSetRowCount(poRAT,mDicoVal.size());
         int c(0);
         for (auto kv : mDicoVal){
             GDALRATSetValueAsString(poRAT,c,0,kv.second.c_str());
             c++;
         }
-        //CPLErr er = aBand->SetDefaultRAT( reinterpret_cast<GDALRasterAttributeTable*>(poRAT));
         //GDALRasterAttributeTableH poRAT2 =reinterpret_cast<GDALRasterAttributeTableH>(aBand->GetDefaultRAT( ));
-        //std::cout << " row count of RAT " <<  GDALRATGetRowCount(poRAT2) << std::endl;
         std::cout << "changes written " << GDALRATChangesAreWrittenToFile(poRAT)<< std::endl;
     }
 }
@@ -528,7 +522,7 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             //GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("MEM");
             // bug sur le server carto en 2026 10 ; driver mem ne sais pas créer des layers
             GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("GPKG");
-            boost::filesystem::path tmpPath = boost::filesystem::path("/vsimem/") / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%");
+            boost::filesystem::path tmpPath = boost::filesystem::path("/vsimem/") / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.gpkg");
 
             std::string name1 = tmpPath.string();
             std::string name2 = name1.substr(5,name1.size()-5);

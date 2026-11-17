@@ -2,8 +2,10 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -52,7 +54,34 @@ func addCorsHeaders(next http.Handler) http.Handler {
 	})
 }
 
+type GeoResponse struct {
+	Status  string `json:"status"`
+	Country string `json:"countryCode"`
+	Query   string `json:"query"`
+}
+
+func getCountryFromIP(ip string) (string, error) {
+        if ip[0] == '1' && ip[1] == '0' {
+               return "intern", nil
+        }
+	url := fmt.Sprintf("http://ip-api.com/json/%s?fields=status,countryCode", ip)
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	var geo GeoResponse
+	if err := json.NewDecoder(resp.Body).Decode(&geo); err != nil {
+		return "", err
+	}
+	if geo.Status != "success" {
+		return "", fmt.Errorf("GeoIP lookup failed for %s", ip)
+	}
+	return geo.Country, nil
+}
+
 func main() {
+	allowedCountries := []string{"intern","BE", "FR", "DE", "LU", "NL", "CH"}
 	certCarto, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/fullchain.pem", "/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/privkey.pem")
 	if err != nil {
 		fmt.Println("Carto certificate not found!")
@@ -94,6 +123,33 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		ip := r.Header.Get("X-Forwarded-For")
+		if ip == "" {
+			ip, _, _ = net.SplitHostPort(r.RemoteAddr)
+		} else {
+			ips := strings.Split(ip, ",")
+			ip = strings.TrimSpace(ips[0])
+		}
+		country, err := getCountryFromIP(ip)
+		if err != nil {
+			fmt.Printf("[ERROR] IP %s: %v", ip, err)
+			http.Error(w, "Geolocation lookup failed", http.StatusInternalServerError)
+			return
+		}
+		isAllowed := false
+		for _, allowed := range allowedCountries {
+			if strings.EqualFold(country, allowed) {
+				isAllowed = true
+				break
+			}
+		}
+		if !isAllowed {
+			log.Printf("[DENIED] IP: %s | Country: %s", ip, country)
+			http.Error(w, "Access denied from your location", http.StatusForbidden)
+			return
+		}
+		log.Printf("[ALLOWED] IP: %s | Country: %s", ip, country)
+
 		switch r.Host {
 		case "forestimator.gembloux.ulg.ac.be":
 			if strings.Contains(r.URL.Path, "/dev") {
@@ -109,10 +165,5 @@ func main() {
 			http.Error(w, "Unknown host", http.StatusNotFound)
 		}
 	})
-	//listener.Close()
 	log.Println(http.Serve(listener, nil))
-
-	//log.Printf("reverse proxy listening on %s", server.Addr)
-	//log.Fatal(server.ListenAndServe())
-
 }
