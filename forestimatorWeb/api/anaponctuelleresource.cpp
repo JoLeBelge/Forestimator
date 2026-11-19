@@ -20,7 +20,7 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
     GDALAllRegister();
 
     // en amont du résultat pour les couches, ajouter des métadonnées, comme le fait qu\"on est bien en RW? le src du pt?
-    bool inRW=mDico->getLayerBase("ZBIO")->getValue(x,y)!=0;
+    bool inRW=mDico->getLayerBase("ZBIO")->getValue(x,y,epsg)!=0;
 
     // le double to String de response.out m'arrondi le x (et pas le y, mystère). je fait le cast moi-même
     response.out() << "{\n\"forestimatorAnalyses\":\"point\",\n"

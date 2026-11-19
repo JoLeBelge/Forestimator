@@ -197,7 +197,7 @@ double rasterFiles::getValueDouble(double x, double y, int epsg){
         source.importFromEPSG(epsg);
         OGRPoint pt(x,y);
         pt.assignSpatialReference(&source);
-        pt.transformTo(mGDALDat->GetSpatialRef());
+        pt.transformTo(mGDALDat->GetSpatialRef()->Clone());
         x=pt.getX();y=pt.getY();
 
         GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
@@ -430,13 +430,8 @@ std::map<double,int>  rasterFiles::valAndFreq(OGRGeometry * poGeom){
 
     std::map<double,int> aMapValandFrequ;
     GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
-    //OGRSpatialReference source;
-    //source.importFromEPSG(epsg);
-    //poGeom->assignSpatialReference(&source);
-    char ** proj;
-    poGeom->getSpatialReference()->exportToProj4(proj);
-    std::cout << proj << std::endl;
-    poGeom->transformTo(mGDALDat->GetSpatialRef());
+
+    poGeom->transformTo(mGDALDat->GetSpatialRef()->Clone());
 
     GDALDataset * mask = rasterizeGeom(poGeom);
     OGREnvelope ext;
@@ -657,77 +652,6 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
         aRes=1;
     }
     return aRes;
-}
-
-GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
-    std::string output("/vsimem/tmp.tif");
-
-    const char *out=output.c_str();
-    GDALDriver *pDriver;
-    GDALDataset *pRaster=NULL, * pShp;
-    const char *pszFormat = "MEM";
-
-    pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-    if( pDriver == NULL )
-    {
-        printf( "%s driver not available.\n", pszFormat );
-    } else {
-
-        OGREnvelope ext;
-        poGeom->getEnvelope(&ext);
-        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-
-        if( aGDALDat == NULL )
-        {
-            std::cout << "rasterizeGeom ; on m'as donnée un pointeur GDALDataset qui est nul" << std::endl;
-        } else {
-            const char *pszWkt = aGDALDat->GetProjectionRef();
-            OGRSpatialReference oSRS;
-            oSRS.importFromWkt(&pszWkt);
-            // driver et dataset shp -- creation depuis la géométrie
-            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("MEM");
-            pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
-            OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
-            OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
-            feat->SetGeometry(poGeom);
-            OGRErr err = lay->CreateFeature(feat);
-            if (err != OGRERR_NONE) {
-                std::cout << "Error creating feature: " << err << std::endl;
-            }
-
-            double transform[6];
-            aGDALDat->GetGeoTransform(transform);
-
-            double pixelWidth = transform[1];
-            double pixelHeight = -transform[5];
-            //determine dimensions of the tile
-            int xSize = round(width/pixelWidth);
-            int ySize = round(height/pixelHeight);
-
-            double tr2[6];
-            tr2[0]=ext.MinX;
-            tr2[3]=ext.MaxY;
-            tr2[1]=transform[1];
-            tr2[2]=transform[2];
-            tr2[4]=transform[4];
-            tr2[5]=transform[5];
-            // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
-            if (xSize>0 && ySize>0){
-                pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
-                pRaster->SetGeoTransform(tr2);
-                pRaster->SetProjection(aGDALDat->GetProjectionRef());
-                GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
-            } else {
-                std::cout << "global::rasterizeGeom: raster size problem x="<<xSize<<", y="<< ySize<<"\n" << std::endl;
-            }
-            // on en avait besoin que pour l'extent et resol
-            GDALClose(aGDALDat);
-            OGRFeature::DestroyFeature(feat);
-            pShp->DeleteLayer(0);
-            GDALClose(pShp);
-        }
-    }
-    return pRaster;
 }
 
 bool layerBase::cropIm(std::string aOut, OGREnvelope ext)
