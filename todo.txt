@@ -1,11 +1,16 @@
 To do list forestimator
 -----------------------
+	-symbologie dendro : colortable semble foutre la merde quand elle n'est pas complête/continue. modifier les raster, soit supprimer la color table (gdal 13.3, oui je fais ca, depuis un autre ordi) mais juste pour les raster variables continues
 
--Forestimator Web: déployer une deuxième version du site avec les couches en Lambert2008, https://forestimator.gembloux.ulg.ac.be/dev/
-	-projeter toutes les couches en BL08 -> todo JL
-	- dans la bd sqlite, nouveau directory pour les raster en Lambert2008 dans les colonnes "Dir" (tables fichier GIS et layerApt) -> JL
-	- on crée une nouvelle branche git et on modifie le code openlayer : systeme de projection et extend.
-	- quand tout fonctionne, on change forestimator mobile pour qu'il soit compatible
+-Forestimator DEV:
+
+	- api : ajout paramètre epsg pour ana pt.
+	- passage version mobile sur la version BL08 -> uniquement délicat pour la partie api et téléchargement -> TT
+	- 
+
+-Middelware 	- diminuer la quantité de logs, ç'est trop lourd. relancer chaque semaine/mois pour splitté les logs (actuellement tout les jours sont dans un fichier unique)
+		-forestimator mapsite.xml : n'est plus accessible pour les robots de google
+		- utiliser forestimator depuis le servcarto est excessivement lent... résoudre le problème. Crée un gros problème pour la génération des rapports (ana ponct et ana surf web) ou forestimator se questionne lui-même pour avoir des images wms!!.
 
 -Forestimator Web: -> formulaire consultation/modification email pour utilisateur : il faut alors une page "mon compte". -> TT, plutôt dans le middleware
 

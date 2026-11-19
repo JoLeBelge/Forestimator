@@ -37,3 +37,6 @@ forestimatorWeb/log.txt
 VideosTuto/*
 forestimatorMobile/documentation/manuel/Images/*
 forestimatorMobile/pubspec.lock
+*.qtcreator*
+forestimatorWeb/mapserver/mount_script.txt
+

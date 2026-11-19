@@ -4,45 +4,35 @@
 #include "cdicoapt.h"
 #include <boost/algorithm/string/replace.hpp>
 #include "cpl_conv.h" // for CPLMalloc()
-// pour les vecteurs
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
 #include "gdal_priv.h"
 #include <numeric>
 #include "color.h"
 
-
-
 // pour la comparaison de deux enveloppes lors du crop d'une image
 double getArea(OGREnvelope *env);
-
-
-std::string getAbbreviation(std::string str);
-
-//GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat);
 
 // renvoie une liste de polgone qui sont des hexagones
 std::vector<OGRPolygon*> hexGeombin(GDALDataset *mask);
 // renvoie une grille de point, centre d'hexagone
 std::vector<OGRPoint> hexbin(GDALDataset * mask);
 
-double predHdom(std::vector<double> aVHs);
-double getQ95(std::vector<double> aVHs);
 
 class basicStat;
 class cEss; // avec les aptitudes de l'essence
 class color;
 
-class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches.
+class rasterFiles;
 class layerBase;
 class layerStat;
 
 enum class TypeVar {Classe,
-                    Continu
-                   };
+                     Continu
+};
 
 enum class TypeLayer {
-     Init
+    Init
     ,KK // les cartes dérivées des CS
     ,Station // lié à la description de la station, approche FEE ; NH NT ZBIO, mais aussi les stations du CS
     ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
@@ -51,8 +41,6 @@ enum class TypeLayer {
     ,Peuplement // description du peuplement en place
 };
 
-
-// forward dec
 class cDicoApt;
 
 inline bool exists (const std::string& name){
@@ -74,8 +62,8 @@ public:
     std::string getMax(){return roundDouble(max);}
     std::string getMean(int precisionVal=1){return roundDouble(mean,precisionVal);}
     std::string getNb(){return std::to_string(nb);}
-     std::string getSurfTot(int precisionVal=1){return roundDouble((nbNA+nb)*pow(resolution,2)/10000.0,precisionVal);}
-     std::string getNbNA(int precisionVal=1){return roundDouble(nbNA*pow(resolution,2)/10000.0,precisionVal);}
+    std::string getSurfTot(int precisionVal=1){return roundDouble((nbNA+nb)*pow(resolution,2)/10000.0,precisionVal);}
+    std::string getNbNA(int precisionVal=1){return roundDouble(nbNA*pow(resolution,2)/10000.0,precisionVal);}
     std::string getSum(int precisionVal=1){
         return roundDouble(mean*(nb*pow(resolution,2))/10000.0,precisionVal);}
     int getSumInt(){
@@ -89,7 +77,6 @@ public:
     double getFreq(double aVal){
         double aRes(0);
         if (mValFreq.find(aVal)!=mValFreq.end()){
-            //std::cout << " freq pour val " << aVal << " est de " << mValFreq.at(aVal) << " pixel sur un total de " << nb << std::endl;
             aRes=mValFreq.at(aVal)/(double (nb));
         }
         return aRes;
@@ -98,7 +85,7 @@ public:
     double getMeanDbl(){return mean;}
     int nbNA;
     double resolution;
-   private:
+private:
     double min,max,mean,stdev;
     int nb;
 
@@ -111,7 +98,6 @@ public:
     rasterFiles(std::string aPathTif,std::string aCode);
     std::string Code() const{return mCode;}
     void checkForQml();
-    // retourne le chemin d'accès complêt
     std::string getPathTif() const{return mPathRaster;}
     std::string symbology() const{return mPathQml;}
     bool hasSymbology() const{return mPathQml!="";}
@@ -121,18 +107,20 @@ public:
         // en Mo
         double aRes(0);
         if (boost::filesystem::exists(mPathRaster)){
-        aRes= ((double) boost::filesystem::file_size(mPathRaster))/1000000.0;
+            aRes= ((double) boost::filesystem::file_size(mPathRaster))/1000000.0;
         }
         return aRes;
     }
     double getResolution(){return mResolution;}
 
     // méthode GDAL
-    int getValue(double x, double y);
-    double getValueDouble(double x, double y);
+    int getValue(double x, double y, int epsg=3812);
+    double getValueDouble(double x, double y, int epsg=3812);
     // rasterfile, pas de dictionnaire
     basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
+    std::map<double,int> valAndFreq(OGRGeometry * poGeom);
     GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
+
 protected:
     std::string mPathRaster, mPathQml, mCode;
 
@@ -144,7 +132,7 @@ public:
     layerBase(std::string aCode,cDicoApt * aDico);
     layerBase(std::shared_ptr<layerBase> aLB);
 
-    std::string NomFile(); // nom du fichier tiff sans l'extension
+    std::string NomFile(); // sans l'extension
     std::string NomFileWithExt();
 
     std::string Nom(){return mNom;}
@@ -162,20 +150,19 @@ public:
     bool Expert() const{return mExpert;}
     double Gain() const{return mGain;}
     void catSummary(){std::cout << "layerbase ; Code " << mCode << " , Nom " << mNom << ", raser " << mPathRaster << ", dictionnaire valeurs de " << mDicoVal.size() << " elements " << std::endl;}
-    // pour l'api qui veu avoir la table dictionnaire
     std::string getDicoValStr();
     std::string EssCode() const{std::string aRes="";
-                                   if ((mType==TypeLayer::CS) |(mType==TypeLayer::FEE)){aRes=mCode.substr(0,2);}
-                                   return aRes;}
+        if ((mType==TypeLayer::CS) |(mType==TypeLayer::FEE)){aRes=mCode.substr(0,2);}
+        return aRes;}
     std::string getCatLayerStr() const{std::string aRes("");
-      if (mType==TypeLayer::KK){aRes="KK";}
-      if (mType==TypeLayer::Station){aRes="Station";}
-      if (mType==TypeLayer::Externe){aRes="Externe";}
-      if (mType==TypeLayer::FEE){aRes="FEE";}
-      if (mType==TypeLayer::CS){aRes="CS";}
+        if (mType==TypeLayer::KK){aRes="KK";}
+        if (mType==TypeLayer::Station){aRes="Station";}
+        if (mType==TypeLayer::Externe){aRes="Externe";}
+        if (mType==TypeLayer::FEE){aRes="FEE";}
+        if (mType==TypeLayer::CS){aRes="CS";}
         return aRes;}
 
-    // stat sur un polygone ; deux retour possible, une map avec clé = valeur raster, une map avec clé = signification string
+    // stat sur un polygone pour raster de classes ; deux retour possible, une map avec clé = valeur raster, une map avec clé = signification string
     // clé ; signification du code raster. Val ; nombre d'occurence
     std::map<std::string,int> computeStat1(OGRGeometry * poGeom);
     // clé ; val raster. val ; pct. Comment gerer les no data? code int -1?
@@ -183,7 +170,7 @@ public:
     // retourne la valeur majoritaire sur le polygone ainsi que son prct en surface
     std::pair<int,double> valMajoritaire(OGRGeometry * poGeom);
 
-     std::string summaryStat(OGRGeometry * poGeom);
+    std::string summaryStat(OGRGeometry * poGeom);
 
     // ça c'est pour les couches variables continues
     basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);

@@ -810,13 +810,11 @@ void parcellaire::projetAndConvertGDAL()
 
 void parcellaire::computeStatGlob(OGRGeometry *poGeomGlobale)
 {
-    std::cout << " groupLayers::computeStatGlob " << std::endl;
-    clearStat();
 
+    clearStat();
     // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
     for (auto &l : getSelectedLayer4Download())
     {
-
         if (l->l4Stat())
         {
             // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
@@ -824,6 +822,5 @@ void parcellaire::computeStatGlob(OGRGeometry *poGeomGlobale)
             mVLStat.push_back(std::make_shared<layerStatChart>(l, stat, poGeomGlobale));
         }
     }
-
-    m_app->addLog("compute stat, " + std::to_string(getNumSelect4Download()) + " traitements", typeLog::anas); // add some web stats
+    m_app->addLog("compute stat, " + std::to_string(getNumSelect4Download()) + " traitements", typeLog::anas);
 }
