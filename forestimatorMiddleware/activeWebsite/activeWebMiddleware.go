@@ -490,7 +490,7 @@ func main() {
 				director := forestimator.proxy.Director
 				forestimator.proxy.Director = func(r *http.Request) {
 					director(r)
-					recordRequest(&forestimator, r.RemoteAddr+r.RequestURI)
+					recordRequest(&forestimator, r.Header.Get("X-Forwarded-For")+r.RequestURI)
 					/*if strings.Contains(r.RequestURI, "?signal=") && strings.Contains(r.RequestURI, "&wtd=") {
 						log.Println("Signal detected in request URI")
 						r.URL.RawQuery = "GET /"

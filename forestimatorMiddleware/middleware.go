@@ -61,9 +61,9 @@ type GeoResponse struct {
 }
 
 func getCountryFromIP(ip string) (string, error) {
-        if ip[0] == '1' && ip[1] == '0' {
-               return "intern", nil
-        }
+	if ip[0] == '1' && ip[1] == '0' {
+		return "intern", nil
+	}
 	url := fmt.Sprintf("http://ip-api.com/json/%s?fields=status,countryCode", ip)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -81,7 +81,7 @@ func getCountryFromIP(ip string) (string, error) {
 }
 
 func main() {
-	allowedCountries := []string{"intern","BE", "FR", "DE", "LU", "NL", "CH"}
+	allowedCountries := []string{"intern", "BE", "FR", "DE", "LU", "NL", "CH"}
 	certCarto, err := tls.LoadX509KeyPair("/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/fullchain.pem", "/etc/letsencrypt/live/gxgfservcarto.gxabt.ulg.ac.be-0001/privkey.pem")
 	if err != nil {
 		fmt.Println("Carto certificate not found!")
@@ -114,8 +114,10 @@ func main() {
 		GetCertificate: getCertificates,
 	}
 
+	lookupTable := make(map[string]string)
+
 	siteProxy := newProxy("http://localhost:47000")
-	devProxy := newProxy("http://localhost:47100")
+	devProxy := newProxy("http://localhost:47105")
 
 	listener, err := tls.Listen("tcp", ":443", tlsConfig)
 	if err != nil {
@@ -130,12 +132,17 @@ func main() {
 			ips := strings.Split(ip, ",")
 			ip = strings.TrimSpace(ips[0])
 		}
-		country, err := getCountryFromIP(ip)
-		if err != nil {
-			fmt.Printf("[ERROR] IP %s: %v", ip, err)
-			http.Error(w, "Geolocation lookup failed", http.StatusInternalServerError)
-			return
+		country := lookupTable[ip]
+		err := error(nil)
+		if country == "" {
+			country, err = getCountryFromIP(ip)
+			if err != nil {
+				fmt.Printf("[ERROR] IP %s: %v", ip, err)
+				http.Error(w, "Geolocation lookup failed", http.StatusInternalServerError)
+				return
+			}
 		}
+		lookupTable[ip] = country
 		isAllowed := false
 		for _, allowed := range allowedCountries {
 			if strings.EqualFold(country, allowed) {
