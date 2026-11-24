@@ -2,9 +2,6 @@ LAYER
     NAME "CS_Ardenne"
     TYPE RASTER
     STATUS ON
-    PROJECTION
-        "init=epsg:31370"
-    END
     DATA "GSA_V7_202409_RW.tif"
     PROCESSING "BANDS=1"
     CLASSITEM "[pixel]"
@@ -20,7 +17,6 @@ LAYER
     METADATA
         "wms_title" "Catalogue de station (toutes les régions)" 
     END
-    TEMPLATE "../template.html"
 END
 LAYER
     NAME "CS_region_Ardenne"
@@ -43,7 +39,6 @@ LAYER
     METADATA
         "wms_title" "Catalogue de station pour l'Ardenne" 
     END
-    TEMPLATE "../template.html"
 END
 LAYER
     NAME "CS_region_FFC"
@@ -66,5 +61,4 @@ LAYER
     METADATA
         "wms_title" "Catalogue de station pour la Fagne-Famenne-Calestienne" 
     END
-    TEMPLATE "../template.html"
 END

@@ -2,16 +2,13 @@ MAP
     NAME "ogf"
     EXTENT 42250.00012 21170.00012000001 295170.00012 167700.00012
     SIZE 800 800
-
-    SHAPEPATH "/media/Data10/Forestimator/BL2008/Autre/"
+    SHAPEPATH "/media/Data10/Forestimator/Autre/"
     IMAGECOLOR 255 255 255
     IMAGETYPE "PNG"
     TRANSPARENT ON
-
     PROJECTION
         "init=epsg:31370"
     END
-
     WEB
         METADATA
             "wms_label" "Serveur WMS de diverses cartes relatives aux forets subnaturelles matures"
@@ -39,9 +36,6 @@ MAP
         CONNECTION "ogf_ciblage_polygones.gpkg"
         DATA "ogf_ciblage_polygones"
 
-        PROJECTION
-            "init=epsg:31370"
-        END
 
         CLASSITEM "Classe"
 
@@ -84,9 +78,6 @@ MAP
 
         DATA "ogf_cas_stationnel.tif"
 
-        PROJECTION
-            "init=epsg:31370"
-        END
 
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
@@ -126,6 +117,9 @@ MAP
 
 
     # -------------------------------------------------------------------------
+        PROJECTION
+            "init=epsg:31370"
+        END
     # Raster intermediaire q70 : 0 transparent ; 1 noir.
     # -------------------------------------------------------------------------
     LAYER
@@ -134,10 +128,6 @@ MAP
         STATUS ON
 
         DATA "ogf_q70_pixels_retenus.tif"
-
-        PROJECTION
-            "init=epsg:31370"
-        END
 
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
@@ -177,9 +167,6 @@ MAP
 
         DATA "ogf_q90_pixels_retenus.tif"
 
-        PROJECTION
-            "init=epsg:31370"
-        END
 
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
@@ -225,9 +212,6 @@ MAP
         TOLERANCE 5
         TOLERANCEUNITS PIXELS
         
-        PROJECTION
-            "init=epsg:31370"
-        END
 
         CLASSITEM "group_id"
 

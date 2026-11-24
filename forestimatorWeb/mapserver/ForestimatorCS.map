@@ -5,7 +5,7 @@ MAP
     SHAPEPATH "/media/Data10/Forestimator/BL2008/CS/"
     IMAGECOLOR 255 255 255
     PROJECTION
-        "init=epsg:31370"
+        "init=epsg:3812"
     END
     WEB
         METADATA
@@ -20,784 +20,560 @@ MAP
         NAME "Aptitude_CS_AB"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_AB.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Alisier Blanc" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_AG"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_AG.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Sapin de Vancouver" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_AN"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_AN.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Sapin noble" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_AP"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_AP.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Sapin pectiné" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_AX"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_AX.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Aulne glutineux" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_BP"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_BP.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Bouleau pubescent" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_BV"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_BV.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Bouleau verruqueux" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_CA"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_CA.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Charme" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_CD"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_CD.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Cèdre de lAtlas" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_CO"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_CO.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Cormier" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_CP"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_CP.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Chêne pédonculé" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_CR"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_CR.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Chêne rouge dAmérique" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_CS"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_CS.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Chêne sessile" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_CT"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_CT.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Châtaignier" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_CY"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_CY.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Cyprès de Lawson" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_DO"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_DO.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Douglas" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_EC"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_EC.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Érable champêtre" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_EK"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_EK.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Épicea de Sitka" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_EL"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_EL.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Érable plane" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_EP"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_EP.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Épicéa commun" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_ES"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_ES.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Érable sycomore" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_FR"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_FR.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Frêne" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_HE"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_HE.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Hêtre" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_IF"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_IF.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'If commun" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_JH"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_JH.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Noyer hybride" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_JN"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_JN.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Noyer noir" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_JR"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_JR.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Noyer commun" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_ME"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_ME.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Mélèze dEurope" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_MH"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_MH.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Mélèze hybride" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_MJ"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_MJ.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Mélèze du Japon" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_MR"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_MR.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Merisier" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_NO"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_NO.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Sapin de Nordmann" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_OC"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_OC.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Orme champêtre" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_OL"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_OL.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Orme lisse" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_OM"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_OM.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Orme de montagne" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PA"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PA.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Pin noir dAutriche" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PC"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PC.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Pin laricio de Corse" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PG"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PG.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Peuplier grisard" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PK"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PK.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Pin de Koekelare" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PM"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PM.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Pommier sauvage" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PN"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PN.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Peuplier noir" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PO"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PO.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Poirier sauvage" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PS"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PS.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Pin sylvestre" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PT"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PT.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Peuplier tremble" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PY"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PY.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Peuplier noir hybride" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_PZ"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_PZ.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Peuplier baumier" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_RO"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_RO.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Robinier" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_RY"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_RY.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour les Caryers" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_SA"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_SA.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Saule blanc" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_SO"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_SO.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Sorbier des oiseleurs" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_ST"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_ST.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour l'Alisier torminal" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_TC"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_TC.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Tilleul à petites feuilles" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_TH"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_TH.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Thuya géant" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_TP"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_TP.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Tilleul à grandes feuilles" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_TU"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_TU.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Tulipier de Virginie" 
         END
-        TEMPLATE "../template.html"
     END
     LAYER
         NAME "Aptitude_CS_TY"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "recommandation_TY.tif"
         INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
         METADATA
             "wms_title" "recommandation pour le Tsuga hétérophylle" 
         END
-        TEMPLATE "../template.html"
     END
 END

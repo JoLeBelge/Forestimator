@@ -53,9 +53,6 @@ MAP
         NAME "NH"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "NH202408.tif"
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
@@ -160,9 +157,6 @@ MAP
         NAME "NT"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "NT2023.tif"
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
@@ -217,9 +211,6 @@ MAP
         NAME "SS"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "SS_W_201911.tif"
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
@@ -254,9 +245,6 @@ MAP
         NAME "Topo"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "TOPO2020.tif"
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
@@ -298,9 +286,6 @@ MAP
         NAME "ZBIO"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "ZBIO.tif"
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
