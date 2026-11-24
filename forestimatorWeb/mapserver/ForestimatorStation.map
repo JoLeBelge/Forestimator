@@ -5,7 +5,7 @@ MAP
     SHAPEPATH "/media/Data10/Forestimator/BL2008/Station/"
     IMAGECOLOR 255 255 255
     PROJECTION
-        "init=epsg:31370"
+        "init=epsg:3812"
     END
     WEB
         METADATA
@@ -20,9 +20,6 @@ MAP
         NAME "AE"
         TYPE RASTER
         STATUS ON
-        PROJECTION
-            "init=epsg:31370"
-        END
         DATA "AE_RW_202408.tif"
         PROCESSING "BANDS=1"
         CLASSITEM "[pixel]"
