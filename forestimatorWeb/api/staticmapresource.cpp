@@ -19,16 +19,7 @@ void staticMapResource::handleRequest(const Http::Request &request,Http::Respons
         if (mDico->hasLayerBase(lCode)){
         std::shared_ptr<layerBase> l =mDico->getLayerBase(lCode);
         OGRGeometry * pol=mDico->checkPolyg(aPolyg);
-        //OGRGeometry * envGeom=mDico->checkPolyg(aEnv,10000);
          if (pol!=NULL){
-         //OGREnvelope * env= new OGREnvelope;
-            /* if (envGeom!=NULL){
-                 envGeom->getEnvelope(env);
-             } else {
-                 env=NULL;
-             }
-             */
-
          staticMap sm(l,pol,aSz);
          std::ifstream r(sm.getFileName(), std::ios::in | std::ios::binary);
          response.addHeader("Content-Type","image/png");

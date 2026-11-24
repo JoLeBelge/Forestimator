@@ -5,6 +5,7 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
     auto params = request.urlParams();
     std::string listCode("");
     std::string aPolyg("");
+    int epsg=31370;
 
     // "/api/anaSurf/layers/${listLayerCode}/polygon/${pol}"
     // "
@@ -13,6 +14,7 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
         const auto &value = param.second;
         if (name=="listLayerCode") {listCode=value;}
         if (name=="pol") {aPolyg=value;}
+        if (name=="epsg") {epsg=std::stoi(value);}
     }
     GDALAllRegister();
 
@@ -21,6 +23,9 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
 
     OGRGeometry * pol=NULL;
     OGRErr err=OGRGeometryFactory::createFromWkt(aPolyg.c_str(),NULL,&pol);
+    OGRSpatialReference source;
+    source.importFromEPSG(epsg);
+    pol->assignSpatialReference(&source);
 
     response.addHeader("Content-Type","application/json");
     if (pol!=NULL && err==OGRERR_NONE){

@@ -317,10 +317,8 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
 
     OGRPoint pt = mSP->getPoint();
 
-    // je peux pas utiliser le membre mapextent de GL car celui-ci ne se met à jours que lorsqu'on télécharge une carte sur l'emprise courante...
     // depuis que l'IGN est passé à la version 1.3 du serveur WMS, je ne parviens plus à télécharger les cartes wms en jpg.
-    // donc il faut changer cette ligne. utiliser l'IGN du serveur grfmn?
-    staticMap sm = staticMap(mSP->mDico->getLayerBase("IGNgrfmn"), &pt);
+    staticMap sm = staticMap(mSP->mDico->getLayerBase("IGN"), &pt);
     // ajout du logo IGN. ajout des crédits ; toujours les mêmes, en dur.
     sm.addImg(mSP->mDico->File("logoIGN"));
     boost::replace_all(tp, "PATH_CARTE", sm.getFileName());

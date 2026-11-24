@@ -2,7 +2,7 @@ MAP
     NAME "Essences recommandées par les Guides des stations"
     EXTENT 42250.00012 21170.00012000001 295170.00012 167700.00012
     SIZE 800 800
-    SHAPEPATH "/media/Data10/Forestimator/CS/"
+    SHAPEPATH "/media/Data10/Forestimator/BL2008/CS/"
     IMAGECOLOR 255 255 255
     PROJECTION
         "init=epsg:31370"

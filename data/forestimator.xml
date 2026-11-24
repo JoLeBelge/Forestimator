@@ -401,31 +401,6 @@ Pour afficher la liste des couches et des traitements disponibles;
 <br></br><br></br>
 <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/help">https://forestimator.gembloux.ulg.ac.be/api/help</a>
 <br></br><br></br>
-<h3>Dictionnaire des couches cartographiques</h3>
-La majorité des couches cartographiques sont au format raster. Les variables de classes stoquées dans les couches raster sont renseignées au moyen d'une valeur entière. Il évidemment est nécessaire de connaitre la signification des valeurs entières pour correctement appréhender la couche raster ou les résultats d'analyses relatifs à cette couches : c'est le rôle du dictionnaire de la couche de fournir ces renseignement.
-<br></br>
-Les dictionnaires de couches sont disponibles en renseignant le nom de la carte de la manière suivate (exemple pour l'aptitude du hêtre) :
-<br></br><br></br>
-<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/HE_FEE">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">HE_FEE</font></a>
-<br></br><br></br>
-Voici ce que serveur retourne comme réponse :
-<br></br>
-<code class="hljs">
-<span class="hljs-comment">
-1;Optimum<br></br>
-2;Tolérance<br></br>
-3;Tolérance élargie<br></br>
-4;Exclusion<br></br>
-5;Optimum/Tolérance<br></br>
-6;Optimum/Tolérance élargie<br></br>
-7;Optimum/Exclusion<br></br>
-8;Tolérance/Tolérance élargie<br></br>
-9;Tolérance/Exclusion<br></br>
-10;Tolérance élargie/Exclusion<br></br>
-11;Indéterminé<br></br>
-12;Indéterminé (Zone batie)<br></br>
-</span></code>
-<br></br>
 
 <h3>Analyse ponctuelle</h3>
 Les analyses sont effectuées pour une position donnée sur une couche définie.
@@ -450,7 +425,7 @@ https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NO
 <br></br><br></br>
 CODE_COUCHE_OU_NOM_TRAITEMENT; consultez la page <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/help">https://forestimator.gembloux.ulg.ac.be/api/help</a> pour avoir la liste.
 <br></br><br></br>
-POLYGONE_FORMAT_WKT; le polygone délimitant la surface de terrain pour laquelle vous souhaitez effectuer les analyses. Le format doit être le WKT, le système de projection doit être en Belge Lambert 72. De plus, la géométrie du polygone doit être valide et sa surface ne peut dépasser 200 ha.
+POLYGONE_FORMAT_WKT; le polygone délimitant la surface de terrain pour laquelle vous souhaitez effectuer les analyses. Le format doit être le WKT, le système de projection doit être en Belge Lambert 2008. De plus, la géométrie du polygone doit être valide et sa surface ne peut dépasser 200 ha.
 <br></br><br></br>
 <p style="margin-bottom:0.2cm;margin-top:0.2cm">
 Certains traitements acceptent des arguments qui permettent de modifier leurs comportement par défaut. Dans ce cas, la syntaxe sera la suivante:
@@ -480,10 +455,7 @@ https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">aptitude</font>/p
 <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/CNSW/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))">
 https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CNSW</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
 </p>
-<!--
-<p style="margin-bottom:0.2cm;margin-top:0.2cm;">
-http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
-</p>-->
+
 
 
 <br></br>
@@ -582,7 +554,7 @@ parcellaire.shp &lt;- st_read(shp.path)<br></br>
 <!--LEGEND_CARTE si je veux la légende couleur il faut ajouter de manière automatique les couleurs dans les styles ci-dessus, je le ferai ultérieurement-->
 <br></br>
 Copyright ; © CartoWeb.be – IGN/NGI.
-Position de la station (Belge Lambert 72) : 
+Position de la station (Belge Lambert 2008) : 
 POSITION_PTX, POSITION_PTY.
 </div>
 

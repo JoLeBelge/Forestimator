@@ -7,7 +7,7 @@
 
 void rasterClipResource::handleRequest(const Http::Request &request, Http::Response &response)
 {
-    //std::cout << "rasterClipResource:: handle request" << std::endl;
+
     char **papszOptions = nullptr;
     auto params = request.urlParams();
     std::string lCode;
@@ -93,7 +93,6 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
 
     // ne pas oublier que le decoder de tiff pour la lecture d'un pixel unique dans FM est inféodé à la compressiond deflate.
     papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "DEFLATE");
-    //papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "LZW");
     papszOptions = CSLSetNameValue(papszOptions, "TILED", "YES");
 
     if (coordCount == 4)
@@ -104,7 +103,7 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
         ext.MaxX = xmax;
         ext.MinX = xmin;
 
-        std::cout << " cropIm layer " << l->getPathTif() << " on extend " << xmin << ", " << ymin << ", " << xmax << ", " << ymax << std::endl;
+        if (globTest){std::cout << " cropIm layer " << l->getPathTif() << " on extend " << xmin << ", " << ymin << ", " << xmax << ", " << ymax << std::endl;}
 
         pInputRaster->GetGeoTransform(tr1);
 

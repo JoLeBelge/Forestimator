@@ -5,7 +5,7 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
     auto params = request.urlParams();
     std::string listCode("");
     double x = 0.0,y = 0.0;
-
+    int epsg =31370;
     // "/api/anaPt/${listLayerCode}/x/${x}/y/${y}"
     for (const auto &param : params) {
         const auto &name = param.first;
@@ -14,20 +14,19 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
         if (name=="listLayerCode") {listCode=value;}
         if (name=="x") {x=std::stod(value);}
         if (name=="y") {y=std::stod(value);}
+        if (name=="epsg") {epsg=std::stoi(value);}
     }
-    /*std::cout << std::fixed;
-    std::cout << std::setprecision(2);
-    std::cout << "x " << x << ", y" << y <<std::endl;*/
+
     GDALAllRegister();
 
     // en amont du résultat pour les couches, ajouter des métadonnées, comme le fait qu\"on est bien en RW? le src du pt?
-    bool inRW=mDico->getLayerBase("ZBIO")->getValue(x,y)!=0;
+    bool inRW=mDico->getLayerBase("ZBIO")->getValue(x,y,epsg)!=0;
 
     // le double to String de response.out m'arrondi le x (et pas le y, mystère). je fait le cast moi-même
     response.out() << "{\n\"forestimatorAnalyses\":\"point\",\n"
                    <<       "\"x\":" << roundDouble(x) << ",\n"
                    <<       "\"y\":" <<  roundDouble(y) << ",\n"
-                   <<       "\"src\":\"EPSG31370\",\n"
+                   <<       "\"src\":\"EPSG" << std::to_string(epsg) << "\",\n"
                    <<       "\"inRW\":" << inRW << ",\n"
                    <<       "\"RequestedLayers\":[\n";
 

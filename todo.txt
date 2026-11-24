@@ -1,11 +1,10 @@
 To do list forestimator
 -----------------------
 
--Forestimator Web: déployer une deuxième version du site avec les couches en Lambert2008, https://forestimator.gembloux.ulg.ac.be/dev/
-	-projeter toutes les couches en BL08 -> todo JL
-	- dans la bd sqlite, nouveau directory pour les raster en Lambert2008 dans les colonnes "Dir" (tables fichier GIS et layerApt) -> JL
-	- on crée une nouvelle branche git et on modifie le code openlayer : systeme de projection et extend.
-	- quand tout fonctionne, on change forestimator mobile pour qu'il soit compatible
+-Forestimator DEV:
+	- passage version mobile sur la version BL08 -> TT
+-Middelware 	- diminuer la quantité de logs, ç'est trop lourd. relancer chaque semaine/mois pour splitté les logs (actuellement tout les jours sont dans un fichier unique)
+		-forestimator mapsite.xml : n'est plus accessible pour les robots de google : white list
 
 -Forestimator Web: -> formulaire consultation/modification email pour utilisateur : il faut alors une page "mon compte". -> TT, plutôt dans le middleware
 

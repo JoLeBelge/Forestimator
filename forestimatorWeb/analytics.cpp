@@ -16,7 +16,7 @@ Analytics::Analytics(std::string aFileDB) : session()
         session.createTables();
         std::cout << "Created analytics database." << std::endl;
     } catch (std::exception& e) {
-        //std::cout << "Using existing analytics database...";
+        std::cout << "Using existing analytics database and bdfile " << aFileDB << "..";
     }
 
 }
@@ -108,15 +108,6 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     root()->setPadding(0);
     root()->setOverflow(Wt::Overflow::Scroll);
 
-
-    /* nbMonthSelection_  =layout->addWidget(std::make_unique<Wt::WComboBox>());
-    for (int c(0);c<5;c++){
-        nbMonthSelection_->addItem(std::to_string(1+c*3));
-    }
-    nbMonthSelection_->changed().connect(std::bind(&PageAnalytics::changeGraph,this));*/
-
-    //Wt::WContainerWidget * contentChart = layout->addWidget(std::make_unique<Wt::WContainerWidget>(),0);
-    //mChart = layout->addWidget(std::make_unique<Chart::WCartesianChart>());
     mChart = root()->addWidget(std::make_unique<Chart::WCartesianChart>());
 
 

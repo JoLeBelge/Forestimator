@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = forestimatorWeb
+TARGET = forestimatorWeb-dev
 INCLUDEPATH += .
 CONFIG -= qt
 QT -= gui
@@ -10,7 +10,7 @@ CONFIG += c++17
 QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
 
 LIBS = -lcurl -lwthttp -lwt -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3 -lboost_program_options -lboost_filesystem
-#LIBS += -lboost_system -lboost_iostreams
+
 DEPENDPATH += /usr/include/gdal/
 INCLUDEPATH += /usr/include/gdal/
 
@@ -21,14 +21,11 @@ INCLUDEPATH += $$PWD/auth/
 INCLUDEPATH += $$PWD/libzipp/src/
 DEPENDPATH += $$PWD/libzipp/src/
 
-
 INCLUDEPATH += $$PWD./rapidxml/
 DEPENDPATH += $$PWD./rapidxml/
 
 SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \
-    #ACR/terrainviellecouperase.cpp \
-    OGF/formOGF.cpp \
     api/anasurfresource.cpp \
     analytics.cpp \
     api/anaponctuelleresource.cpp \
@@ -67,11 +64,7 @@ SOURCES += main.cpp \
 
 HEADERS += \
     ../carteApt/cdicoaptbase.h \
-    #ACR/terrainviellecouperase.h \
-    #ACR/formviellecouperase.h \
-    OGF/formOGF.h \
     api/anasurfresource.h \
-    #desserteForest/desserteForest.h \
     analytics.h \
     api/anaponctuelleresource.h \
     api/polygfrommobile.h \
@@ -110,4 +103,3 @@ HEADERS += \
     ../stationDescriptor/rapidxml/rapidxml.hpp \
     ../stationDescriptor/rapidxml/rapidxml_iterators.hpp \
     tools/tools.hpp \
-
