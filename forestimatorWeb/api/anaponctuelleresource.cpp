@@ -2,6 +2,7 @@
 
 void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Response &response){
 
+
     auto params = request.urlParams();
     std::string listCode("");
     double x = 0.0,y = 0.0;
@@ -38,7 +39,7 @@ void anaPonctuelleResource::handleRequest(const Http::Request &request,Http::Res
         if (mDico->hasLayerBase(code)){
              std::shared_ptr<layerBase> l =mDico->getLayerBase(code);
              if (l->getCatLayer() != TypeLayer::Externe){
-             int v = l->getValue(x,y);
+             int v = l->getValue(x,y,epsg);
              std::string foundR=l->rasterExist() ? "true" : "false";
              response.out() << "    { \n\"layerCode\":\"" << code <<"\",\n"
                             << "    \"foundLayer\":true,\n"

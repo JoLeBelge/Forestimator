@@ -197,7 +197,11 @@ double rasterFiles::getValueDouble(double x, double y, int epsg){
         source.importFromEPSG(epsg);
         OGRPoint pt(x,y);
         pt.assignSpatialReference(&source);
-        pt.transformTo(mGDALDat->GetSpatialRef()->Clone());
+        OGRErr er =pt.transformTo(mGDALDat->GetSpatialRef()->Clone());
+
+        if (er!=0){
+            std::cout << er << std::endl;
+        }
         x=pt.getX();y=pt.getY();
 
         GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
@@ -763,38 +767,38 @@ double getArea(OGREnvelope *env)
 
 std::string layerBase::getJSdisplayLayer() const{
     std::string JScommand=std::string("console.log('display Layer'); if (typeof extent!='undefined'){activeLayer  = new ol.layer.Tile({")+
-                            "extent: extent,"+
-                            "title: 'MYTITLE',"+
-                            "source: new ol.source.TileWMS({"+
-                            "preload: Infinity,"+
-                            "title: 'MYTITLE',"+
-                            "url: 'MYURL',"+
-                            "crossOrigin: 'anonymous',"+
-                            "attributions: 'MYATTRIBUTION',"+
-                            "params: {"+
-                            "'LAYERS': 'MYLAYER',"+
-                            "'TILED': false,"+
-                            //'TILED': false, // avant était à true mais ça faisait bugger cartoweb_topo
-                            "'FORMAT': 'image/png'"+
-                            "},"+
-                            //"tileGrid: tileGrid,"+
-                            "projection: 'EPSG:3812',"+
-                            " }),"+
-                            //opacity: Object.keys(activeLayers).length==0?1:0.5 // première image ; opaque. Les autres ; tranparence
-                            " opacity: 1"+
-                            "});";
+            "extent: extent,"+
+            "title: 'MYTITLE',"+
+            "source: new ol.source.TileWMS({"+
+            "preload: Infinity,"+
+            "title: 'MYTITLE',"+
+            "url: 'MYURL',"+
+            "crossOrigin: 'anonymous',"+
+            "attributions: 'MYATTRIBUTION',"+
+            "params: {"+
+            "'LAYERS': 'MYLAYER',"+
+            "'TILED': false,"+
+            //'TILED': false, // avant était à true mais ça faisait bugger cartoweb_topo
+            "'FORMAT': 'image/png'"+
+            "},"+
+            //"tileGrid: tileGrid,"+
+            "projection: 'EPSG:3812',"+
+            " }),"+
+            //opacity: Object.keys(activeLayers).length==0?1:0.5 // première image ; opaque. Les autres ; tranparence
+            " opacity: 1"+
+            "});";
 
 
     if (mTypeWMS==TypeWMS::ArcGisRest){
         JScommand=std::string("console.log('display Layer');if (typeof extent!='undefined'){activeLayer  = new ol.layer.Tile({")+
-                    "extent: extent,"+
-                    "title: 'MYTITLE',"+
-                    "  source: new ol.source.TileArcGISRest({"+
-                    "    attributions: 'MYATTRIBUTION',"+
-                    " url:'MYURL'"+
-                    "}),"+
-                    " opacity: 1"+
-                    "});";
+                "extent: extent,"+
+                "title: 'MYTITLE',"+
+                "  source: new ol.source.TileArcGISRest({"+
+                "    attributions: 'MYATTRIBUTION',"+
+                " url:'MYURL'"+
+                "}),"+
+                " opacity: 1"+
+                "});";
 
     }
 
