@@ -59,7 +59,7 @@ int launchForestimator(int argc, char **argv)
 
         // http://localhost:8085/api/anaPt/layers/EP_FEE+EP_CS+MNH2019+CNSW/x/200000.3/y/80000.1
         server.addResource(anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");
-        server.addResource(anaPonctResource, "/api/anaPt2/layers/${listLayerCode}/epsg/${epsg}/x/${x}/y/${y}");
+        server.addResource(anaPonctResource, "/api/anaPt/layers/${listLayerCode}/epsg/${epsg}/x/${x}/y/${y}");
         server.addResource(anaSurfRes, "/api/anaSurf/layers/${listLayerCode}/polygon/${pol}");
         server.addResource(anaSurfRes, "/api/anaSurf/layers/${listLayerCode}/epsg/${epsg}/polygon/${pol}");
 
