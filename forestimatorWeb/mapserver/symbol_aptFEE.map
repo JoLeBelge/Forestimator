@@ -1,0 +1,86 @@
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Optimum"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+   CLASS 
+      NAME "Tolerance"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 103 206 34
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Exclusion"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 29 100 21
+       END
+   END
+   CLASS 
+      NAME "Optimum/Tolerance elargie"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Optimum/Exclusion"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Tolerance elargie"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 239 161 25
+       END
+   END
+   CLASS 
+      NAME "Tolerance/Exclusion"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Tolerance elargie/Exclusion"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 0 0
+       END
+   END
+   CLASS 
+      NAME "Indetermine"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Indetermine (Zone batie)"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
