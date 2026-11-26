@@ -48,7 +48,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
 
   //item = std::make_unique<Wt::WMenuItem>("Forestimator API", std::make_unique<Wt::WText>(WString::tr("docu.api")));
   //subMenu->addItem(std::move(item));
-  //subMenu->addItem(std::move(downloadPage()));
+  subMenu->addItem(std::move(downloadPage()));
 
   subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
   subMenu = subMenuPtr.get();

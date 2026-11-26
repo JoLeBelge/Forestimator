@@ -4,8 +4,6 @@ MAP
 	SIZE           800 800
 	SHAPEPATH      "/media/Data10/Forestimator/BL2008/FEE/"
 	IMAGECOLOR     255 255 255
-
-
 	PROJECTION
 		"init=epsg:3812"
 	END
