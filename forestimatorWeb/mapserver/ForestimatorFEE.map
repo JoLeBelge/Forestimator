@@ -1,13 +1,12 @@
 MAP
 	NAME		"Aptitude_FEE"
-	EXTENT	42250.0001199999969685 21170.0001200000115205 295170.0001199999824166 167700.0001200000115205
+	#EXTENT	42250.0001199999969685 21170.0001200000115205 295170.0001199999824166 167700.0001200000115205
 	SIZE           800 800
 	SHAPEPATH      "/media/Data10/Forestimator/BL2008/FEE/"
 	IMAGECOLOR     255 255 255
 	PROJECTION
 		"init=epsg:3812"
 	END
-	
 	WEB
 		METADATA
 	    	"wms_label"           "Serveur WMS des cartes d'aptitudes du Fichier Ecologique des Essences"
@@ -110,7 +109,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Sapin de Vancouver"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -207,7 +206,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Sapin noble"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -304,7 +303,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Sapin pectine"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -401,7 +400,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de Aulne glutineux"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -498,7 +497,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Bouleau pubescent"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -595,7 +594,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Bouleau verruqueux"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -692,7 +691,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Charme"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -789,7 +788,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Cèdre de Atlas"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -886,7 +885,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Cormier"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -983,7 +982,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Chêne pedoncule"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1080,7 +1079,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Chêne rouge Amerique"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1177,7 +1176,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Chêne sessile"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1274,7 +1273,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Châtaignier"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1371,7 +1370,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Cyprès de Lawson"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1468,7 +1467,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Douglas"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1565,7 +1564,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de erable champêtre"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1662,7 +1661,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de epicea de Sitka"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1759,7 +1758,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de erable plane"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1856,7 +1855,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de epicea commun"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -1953,7 +1952,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du erable sycomore"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2050,7 +2049,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Frêne"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2147,7 +2146,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Hêtre"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2244,7 +2243,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de If commun"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2341,7 +2340,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Noyer hybride"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2438,7 +2437,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Noyer noir"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2535,7 +2534,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Noyer commun"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2632,7 +2631,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Melèze Europe"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2729,7 +2728,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Melèze hybride"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2826,7 +2825,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Melèze du Japon"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -2923,7 +2922,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Merisier"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3020,7 +3019,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Sapin de Nordmann"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3117,7 +3116,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de Orme champêtre"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3214,7 +3213,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de Orme lisse"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3311,7 +3310,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de Orme de montagne"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3408,7 +3407,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Pin noir Autriche"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3505,7 +3504,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Pin laricio de Corse"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3602,7 +3601,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Peuplier grisard"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3699,7 +3698,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Pin de Koekelare"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3796,7 +3795,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Pommier sauvage"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3893,7 +3892,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Peuplier noir"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -3990,7 +3989,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Poirier sauvage"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4087,7 +4086,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Pin sylvestre"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4184,7 +4183,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Peuplier tremble"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4281,7 +4280,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Peuplier noir hybride"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4378,7 +4377,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Peuplier baumier"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4475,7 +4474,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Robinier"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4572,7 +4571,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude desCaryers"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4669,7 +4668,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Saule blanc"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4766,7 +4765,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Sorbier des oiseleurs"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4863,7 +4862,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude de Alisier torminal"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -4960,7 +4959,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Tilleul à petites feuilles"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -5057,7 +5056,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Thuya geant"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -5154,7 +5153,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Tilleul à grandes feuilles"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -5251,7 +5250,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Tulipier de Virginie"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
@@ -5348,7 +5347,7 @@ LAYER
    END
  METADATA
       "wms_title"           "Aptitude du Tsuga heterophylle"
-      "wms_srs"             "EPSG:31370"
+
    END
    TEMPLATE "../template.html"
 END
